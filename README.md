@@ -98,16 +98,14 @@ document.body.append(
 ```
 
 ## Events and dynamic parts
+*investigation*:
 ```js
-const output_dynamic= (function(){
-	const element= el("span", { style: { fontWeight: "bold" }, textContent: "" });
-	return {
-		element,
-		onchange: listen("change", event=> assign(element, { textContent: event.target.value }))
-	};
-})();
+const output_dynamic= eventsSink(store=> ({
+	element,
+	onchange: listen("change", event=> assign(store.element, { textContent: event.target.value }))
+}));
 document.body.append(
-	output_dynamic.element,
+	el("span", { style: { fontWeight: "bold" }, textContent: "" }, output_dynamic.target),
 	el("input", { type: "text" }, output_dynamic.onchange)
 );
 ```

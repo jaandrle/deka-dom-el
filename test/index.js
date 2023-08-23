@@ -22,35 +22,35 @@ function component({ value= "World" }= {}){
 		}
 	`;
 	
-	const output= (function(){
-		const element= el("strong", { textContent: value });
-		return {
-			element,
-			onchange: listen("change", function(event){
-				assign(element, { textContent: event.target.value });
-			})
-		}
-	})();
-	const input= (function(){
-		const element= el("input", { type: "text", value }, output.onchange);
-		return {
-			element,
-			onchange: listen("change", function(event){
-				assign(element, { value: event.detail });
-				dispatch("change")(element);
-			})
-		};
-	})();
+	const output= eventsSink(store=> ({
+		onchange: listen("change", function(event){
+			assign(store.element, { textContent: event.target.value });
+		})
+	}));
+	const input= eventsSink(store=> ({
+		onchange: listen("change", function(event){
+			assign(store.element, { value: event.detail });
+			dispatch("change")(input.element);
+		})
+	}));
 	return el("div", { className: name }, input.onchange).append(
 		el("p").append(
 			el("#text", { textContent: "Hello " }),
-			output.element,
+			el("strong", { textContent: value }, output.target),
 		),
 		el("label").append(
 			el("#text", { textContent: "Set name:" }),
-			input.element
+			el("input", { type: "text", value }, output.onchange, input.target)
 		)
 	)
+}
+function eventsSink(fn){
+	const store= {
+		element: null,
+		target: function(element){ store.element= element; },
+	};
+	Object.assign(store, fn(store));
+	return store;
 }
 function createStyle(){
 	const style= el("style");
