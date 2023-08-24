@@ -1,23 +1,16 @@
 const mark= Symbol.for("signal");
 export function isSignal(candidate){
-	try{
-		return Reflect.has(candidate, mark);
-	} catch(e){
-		return false;
-	}
+	try{ return Reflect.has(candidate, mark); }
+	catch(e){ return false; }
 }
-export function S(signal, ...value){
-	if(typeof signal==="function"){
-		const out= create();
-		watch(()=> S(out, signal()));
-		return out;
-	}
-	if(!isSignal(signal))
+export function S(signal){
+	if(typeof signal!=="function")
 		return create(signal);
+	if(isSignal(signal)) return signal;
 	
-	if(value.length===0)
-		return read(signal);
-	return write(signal, value[0]);
+	const out= create();
+	watch(()=> out(signal()));
+	return out;
 }
 const stack= [];
 export function watch(context){
@@ -30,16 +23,22 @@ function currentContext(){
 	return stack[stack.length - 1];
 }
 function create(value){
+	if(isSignal(value)) return value;
+	
 	if(typeof value==="object" && value!==null)
+		//TODO Array?
 		return Object.fromEntries(
 			Object.entries(value)
 			.map(([ key, value ])=> [ key, create(value) ])
 		);
-	return {
+	const signal= (...value)=>
+		value.length ? write(signal, value[0]) : read(signal);
+	Object.assign(signal, {
 		[mark]: true,
 		value,
 		listeners: new Set()
-	};
+	});
+	return signal;
 }
 function read({ value, listeners }){
 	const context= currentContext();

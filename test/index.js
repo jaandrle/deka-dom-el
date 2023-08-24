@@ -22,24 +22,24 @@ function component({ name= "World", surname= "" }= {}){
 		}
 	`;
 	const store= S({ name, surname });
-	const full_name= S(()=> S(store.name)+" "+S(store.surname));
+	const full_name= S(()=> store.name()+" "+store.surname());
 	listen(full_name, console.log);
 	
 	return el("div", { className }).append(
 		el("p").append(
 			el("#text", { textContent: "Hello " }),
-			el("strong", { textContent: ()=> S(full_name) }),
+			el("strong", { textContent: full_name }),
 			el("#text", { textContent: "!" }),
 		),
 		el("label").append(
 			el("#text", { textContent: "Set name:" }),
-			el("input", { type: "text", value: ()=> S(store.name) },
-				listen("change", ev=> S(store.name, ev.target.value))),
+			el("input", { type: "text", value: store.name },
+				listen("change", ev=> store.name(ev.target.value))),
 		),
 		el("label").append(
 			el("#text", { textContent: "Set surname:" }),
-			el("input", { type: "text", value: ()=> S(store.surname) },
-				listen("change", ev=> S(store.surname, ev.target.value))),
+			el("input", { type: "text", value: store.surname },
+				listen("change", ev=> store.surname(ev.target.value))),
 		)
 	)
 }

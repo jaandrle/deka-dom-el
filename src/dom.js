@@ -20,12 +20,7 @@ export function createElementNS(tag, attributes, attributes_todo){
 }
 export { createElementNS as elNS };
 
-import { watch } from './signals.js';
-function isReactive(key, attr){
-	if(typeof attr !== "function") return false;
-	if(key.startsWith("on")) return false;
-	return true;
-}
+import { watch, isSignal } from './signals.js';
 export function assign(element, ...attributes){
 	if(!attributes.length) return element;
 	const is_svg= element instanceof SVGElement;
@@ -34,7 +29,7 @@ export function assign(element, ...attributes){
 	Object.entries(Object.assign({}, ...attributes)).forEach(function assignNth([ key, attr ]){
 		if(key[0]==="=") return setRemoveAttr(key.slice(1), attr);
 		if(key[0]===".") return setDelete(element, key.slice(1), attr);
-		if(isReactive(key, attr))
+		if(isSignal(attr)) //TODO: unmounted
 			return watch(()=> assignNth([ key, attr() ]));
 		if(typeof attr === "object"){
 			switch(key){

@@ -102,8 +102,8 @@ document.body.append(
 ```js
 const value= S("");
 document.body.append(
-	el("span", { style: { fontWeight: "bold" }, textContent: ()=> S(value) }),
+	el("span", { style: { fontWeight: "bold" }, textContent: value }),
 	el("input", { type: "text" },
-		listen("change", event=> S(value, event.target, value)))
+		listen("change", event=> value(event.target.value)))
 );
 ```
