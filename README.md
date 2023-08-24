@@ -97,15 +97,13 @@ document.body.append(
 );
 ```
 
-## Events and dynamic parts
+## Events and signals for reactivity
 *investigation*:
 ```js
-const output_dynamic= eventsSink(store=> ({
-	element,
-	onchange: listen("change", event=> assign(store.element, { textContent: event.target.value }))
-}));
+const value= S("");
 document.body.append(
-	el("span", { style: { fontWeight: "bold" }, textContent: "" }, output_dynamic.target),
-	el("input", { type: "text" }, output_dynamic.onchange)
+	el("span", { style: { fontWeight: "bold" }, textContent: ()=> S(value) }),
+	el("input", { type: "text" },
+		listen("change", event=> S(value, event.target, value)))
 );
 ```

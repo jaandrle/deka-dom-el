@@ -4,3 +4,4 @@
 });
 export * from "./src/dom.js";
 export * from "./src/events.js";
+export * from "./src/signals.js";
