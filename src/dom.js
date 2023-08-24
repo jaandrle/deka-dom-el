@@ -1,24 +1,23 @@
+let namespace_curr= "html";
+export function namespace(namespace){
+	namespace_curr= namespace==="svg" ? "http://www.w3.org/2000/svg" : namespace;
+	return {
+		append(el){ namespace_curr= "html"; return el; }
+	};
+}
 export function createElement(tag, attributes, ...connect){
 	let el;
 	switch(true){
-		case typeof tag==="function":	el= tag(attributes || undefined); break;
-		case tag==="<>":				el= document.createDocumentFragment(); break;
-		case tag==="#text":				el= assign(document.createTextNode(""), attributes); break;
-		default:						el= assign(document.createElement(tag), attributes);
+		case typeof tag==="function": el= tag(attributes || undefined); break;
+		case tag==="<>":              el= document.createDocumentFragment(); break;
+		case tag==="#text":           el= assign(document.createTextNode(""), attributes); break;
+		case namespace_curr!=="html": el= assign(document.createElementNS(namespace_curr, tag), attributes); break;
+		default:                      el= assign(document.createElement(tag), attributes);
 	}
 	connect.forEach(c=> c(el));
 	return el;
 }
 export { createElement as el };
-export function createElementNS(tag, attributes, attributes_todo){
-	let namespace= "svg";
-	if(typeof attributes_todo !== "undefined"){
-		namespace= tag; tag= attributes; attributes= attributes_todo; }
-	if(tag==="<>") return document.createDocumentFragment();
-	if(tag==="") return document.createTextNode(attributes.textContent ?? attributes.innerText ?? attributes.innerHTML);
-	return assign(document.createElementNS(namespace==="svg" ? "http://www.w3.org/2000/svg" : namespace, tag), attributes);
-}
-export { createElementNS as elNS };
 
 import { watch, isSignal } from './signals.js';
 export function assign(element, ...attributes){
@@ -27,10 +26,10 @@ export function assign(element, ...attributes){
 	const setRemoveAttr= (is_svg ? setRemoveNS : setRemove).bind(null, element, "Attribute");
 	
 	Object.entries(Object.assign({}, ...attributes)).forEach(function assignNth([ key, attr ]){
-		if(key[0]==="=") return setRemoveAttr(key.slice(1), attr);
-		if(key[0]===".") return setDelete(element, key.slice(1), attr);
 		if(isSignal(attr)) //TODO: unmounted
 			return watch(()=> assignNth([ key, attr() ]));
+		if(key[0]==="=") return setRemoveAttr(key.slice(1), attr);
+		if(key[0]===".") return setDelete(element, key.slice(1), attr);
 		if(typeof attr === "object"){
 			switch(key){
 				case "style":		return forEachEntries(attr, setRemove.bind(null, element.style, "Property"))

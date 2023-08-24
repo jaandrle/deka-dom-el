@@ -1,5 +1,5 @@
-import { S, watch, el, elNS, assign, listen, dispatch } from "../index.js";
-Object.assign(globalThis, { S, watch, el, elNS, assign, listen, dispatch });
+import { S, watch, el, namespace, assign, listen, dispatch } from "../index.js";
+Object.assign(globalThis, { S, watch, el, namespace, assign, listen, dispatch });
 
 const { style, css }= createStyle();
 globalThis.test= console.log;
