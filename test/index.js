@@ -25,7 +25,7 @@ function component({ name= "World", surname= "" }= {}){
 	const full_name= S(()=> store.name()+" "+store.surname());
 	on(full_name, console.log);
 	
-	return el("div", { className }).append(
+	return el("div", { className }, on.connected(console.log)).append(
 		el("p").append(
 			el("#text", { textContent: "Hello " }),
 			el("strong", { textContent: full_name }),
