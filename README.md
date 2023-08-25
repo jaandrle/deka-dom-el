@@ -104,6 +104,6 @@ const value= S("");
 document.body.append(
 	el("span", { style: { fontWeight: "bold" }, textContent: value }),
 	el("input", { type: "text" },
-		listen("change", event=> value(event.target.value)))
+		on("change", event=> value(event.target.value)))
 );
 ```

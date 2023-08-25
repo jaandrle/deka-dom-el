@@ -1,9 +1,9 @@
-import { S, watch, el, namespace, assign, listen, dispatch } from "../index.js";
-Object.assign(globalThis, { S, watch, el, namespace, assign, listen, dispatch });
+import { S, watch, el, namespace, assign, on, dispatch } from "../index.js";
+Object.assign(globalThis, { S, watch, el, namespace, assign, on, dispatch });
 
 const { style, css }= createStyle();
 globalThis.test= console.log;
-const app= el(component, null, listen("change", globalThis.test));
+const app= el(component, null, on("change", globalThis.test));
 dispatch("change", "Peter")(app);
 console.log(app, app instanceof HTMLDivElement);
 
@@ -23,7 +23,7 @@ function component({ name= "World", surname= "" }= {}){
 	`;
 	const store= S({ name, surname });
 	const full_name= S(()=> store.name()+" "+store.surname());
-	listen(full_name, console.log);
+	on(full_name, console.log);
 	
 	return el("div", { className }).append(
 		el("p").append(
@@ -34,12 +34,12 @@ function component({ name= "World", surname= "" }= {}){
 		el("label").append(
 			el("#text", { textContent: "Set name:" }),
 			el("input", { type: "text", value: store.name },
-				listen("change", ev=> store.name(ev.target.value))),
+				on("change", ev=> store.name(ev.target.value))),
 		),
 		el("label").append(
 			el("#text", { textContent: "Set surname:" }),
 			el("input", { type: "text", value: store.surname },
-				listen("change", ev=> store.surname(ev.target.value))),
+				on("change", ev=> store.surname(ev.target.value))),
 		)
 	)
 }
