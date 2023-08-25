@@ -1,6 +1,6 @@
-import { isSignal } from './signals.js';
+import { isSignal, addSignalListener } from './signals.js';
 export function on(event, listener, options){
-	if(isSignal(event)) return event.listeners.add(listener);
+	if(isSignal(event)) return addSignalListener(event, listener);
 	return element=> element.addEventListener(event, listener, options);
 }
 export function dispatch(event, detail){

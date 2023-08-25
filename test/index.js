@@ -1,5 +1,5 @@
-import { S, watch, el, namespace, assign, on, dispatch } from "../index.js";
-Object.assign(globalThis, { S, watch, el, namespace, assign, on, dispatch });
+import { S, reactive, watch, el, namespace, assign, on, dispatch } from "../index.js";
+Object.assign(globalThis, { S, reactive, watch, el, namespace, assign, on, dispatch });
 
 const { style, css }= createStyle();
 globalThis.test= console.log;
@@ -21,7 +21,7 @@ function component({ name= "World", surname= "" }= {}){
 			margin-inline-start: .5em;
 		}
 	`;
-	const store= S({ name, surname });
+	const store= reactive({ name, surname });
 	const full_name= S(()=> store.name()+" "+store.surname());
 	on(full_name, console.log);
 	
