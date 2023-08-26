@@ -41,11 +41,11 @@ function connectionsChangesObserverConstructor(){
 	const observer= new MutationObserver(function(mutations){
 		for(const mutation of mutations){
 			if(mutation.type!=="childList") continue;
-			if(observerAdded(mutation.addedNodes)){
+			if(observerAdded(mutation.addedNodes, true)){
 				stop();
 				continue;
 			}
-			if(observerRemoved(mutation.removedNodes))
+			if(observerRemoved(mutation.removedNodes, true))
 				stop();
 		}
 	});
@@ -113,9 +113,9 @@ function connectionsChangesObserverConstructor(){
 		}
 		return out;
 	}
-	function observerAdded(addedNodes){
+	function observerAdded(addedNodes, is_root){
 		for(const element of addedNodes){
-			collectChildren(element).then(observerAdded);
+			if(is_root) collectChildren(element).then(observerAdded);
 			if(!store.has(element)) return false;
 			
 			const ls= store.get(element);
@@ -125,9 +125,9 @@ function connectionsChangesObserverConstructor(){
 			return true;
 		}
 	}
-	function observerRemoved(removedNodes){
+	function observerRemoved(removedNodes, is_root){
 		for(const element of removedNodes){
-			collectChildren(element).then(observerRemoved);
+			if(is_root) collectChildren(element).then(observerRemoved);
 			if(!store.has(element)) return false;
 			
 			const ls= store.get(element);
