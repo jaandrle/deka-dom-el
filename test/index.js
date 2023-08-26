@@ -1,18 +1,17 @@
-import { S, reactive, watch, el, namespace, assign, on, dispatch } from "../index.js";
-Object.assign(globalThis, { S, reactive, watch, el, namespace, assign, on, dispatch });
+import { S, empty, watch, el, namespace, assign, on, dispatch } from "../index.js";
+Object.assign(globalThis, { S, watch, el, namespace, assign, on, dispatch });
 
-const { style, css }= createStyle();
-globalThis.test= console.log;
-const app= el(component, null, on("change", globalThis.test));
+const style= createStyle();
+const app= el(todosComponent);
 dispatch("change", "Peter")(app);
 console.log(app, app instanceof HTMLDivElement);
 
-document.head.append(style);
+document.head.append(style.element);
 document.body.append(app);
 
-function component({ name= "World", surname= "" }= {}){
-	const className= "naiveForm";
-	css`
+function todosComponent({ todos= [] }= {}){
+	const className= "basicTodoForm";
+	style.css`
 		.${className}{
 			display: flex;
 			flex-flow: column nowrap;
@@ -21,34 +20,80 @@ function component({ name= "World", surname= "" }= {}){
 			margin-inline-start: .5em;
 		}
 	`;
-	const store= reactive({ name, surname });
-	const full_name= S(()=> store.name()+" "+store.surname());
-	on(full_name, console.log);
+	todos= S.reactive(todos);
+	globalThis.__todos__= todos; //TODO
+	const name= "todoName";
+	const onsubmit= on("submit", event=> {
+		const value= event.target.elements[name].value;
+		if(!value) return;
+		
+		event.preventDefault();
+		todos.push(value)
+		event.target.elements[name].value= "";
+	});
+	const onremove= on("click", event=> {
+		const value= Number(event.target.value);
+		if(Number.isNaN(value)) return;
+		event.preventDefault();
+		todos.splice(value, 1);
+	});
 	
-	return el("div", { className }, on.connected(console.log)).append(
-		el("p").append(
-			el("#text", { textContent: "Hello " }),
-			el("strong", { textContent: full_name }),
-			el("#text", { textContent: "!" }),
+	return el("div", { className }).append(
+		el("div").append(
+			el("h1", "Todos:"),
+			elR(todos,
+				ts=> !ts.length
+				? el("p", "No todos yet")
+				: ts.map((t, i)=> el(todoComponent, { textContent: t, value: i, className }, onremove)))
 		),
-		el("label").append(
-			el("#text", { textContent: "Set name:" }),
-			el("input", { type: "text", value: store.name },
-				on("change", ev=> store.name(ev.target.value))),
-		),
-		el("label").append(
-			el("#text", { textContent: "Set surname:" }),
-			el("input", { type: "text", value: store.surname },
-				on("change", ev=> store.surname(ev.target.value))),
+		el("form", null, onsubmit).append(
+			el("h2", "Add:"),
+			el("label", "New todo: ").append(
+				el("input", { name, type: "text", required: true }),
+			),
+			el("button", "+")
 		)
 	)
 }
+function todoComponent({ textContent, className, value }){
+	style.key(todoComponent).css`
+		.${className} button{
+			margin-inline-start: 1em;
+		}
+	`;
+	return el("p").append(
+		el("#text", textContent),
+		el("button", { type: "button", value, textContent: "-" })
+	);
+}
+function elR(signal, map){
+	const mark= document.createComment("reactive");
+	const out= el("<>").append(mark);
+	let cache;
+	const toEls= v=> {
+		let els= map(v);
+		if(!Array.isArray(els))
+			els= [ els ];
+		if(cache) cache.forEach(el=> el.remove());
+		cache= els;
+		mark.before(...els);
+	};
+	on(signal, toEls);
+	toEls(signal());
+	return out;
+}
 function createStyle(){
-	const style= el("style");
+	const element= el("style");
+	const store= new WeakSet();
 	return {
-		style,
+		element,
+		key(k){
+			if(store.has(k)) return { css: ()=> {} };
+			store.add(k);
+			return this;
+		},
 		css(...args){
-			style.appendChild(el("#text", { textContent: String.raw(...args) }));
+			element.appendChild(el("#text", { textContent: String.raw(...args) }));
 		}
 	};
 }

@@ -1,3 +1,4 @@
+import { addSignalListener, isSignal } from './signals.js';
 let namespace_curr= "html";
 export function namespace(namespace){
 	namespace_curr= namespace==="svg" ? "http://www.w3.org/2000/svg" : namespace;
@@ -6,6 +7,8 @@ export function namespace(namespace){
 	};
 }
 export function createElement(tag, attributes, ...connect){
+	if(typeof attributes==="string" || ( isSignal(attributes) /* TODO && isText*/ ))
+		attributes= { textContent: attributes };
 	let el;
 	switch(true){
 		case typeof tag==="function": el= tag(attributes || undefined); break;
@@ -19,15 +22,16 @@ export function createElement(tag, attributes, ...connect){
 }
 export { createElement as el };
 
-import { watch, isSignal } from './signals.js';
 export function assign(element, ...attributes){
 	if(!attributes.length) return element;
 	const is_svg= element instanceof SVGElement;
 	const setRemoveAttr= (is_svg ? setRemoveNS : setRemove).bind(null, element, "Attribute");
 	
 	Object.entries(Object.assign({}, ...attributes)).forEach(function assignNth([ key, attr ]){
-		if(isSignal(attr)) //TODO: unmounted
-			return watch(()=> assignNth([ key, attr() ]));
+		if(isSignal(attr)){ //TODO: unmounted
+			addSignalListener(attr, attr=> assignNth([ key, attr ]));
+			attr= attr();
+		}
 		if(key[0]==="=") return setRemoveAttr(key.slice(1), attr);
 		if(key[0]===".") return setDelete(element, key.slice(1), attr);
 		if(typeof attr === "object"){

@@ -15,7 +15,8 @@ export function S(value){
 	watch(()=> out(value()));
 	return out;
 }
-export function reactive(data){
+S.reactive= reactive;
+function reactive(data){
 	if(isSignal(data))
 		return data;
 	if(typeof data!=="object" || data===null)
@@ -37,10 +38,14 @@ export function reactive(data){
 	const signal= (...value)=>
 		value.length ? write(signal, reactive(value[0])) : read(signal[mark]);
 	return createWrapObject(type, toSignal(signal, data));
-}
+};
 const stack= [];
 export function watch(context){
-	stack.push(context);
+	stack.push(function contextReWatch(){
+		stack.push(contextReWatch);
+		context();
+		stack.pop();
+	});
 	context();
 	stack.pop();
 };
@@ -103,4 +108,5 @@ function read({ value, listeners }){
 function write(signal, value){
 	signal[mark].value= value;
 	signal[mark].listeners.forEach(fn=> fn(value))
+	return value;
 }
