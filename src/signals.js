@@ -1,11 +1,6 @@
-const mark= Symbol.for("signal");
-export function isSignal(candidate){
-	try{ return Reflect.has(candidate, mark); }
-	catch(e){ return false; }
-}
-export function addSignalListener(signal, listener){
-	return signal[mark].listeners.add(listener);
-}
+import { mark, isSignal, toSignal, addSignalListener } from "./signals-common.js";
+export { isSignal, addSignalListener };
+
 export function S(value){
 	if(typeof value!=="function")
 		return create(value);
@@ -58,13 +53,6 @@ function create(value){
 	const signal=  (...value)=>
 		value.length ? write(signal, value[0]) : read(signal[mark]);
 	return toSignal(signal, value);
-}
-function toSignal(signal, value){
-	signal[mark]= {
-		value,
-		listeners: new Set()
-	};
-	return signal;
 }
 function createWrapObject(type, signal){
 	return new Proxy(signal, {

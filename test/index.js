@@ -1,11 +1,9 @@
-import { S, empty, watch, el, namespace, assign, on, dispatch } from "../index.js";
-Object.assign(globalThis, { S, watch, el, namespace, assign, on, dispatch });
+import { S, el, on, off } from "../index.js";
+//import { empty, namespace, on, dispatch } from "../index.js";
+Object.assign(globalThis, { S, el, on, off });
 
 const style= createStyle();
 const app= el(todosComponent);
-dispatch("change", "Peter")(app);
-console.log(app, app instanceof HTMLDivElement);
-
 document.head.append(style.element);
 document.body.append(app);
 

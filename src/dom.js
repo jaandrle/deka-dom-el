@@ -1,4 +1,3 @@
-import { addSignalListener, isSignal } from './signals.js';
 let namespace_curr= "html";
 export function namespace(namespace){
 	namespace_curr= namespace==="svg" ? "http://www.w3.org/2000/svg" : namespace;
@@ -6,8 +5,10 @@ export function namespace(namespace){
 		append(el){ namespace_curr= "html"; return el; }
 	};
 }
+import { typeOf } from './helpers.js';
+import { isSignal, valueOfSignal } from './signals-common.js';
 export function createElement(tag, attributes, ...connect){
-	if(typeof attributes==="string" || ( isSignal(attributes) /* TODO && isText*/ ))
+	if(typeOf(attributes)!=="[object Object]" || ( isSignal(attributes) && typeOf(valueOfSignal(attributes))!=="[object Object]" ))
 		attributes= { textContent: attributes };
 	let el;
 	switch(true){
@@ -22,6 +23,7 @@ export function createElement(tag, attributes, ...connect){
 }
 export { createElement as el };
 
+import { addSignalListener } from './signals-common.js';
 export function assign(element, ...attributes){
 	if(!attributes.length) return element;
 	const is_svg= element instanceof SVGElement;

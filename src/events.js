@@ -1,7 +1,18 @@
-import { isSignal, addSignalListener } from './signals.js';
+import { isSignal, addSignalListener, removeSignalListener } from './signals-common.js';
 export function on(event, listener, options){
-	if(isSignal(event)) return addSignalListener(event, listener);
-	return element=> element.addEventListener(event, listener, options);
+	if(!isSignal(event))
+		return element=> element.addEventListener(event, listener, options);
+	//TODO cleanup when signal removed (also TODO)
+	if(options && options.signal)
+		options.signal.addEventListener("abort", ()=> removeSignalListener(event, listener));
+	return addSignalListener(event, listener);
+}
+export function off(){//TODO is needed?
+	const abort= new AbortController();
+	return new Proxy(()=> abort.abort(), {
+		get(_, p){ return Reflect.get(abort, p); },
+		ownKeys(){ return [ "signal" ]; }
+	})
 }
 export function dispatch(event, detail){
 	if(typeof event === "string")
@@ -10,6 +21,7 @@ export function dispatch(event, detail){
 }
 
 const connections_changes= connectionsChangesObserverConstructor();
+//TODO remove listener(s) options
 on.connected= function(listener){
 	return function registerElement(element){
 		connections_changes.onConnected(element, listener);
