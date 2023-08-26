@@ -1,4 +1,5 @@
-import { S, el, on, off } from "../index.js";
+import { el, on, off } from "../index.js";
+import { S } from "../src/signals.js";
 //import { empty, namespace, on, dispatch } from "../index.js";
 Object.assign(globalThis, { S, el, on, off });
 
@@ -39,8 +40,7 @@ function todosComponent({ todos= [] }= {}){
 	return el("div", { className }).append(
 		el("div").append(
 			el("h1", "Todos:"),
-			elR(todos,
-				ts=> !ts.length
+			el("<>", todos, ts=> !ts.length
 				? el("p", "No todos yet")
 				: ts.map((t, i)=> el(todoComponent, { textContent: t, value: i, className }, onremove)))
 		),
@@ -63,22 +63,6 @@ function todoComponent({ textContent, className, value }){
 		el("#text", textContent),
 		el("button", { type: "button", value, textContent: "-" })
 	);
-}
-function elR(signal, map){
-	const mark= document.createComment("reactive");
-	const out= el("<>").append(mark);
-	let cache;
-	const toEls= v=> {
-		let els= map(v);
-		if(!Array.isArray(els))
-			els= [ els ];
-		if(cache) cache.forEach(el=> el.remove());
-		cache= els;
-		mark.before(...els);
-	};
-	on(signal, toEls);
-	toEls(signal());
-	return out;
 }
 function createStyle(){
 	const element= el("style");

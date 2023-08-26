@@ -1,3 +1,5 @@
+import { signals } from "./signals-common.js";
+
 let namespace_curr= "html";
 export function namespace(namespace){
 	namespace_curr= namespace==="svg" ? "http://www.w3.org/2000/svg" : namespace;
@@ -5,15 +7,17 @@ export function namespace(namespace){
 		append(el){ namespace_curr= "html"; return el; }
 	};
 }
-import { typeOf } from './helpers.js';
-import { isSignal, valueOfSignal } from './signals-common.js';
 export function createElement(tag, attributes, ...connect){
-	if(typeOf(attributes)!=="[object Object]" || ( isSignal(attributes) && typeOf(valueOfSignal(attributes))!=="[object Object]" ))
-		attributes= { textContent: attributes };
 	let el;
+	if("<>"===tag){
+		if(signals.isReactiveAtrribute(attributes))
+			return signals.reactiveElement(attributes, ...connect);
+		el= document.createDocumentFragment();
+	}
+	if(signals.isTextContent(attributes))
+		attributes= { textContent: attributes };
 	switch(true){
 		case typeof tag==="function": el= tag(attributes || undefined); break;
-		case tag==="<>":              el= document.createDocumentFragment(); break;
 		case tag==="#text":           el= assign(document.createTextNode(""), attributes); break;
 		case namespace_curr!=="html": el= assign(document.createElementNS(namespace_curr, tag), attributes); break;
 		default:                      el= assign(document.createElement(tag), attributes);
@@ -23,17 +27,14 @@ export function createElement(tag, attributes, ...connect){
 }
 export { createElement as el };
 
-import { addSignalListener } from './signals-common.js';
 export function assign(element, ...attributes){
 	if(!attributes.length) return element;
 	const is_svg= element instanceof SVGElement;
 	const setRemoveAttr= (is_svg ? setRemoveNS : setRemove).bind(null, element, "Attribute");
 	
 	Object.entries(Object.assign({}, ...attributes)).forEach(function assignNth([ key, attr ]){
-		if(isSignal(attr)){ //TODO: unmounted
-			addSignalListener(attr, attr=> assignNth([ key, attr ]));
-			attr= attr();
-		}
+		if(signals.isReactiveAtrribute(attr, key))
+			attr= signals.process(key, attr, assignNth);
 		if(key[0]==="=") return setRemoveAttr(key.slice(1), attr);
 		if(key[0]===".") return setDelete(element, key.slice(1), attr);
 		if(typeof attr === "object"){

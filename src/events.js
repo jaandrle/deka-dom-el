@@ -1,11 +1,13 @@
-import { isSignal, addSignalListener, removeSignalListener } from './signals-common.js';
+import { signals } from './signals-common.js';
+export { registerReactivity } from './signals-common.js';
+
 export function on(event, listener, options){
-	if(!isSignal(event))
+	if(!signals.isReactiveAtrribute(event))
 		return element=> element.addEventListener(event, listener, options);
 	//TODO cleanup when signal removed (also TODO)
 	if(options && options.signal)
-		options.signal.addEventListener("abort", ()=> removeSignalListener(event, listener));
-	return addSignalListener(event, listener);
+		options.signal.addEventListener("abort", ()=> signals.off(event, listener));
+	return signals.on(event, listener);
 }
 export function off(){//TODO is needed?
 	const abort= new AbortController();

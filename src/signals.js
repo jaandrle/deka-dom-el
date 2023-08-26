@@ -1,5 +1,41 @@
-import { mark, isSignal, toSignal, addSignalListener } from "./signals-common.js";
-export { isSignal, addSignalListener };
+export const mark= Symbol.for("signal");
+
+export function isSignal(candidate){
+	try{ return Reflect.has(candidate, mark); }
+	catch(e){ return false; }
+}
+import { typeOf } from './helpers.js';
+import { registerReactivity } from "./signals-common.js";
+registerReactivity({
+	isReactiveAtrribute(attr, key){ return isSignal(attr); },
+	isTextContent(attributes){
+		//TODO FIX el(…, S.reactive(…))
+		return typeOf(attributes)!=="[object Object]" || ( isSignal(attributes) && typeOf(valueOfSignal(attributes))!=="[object Object]" );
+	},
+	process(key, attr, assignNth){ //TODO: unmounted
+		addSignalListener(attr, attr=> assignNth([ key, attr ]));
+		return attr();
+	},
+	on: addSignalListener,
+	off: removeSignalListener,
+	reactiveElement(signal, map){
+		const mark= document.createComment("reactive");
+		const out= document.createDocumentFragment();
+		out.append(mark);
+		let cache;
+		const toEls= v=> {
+			let els= map(v);
+			if(!Array.isArray(els))
+				els= [ els ];
+			if(cache) cache.forEach(el=> el.remove());
+			cache= els;
+			mark.before(...els);
+		};
+		addSignalListener(signal, toEls);
+		toEls(signal());
+		return out;
+	}
+});
 
 export function S(value){
 	if(typeof value!=="function")
@@ -34,6 +70,14 @@ function reactive(data){
 		value.length ? write(signal, reactive(value[0])) : read(signal[mark]);
 	return createWrapObject(type, toSignal(signal, data));
 };
+function toSignal(signal, value){
+	signal[mark]= {
+		value,
+		listeners: new Set()
+	};
+	return signal;
+}
+
 const stack= [];
 export function watch(context){
 	stack.push(function contextReWatch(){
@@ -97,4 +141,13 @@ function write(signal, value){
 	signal[mark].value= value;
 	signal[mark].listeners.forEach(fn=> fn(value))
 	return value;
+}
+function valueOfSignal(signal){
+	return signal[mark].value;
+}
+export function addSignalListener(signal, listener){
+	return signal[mark].listeners.add(listener);
+}
+export function removeSignalListener(signal, listener){
+	return signal[mark].listeners.delete(listener);
 }
