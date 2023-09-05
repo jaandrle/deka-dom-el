@@ -22,7 +22,7 @@ export function createElement(tag, attributes, ...connect){
 		case typeof tag==="function": el= tag(attributes || undefined); break;
 		case tag==="#text":           el= assign(document.createTextNode(""), attributes); break;
 		case namespace_curr!=="html": el= assign(document.createElementNS(namespace_curr, tag), attributes); break;
-		default:                      el= assign(document.createElement(tag), attributes);
+		case !el:                     el= assign(document.createElement(tag), attributes);
 	}
 	connect.forEach(c=> c(el));
 	return el;

@@ -1,6 +1,6 @@
 {
 	"name": "deka-dom-el",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"description": "A low-code library that simplifies the creation of native DOM elements/components using small wrappers and tweaks.",
 	"author": "Jan Andrle <andrle.jan@centrum.cz>",
 	"license": "MIT",
@@ -19,6 +19,9 @@
 		".": {
 			"import": "./index.js"
 		},
+		"./jsdom": {
+			"import": "./src/jsdom.js"
+		},
 		"./signals": {
 			"import": "./src/signals.js"
 		},
@@ -30,6 +33,9 @@
 		"*": {
 			".": [
 				"./index.d.ts"
+			],
+			"./jsdom": [
+				"./src/jsdom.d.ts"
 			],
 			"./signals": [
 				"./src/signals.d.ts"
