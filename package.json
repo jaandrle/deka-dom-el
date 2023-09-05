@@ -17,16 +17,20 @@
 	"type": "module",
 	"exports": {
 		".": {
-			"import": "./index.js"
+			"import": "./index.js",
+			"types": "./index.d.ts"
 		},
 		"./jsdom": {
-			"import": "./src/jsdom.js"
+			"import": "./src/jsdom.js",
+			"types": "./src/jsdom.d.ts"
 		},
 		"./signals": {
-			"import": "./src/signals.js"
+			"import": "./src/signals.js",
+			"types": "./src/signals.d.ts"
 		},
 		"./signals-lib": {
-			"import": "./src/signals-lib.js"
+			"import": "./src/signals-lib.js",
+			"types": "./src/signals.d.ts"
 		}
 	},
 	"typesVersions": {
