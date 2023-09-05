@@ -8,13 +8,15 @@ export function namespace(namespace){
 	};
 }
 export function createElement(tag, attributes, ...connect){
+	const s= signals(this);
 	let el;
+	//TODO Array.isArray(tag) ⇒ set key (cache els)
 	if("<>"===tag){
-		if(signals.isReactiveAtrribute(attributes))
-			return signals.reactiveElement(attributes, ...connect);
+		if(s.isReactiveAtrribute(attributes))
+			return s.reactiveElement(attributes, ...connect);
 		el= document.createDocumentFragment();
 	}
-	if(signals.isTextContent(attributes))
+	if(s.isTextContent(attributes))
 		attributes= { textContent: attributes };
 	switch(true){
 		case typeof tag==="function": el= tag(attributes || undefined); break;
@@ -27,16 +29,19 @@ export function createElement(tag, attributes, ...connect){
 }
 export { createElement as el };
 
+const prop_cache= new Map();
 export function assign(element, ...attributes){
+	const s= signals(this);
 	if(!attributes.length) return element;
 	const is_svg= element instanceof SVGElement;
 	const setRemoveAttr= (is_svg ? setRemoveNS : setRemove).bind(null, element, "Attribute");
 	
 	Object.entries(Object.assign({}, ...attributes)).forEach(function assignNth([ key, attr ]){
-		if(signals.isReactiveAtrribute(attr, key))
-			attr= signals.process(key, attr, assignNth);
-		if(key[0]==="=") return setRemoveAttr(key.slice(1), attr);
-		if(key[0]===".") return setDelete(element, key.slice(1), attr);
+		if(s.isReactiveAtrribute(attr, key))
+			attr= s.processReactiveAttribute(el, key, attr, assignNth);
+		const [ k ]= key;
+		if("="===k) return setRemoveAttr(key.slice(1), attr);
+		if("."===k) return setDelete(element, key.slice(1), attr);
 		if(typeof attr === "object"){
 			switch(key){
 				case "style":		return forEachEntries(attr, setRemove.bind(null, element.style, "Property"))
@@ -51,17 +56,13 @@ export function assign(element, ...attributes){
 			return setRemoveAttr(key, attr);
 		}
 		switch(key){
-			case "href" || "src" || "style":
-				return setRemoveAttr(key, attr);
 			case "xlink:href":
 				return setRemoveAttr(key, attr, "http://www.w3.org/1999/xlink");
 			case "textContent" || "innerText":
 				if(!is_svg) break;
 				return element.appendChild(document.createTextNode(attr));
 		}
-		if(key in element && !is_svg)
-			return setDelete(element, key, attr);
-		return setRemoveAttr(key, attr);
+		return isPropSetter(element, key) ? setDelete(element, key, attr) : setRemoveAttr(key, attr);
 	});
 	return element;
 }
@@ -73,8 +74,24 @@ export function classListDeclartive(element, toggle){
 			element.classList.toggle(class_name, val===-1 ? undefined : Boolean(val)))
 	return element;
 }
-
-export function empty(el){ Array.from(el.children).forEach(el=> el.remove()); return el; }
+export function empty(el){
+	Array.from(el.children).forEach(el=> el.remove());
+	return el;
+}
+function isPropSetter(el, key){
+	const cache_key= el.nodeName+","+key;
+	if(prop_cache.has(cache_key)) return prop_cache.get(cache_key);
+	const des= getPropDescriptor(el, key);
+	const is_set= !isUndef(des.set);
+	prop_cache.set(cache_key, is_set);
+	return is_set;
+}
+function getPropDescriptor(p, key){
+	p= Object.getPrototypeOf(p);
+	if(!p) return {};
+	const des= Object.getOwnPropertyDescriptor(p, key);
+	return des ? des : getPropDescriptor(p, key);
+}
 
 function forEachEntries(obj, cb){ return Object.entries(obj).forEach(([ key, val ])=> cb(key, val)); }
 function isUndef(value){ return typeof value==="undefined"; }

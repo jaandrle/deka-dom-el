@@ -1,37 +1,25 @@
-import { signals } from './signals-common.js';
 export { registerReactivity } from './signals-common.js';
 
 export function on(event, listener, options){
-	if(!signals.isReactiveAtrribute(event))
-		return element=> element.addEventListener(event, listener, options);
-	//TODO cleanup when signal removed (also TODO)
-	if(options && options.signal)
-		options.signal.addEventListener("abort", ()=> signals.off(event, listener));
-	return signals.on(event, listener);
-}
-export function off(){//TODO is needed?
-	const abort= new AbortController();
-	return new Proxy(()=> abort.abort(), {
-		get(_, p){ return Reflect.get(abort, p); },
-		ownKeys(){ return [ "signal" ]; }
-	})
-}
-export function dispatch(event, detail){
-	if(typeof event === "string")
-		event= typeof detail==="undefined" ? new Event(event) : new CustomEvent(event, { detail });
-	return element=> element.dispatchEvent(event);
+	return element=> {
+		element.addEventListener(event, listener, options);
+		return element;
+	};
 }
 
 const connections_changes= connectionsChangesObserverConstructor();
-//TODO remove listener(s) options
-on.connected= function(listener){
+on.connected= function(listener, options){
 	return function registerElement(element){
 		connections_changes.onConnected(element, listener);
+		if(options && options.signal)
+			options.signal.addEventListener("abort", ()=> connections_changes.offConnected(element, listener));
 	};
 };
-on.disconnected= function(listener){
+on.disconnected= function(listener, options){
 	return function registerElement(element){
 		connections_changes.onDisconnected(element, listener);
+		if(options && options.signal)
+			options.signal.addEventListener("abort", ()=> connections_changes.offDisconnected(element, listener));
 	};
 };
 

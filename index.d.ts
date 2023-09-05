@@ -1,15 +1,14 @@
-/**
- * @private
- */
-type T_DOM_HETNM= HTMLElementTagNameMap & SVGElementTagNameMap & {
-	'<>': DocumentFragment,
-	'': HTMLElement,
-	'zzz_text': Text
+import { Signal } from "./src/signals";
+//TODO?
+declare global {
+	type ddeFires<T extends string[]>= ( (...a: any[])=> any ) & { events: T };
+	type ddeSignal<T, A>= Signal<T, A>;
 }
-/**
- * @private
- */
-type T_DOM_ATTRS_MODIFIED= {
+type ElementTagNameMap= HTMLElementTagNameMap & SVGElementTagNameMap & {
+	'#text': Text
+}
+type Element= ElementTagNameMap[keyof ElementTagNameMap];
+type AttrsModified= {
 	/**
 	 * In fact argumen for `*.setAttribute("style", *)`.
 	 */
@@ -17,7 +16,11 @@ type T_DOM_ATTRS_MODIFIED= {
 	/**
 	 * Provide option to add/remove/toggle CSS clasess (index of object) using 1/0/-1. In fact `el.classList.toggle(class_name)` for `-1` and `el.classList.toggle(class_name, Boolean(...))` for others.
 	 */
-	classList: Record<string,-1|0|1>
+	classList: Record<string,-1|0|1>,
+	/**
+	 * Sets `aria-*` simiraly to `dataset`
+	 * */
+	ariaset: Record<string,string>,
 }
 /**
  * Just element attributtes
@@ -27,53 +30,172 @@ type T_DOM_ATTRS_MODIFIED= {
  * There is added support for `data[A-Z].*`/`aria[A-Z].*` to be converted to the kebab-case alternatives.
  * @private
  */
-type T_DOM_ATTRS<T extends keyof T_DOM_HETNM | T_DOM_HETNM[keyof T_DOM_HETNM]>=
-	T extends keyof T_DOM_HETNM ?
-	Omit<T_DOM_HETNM[T],"classList"> & T_DOM_ATTRS_MODIFIED :
-	Omit<T,"classList"> & T_DOM_ATTRS_MODIFIED;
-/**
- * Procedure for merging object into the element properties.
- * Very simple example: `$dom.assign(document.body, { className: "test" });` is equivalent to `document.body.className= "test";`.
- * It is not deep copy in general, but it supports `style`, `style_vars` and `dataset` objects (see below).
- *
- * **#1: All together**
- * ```javascript
- * const el= document.body;
- * const onclick= function(){ console.log(this.dataset.js_param); };
- * $dom.assign(el, { textContent: "BODY", style: "color: red;", dataset: { js_param: "CLICKED" }, onclick });
- * //result HTML: <body style="color: red;" data-js_param="CLICKED">BODY</body>
- * //console output on click: "CLICKED"
- * $dom.assign(el, { style: { color: "green" } });
- * //result HTML: <body style="color: green;" data-js_param="CLICKED">BODY</body>
- * //console output on click: "CLICKED"
- * ```
- *
- * **`\*.classList.toggle`**
- * ```javascript
- * const el= document.body;
- * $dom.assign(el, { classList: { testClass: -1 } });
- * //result HTML: <body class="testClass">…</body>
- * $dom.assign(el, { classList: { testClass: -1 } });
- * //result HTML: <body class="">…</body>
- *
- * $dom.assign(el, { classList: { testClass: true } });//or 1
- * //result HTML: <body class="testClass">…</body>
- * $dom.assign(el, { classList: { testClass: false } });//or 0
- * //result HTML: <body class="">…</body>
- * //...
- * ```
- *
- * **#3 Links and images**
- * ```javascript
- * $dom.assign(A_ELEMENT, { href: "www.google.com" });//=> <a href="www.google.com" …
- * $dom.assign(IMG_ELEMENT, { src: "image.png" });//=> <img src="image.png" …
- *
- * **#4 data\* and aria\***
- * $dom.assign(el, { ariaLabel: "The aria-label", dataExample: "data-example" });//=> <body aria-label="The aria-label" data-example="data-example">
- * ```
- * @category Public
- * @version 2.0.0
- */
-export function assign<EL extends HTMLElement>(element: EL, ...attrs_array: T_DOM_ATTRS<EL>[]): EL
+type ElementAttributes<T extends keyof ElementTagNameMap | ElementTagNameMap[keyof ElementTagNameMap]>=
+	T extends keyof ElementTagNameMap ?
+	Omit<ElementTagNameMap[T],"classList"> & AttrsModified :
+	Omit<T,"classList"> & AttrsModified;
+export function assign<El extends Element>(element: El, ...attrs_array: ElementAttributes<El>[]): El
 
-export function el<TAG extends keyof T_DOM_HETNM>(tag_name: TAG, attrs: T_DOM_ATTRS<T_DOM_HETNM[TAG]>): T_DOM_HETNM[TAG]
+type ElementExtender<El extends Element>= (element: El)=> El;
+type TagNameFragment= "<>";
+export function el<TAG extends keyof ElementTagNameMap>(
+	tag_name: TAG,
+	attrs?: ElementAttributes<ElementTagNameMap[TAG]>,
+	...extenders: ElementExtender<ElementTagNameMap[TAG]>[]
+): ElementTagNameMap[TAG]
+export function el<T>(
+	tag_name: TagNameFragment,
+	signal?: Signal<T, any>,
+	cb?: (a: T)=> HTMLElement | HTMLElement[]
+): DocumentFragment
+export function el<T extends (...a: any)=> Element>(
+	fComponent: T,
+	attrs?: Parameters<T> & ElementAttributes<ReturnType<T>>,
+	...extenders: ElementExtender<ReturnType<T>>[]
+): ReturnType<T>
+
+interface On{
+	<
+		EE extends ElementExtender<Element>,
+		El extends ( EE extends ElementExtender<infer El> ? El : never ),
+		Event extends keyof DocumentEventMap>(
+			type: Event,
+			listener: (this: El, ev: DocumentEventMap[Event]) => any,
+			options?: AddEventListenerOptions
+		) : EE;
+	connected<
+		EE extends ElementExtender<Element>,
+		El extends ( EE extends ElementExtender<infer El> ? El : never )
+		>(
+			listener: (el: El) => any,
+			options?: AddEventListenerOptions
+		) : EE;
+	disconnected<
+		EE extends ElementExtender<Element>,
+		El extends ( EE extends ElementExtender<infer El> ? El : never )
+		>(
+			listener: (el: El) => any,
+			options?: AddEventListenerOptions
+		) : EE;
+}
+export const on: On;
+
+//TODO?
+export type Fires<T extends string[]>= ( (...a: any[])=> any ) & { events: T };
+
+//TODO for SVG
+declare global{
+	interface HTMLDivElement{ append(...nodes: (Node | string)[]): HTMLDivElement; }
+	interface HTMLAnchorElement{ append(...nodes: (Node | string)[]): HTMLAnchorElement; }
+	interface HTMLElement{ append(...nodes: (Node | string)[]): HTMLElement; }
+	interface HTMLElement{ append(...nodes: (Node | string)[]): HTMLElement; }
+	interface HTMLAreaElement{ append(...nodes: (Node | string)[]): HTMLAreaElement; }
+	interface HTMLElement{ append(...nodes: (Node | string)[]): HTMLElement; }
+	interface HTMLElement{ append(...nodes: (Node | string)[]): HTMLElement; }
+	interface HTMLAudioElement{ append(...nodes: (Node | string)[]): HTMLAudioElement; }
+	interface HTMLElement{ append(...nodes: (Node | string)[]): HTMLElement; }
+	interface HTMLBaseElement{ append(...nodes: (Node | string)[]): HTMLBaseElement; }
+	interface HTMLElement{ append(...nodes: (Node | string)[]): HTMLElement; }
+	interface HTMLElement{ append(...nodes: (Node | string)[]): HTMLElement; }
+	interface HTMLQuoteElement{ append(...nodes: (Node | string)[]): HTMLQuoteElement; }
+	interface HTMLBodyElement{ append(...nodes: (Node | string)[]): HTMLBodyElement; }
+	interface HTMLBRElement{ append(...nodes: (Node | string)[]): HTMLBRElement; }
+	interface HTMLButtonElement{ append(...nodes: (Node | string)[]): HTMLButtonElement; }
+	interface HTMLCanvasElement{ append(...nodes: (Node | string)[]): HTMLCanvasElement; }
+	interface HTMLTableCaptionElement{ append(...nodes: (Node | string)[]): HTMLTableCaptionElement; }
+	interface HTMLElement{ append(...nodes: (Node | string)[]): HTMLElement; }
+	interface HTMLElement{ append(...nodes: (Node | string)[]): HTMLElement; }
+	interface HTMLTableColElement{ append(...nodes: (Node | string)[]): HTMLTableColElement; }
+	interface HTMLTableColElement{ append(...nodes: (Node | string)[]): HTMLTableColElement; }
+	interface HTMLDataElement{ append(...nodes: (Node | string)[]): HTMLDataElement; }
+	interface HTMLDataListElement{ append(...nodes: (Node | string)[]): HTMLDataListElement; }
+	interface HTMLElement{ append(...nodes: (Node | string)[]): HTMLElement; }
+	interface HTMLModElement{ append(...nodes: (Node | string)[]): HTMLModElement; }
+	interface HTMLDetailsElement{ append(...nodes: (Node | string)[]): HTMLDetailsElement; }
+	interface HTMLElement{ append(...nodes: (Node | string)[]): HTMLElement; }
+	interface HTMLDialogElement{ append(...nodes: (Node | string)[]): HTMLDialogElement; }
+	interface HTMLDivElement{ append(...nodes: (Node | string)[]): HTMLDivElement; }
+	interface HTMLDListElement{ append(...nodes: (Node | string)[]): HTMLDListElement; }
+	interface HTMLElement{ append(...nodes: (Node | string)[]): HTMLElement; }
+	interface HTMLElement{ append(...nodes: (Node | string)[]): HTMLElement; }
+	interface HTMLEmbedElement{ append(...nodes: (Node | string)[]): HTMLEmbedElement; }
+	interface HTMLFieldSetElement{ append(...nodes: (Node | string)[]): HTMLFieldSetElement; }
+	interface HTMLElement{ append(...nodes: (Node | string)[]): HTMLElement; }
+	interface HTMLElement{ append(...nodes: (Node | string)[]): HTMLElement; }
+	interface HTMLElement{ append(...nodes: (Node | string)[]): HTMLElement; }
+	interface HTMLFormElement{ append(...nodes: (Node | string)[]): HTMLFormElement; }
+	interface HTMLHeadingElement{ append(...nodes: (Node | string)[]): HTMLHeadingElement; }
+	interface HTMLHeadingElement{ append(...nodes: (Node | string)[]): HTMLHeadingElement; }
+	interface HTMLHeadingElement{ append(...nodes: (Node | string)[]): HTMLHeadingElement; }
+	interface HTMLHeadingElement{ append(...nodes: (Node | string)[]): HTMLHeadingElement; }
+	interface HTMLHeadingElement{ append(...nodes: (Node | string)[]): HTMLHeadingElement; }
+	interface HTMLHeadingElement{ append(...nodes: (Node | string)[]): HTMLHeadingElement; }
+	interface HTMLHeadElement{ append(...nodes: (Node | string)[]): HTMLHeadElement; }
+	interface HTMLElement{ append(...nodes: (Node | string)[]): HTMLElement; }
+	interface HTMLElement{ append(...nodes: (Node | string)[]): HTMLElement; }
+	interface HTMLHRElement{ append(...nodes: (Node | string)[]): HTMLHRElement; }
+	interface HTMLHtmlElement{ append(...nodes: (Node | string)[]): HTMLHtmlElement; }
+	interface HTMLElement{ append(...nodes: (Node | string)[]): HTMLElement; }
+	interface HTMLIFrameElement{ append(...nodes: (Node | string)[]): HTMLIFrameElement; }
+	interface HTMLImageElement{ append(...nodes: (Node | string)[]): HTMLImageElement; }
+	interface HTMLInputElement{ append(...nodes: (Node | string)[]): HTMLInputElement; }
+	interface HTMLModElement{ append(...nodes: (Node | string)[]): HTMLModElement; }
+	interface HTMLElement{ append(...nodes: (Node | string)[]): HTMLElement; }
+	interface HTMLLabelElement{ append(...nodes: (Node | string)[]): HTMLLabelElement; }
+	interface HTMLLegendElement{ append(...nodes: (Node | string)[]): HTMLLegendElement; }
+	interface HTMLLIElement{ append(...nodes: (Node | string)[]): HTMLLIElement; }
+	interface HTMLLinkElement{ append(...nodes: (Node | string)[]): HTMLLinkElement; }
+	interface HTMLElement{ append(...nodes: (Node | string)[]): HTMLElement; }
+	interface HTMLMapElement{ append(...nodes: (Node | string)[]): HTMLMapElement; }
+	interface HTMLElement{ append(...nodes: (Node | string)[]): HTMLElement; }
+	interface HTMLMenuElement{ append(...nodes: (Node | string)[]): HTMLMenuElement; }
+	interface HTMLMetaElement{ append(...nodes: (Node | string)[]): HTMLMetaElement; }
+	interface HTMLMeterElement{ append(...nodes: (Node | string)[]): HTMLMeterElement; }
+	interface HTMLElement{ append(...nodes: (Node | string)[]): HTMLElement; }
+	interface HTMLElement{ append(...nodes: (Node | string)[]): HTMLElement; }
+	interface HTMLObjectElement{ append(...nodes: (Node | string)[]): HTMLObjectElement; }
+	interface HTMLOListElement{ append(...nodes: (Node | string)[]): HTMLOListElement; }
+	interface HTMLOptGroupElement{ append(...nodes: (Node | string)[]): HTMLOptGroupElement; }
+	interface HTMLOptionElement{ append(...nodes: (Node | string)[]): HTMLOptionElement; }
+	interface HTMLOutputElement{ append(...nodes: (Node | string)[]): HTMLOutputElement; }
+	interface HTMLParagraphElement{ append(...nodes: (Node | string)[]): HTMLParagraphElement; }
+	interface HTMLPictureElement{ append(...nodes: (Node | string)[]): HTMLPictureElement; }
+	interface HTMLPreElement{ append(...nodes: (Node | string)[]): HTMLPreElement; }
+	interface HTMLProgressElement{ append(...nodes: (Node | string)[]): HTMLProgressElement; }
+	interface HTMLQuoteElement{ append(...nodes: (Node | string)[]): HTMLQuoteElement; }
+	interface HTMLElement{ append(...nodes: (Node | string)[]): HTMLElement; }
+	interface HTMLElement{ append(...nodes: (Node | string)[]): HTMLElement; }
+	interface HTMLElement{ append(...nodes: (Node | string)[]): HTMLElement; }
+	interface HTMLElement{ append(...nodes: (Node | string)[]): HTMLElement; }
+	interface HTMLElement{ append(...nodes: (Node | string)[]): HTMLElement; }
+	interface HTMLScriptElement{ append(...nodes: (Node | string)[]): HTMLScriptElement; }
+	interface HTMLElement{ append(...nodes: (Node | string)[]): HTMLElement; }
+	interface HTMLSelectElement{ append(...nodes: (Node | string)[]): HTMLSelectElement; }
+	interface HTMLSlotElement{ append(...nodes: (Node | string)[]): HTMLSlotElement; }
+	interface HTMLElement{ append(...nodes: (Node | string)[]): HTMLElement; }
+	interface HTMLSourceElement{ append(...nodes: (Node | string)[]): HTMLSourceElement; }
+	interface HTMLSpanElement{ append(...nodes: (Node | string)[]): HTMLSpanElement; }
+	interface HTMLElement{ append(...nodes: (Node | string)[]): HTMLElement; }
+	interface HTMLStyleElement{ append(...nodes: (Node | string)[]): HTMLStyleElement; }
+	interface HTMLElement{ append(...nodes: (Node | string)[]): HTMLElement; }
+	interface HTMLElement{ append(...nodes: (Node | string)[]): HTMLElement; }
+	interface HTMLElement{ append(...nodes: (Node | string)[]): HTMLElement; }
+	interface HTMLTableElement{ append(...nodes: (Node | string)[]): HTMLTableElement; }
+	interface HTMLTableSectionElement{ append(...nodes: (Node | string)[]): HTMLTableSectionElement; }
+	interface HTMLTableCellElement{ append(...nodes: (Node | string)[]): HTMLTableCellElement; }
+	interface HTMLTemplateElement{ append(...nodes: (Node | string)[]): HTMLTemplateElement; }
+	interface HTMLTextAreaElement{ append(...nodes: (Node | string)[]): HTMLTextAreaElement; }
+	interface HTMLTableSectionElement{ append(...nodes: (Node | string)[]): HTMLTableSectionElement; }
+	interface HTMLTableCellElement{ append(...nodes: (Node | string)[]): HTMLTableCellElement; }
+	interface HTMLTableSectionElement{ append(...nodes: (Node | string)[]): HTMLTableSectionElement; }
+	interface HTMLTimeElement{ append(...nodes: (Node | string)[]): HTMLTimeElement; }
+	interface HTMLTitleElement{ append(...nodes: (Node | string)[]): HTMLTitleElement; }
+	interface HTMLTableRowElement{ append(...nodes: (Node | string)[]): HTMLTableRowElement; }
+	interface HTMLTrackElement{ append(...nodes: (Node | string)[]): HTMLTrackElement; }
+	interface HTMLElement{ append(...nodes: (Node | string)[]): HTMLElement; }
+	interface HTMLUListElement{ append(...nodes: (Node | string)[]): HTMLUListElement; }
+	interface HTMLElement{ append(...nodes: (Node | string)[]): HTMLElement; }
+	interface HTMLVideoElement{ append(...nodes: (Node | string)[]): HTMLVideoElement; }
+	interface HTMLElement{ append(...nodes: (Node | string)[]): HTMLElement; }
+	interface DocumentFragment{ append(...nodes: (Node | string)[]): DocumentFragment; }
+}

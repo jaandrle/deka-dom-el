@@ -1,0 +1,88 @@
+{
+	"name": "deka-dom-el",
+	"version": "0.1.0",
+	"description": "A low-code library that simplifies the creation of native DOM elements/components using small wrappers and tweaks.",
+	"author": "Jan Andrle <andrle.jan@centrum.cz>",
+	"license": "MIT",
+	"homepage": "https://gitea.jaandrle.cz/jaandrle/deka-dom-el",
+	"repository": {
+		"type": "git",
+		"url": "git@jaandrle.cz:jaandrle/deka-dom-el.git"
+	},
+	"bugs": {
+		"url": "https://gitea.jaandrle.cz/jaandrle/deka-dom-el/issues"
+	},
+	"main": "index.js",
+	"types": "./index.d.ts",
+	"exports": {
+		".": {
+			"import": "./index.js"
+		},
+		"./signals": {
+			"import": "./src/signals.js"
+		},
+		"./signals-lib": {
+			"import": "./src/signals-lib.js"
+		}
+	},
+	"typesVersions": {
+		"*": {
+			".": [
+				"./index.d.ts"
+			],
+			"./signals": [
+				"./src/signals.d.ts"
+			],
+			"./signals-lib": [
+				"./src/signals.d.ts"
+			]
+		}
+	},
+	"files": [
+		"index.js",
+		"index.d.ts",
+		"src"
+	],
+	"engines": {
+		"node": ">=18"
+	},
+	"jshintConfig": {
+		"esversion": 6,
+		"node": "true",
+		"undef": "true",
+		"latedef": "true",
+		"maxparams": 4,
+		"maxdepth": 3,
+		"maxcomplexity": 19
+	},
+	"size-limit": [
+		{
+			"path": "./index.js",
+			"limit": "10 kB",
+			"gzip": false
+		},
+		{
+			"path": "./index-with-signals.js",
+			"limit": "10 kB",
+			"gzip": false
+		}
+	],
+	"modifyEsbuildConfig": {
+		"platform": "browser"
+	},
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"keywords": [
+		"dom",
+		"javascript",
+		"low-code",
+		"typescript"
+	],
+	"devDependencies": {
+		"@size-limit/preset-small-lib": "^8.2.6",
+		"esbuild": "^0.19.2",
+		"nodejsscript": "github:jaandrle/nodejsscript#dev-v1",
+		"size-limit-node-esbuild": "^0.2.0"
+	}
+}
