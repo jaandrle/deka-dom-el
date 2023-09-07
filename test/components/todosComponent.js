@@ -12,13 +12,15 @@ const className= style.host(todosComponent).css`
 	}
 `;
 /** @param {{ todos: string[] }} */
-export function todosComponent({ todos= [] }= {}){
-	const todosS= S(todos.map(v=> S(v)), {
+export function todosComponent({ todos= [ "A" ] }= {}){
+	const todosS= S([], {
 		/** @param {string} v */
 		add(v){ this.value.push(S(v)); },
 		/** @param {number} i */
-		remove(i){ this.value.splice(i, 1); }
+		remove(i){ this.value.splice(i, 1); },
+		[S.symbols.onclear](){ S.clear(...this.value); },
 	});
+	todos.forEach(v=> S.action(todosS, "add", v));
 	console.log(todosS); //TODO
 	const name= "todoName";
 	const onsubmitAdd= on("submit", event=> {

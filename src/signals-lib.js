@@ -1,4 +1,4 @@
-export const mark= Symbol.for("signal");
+export const mark= Symbol.for("Signal");
 
 export function isSignal(candidate){
 	try{ return Reflect.has(candidate, mark); }
@@ -12,10 +12,9 @@ export function S(value, actions){
 	const out= create();
 	watch(()=> out(value()));
 	return out;
+	//TODO is auto remove if used for args, if external listener needs also S.clear
 }
 S.action= function(signal, name, ...a){
-	if(!isSignal(signal))
-		throw new Error(`'${signal}' is not a signal!`);
 	const s= signal[mark], { actions }= s;
 	if(!actions || !Reflect.has(actions, name))
 		throw new Error(`'${signal}' has no action with name '${name}'!`);
@@ -23,16 +22,25 @@ S.action= function(signal, name, ...a){
 	if(s.skip) return Reflect.deleteProperty(s, "skip");
 	s.listeners.forEach(l=> l(s.value));
 };
-S.on= function on(signals, listener, options){
+S.on= function on(signals, listener, options= {}){
+	const { signal: as }= options;
+	if(as && as.aborted) return;
 	if(Array.isArray(signals)) return signals.forEach(s=> on(s, listener, options));
 	addSignalListener(signals, listener);
-	if(options && options.signal)
-		options.signal.addEventListener("abort", ()=> removeSignalListener(signals, listener));
+	if(as) as.addEventListener("abort", ()=> removeSignalListener(signals, listener));
 	//TODO cleanup when signal removed (also TODO)
+};
+S.symbols= {
+	signal: mark,
+	onclear: Symbol.for("Signal.onclear")
 };
 S.clear= function(...signals){
 	for(const signal of signals){
-		signal[mark].listeners.clear();
+		const s= signal[mark];
+		const { onclear }= S.symbols;
+		if(s.actions && s.actions[onclear])
+			s.actions[onclear].call(s);
+		s.listeners.clear();
 		Reflect.deleteProperty(signal, mark);
 	}
 };
@@ -48,13 +56,13 @@ export const signals_config= {
 		return attrS();
 	},
 	reactiveElement(signal, map){
-		const mark_start= document.createComment("<> #reactive");
-		const mark_end= document.createComment("</> #reactive");
+		const mark_start= document.createComment("<#reactive>");
+		const mark_end= document.createComment("</#reactive>");
 		const out= document.createDocumentFragment();
 		out.append(mark_start, mark_end);
-		const toEls= v=> {
+		const reRenderReactiveElement= v=> {
 			if(!mark_start.parentNode || !mark_end.parentNode)
-				return removeSignalListener(signal, toEls);
+				return removeSignalListener(signal, reRenderReactiveElement);
 			let els= map(v);
 			if(!Array.isArray(els))
 				els= [ els ];
@@ -63,8 +71,8 @@ export const signals_config= {
 				el_r.remove();
 			mark_start.after(...els);
 		};
-		addSignalListener(signal, toEls);
-		toEls(signal());
+		addSignalListener(signal, reRenderReactiveElement);
+		reRenderReactiveElement(signal());
 		return out;
 	}
 };
