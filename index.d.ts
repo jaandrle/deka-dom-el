@@ -2,7 +2,6 @@ import { Signal } from "./src/signals";
 //TODO?
 declare global {
 	type ddeFires<T extends string[]>= ( (...a: any[])=> any ) & { events: T };
-	type ddeSignal<T, A>= Signal<T, A>;
 }
 type ElementTagNameMap= HTMLElementTagNameMap & SVGElementTagNameMap & {
 	'#text': Text

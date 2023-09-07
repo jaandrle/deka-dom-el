@@ -12,7 +12,7 @@ export function S(value, actions){
 	const out= create();
 	watch(()=> out(value()));
 	return out;
-	//TODO is auto remove if used for args, if external listener needs also S.clear
+	//TODO for docs: is auto remove if used for args, if external listener needs also S.clear
 }
 S.action= function(signal, name, ...a){
 	const s= signal[mark], { actions }= s;
@@ -28,7 +28,7 @@ S.on= function on(signals, listener, options= {}){
 	if(Array.isArray(signals)) return signals.forEach(s=> on(s, listener, options));
 	addSignalListener(signals, listener);
 	if(as) as.addEventListener("abort", ()=> removeSignalListener(signals, listener));
-	//TODO cleanup when signal removed (also TODO)
+	//TODO cleanup when signal removed
 };
 S.symbols= {
 	signal: mark,

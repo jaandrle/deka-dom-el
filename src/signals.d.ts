@@ -43,3 +43,7 @@ interface S {
 	}
 }
 export const S: S;
+declare global {
+	type ddeSignal<T, A>= Signal<T, A>;
+	type ddeActions<V>= Actions<V>
+}
