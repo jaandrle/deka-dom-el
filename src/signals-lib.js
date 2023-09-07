@@ -29,7 +29,7 @@ S.on= function on(signals, listener, options){
 	if(options && options.signal)
 		options.signal.addEventListener("abort", ()=> removeSignalListener(signals, listener));
 	//TODO cleanup when signal removed (also TODO)
-}
+};
 S.clear= function(...signals){
 	for(const signal of signals){
 		signal[mark].listeners.clear();
@@ -100,7 +100,7 @@ export function watch(context){
 	stack_watch.push(contextReWatch);
 	context();
 	stack_watch.pop();
-};
+}
 function currentContext(){
 	return stack_watch[stack_watch.length - 1];
 }
@@ -116,7 +116,7 @@ function write(signal, value){
 	const s= signal[mark];
 	if(s.value===value) return;
 	s.value= value;
-	s.listeners.forEach(fn=> fn(value))
+	s.listeners.forEach(fn=> fn(value));
 	return value;
 }
 

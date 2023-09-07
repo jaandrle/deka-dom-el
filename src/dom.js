@@ -1,5 +1,6 @@
 import { signals } from "./signals-common.js";
 
+/** @type {"html"|"svg"|string} */
 let namespace_curr= "html";
 export function namespace(namespace){
 	namespace_curr= namespace==="svg" ? "http://www.w3.org/2000/svg" : namespace;
@@ -29,22 +30,24 @@ export function createElement(tag, attributes, ...connect){
 }
 export { createElement as el };
 
-const prop_cache= new Map();
+/** @type {Map<string, boolean>} */
+const prop_cache= new Map(JSON.parse('[["#text,textContent",true],["HTMLElement,textContent",true],["HTMLElement,className",true]]'));
 export function assign(element, ...attributes){
 	const s= signals(this);
 	if(!attributes.length) return element;
 	const is_svg= element instanceof SVGElement;
 	const setRemoveAttr= (is_svg ? setRemoveNS : setRemove).bind(null, element, "Attribute");
 	
+	/* jshint maxcomplexity:15 */
 	Object.entries(Object.assign({}, ...attributes)).forEach(function assignNth([ key, attr ]){
 		if(s.isReactiveAtrribute(attr, key))
-			attr= s.processReactiveAttribute(el, key, attr, assignNth);
+			attr= s.processReactiveAttribute(element, key, attr, assignNth);
 		const [ k ]= key;
 		if("="===k) return setRemoveAttr(key.slice(1), attr);
 		if("."===k) return setDelete(element, key.slice(1), attr);
 		if(typeof attr === "object"){
 			switch(key){
-				case "style":		return forEachEntries(attr, setRemove.bind(null, element.style, "Property"))
+				case "style":		return forEachEntries(attr, setRemove.bind(null, element.style, "Property"));
 				case "dataset":		return forEachEntries(attr, setDelete.bind(null, element.dataset));
 				case "ariaset":		return forEachEntries(attr, (key, val)=> setRemoveAttr("aria-"+key, val));
 				case "classList":	return classListDeclartive(element, attr);
@@ -71,7 +74,7 @@ export function classListDeclartive(element, toggle){
 	
 	forEachEntries(toggle,
 		(class_name, val)=>
-			element.classList.toggle(class_name, val===-1 ? undefined : Boolean(val)))
+			element.classList.toggle(class_name, val===-1 ? undefined : Boolean(val)));
 	return element;
 }
 export function empty(el){
@@ -79,18 +82,23 @@ export function empty(el){
 	return el;
 }
 function isPropSetter(el, key){
+	const cache_key_he= "HTMLElement,"+key;
+	if(el instanceof HTMLElement && prop_cache.has(cache_key_he))
+		return prop_cache.get(cache_key_he);
 	const cache_key= el.nodeName+","+key;
 	if(prop_cache.has(cache_key)) return prop_cache.get(cache_key);
-	const des= getPropDescriptor(el, key);
+	const [ des, level, p ]= getPropDescriptor(el, key);
 	const is_set= !isUndef(des.set);
-	prop_cache.set(cache_key, is_set);
+	if(!is_set || level)
+		prop_cache.set(p===HTMLElement.prototype ? cache_key_he : cache_key, is_set);
 	return is_set;
 }
-function getPropDescriptor(p, key){
+function getPropDescriptor(p, key, level= 0){
 	p= Object.getPrototypeOf(p);
-	if(!p) return {};
+	if(!p) return [ {}, level, p ];
 	const des= Object.getOwnPropertyDescriptor(p, key);
-	return des ? des : getPropDescriptor(p, key);
+	if(!des) return getPropDescriptor(p, key, level+1);
+	return [ des, level, p ];
 }
 
 function forEachEntries(obj, cb){ return Object.entries(obj).forEach(([ key, val ])=> cb(key, val)); }
@@ -98,4 +106,4 @@ function isUndef(value){ return typeof value==="undefined"; }
 
 function setRemove(obj, prop, key, val){ return obj[ (isUndef(val) ? "remove" : "set") + prop ](key, val); }
 function setRemoveNS(obj, prop, key, val, ns= null){ return obj[ (isUndef(val) ? "remove" : "set") + prop + "NS" ](ns, key, val); }
-function setDelete(obj, prop, val){ return Reflect[ isUndef(val) ? "deleteProperty" : "set" ](obj, prop, val); }
+function setDelete(obj, prop, val){ return Reflect.set(obj, prop, val); }

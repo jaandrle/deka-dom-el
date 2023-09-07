@@ -1,6 +1,6 @@
 {
 	"name": "deka-dom-el",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"description": "A low-code library that simplifies the creation of native DOM elements/components using small wrappers and tweaks.",
 	"author": "Jan Andrle <andrle.jan@centrum.cz>",
 	"license": "MIT",
@@ -58,13 +58,16 @@
 		"node": ">=18"
 	},
 	"jshintConfig": {
-		"esversion": 6,
-		"node": "true",
+		"esversion": 11,
+		"browser": true,
 		"undef": "true",
 		"latedef": "true",
-		"maxparams": 4,
+		"maxparams": 5,
 		"maxdepth": 3,
-		"maxcomplexity": 19
+		"maxcomplexity": 10,
+		"globals": {
+			"requestIdleCallback": false
+		}
 	},
 	"size-limit": [
 		{
@@ -93,6 +96,7 @@
 	"devDependencies": {
 		"@size-limit/preset-small-lib": "^8.2.6",
 		"esbuild": "^0.19.2",
+		"jshint": "^2.13.6",
 		"nodejsscript": "github:jaandrle/nodejsscript#dev-v1",
 		"size-limit-node-esbuild": "^0.2.0"
 	}

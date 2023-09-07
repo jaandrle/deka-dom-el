@@ -1,11 +1,11 @@
-import { namespace, el, on, registerReactivity } from "../index.js";
+import { namespace, el, assign, on, registerReactivity } from "../index.js";
 import { S } from "../src/signals.js";
 // import { empty, namespace, on, dispatch } from "../index.js";
 // import "../dist/dde-with-signals.js";
 // Object.assign(globalThis, dde);
 // import { el, on, off, S } from "../dist/esm-with-signals.js";
 const style= createStyle();
-Object.assign(globalThis, { S, el, namespace, on, registerReactivity, style });
+Object.assign(globalThis, { S, el, assign, namespace, on, registerReactivity, style });
 export { S, el, on, registerReactivity, style };
 
 function createStyle(){
