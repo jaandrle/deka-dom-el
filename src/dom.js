@@ -12,16 +12,12 @@ export function createElement(tag, attributes, ...connect){
 	const s= signals(this);
 	let el;
 	//TODO Array.isArray(tag) ⇒ set key (cache els)
-	if("<>"===tag){
-		if(s.isReactiveAtrribute(attributes))
-			return s.reactiveElement(attributes, ...connect);
-		el= document.createDocumentFragment();
-	}
 	if(s.isTextContent(attributes))
 		attributes= { textContent: attributes };
 	switch(true){
 		case typeof tag==="function": el= tag(attributes || undefined); break;
 		case tag==="#text":           el= assign(document.createTextNode(""), attributes); break;
+		case tag==="<>":              el= assign(document.createDocumentFragment(), attributes); break;
 		case namespace_curr!=="html": el= assign(document.createElementNS(namespace_curr, tag), attributes); break;
 		case !el:                     el= assign(document.createElement(tag), attributes);
 	}
@@ -40,8 +36,7 @@ export function assign(element, ...attributes){
 	
 	/* jshint maxcomplexity:15 */
 	Object.entries(Object.assign({}, ...attributes)).forEach(function assignNth([ key, attr ]){
-		if(s.isReactiveAtrribute(attr, key))
-			attr= s.processReactiveAttribute(element, key, attr, assignNth);
+		attr= s.processReactiveAttribute(element, key, attr, assignNth);
 		const [ k ]= key;
 		if("="===k) return setRemoveAttr(key.slice(1), attr);
 		if("."===k) return setDelete(element, key.slice(1), attr);

@@ -1,9 +1,7 @@
 import { typeOf } from './helpers.js';
 export const signals_global= {
-	isReactiveAtrribute(attr, key){ return false; },
 	isTextContent(attributes){ return typeOf(attributes)!=="[object Object]"; },
-	processReactiveAttribute(el, key, attr, assignNth){ return false; },
-	reactiveElement(attributes, ...connect){ return null; }
+	processReactiveAttribute(el, key, attr, assignNth){ return attr; },
 };
 export function registerReactivity(def, global= true){
 	if(global) return Object.assign(signals_global, def);

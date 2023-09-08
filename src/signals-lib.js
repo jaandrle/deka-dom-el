@@ -39,6 +39,7 @@ S.symbols= {
 };
 S.clear= function(...signals){
 	for(const signal of signals){
+		Reflect.deleteProperty(signal, "toJSON");
 		const s= signal[mark];
 		const { onclear }= S.symbols;
 		if(s.actions && s.actions[onclear])
@@ -60,36 +61,36 @@ S.clear= function(...signals){
 		});
 	}
 };
+S.el= function(signal, map){
+	const mark_start= document.createComment("<#reactive>");
+	const mark_end= document.createComment("</#reactive>");
+	const out= document.createDocumentFragment();
+	out.append(mark_start, mark_end);
+	const reRenderReactiveElement= v=> {
+		if(!mark_start.parentNode || !mark_end.parentNode)
+			return removeSignalListener(signal, reRenderReactiveElement);
+		let els= map(v);
+		if(!Array.isArray(els))
+			els= [ els ];
+		let el_r= mark_start;
+		while(( el_r= mark_start.nextSibling ) !== mark_end)
+			el_r.remove();
+		mark_start.after(...els);
+	};
+	addSignalListener(signal, reRenderReactiveElement);
+	reRenderReactiveElement(signal());
+	return out;
+};
 
 import { typeOf } from './helpers.js';
 export const signals_config= {
-	isReactiveAtrribute(attr, key){ return isSignal(attr); },
 	isTextContent(attributes){
 		return typeOf(attributes)==="string" || ( isSignal(attributes) && typeOf(valueOfSignal(attributes))==="string" );
 	},
 	processReactiveAttribute(_, key, attrS, assignNth){
+		if(!isSignal(attrS)) return attrS;
 		addSignalListener(attrS, attr=> assignNth([ key, attr ]));
 		return attrS();
-	},
-	reactiveElement(signal, map){
-		const mark_start= document.createComment("<#reactive>");
-		const mark_end= document.createComment("</#reactive>");
-		const out= document.createDocumentFragment();
-		out.append(mark_start, mark_end);
-		const reRenderReactiveElement= v=> {
-			if(!mark_start.parentNode || !mark_end.parentNode)
-				return removeSignalListener(signal, reRenderReactiveElement);
-			let els= map(v);
-			if(!Array.isArray(els))
-				els= [ els ];
-			let el_r= mark_start;
-			while(( el_r= mark_start.nextSibling ) !== mark_end)
-				el_r.remove();
-			mark_start.after(...els);
-		};
-		addSignalListener(signal, reRenderReactiveElement);
-		reRenderReactiveElement(signal());
-		return out;
 	}
 };
 
@@ -108,8 +109,9 @@ function toSignal(signal, value, actions){
 		actions= {};
 	signal[mark]= {
 		value, actions,
-		listeners: new Set(),
+		listeners: new Set()
 	};
+	signal.toJSON= ()=> signal();
 	Object.setPrototypeOf(signal[mark], protoSigal);
 	return signal;
 }
