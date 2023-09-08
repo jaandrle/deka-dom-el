@@ -4,15 +4,18 @@ export function isSignal(candidate){
 	try{ return Reflect.has(candidate, mark); }
 	catch(e){ return false; }
 }
+/** @type {WeakMap<function,Set<ddeSignal<any, any>>>} */
+const deps= new WeakMap();
 export function S(value, actions){
 	if(typeof value!=="function")
 		return create(value, actions);
 	if(isSignal(value)) return value;
 	
-	const out= create();
-	watch(()=> out(value()));
+	const out= create("");
+	const context= ()=> out(value());
+	deps.set(context, new Set([ out ]));
+	watch(context);
 	return out;
-	//TODO for docs: is auto remove if used for args, if external listener needs also S.clear
 }
 S.action= function(signal, name, ...a){
 	const s= signal[mark], { actions }= s;
@@ -40,8 +43,21 @@ S.clear= function(...signals){
 		const { onclear }= S.symbols;
 		if(s.actions && s.actions[onclear])
 			s.actions[onclear].call(s);
-		s.listeners.clear();
+		clearListDeps(signal, s);
 		Reflect.deleteProperty(signal, mark);
+	}
+	function clearListDeps(signal, s){
+		s.listeners.forEach(l=> {
+			s.listeners.delete(l);
+			if(!deps.has(l)) return;
+			
+			const ls= deps.get(l);
+			ls.delete(signal);
+			if(ls.size>1) return;
+			
+			S.clear(...ls);
+			deps.delete(l);
+		});
 	}
 };
 
@@ -98,16 +114,17 @@ function toSignal(signal, value, actions){
 	return signal;
 }
 
+/** @type {function[]} */
 const stack_watch= [];
-export function watch(context){
+function watch(context){
 	const contextReWatch= function(){
 		stack_watch.push(contextReWatch);
 		context();
 		stack_watch.pop();
 	};
-	stack_watch.push(contextReWatch);
-	context();
-	stack_watch.pop();
+	//reassign deps as final context is contextReWatch
+	if(deps.has(context)){ deps.set(contextReWatch, deps.get(context)); deps.delete(context); }
+	contextReWatch();
 }
 function currentContext(){
 	return stack_watch[stack_watch.length - 1];
@@ -117,6 +134,7 @@ function read(signal){
 	const { value, listeners }= signal[mark];
 	const context= currentContext();
 	if(context) listeners.add(context);
+	if(deps.has(context)) deps.get(context).add(signal);
 	return value;
 }
 function write(signal, value){
@@ -124,7 +142,7 @@ function write(signal, value){
 	const s= signal[mark];
 	if(s.value===value) return;
 	s.value= value;
-	s.listeners.forEach(fn=> fn(value));
+	s.listeners.forEach(l=> l(value));
 	return value;
 }
 
