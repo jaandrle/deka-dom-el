@@ -10,16 +10,18 @@ const className= style.host(todosComponent).css`
 	:host button{
 		margin-inline-start: 1em;
 	}
+	:host output{
+		white-space: pre;
+	}
 `;
 /** @param {{ todos: string[] }} */
-export function todosComponent({ todos= [ "A" ] }= {}){
+export function todosComponent({ todos= [ "Task A" ] }= {}){
 	const todosS= S([], {
 		add(v){ this.value.push(S(v)); },
 		remove(i){ this.value.splice(i, 1); },
 		[S.symbols.onclear](){ S.clear(...this.value); },
 	});
 	todos.forEach(v=> S.action(todosS, "add", v));
-	console.log(todosS); //TODO
 	const name= "todoName";
 	const onsubmitAdd= on("submit", event=> {
 		const value= event.target.elements[name].value;
@@ -33,16 +35,18 @@ export function todosComponent({ todos= [ "A" ] }= {}){
 		S.action(todosS, "remove", event.detail));
 	
 	const ul_todos= el("ul").append(
-		el("<>", todosS,
-			ts=> ts.map((t, i)=> el(todoComponent, { textContent: t, value: i, className }, onremove))
+		S.el(todosS, ts=> ts
+			.map((textContent, value)=>
+				el(todoComponent, { textContent, value, className }, onremove))
 	));
 	return el("div", { className }).append(
 		el("div").append(
 			el("h2", "Todos:"),
 			el("h3", "List of todos:"),
-			el("<>", todosS, ts=> !ts.length
+			S.el(todosS, ts=> !ts.length
 				? el("p", "No todos yet")
-				: ul_todos)
+				: ul_todos),
+			el("p", "Click to the text to edit it.")
 		),
 		el("form", null, onsubmitAdd).append(
 			el("h3", "Add a todo:"),
@@ -50,13 +54,17 @@ export function todosComponent({ todos= [ "A" ] }= {}){
 				el("input", { name, type: "text", required: true }),
 			),
 			el("button", "+")
+		),
+		el("div").append(
+			el("h3", "Output (JSON):"),
+			el("output", S(()=> JSON.stringify(todosS, null, "\t")))
 		)
 	)
 }
 /**
  * @type {ddeFires<[ "click" ]>}
  * @param {{
- *	textContent: string | ddeSignal<string, any>
+ *	textContent: ddeSignal<string, any>
  *	value: number
  * }}
  * */
@@ -68,8 +76,16 @@ function todoComponent({ textContent, value }){
 		event.stopPropagation();
 		ref().dispatchEvent(new CustomEvent("remove", { detail: value }));
 	});
+	const is_editable= S(false);
+	const onedited= on("change", ev=> {
+		textContent(ev.target.value);
+		is_editable(false);
+	});
 	return el("li", null, ref).append(
-		el("#text", textContent),
+		S.el(is_editable, is=> is
+			? el("input", { value: textContent(), type: "text" }, onedited)
+			: el("span", textContent, on("click", ()=> is_editable(true))),
+		),
 		el("button", { type: "button", value, textContent: "-" }, onclick)
 	);
 }

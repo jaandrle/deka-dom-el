@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+<!-- DEL CSP https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP | https://github.com/Prinzhorn/minimal-csp -->
+<!-- DEL https://github.com/jensimmons/cssremedy -->
+<!-- <link rel="stylesheet" href="https://github.com/jensimmons/cssremedy/raw/master/css/remedy.css"> -->
+
+	<title>Small DOM element creation enhancements</title>
+	<meta name="description" content="Making creatig elements easier">
+	<script type="module">
+		import { el } from "../index.js";
+		document.body.append(
+			el("p", { textContent: "Ahoj", style: { color: "green" } })
+		);
+	</script>
+</head>
+<body>
+</body>
+</html>
