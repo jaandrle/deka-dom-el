@@ -7,19 +7,19 @@ export function on(event, listener, options){
 	};
 }
 
-const connections_changes= connectionsChangesObserverConstructor();
+const c_ch_o= connectionsChangesObserverConstructor();
 on.connected= function(listener, options){
 	return function registerElement(element){
-		connections_changes.onConnected(element, listener);
+		c_ch_o.onConnected(element, listener);
 		if(options && options.signal)
-			options.signal.addEventListener("abort", ()=> connections_changes.offConnected(element, listener));
+			options.signal.addEventListener("abort", ()=> c_ch_o.offConnected(element, listener));
 	};
 };
 on.disconnected= function(listener, options){
 	return function registerElement(element){
-		connections_changes.onDisconnected(element, listener);
+		c_ch_o.onDisconnected(element, listener);
 		if(options && options.signal)
-			options.signal.addEventListener("abort", ()=> connections_changes.offDisconnected(element, listener));
+			options.signal.addEventListener("abort", ()=> c_ch_o.offDisconnected(element, listener));
 	};
 };
 

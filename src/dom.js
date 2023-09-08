@@ -50,7 +50,7 @@ export function assign(element, ...attributes){
 				case "style":		return forEachEntries(attr, setRemove.bind(null, element.style, "Property"));
 				case "dataset":		return forEachEntries(attr, setDelete.bind(null, element.dataset));
 				case "ariaset":		return forEachEntries(attr, (key, val)=> setRemoveAttr("aria-"+key, val));
-				case "classList":	return classListDeclartive(element, attr);
+				case "classList":	return classListDeclarative(element, attr);
 				default:			return Reflect.set(element, key, attr);
 			}
 		}
@@ -59,6 +59,8 @@ export function assign(element, ...attributes){
 			return setRemoveAttr(key, attr);
 		}
 		switch(key){
+			case "href" || "src":
+				return setRemoveAttr(key, attr);
 			case "xlink:href":
 				return setRemoveAttr(key, attr, "http://www.w3.org/1999/xlink");
 			case "textContent" || "innerText":
@@ -69,7 +71,7 @@ export function assign(element, ...attributes){
 	});
 	return element;
 }
-export function classListDeclartive(element, toggle){
+export function classListDeclarative(element, toggle){
 	if(typeof toggle !== "object") return element;
 	
 	forEachEntries(toggle,
@@ -101,6 +103,7 @@ function getPropDescriptor(p, key, level= 0){
 	return [ des, level, p ];
 }
 
+/** @template {Record<any, any>} T  @param {T} obj @param {(param: [ keyof T, T[keyof T] ])=> void} cb */
 function forEachEntries(obj, cb){ return Object.entries(obj).forEach(([ key, val ])=> cb(key, val)); }
 function isUndef(value){ return typeof value==="undefined"; }
 
