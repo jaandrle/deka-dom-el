@@ -86,6 +86,8 @@ function w(e, ...t) {
 		if (/(aria|data)([A-Z])/.test(i))
 			return i = i.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase(), f(i, u);
 		switch (i) {
+			case "href":
+				return f(i, u);
 			case "xlink:href":
 				return f(i, u, "http://www.w3.org/1999/xlink");
 			case "textContent":
@@ -112,14 +114,14 @@ function D(e, t) {
 	let n = e.nodeName + "," + t;
 	if (h.has(n))
 		return h.get(n);
-	let [f, d, i] = y(e, t), u = !L(f.set);
+	let [f, d, i] = R(e, t), u = !L(f.set);
 	return (!u || d) && h.set(i === HTMLElement.prototype ? r : n, u), u;
 }
-function y(e, t, r = 0) {
+function R(e, t, r = 0) {
 	if (e = Object.getPrototypeOf(e), !e)
 		return [{}, r, e];
 	let n = Object.getOwnPropertyDescriptor(e, t);
-	return n ? [n, r, e] : y(e, t, r + 1);
+	return n ? [n, r, e] : R(e, t, r + 1);
 }
 function m(e, t) {
 	return Object.entries(e).forEach(([r, n]) => t(r, n));
@@ -138,21 +140,21 @@ function C(e, t, r) {
 }
 
 // src/events.js
-function R(e, t, r) {
+function y(e, t, r) {
 	return (n) => (n.addEventListener(e, t, r), n);
 }
-var E = P();
-R.connected = function(e, t) {
+var E = _();
+y.connected = function(e, t) {
 	return function(n) {
 		E.onConnected(n, e), t && t.signal && t.signal.addEventListener("abort", () => E.offConnected(n, e));
 	};
 };
-R.disconnected = function(e, t) {
+y.disconnected = function(e, t) {
 	return function(n) {
 		E.onDisconnected(n, e), t && t.signal && t.signal.addEventListener("abort", () => E.offDisconnected(n, e));
 	};
 };
-function P() {
+function _() {
 	let e = /* @__PURE__ */ new Map(), t = !1, r = new MutationObserver(function(o) {
 		for (let c of o)
 			if (c.type === "childList") {
@@ -239,11 +241,11 @@ function P() {
 });
 export {
 	w as assign,
-	T as classListDeclartive,
+	T as classListDeclarative,
 	F as createElement,
 	F as el,
 	I as empty,
 	z as namespace,
-	R as on,
+	y as on,
 	A as registerReactivity
 };
