@@ -152,8 +152,10 @@ function valueOfSignal(signal){
 	return signal[mark].value;
 }
 function addSignalListener(signal, listener){
+	if(!signal[mark]) return;
 	return signal[mark].listeners.add(listener);
 }
 function removeSignalListener(signal, listener){
+	if(!signal[mark]) return;
 	return signal[mark].listeners.delete(listener);
 }

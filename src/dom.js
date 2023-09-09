@@ -15,7 +15,11 @@ export function createElement(tag, attributes, ...connect){
 	if(s.isTextContent(attributes))
 		attributes= { textContent: attributes };
 	switch(true){
-		case typeof tag==="function": el= tag(attributes || undefined); break;
+		case typeof tag==="function": {
+			const ref= c=> c ? (connect.unshift(c), undefined) : el;
+			el= tag(attributes || undefined, ref);
+			break;
+		}
 		case tag==="#text":           el= assign(document.createTextNode(""), attributes); break;
 		case tag==="<>":              el= assign(document.createDocumentFragment(), attributes); break;
 		case namespace_curr!=="html": el= assign(document.createElementNS(namespace_curr, tag), attributes); break;
@@ -34,7 +38,7 @@ export function assign(element, ...attributes){
 	const is_svg= element instanceof SVGElement;
 	const setRemoveAttr= (is_svg ? setRemoveNS : setRemove).bind(null, element, "Attribute");
 	
-	/* jshint maxcomplexity:15 */
+	/* jshint maxcomplexity:16 */
 	Object.entries(Object.assign({}, ...attributes)).forEach(function assignNth([ key, attr ]){
 		attr= s.processReactiveAttribute(element, key, attr, assignNth);
 		const [ k ]= key;

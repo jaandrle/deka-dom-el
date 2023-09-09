@@ -1,15 +1,16 @@
-import { namespace, el, assign, on, registerReactivity } from "../index.js";
-import { S, isSignal } from "../src/signals.js";
+import * as dde_dom from "../index.js";
+export * from "../index.js";
+import * as dde_s from "../src/signals.js";
+export * from "../src/signals.js";
 // import { empty, namespace, on, dispatch } from "../index.js";
 // import "../dist/dde-with-signals.js";
 // Object.assign(globalThis, dde);
 // import { el, on, off, S } from "../dist/esm-with-signals.js";
-const style= createStyle();
-Object.assign(globalThis, { S, el, assign, namespace, on, registerReactivity, style });
-export { S, isSignal, el, on, registerReactivity, style };
+export const style= createStyle();
+Object.assign(globalThis, dde_dom, dde_s);
 
 function createStyle(){
-	const element= el("style");
+	const element= dde_dom.el("style");
 	const store= new WeakSet();
 	let host;
 	return {

@@ -1,7 +1,16 @@
 import { Signal } from "./src/signals";
 //TODO?
+/** Is filled when function is succesfully called ⇒ and returns component's root element. */
+type Host<el extends Element>= (extender?: ElementExtender<el>)=> el | undefined;
 declare global {
-	type ddeFires<T extends string[]>= ( (...a: any[])=> any ) & { events: T };
+	/**
+	 * `ref` is filled when function is succesfully called ⇒ and returns component's root element.
+	 * */
+	type ddeComponent<
+	A extends Record<any, any>,
+	R extends Element,
+	T extends string[] = []
+	>= (attrs: A, ref: Host<R>)=> R & { _events: T };
 }
 type ElementTagNameMap= HTMLElementTagNameMap & SVGElementTagNameMap & {
 	'#text': Text
@@ -47,12 +56,14 @@ export function el<T>(
 	signal?: Signal<T, any>,
 	cb?: (a: T)=> HTMLElement | HTMLElement[]
 ): DocumentFragment
-export function el<T extends (...a: any)=> Element>(
+export function el<R extends Element, T extends (attrs: any, host: Host<R>)=> R>(
 	fComponent: T,
-	attrs?: Parameters<T> & ElementAttributes<ReturnType<T>>,
+	attrs?: Parameters<T>,
 	...extenders: ElementExtender<ReturnType<T>>[]
 ): ReturnType<T>
 
+export function dispatchEvent(element: HTMLElement, name: keyof DocumentEventMap): void;
+export function dispatchEvent(element: HTMLElement, name: string, data: any): void;
 interface On{
 	<
 		EE extends ElementExtender<Element>,

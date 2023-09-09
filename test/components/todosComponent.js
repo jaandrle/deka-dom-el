@@ -1,4 +1,4 @@
-import { style, el, on, S } from '../exports.js';
+import { style, el, dispatchEvent, on, S } from '../exports.js';
 const className= style.host(todosComponent).css`
 	:host{
 		display: flex;
@@ -24,12 +24,10 @@ export function todosComponent({ todos= [ "Task A" ] }= {}){
 	todos.forEach(v=> S.action(todosS, "add", v));
 	const name= "todoName";
 	const onsubmitAdd= on("submit", event=> {
-		const value= event.target.elements[name].value;
-		if(!value) return;
-		
+		const el= event.target.elements[name];
 		event.preventDefault();
-		S.action(todosS, "add", value);
-		event.target.elements[name].value= "";
+		S.action(todosS, "add", el.value);
+		el.value= "";
 	});
 	const onremove= on("remove", event=>
 		S.action(todosS, "remove", event.detail));
@@ -62,26 +60,25 @@ export function todosComponent({ todos= [ "Task A" ] }= {}){
 	)
 }
 /**
- * @type {ddeFires<[ "click" ]>}
- * @param {{
- *	textContent: ddeSignal<string, any>
- *	value: number
- * }}
+ * @type {ddeComponent<
+ *	{ textContent: ddeSignal<string, any>, value: number },
+ *	HTMLLIElement,
+ *	[ "click" ]
+ * >}
  * */
-function todoComponent({ textContent, value }){
-	const ref= S();
+function todoComponent({ textContent, value }, host){
 	const onclick= on("click", event=> {
 		const value= Number(event.target.value);
 		event.preventDefault();
 		event.stopPropagation();
-		ref().dispatchEvent(new CustomEvent("remove", { detail: value }));
+		dispatchEvent(host(), "remove", value);
 	});
 	const is_editable= S(false);
 	const onedited= on("change", ev=> {
 		textContent(ev.target.value);
 		is_editable(false);
 	});
-	return el("li", null, ref).append(
+	return el("li").append(
 		S.el(is_editable, is=> is
 			? el("input", { value: textContent(), type: "text" }, onedited)
 			: el("span", textContent, on("click", ()=> is_editable(true))),

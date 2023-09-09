@@ -1,25 +1,31 @@
 export { registerReactivity } from './signals-common.js';
 
+export function dispatchEvent(element, name, ...d){
+	const event= d.length ? new CustomEvent(name, { detail: d[0] }) : new Event(name);
+	return element.dispatchEvent(event);
+}
 export function on(event, listener, options){
-	return element=> {
+	return function registerElement(element){
 		element.addEventListener(event, listener, options);
 		return element;
 	};
 }
 
 const c_ch_o= connectionsChangesObserverConstructor();
+import { onAbort } from './helpers.js';
+//TODO: cleanUp when event before abort?
 on.connected= function(listener, options){
 	return function registerElement(element){
-		c_ch_o.onConnected(element, listener);
-		if(options && options.signal)
-			options.signal.addEventListener("abort", ()=> c_ch_o.offConnected(element, listener));
+		const c= onAbort(options && options.signal, ()=> c_ch_o.offConnected(element, listener));
+		if(c) c_ch_o.onConnected(element, listener);
+		return element;
 	};
 };
 on.disconnected= function(listener, options){
 	return function registerElement(element){
-		c_ch_o.onDisconnected(element, listener);
-		if(options && options.signal)
-			options.signal.addEventListener("abort", ()=> c_ch_o.offDisconnected(element, listener));
+		const c= onAbort(options && options.signal, ()=> c_ch_o.offDisconnected(element, listener));
+		if(c) c_ch_o.onDisconnected(element, listener);
+		return element;
 	};
 };
 
@@ -64,7 +70,7 @@ function connectionsChangesObserverConstructor(){
 		}
 	};
 	function cleanWhenOff(element, ls){
-		if(ls.connected.length || ls.disconnect.length)
+		if(ls.connected.length || ls.disconnected.length)
 			return;
 		store.delete(element);
 		stop();
@@ -104,7 +110,7 @@ function connectionsChangesObserverConstructor(){
 	function observerAdded(addedNodes, is_root){
 		for(const element of addedNodes){
 			if(is_root) collectChildren(element).then(observerAdded);
-			if(!store.has(element)) return false;
+			if(!store.has(element)) continue;
 			
 			const ls= store.get(element);
 			ls.connected.forEach(listener=> listener(element));
@@ -112,11 +118,12 @@ function connectionsChangesObserverConstructor(){
 			if(!ls.disconnected.length) store.delete(element);
 			return true;
 		}
+		return false;
 	}
 	function observerRemoved(removedNodes, is_root){
 		for(const element of removedNodes){
 			if(is_root) collectChildren(element).then(observerRemoved);
-			if(!store.has(element)) return false;
+			if(!store.has(element)) continue;
 			
 			const ls= store.get(element);
 			ls.disconnected.forEach(listener=> listener(element));
@@ -126,5 +133,6 @@ function connectionsChangesObserverConstructor(){
 			store.delete(element);
 			return true;
 		}
+		return false;
 	}
 }
