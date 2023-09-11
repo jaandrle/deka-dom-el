@@ -16,13 +16,23 @@ import { onAbort } from './helpers.js';
 //TODO: cleanUp when event before abort?
 on.connected= function(listener, options){
 	return function registerElement(element){
+		if(typeof element.connectedCallback === "function"){
+			element.addEventListener("dde:connected", listener, options);
+			return element;
+		}
 		const c= onAbort(options && options.signal, ()=> c_ch_o.offConnected(element, listener));
-		if(c) c_ch_o.onConnected(element, listener);
+		if(!c) return element;
+		if(element.isConnected) listener(new Event("dde:connected"));
+		else c_ch_o.onConnected(element, listener);
 		return element;
 	};
 };
 on.disconnected= function(listener, options){
 	return function registerElement(element){
+		if(typeof element.disconnectedCallback === "function"){
+			element.addEventListener("dde:disconnected", listener, options);
+			return element;
+		}
 		const c= onAbort(options && options.signal, ()=> c_ch_o.offDisconnected(element, listener));
 		if(c) c_ch_o.onDisconnected(element, listener);
 		return element;
