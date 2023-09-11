@@ -87,10 +87,11 @@ export const signals_config= {
 	isTextContent(attributes){
 		return typeOf(attributes)==="string" || ( isSignal(attributes) && typeOf(valueOfSignal(attributes))==="string" );
 	},
-	processReactiveAttribute(_, key, attrS, assignNth){
-		if(!isSignal(attrS)) return attrS;
-		addSignalListener(attrS, attr=> assignNth([ key, attr ]));
-		return attrS();
+	processReactiveAttribute(_, key, attrs, assignNth){
+		//TODO DOC: once the signal is used as attribute, there is no reason to use assign again (if for some reason needed, use imperative listeners clear with `S.clear`)
+		if(!isSignal(attrs)) return attrs;
+		addSignalListener(attrs, attr=> assignNth([ key, attr ]));
+		return attrs();
 	}
 };
 
