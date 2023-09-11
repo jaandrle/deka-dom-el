@@ -1,11 +1,11 @@
 //deka-dom-el library is available via global namespace `dde`
 (()=> {
 	// src/helpers.js
-	function j(e) {
+	function N(e) {
 		let t = typeof e;
 		return t !== "object" ? t : e === null ? "null" : Object.prototype.toString.call(e);
 	}
-	function w(e, t) {
+	function O(e, t) {
 		if (!e || !(e instanceof AbortSignal))
 			return !0;
 		if (!e.aborted)
@@ -17,10 +17,10 @@
 	// src/signals-common.js
 	var l = {
 		isTextContent(e) {
-			return j(e) !== "[object Object]";
+			return N(e) !== "[object Object]";
 		},
-		processReactiveAttribute(e, t, n, r) {
-			return n;
+		processReactiveAttribute(e, t, r, n) {
+			return r;
 		}
 	};
 	function D(e, t = !0) {
@@ -31,43 +31,43 @@
 	}
 	
 	// src/dom.js
-	var m = "html";
+	var v = "html";
 	function F(e) {
-		return m = e === "svg" ? "http://www.w3.org/2000/svg" : e, {
+		return v = e === "svg" ? "http://www.w3.org/2000/svg" : e, {
 			append(t) {
-				return m = "html", t;
+				return v = "html", t;
 			}
 		};
 	}
-	function I(e, t, ...n) {
-		let r = C(this), c;
-		switch (r.isTextContent(t) && (t = { textContent: t }), !0) {
+	function I(e, t, ...r) {
+		let n = C(this), c;
+		switch (n.isTextContent(t) && (t = { textContent: t }), !0) {
 			case typeof e == "function": {
-				c = e(t || void 0, (s) => s ? (n.unshift(s), void 0) : c);
+				c = e(t || void 0, (s) => s ? (r.unshift(s), void 0) : c);
 				break;
 			}
 			case e === "#text":
-				c = x(document.createTextNode(""), t);
+				c = E(document.createTextNode(""), t);
 				break;
 			case e === "<>":
-				c = x(document.createDocumentFragment(), t);
+				c = E(document.createDocumentFragment(), t);
 				break;
-			case m !== "html":
-				c = x(document.createElementNS(m, e), t);
+			case v !== "html":
+				c = E(document.createElementNS(v, e), t);
 				break;
 			case !c:
-				c = x(document.createElement(e), t);
+				c = E(document.createElement(e), t);
 		}
-		return n.forEach((a) => a(c)), c;
+		return r.forEach((a) => a(c)), c;
 	}
 	var h = new Map(JSON.parse('[["#text,textContent",true],["HTMLElement,textContent",true],["HTMLElement,className",true]]'));
-	function x(e, ...t) {
-		let n = C(this);
+	function E(e, ...t) {
+		let r = C(this);
 		if (!t.length)
 			return e;
-		let r = e instanceof SVGElement, c = (r ? S : y).bind(null, e, "Attribute");
+		let n = e instanceof SVGElement, c = (n ? S : j).bind(null, e, "Attribute");
 		return Object.entries(Object.assign({}, ...t)).forEach(function a([s, f]) {
-			f = n.processReactiveAttribute(e, s, f, a);
+			f = r.processReactiveAttribute(e, s, f, a);
 			let [p] = s;
 			if (p === "=")
 				return c(s.slice(1), f);
@@ -76,11 +76,11 @@
 			if (typeof f == "object")
 				switch (s) {
 					case "style":
-						return E(f, y.bind(null, e.style, "Property"));
+						return x(f, j.bind(null, e.style, "Property"));
 					case "dataset":
-						return E(f, L.bind(null, e.dataset));
+						return x(f, L.bind(null, e.dataset));
 					case "ariaset":
-						return E(f, (g, b) => c("aria-" + g, b));
+						return x(f, (g, b) => c("aria-" + g, b));
 					case "classList":
 						return R(e, f);
 					default:
@@ -94,7 +94,7 @@
 				case "xlink:href":
 					return c(s, f, "http://www.w3.org/1999/xlink");
 				case "textContent":
-					if (!r)
+					if (!n)
 						break;
 					return e.appendChild(document.createTextNode(f));
 			}
@@ -102,69 +102,69 @@
 		}), e;
 	}
 	function R(e, t) {
-		return typeof t != "object" || E(
+		return typeof t != "object" || x(
 			t,
-			(n, r) => e.classList.toggle(n, r === -1 ? void 0 : !!r)
+			(r, n) => e.classList.toggle(r, n === -1 ? void 0 : !!n)
 		), e;
 	}
 	function U(e) {
 		return Array.from(e.children).forEach((t) => t.remove()), e;
 	}
 	function M(e, t) {
-		let n = "HTMLElement," + t;
-		if (e instanceof HTMLElement && h.has(n))
-			return h.get(n);
-		let r = e.nodeName + "," + t;
-		if (h.has(r))
+		let r = "HTMLElement," + t;
+		if (e instanceof HTMLElement && h.has(r))
 			return h.get(r);
-		let [c, a, s] = A(e, t), f = !N(c.set);
-		return (!f || a) && h.set(s === HTMLElement.prototype ? n : r, f), f;
+		let n = e.nodeName + "," + t;
+		if (h.has(n))
+			return h.get(n);
+		let [c, a, s] = A(e, t), f = !y(c.set);
+		return (!f || a) && h.set(s === HTMLElement.prototype ? r : n, f), f;
 	}
-	function A(e, t, n = 0) {
+	function A(e, t, r = 0) {
 		if (e = Object.getPrototypeOf(e), !e)
-			return [{}, n, e];
-		let r = Object.getOwnPropertyDescriptor(e, t);
-		return r ? [r, n, e] : A(e, t, n + 1);
+			return [{}, r, e];
+		let n = Object.getOwnPropertyDescriptor(e, t);
+		return n ? [n, r, e] : A(e, t, r + 1);
 	}
-	function E(e, t) {
-		return Object.entries(e).forEach(([n, r]) => t(n, r));
+	function x(e, t) {
+		return Object.entries(e).forEach(([r, n]) => t(r, n));
 	}
-	function N(e) {
+	function y(e) {
 		return typeof e > "u";
 	}
-	function y(e, t, n, r) {
-		return e[(N(r) ? "remove" : "set") + t](n, r);
+	function j(e, t, r, n) {
+		return e[(y(n) ? "remove" : "set") + t](r, n);
 	}
-	function S(e, t, n, r, c = null) {
-		return e[(N(r) ? "remove" : "set") + t + "NS"](c, n, r);
+	function S(e, t, r, n, c = null) {
+		return e[(y(n) ? "remove" : "set") + t + "NS"](c, r, n);
 	}
-	function L(e, t, n) {
-		return Reflect.set(e, t, n);
+	function L(e, t, r) {
+		return Reflect.set(e, t, r);
 	}
 	
 	// src/events.js
-	function $(e, t, ...n) {
-		let r = n.length ? new CustomEvent(t, { detail: n[0] }) : new Event(t);
-		return e.dispatchEvent(r);
+	function $(e, t, ...r) {
+		let n = r.length ? new CustomEvent(t, { detail: r[0] }) : new Event(t);
+		return e.dispatchEvent(n);
 	}
-	function T(e, t, n) {
+	function T(e, t, r) {
 		return function(c) {
-			return c.addEventListener(e, t, n), c;
+			return c.addEventListener(e, t, r), c;
 		};
 	}
-	var v = _();
+	var m = _();
 	T.connected = function(e, t) {
-		return function(r) {
-			return w(t && t.signal, () => v.offConnected(r, e)) && v.onConnected(r, e), r;
+		return function(n) {
+			return typeof n.connectedCallback == "function" ? (n.addEventListener("dde:connected", e, t), n) : (O(t && t.signal, () => m.offConnected(n, e)) && (n.isConnected ? e(new Event("dde:connected")) : m.onConnected(n, e)), n);
 		};
 	};
 	T.disconnected = function(e, t) {
-		return function(r) {
-			return w(t && t.signal, () => v.offDisconnected(r, e)) && v.onDisconnected(r, e), r;
+		return function(n) {
+			return typeof n.disconnectedCallback == "function" ? (n.addEventListener("dde:disconnected", e, t), n) : (O(t && t.signal, () => m.offDisconnected(n, e)) && m.onDisconnected(n, e), n);
 		};
 	};
 	function _() {
-		let e = /* @__PURE__ */ new Map(), t = !1, n = new MutationObserver(function(o) {
+		let e = /* @__PURE__ */ new Map(), t = !1, r = new MutationObserver(function(o) {
 			for (let i of o)
 				if (i.type === "childList") {
 					if (g(i.addedNodes, !0)) {
@@ -182,7 +182,7 @@
 				if (!e.has(o))
 					return;
 				let u = e.get(o), d = u.connected;
-				d.splice(d.indexOf(i), 1), r(o, u);
+				d.splice(d.indexOf(i), 1), n(o, u);
 			},
 			onDisconnected(o, i) {
 				a(), c(o).disconnected.push(i);
@@ -191,10 +191,10 @@
 				if (!e.has(o))
 					return;
 				let u = e.get(o), d = u.disconnected;
-				d.splice(d.indexOf(i), 1), r(o, u);
+				d.splice(d.indexOf(i), 1), n(o, u);
 			}
 		};
-		function r(o, i) {
+		function n(o, i) {
 			i.connected.length || i.disconnected.length || (e.delete(o), s());
 		}
 		function c(o) {
@@ -204,10 +204,10 @@
 			return e.set(o, i), i;
 		}
 		function a() {
-			t || (t = !0, n.observe(document.body, { childList: !0, subtree: !0 }));
+			t || (t = !0, r.observe(document.body, { childList: !0, subtree: !0 }));
 		}
 		function s() {
-			!t || e.size || (t = !1, n.disconnect());
+			!t || e.size || (t = !1, r.disconnect());
 		}
 		function f() {
 			return new Promise(function(o) {
@@ -228,7 +228,7 @@
 				if (i && p(u).then(g), !e.has(u))
 					continue;
 				let d = e.get(u);
-				return d.connected.forEach((O) => O(u)), d.connected.length = 0, d.disconnected.length || e.delete(u), !0;
+				return d.connected.forEach((w) => w(u)), d.connected.length = 0, d.disconnected.length || e.delete(u), !0;
 			}
 			return !1;
 		}
@@ -237,7 +237,7 @@
 				if (i && p(u).then(b), !e.has(u))
 					continue;
 				let d = e.get(u);
-				return d.disconnected.forEach((O) => O(u)), d.connected.length = 0, d.disconnected.length = 0, e.delete(u), !0;
+				return d.disconnected.forEach((w) => w(u)), d.connected.length = 0, d.disconnected.length = 0, e.delete(u), !0;
 			}
 			return !1;
 		}
@@ -246,13 +246,13 @@
 	// index.js
 	[HTMLElement, DocumentFragment].forEach((e) => {
 		let { append: t } = e.prototype;
-		e.prototype.append = function(...n) {
-			return t.apply(this, n), this;
+		e.prototype.append = function(...r) {
+			return t.apply(this, r), this;
 		};
 	});
 	
 	globalThis.dde= {
-		assign: x,
+		assign: E,
 		classListDeclarative: R,
 		createElement: I,
 		dispatchEvent: $,
