@@ -16,12 +16,11 @@ const className= style.host(todosComponent).css`
 `;
 /** @param {{ todos: string[] }} */
 export function todosComponent({ todos= [ "Task A" ] }= {}){
-	const todosS= S([], {
+	const todosS= S(todos.map(t=> S(t)), {
 		add(v){ this.value.push(S(v)); },
 		remove(i){ this.value.splice(i, 1); },
 		[S.symbols.onclear](){ S.clear(...this.value); },
 	});
-	todos.forEach(v=> S.action(todosS, "add", v));
 	const name= "todoName";
 	const onsubmitAdd= on("submit", event=> {
 		const el= event.target.elements[name];
@@ -81,7 +80,7 @@ function todoComponent({ textContent, value }, host){
 	return el("li").append(
 		S.el(is_editable, is=> is
 			? el("input", { value: textContent(), type: "text" }, onedited)
-			: el("span", textContent, on("click", ()=> is_editable(true))),
+			: el("span", { textContent, onclick: is_editable.bind(null, true) }),
 		),
 		el("button", { type: "button", value, textContent: "-" }, onclick)
 	);

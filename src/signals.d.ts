@@ -41,6 +41,7 @@ interface S {
 		signal: SymbolSignal;
 		onclear: SymbolOnclear;
 	}
+	el<S extends any, T extends HTMLElement>(signal: Signal<S, any>, el: (v: S)=> T): T;
 }
 export const S: S;
 declare global {
