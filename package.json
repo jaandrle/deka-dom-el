@@ -73,12 +73,22 @@
 	"size-limit": [
 		{
 			"path": "./index.js",
-			"limit": "10 kB",
+			"limit": "7 kB",
 			"gzip": false
 		},
 		{
-			"path": "./index-with-signals.js",
-			"limit": "10 kB",
+			"path": "./src/signals.js",
+			"limit": "4 kB",
+			"gzip": false
+		},
+		{
+			"path": "./src/jsdom.js",
+			"limit": "8 kB",
+			"gzip": false
+		},
+		{
+			"path": "./test/components/webComponent.js",
+			"limit": "10kb",
 			"gzip": false
 		}
 	],
