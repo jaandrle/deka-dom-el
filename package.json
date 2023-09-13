@@ -16,17 +16,13 @@
 	"types": "./index.d.ts",
 	"type": "module",
 	"exports": {
-		".": {
-			"import": "./index.js",
-			"types": "./index.d.ts"
-		},
 		"./jsdom": {
-			"import": "./src/jsdom.js",
-			"types": "./src/jsdom.d.ts"
+			"import": "./jsdom.js",
+			"types": "./jsdom.d.ts"
 		},
 		"./signals": {
-			"import": "./src/signals.js",
-			"types": "./src/signals.d.ts"
+			"import": "./signals.js",
+			"types": "./signals.d.ts"
 		},
 		"./signals-lib": {
 			"import": "./src/signals-lib.js",
@@ -35,14 +31,11 @@
 	},
 	"typesVersions": {
 		"*": {
-			".": [
-				"./index.d.ts"
-			],
 			"./jsdom": [
-				"./src/jsdom.d.ts"
+				"./jsdom.d.ts"
 			],
 			"./signals": [
-				"./src/signals.d.ts"
+				"./signals.d.ts"
 			],
 			"./signals-lib": [
 				"./src/signals.d.ts"
@@ -50,8 +43,8 @@
 		}
 	},
 	"files": [
-		"index.js",
-		"index.d.ts",
+		"*.js",
+		"*.d.ts",
 		"src"
 	],
 	"engines": {

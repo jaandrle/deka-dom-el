@@ -1,4 +1,4 @@
-import { prop_process } from './dom-common.js';
+import { prop_process } from './src/dom-common.js';
 const { setDelete }= prop_process;
 /** @param {HTMLElement} obj */
 prop_process.setDelete= function(obj, prop, value){
@@ -13,7 +13,7 @@ export let assign;
 export let on;
 export async function register(dom, keys_aditional= []){
 	if(dom_last===dom)
-		return import("../index.js");
+		return import("./index.js");
 
 	keys.push(...keys_aditional);
 	const w= dom.window;
@@ -21,7 +21,7 @@ export async function register(dom, keys_aditional= []){
 	globalThis.window= w;
 	w.console= globalThis.console;
 
-	const m= await import("../index.js");
+	const m= await import("./index.js");
 	el= m.el;
 	assign= m.assign;
 	on= m.on;
