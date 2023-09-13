@@ -1,3 +1,11 @@
+import { prop_process } from './dom-common.js';
+const { setDelete }= prop_process;
+/** @param {HTMLElement} obj */
+prop_process.setDelete= function(obj, prop, value){
+	if("checked"!==prop) return setDelete(obj, prop, value);
+	if(value) return obj.setAttribute("checked", "");
+	obj.removeAttribute("checked");
+}
 const keys= [ "HTMLElement", "SVGElement", "DocumentFragment", "MutationObserver", "document" ];
 let dom_last;
 export let el;

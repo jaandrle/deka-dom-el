@@ -1,6 +1,5 @@
-import { typeOf } from './helpers.js';
 export const signals_global= {
-	isTextContent(attributes){ return typeOf(attributes)!=="[object Object]"; },
+	isTextContent(attributes){ return typeof attributes==="string"; },
 	processReactiveAttribute(el, key, attr, assignNth){ return attr; },
 };
 export function registerReactivity(def, global= true){

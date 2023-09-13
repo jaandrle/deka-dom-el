@@ -30,8 +30,8 @@ export function createElement(tag, attributes, ...connect){
 }
 export { createElement as el };
 
-/** @type {Map<string, boolean>} */
-const prop_cache= new Map(JSON.parse('[["#text,textContent",true],["HTMLElement,textContent",true],["HTMLElement,className",true]]'));
+import { prop_cache, prop_process } from './dom-common.js';
+const { setDelete }= prop_process;
 export function assign(element, ...attributes){
 	const s= signals(this);
 	if(!attributes.length) return element;
@@ -82,6 +82,7 @@ export function empty(el){
 	Array.from(el.children).forEach(el=> el.remove());
 	return el;
 }
+import { isUndef } from "./helpers.js";
 function isPropSetter(el, key){
 	const cache_key_he= "HTMLElement,"+key;
 	if(el instanceof HTMLElement && prop_cache.has(cache_key_he))
@@ -104,8 +105,6 @@ function getPropDescriptor(p, key, level= 0){
 
 /** @template {Record<any, any>} T  @param {T} obj @param {(param: [ keyof T, T[keyof T] ])=> void} cb */
 function forEachEntries(obj, cb){ return Object.entries(obj).forEach(([ key, val ])=> cb(key, val)); }
-function isUndef(value){ return typeof value==="undefined"; }
 
 function setRemove(obj, prop, key, val){ return obj[ (isUndef(val) ? "remove" : "set") + prop ](key, val); }
 function setRemoveNS(obj, prop, key, val, ns= null){ return obj[ (isUndef(val) ? "remove" : "set") + prop + "NS" ](ns, key, val); }
-function setDelete(obj, prop, val){ return Reflect.set(obj, prop, val); }

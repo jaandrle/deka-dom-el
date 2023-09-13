@@ -1,3 +1,4 @@
+export function isUndef(value){ return typeof value==="undefined"; }
 export function typeOf(v){
 	const t= typeof v;
 	if(t!=="object") return t;

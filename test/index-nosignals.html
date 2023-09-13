@@ -12,7 +12,12 @@
 	<script type="module">
 		import { el } from "../index.js";
 		document.body.append(
-			el("p", { textContent: "Ahoj", style: { color: "green" } })
+			el("input", { type: "checkbox", name: "name", checked: true, id: undefined }),
+			el("p", { textContent: "Ahoj", style: { color: "green" } }),
+			el("select", { value: "a" }).append(
+				el("option", { value: "a", textContent: "A" }),
+				el("option", { value: "b", textContent: "B" })
+			)
 		);
 	</script>
 </head>

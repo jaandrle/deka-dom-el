@@ -25,6 +25,7 @@ export class CustomHTMLTestElement extends HTMLElement{
 		);
 	}
 }
+// https://gist.github.com/WebReflection/ec9f6687842aa385477c4afca625bbf4
 customElementsAssign(
 	CustomHTMLTestElement,
 	reflectObservedAttributes,
