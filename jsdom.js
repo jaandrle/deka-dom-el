@@ -1,3 +1,4 @@
+//TODO: https://www.npmjs.com/package/html-element
 import { prop_process } from './src/dom-common.js';
 const { setDelete }= prop_process;
 /** @param {HTMLElement} obj */
@@ -8,9 +9,16 @@ prop_process.setDelete= function(obj, prop, value){
 };
 const keys= [ "HTMLElement", "SVGElement", "DocumentFragment", "MutationObserver", "document" ];
 let dom_last;
+
+export let namespace;
+export let createElement;
 export let el;
 export let assign;
+export let classListDeclarative;
+export let empty;
 export let on;
+export let dispatchEvent;
+
 export async function register(dom, keys_aditional= []){
 	if(dom_last===dom)
 		return import("./index.js");
@@ -22,9 +30,14 @@ export async function register(dom, keys_aditional= []){
 	w.console= globalThis.console;
 
 	const m= await import("./index.js");
+	namespace= m.namespace;
+	createElement= m.createElement;
 	el= m.el;
 	assign= m.assign;
+	classListDeclarative= m.classListDeclarative;
+	empty= m.empty;
 	on= m.on;
+	dispatchEvent= m.dispatchEvent;
 	return m;
 }
 export function unregister(){

@@ -1,6 +1,6 @@
 {
 	"name": "deka-dom-el",
-	"version": "0.1.3",
+	"version": "0.2.0",
 	"description": "A low-code library that simplifies the creation of native DOM elements/components using small wrappers and tweaks.",
 	"author": "Jan Andrle <andrle.jan@centrum.cz>",
 	"license": "MIT",
@@ -16,6 +16,10 @@
 	"types": "./index.d.ts",
 	"type": "module",
 	"exports": {
+		".": {
+			"import": "./index.js",
+			"types": "./index.d.ts"
+		},
 		"./jsdom": {
 			"import": "./jsdom.js",
 			"types": "./jsdom.d.ts"
@@ -24,22 +28,9 @@
 			"import": "./signals.js",
 			"types": "./signals.d.ts"
 		},
-		"./signals-lib": {
+		"./src/signals-lib": {
 			"import": "./src/signals-lib.js",
 			"types": "./src/signals.d.ts"
-		}
-	},
-	"typesVersions": {
-		"*": {
-			"./jsdom": [
-				"./jsdom.d.ts"
-			],
-			"./signals": [
-				"./signals.d.ts"
-			],
-			"./signals-lib": [
-				"./src/signals.d.ts"
-			]
 		}
 	},
 	"files": [
@@ -70,12 +61,12 @@
 			"gzip": false
 		},
 		{
-			"path": "./src/signals.js",
+			"path": "./signals.js",
 			"limit": "4 kB",
 			"gzip": false
 		},
 		{
-			"path": "./src/jsdom.js",
+			"path": "./jsdom.js",
 			"limit": "8 kB",
 			"gzip": false
 		},
