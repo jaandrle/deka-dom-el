@@ -3,6 +3,7 @@ import { prop_process } from './src/dom-common.js';
 const { setDeleteAttr }= prop_process;
 /** @param {HTMLElement} obj */
 prop_process.setDeleteAttr= function(obj, prop, value){
+	if("value"===prop) return obj.setAttribute(prop, value);
 	if("checked"!==prop) return setDeleteAttr(obj, prop, value);
 	if(value) return obj.setAttribute(prop, "");
 	obj.removeAttribute(prop);
