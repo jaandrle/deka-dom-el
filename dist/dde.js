@@ -36,11 +36,11 @@
 	}
 	
 	// src/dom.js
-	var m = "html";
+	var v = "html";
 	function I(e) {
-		return m = e === "svg" ? "http://www.w3.org/2000/svg" : e, {
-			append(t) {
-				return m = "html", t;
+		return v = e === "svg" ? "http://www.w3.org/2000/svg" : e, {
+			append(...t) {
+				return v = "html", t.length === 1 ? t[0] : document.createDocumentFragment().append(...t);
 			}
 		};
 	}
@@ -57,8 +57,8 @@
 			case e === "<>":
 				c = E(document.createDocumentFragment(), t);
 				break;
-			case m !== "html":
-				c = E(document.createElementNS(m, e), t);
+			case v !== "html":
+				c = E(document.createElementNS(v, e), t);
 				break;
 			case !c:
 				c = E(document.createElement(e), t);
@@ -81,11 +81,11 @@
 			if (typeof f == "object")
 				switch (s) {
 					case "style":
-						return v(f, N.bind(null, e.style, "Property"));
+						return m(f, N.bind(null, e.style, "Property"));
 					case "dataset":
-						return v(f, y.bind(null, e.dataset));
+						return m(f, y.bind(null, e.dataset));
 					case "ariaset":
-						return v(f, (x, b) => c("aria-" + x, b));
+						return m(f, (x, b) => c("aria-" + x, b));
 					case "classList":
 						return j(e, f);
 					default:
@@ -107,7 +107,7 @@
 		}), e;
 	}
 	function j(e, t) {
-		return typeof t != "object" || v(
+		return typeof t != "object" || m(
 			t,
 			(r, n) => e.classList.toggle(r, n === -1 ? void 0 : !!n)
 		), e;
@@ -122,16 +122,16 @@
 		let n = e.nodeName + "," + t;
 		if (h.has(n))
 			return h.get(n);
-		let [c, a, s] = _(e, t), f = !p(c.set);
+		let [c, a, s] = D(e, t), f = !p(c.set);
 		return (!f || a) && h.set(s === HTMLElement.prototype ? r : n, f), f;
 	}
-	function _(e, t, r = 0) {
+	function D(e, t, r = 0) {
 		if (e = Object.getPrototypeOf(e), !e)
 			return [{}, r, e];
 		let n = Object.getOwnPropertyDescriptor(e, t);
-		return n ? [n, r, e] : _(e, t, r + 1);
+		return n ? [n, r, e] : D(e, t, r + 1);
 	}
-	function v(e, t) {
+	function m(e, t) {
 		return Object.entries(e).forEach(([r, n]) => t(r, n));
 	}
 	function N(e, t, r, n) {
@@ -146,18 +146,18 @@
 		let n = r.length ? new CustomEvent(t, { detail: r[0] }) : new Event(t);
 		return e.dispatchEvent(n);
 	}
-	function D(e, t, r) {
+	function _(e, t, r) {
 		return function(c) {
 			return c.addEventListener(e, t, r), c;
 		};
 	}
 	var w = P();
-	D.connected = function(e, t) {
+	_.connected = function(e, t) {
 		return function(n) {
 			return typeof n.connectedCallback == "function" ? (n.addEventListener("dde:connected", e, t), n) : (L(t && t.signal, () => w.offConnected(n, e)) && (n.isConnected ? e(new Event("dde:connected")) : w.onConnected(n, e)), n);
 		};
 	};
-	D.disconnected = function(e, t) {
+	_.disconnected = function(e, t) {
 		return function(n) {
 			return typeof n.disconnectedCallback == "function" ? (n.addEventListener("dde:disconnected", e, t), n) : (L(t && t.signal, () => w.offDisconnected(n, e)) && w.onDisconnected(n, e), n);
 		};
@@ -258,7 +258,7 @@
 		el: Z,
 		empty: B,
 		namespace: I,
-		on: D,
+		on: _,
 		registerReactivity: T
 	};
 	

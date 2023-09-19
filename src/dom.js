@@ -5,7 +5,12 @@ let namespace_curr= "html";
 export function namespace(namespace){
 	namespace_curr= namespace==="svg" ? "http://www.w3.org/2000/svg" : namespace;
 	return {
-		append(el){ namespace_curr= "html"; return el; }
+		append(...el){
+			namespace_curr= "html";
+			if(el.length===1) return el[0];
+			const f= document.createDocumentFragment();
+			return f.append(...el);
+		}
 	};
 }
 export function createElement(tag, attributes, ...connect){

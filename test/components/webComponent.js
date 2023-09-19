@@ -1,5 +1,5 @@
 import { el } from "../../index.js";
-import { S } from "../../src/signals.js";
+import { S } from "../../signals.js";
 const { hasOwnProperty }= Object.prototype;
 
 const store= attrsPropsToSignals([ "test" ]);

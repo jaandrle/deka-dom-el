@@ -41,8 +41,8 @@ function $(e, t, r) {
 var S = "html";
 function oe(e) {
 	return S = e === "svg" ? "http://www.w3.org/2000/svg" : e, {
-		append(t) {
-			return S = "html", t;
+		append(...t) {
+			return S = "html", t.length === 1 ? t[0] : document.createDocumentFragment().append(...t);
 		}
 	};
 }
@@ -264,10 +264,10 @@ function L(e) {
 var l = /* @__PURE__ */ new WeakMap();
 function g(e, t) {
 	if (typeof e != "function")
-		return z(e, t);
+		return F(e, t);
 	if (L(e))
 		return e;
-	let r = z(""), n = () => r(e());
+	let r = F(""), n = () => r(e());
 	return l.set(n, /* @__PURE__ */ new Set([r])), G(n), r;
 }
 g.action = function(e, t, ...r) {
@@ -320,7 +320,7 @@ g.el = function(e, t) {
 	};
 	return P(e, a), a(e()), o;
 };
-var F = {
+var z = {
 	isTextContent(e) {
 		return w(e) === "string" || L(e) && w(X(e)) === "string";
 	},
@@ -328,7 +328,7 @@ var F = {
 		return L(r) ? (P(r, (o) => n([t, o])), r()) : r;
 	}
 };
-function z(e, t) {
+function F(e, t) {
 	let r = (...n) => n.length ? Q(r, n[0]) : K(r);
 	return B(r, e, t);
 }
@@ -379,8 +379,8 @@ function U(e, t) {
 		return e[d].listeners.delete(t);
 }
 
-// src/signals.js
-_(F);
+// signals.js
+_(z);
 export {
 	g as S,
 	y as assign,
