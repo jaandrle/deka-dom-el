@@ -50,7 +50,7 @@ function ie(e, t, ...n) {
 	let r = N(this), o;
 	switch (r.isTextContent(t) && (t = { textContent: t }), !0) {
 		case typeof e == "function": {
-			o = e(t || void 0, (i) => i ? (n.unshift(i), void 0) : o);
+			o = e(t || void 0, (s) => s ? (n.unshift(s), void 0) : o);
 			break;
 		}
 		case e === "#text":
@@ -73,39 +73,39 @@ function y(e, ...t) {
 	if (!t.length)
 		return e;
 	let r = e instanceof SVGElement, o = (r ? I : T).bind(null, e, "Attribute");
-	return Object.entries(Object.assign({}, ...t)).forEach(function a([i, s]) {
-		s = n.processReactiveAttribute(e, i, s, a);
-		let [h] = i;
+	return Object.entries(Object.assign({}, ...t)).forEach(function a([s, i]) {
+		i = n.processReactiveAttribute(e, s, i, a);
+		let [h] = s;
 		if (h === "=")
-			return o(i.slice(1), s);
+			return o(s.slice(1), i);
 		if (h === ".")
-			return M(e, i.slice(1), s);
-		if (typeof s == "object")
-			switch (i) {
+			return M(e, s.slice(1), i);
+		if (typeof i == "object" && i !== null)
+			switch (s) {
 				case "style":
-					return O(s, T.bind(null, e.style, "Property"));
+					return O(i, T.bind(null, e.style, "Property"));
 				case "dataset":
-					return O(s, M.bind(null, e.dataset));
+					return O(i, M.bind(null, e.dataset));
 				case "ariaset":
-					return O(s, (E, v) => o("aria-" + E, v));
+					return O(i, (E, v) => o("aria-" + E, v));
 				case "classList":
-					return J(e, s);
+					return J(e, i);
 				default:
-					return Reflect.set(e, i, s);
+					return Reflect.set(e, s, i);
 			}
-		if (/(aria|data)([A-Z])/.test(i))
-			return i = i.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase(), o(i, s);
-		switch (i) {
+		if (/(aria|data)([A-Z])/.test(s))
+			return s = s.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase(), o(s, i);
+		switch (s) {
 			case "href":
-				return o(i, s);
+				return o(s, i);
 			case "xlink:href":
-				return o(i, s, "http://www.w3.org/1999/xlink");
+				return o(s, i, "http://www.w3.org/1999/xlink");
 			case "textContent":
 				if (!r)
 					break;
-				return e.appendChild(document.createTextNode(s));
+				return e.appendChild(document.createTextNode(i));
 		}
-		return W(e, i) ? q(e, i, s) : o(i, s);
+		return W(e, s) ? q(e, s, i) : o(s, i);
 	}), e;
 }
 function J(e, t) {
@@ -124,8 +124,8 @@ function W(e, t) {
 	let r = e.nodeName + "," + t;
 	if (x.has(r))
 		return x.get(r);
-	let [o, a, i] = H(e, t), s = !m(o.set);
-	return (!s || a) && x.set(i === HTMLElement.prototype ? n : r, s), s;
+	let [o, a, s] = H(e, t), i = !m(o.set);
+	return (!i || a) && x.set(s === HTMLElement.prototype ? n : r, i), i;
 }
 function H(e, t, n = 0) {
 	if (e = Object.getPrototypeOf(e), !e)
@@ -173,10 +173,10 @@ function Z() {
 		for (let f of c)
 			if (f.type === "childList") {
 				if (E(f.addedNodes, !0)) {
-					i();
+					s();
 					continue;
 				}
-				v(f.removedNodes, !0) && i();
+				v(f.removedNodes, !0) && s();
 			}
 	});
 	return {
@@ -200,7 +200,7 @@ function Z() {
 		}
 	};
 	function r(c, f) {
-		f.connected.length || f.disconnected.length || (e.delete(c), i());
+		f.connected.length || f.disconnected.length || (e.delete(c), s());
 	}
 	function o(c) {
 		if (e.has(c))
@@ -211,16 +211,16 @@ function Z() {
 	function a() {
 		t || (t = !0, n.observe(document.body, { childList: !0, subtree: !0 }));
 	}
-	function i() {
+	function s() {
 		!t || e.size || (t = !1, n.disconnect());
 	}
-	function s() {
+	function i() {
 		return new Promise(function(c) {
 			(requestIdleCallback || requestAnimationFrame)(c);
 		});
 	}
 	async function h(c) {
-		e.size > 30 && await s();
+		e.size > 30 && await i();
 		let f = [];
 		if (!(c instanceof Node))
 			return f;
@@ -312,15 +312,15 @@ g.clear = function(...e) {
 g.el = function(e, t) {
 	let n = document.createComment("<#reactive>"), r = document.createComment("</#reactive>"), o = document.createDocumentFragment();
 	o.append(n, r);
-	let a = (i) => {
+	let a = (s) => {
 		if (!n.parentNode || !r.parentNode)
 			return $(e, a);
-		let s = t(i);
-		Array.isArray(s) || (s = [s]);
+		let i = t(s);
+		Array.isArray(i) || (i = [i]);
 		let h = n;
 		for (; (h = n.nextSibling) !== r; )
 			h.remove();
-		n.after(...s);
+		n.after(...i);
 	};
 	return P(e, a), a(e()), o;
 };

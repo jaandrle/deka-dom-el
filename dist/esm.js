@@ -76,7 +76,7 @@ function b(e, ...t) {
 			return c(s.slice(1), f);
 		if (h === ".")
 			return y(e, s.slice(1), f);
-		if (typeof f == "object")
+		if (typeof f == "object" && f !== null)
 			switch (s) {
 				case "style":
 					return m(f, N.bind(null, e.style, "Property"));

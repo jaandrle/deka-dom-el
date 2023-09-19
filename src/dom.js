@@ -43,19 +43,19 @@ export function assign(element, ...attributes){
 	const is_svg= element instanceof SVGElement;
 	const setRemoveAttr= (is_svg ? setRemoveNS : setRemove).bind(null, element, "Attribute");
 	
-	/* jshint maxcomplexity:16 */
+	/* jshint maxcomplexity:17 */
 	Object.entries(Object.assign({}, ...attributes)).forEach(function assignNth([ key, attr ]){
 		attr= s.processReactiveAttribute(element, key, attr, assignNth);
 		const [ k ]= key;
 		if("="===k) return setRemoveAttr(key.slice(1), attr);
 		if("."===k) return setDelete(element, key.slice(1), attr);
-		if(typeof attr === "object"){
+		if(typeof attr === "object" && attr!==null){
 			switch(key){
-				case "style":		return forEachEntries(attr, setRemove.bind(null, element.style, "Property"));
-				case "dataset":		return forEachEntries(attr, setDelete.bind(null, element.dataset));
-				case "ariaset":		return forEachEntries(attr, (key, val)=> setRemoveAttr("aria-"+key, val));
-				case "classList":	return classListDeclarative(element, attr);
-				default:			return Reflect.set(element, key, attr);
+				case     "style": return forEachEntries(attr, setRemove.bind(null, element.style, "Property"));
+				case   "dataset": return forEachEntries(attr, setDelete.bind(null, element.dataset));
+				case   "ariaset": return forEachEntries(attr, (key, val)=> setRemoveAttr("aria-"+key, val));
+				case "classList": return classListDeclarative(element, attr);
+				         default: return Reflect.set(element, key, attr);
 			}
 		}
 		if(/(aria|data)([A-Z])/.test(key)){
