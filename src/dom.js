@@ -36,7 +36,7 @@ export function createElement(tag, attributes, ...connect){
 export { createElement as el };
 
 import { prop_cache, prop_process } from './dom-common.js';
-const { setDelete }= prop_process;
+const { setDeleteAttr }= prop_process;
 export function assign(element, ...attributes){
 	const s= signals(this);
 	if(!attributes.length) return element;
@@ -71,7 +71,7 @@ export function assign(element, ...attributes){
 				if(!is_svg) break;
 				return element.appendChild(document.createTextNode(attr));
 		}
-		return isPropSetter(element, key) ? setDelete(element, key, attr) : setRemoveAttr(key, attr);
+		return isPropSetter(element, key) ? setDeleteAttr(element, key, attr) : setRemoveAttr(key, attr);
 	});
 	return element;
 }
@@ -109,7 +109,8 @@ function getPropDescriptor(p, key, level= 0){
 }
 
 /** @template {Record<any, any>} T  @param {T} obj @param {(param: [ keyof T, T[keyof T] ])=> void} cb */
-function forEachEntries(obj, cb){ return Object.entries(obj).forEach(([ key, val ])=> cb(key, val)); }
+function forEachEntries(obj, cb){ return Object.entries(obj).forEach(([ key, val ])=> key && cb(key, val)); }
 
 function setRemove(obj, prop, key, val){ return obj[ (isUndef(val) ? "remove" : "set") + prop ](key, val); }
 function setRemoveNS(obj, prop, key, val, ns= null){ return obj[ (isUndef(val) ? "remove" : "set") + prop + "NS" ](ns, key, val); }
+function setDelete(obj, key, val){ Reflect.set(obj, key, val); if(!isUndef(val)) return; return Reflect.deleteProperty(obj, key); }

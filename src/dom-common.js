@@ -1,8 +1,8 @@
 /** @type {Map<string, boolean>} */
 export const prop_cache= new Map(JSON.parse('[["#text,textContent",true],["HTMLElement,textContent",true],["HTMLElement,className",true]]'));
-export const prop_process= { setDelete };
+export const prop_process= { setDeleteAttr };
 import { isUndef } from './helpers.js';
-function setDelete(obj, prop, val){
+function setDeleteAttr(obj, prop, val){
 	/* Issue
 		For some native attrs you can unset only to set empty string.
 		This can be confusing as it is seen in inspector `<… id=""`.

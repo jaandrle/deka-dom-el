@@ -1,9 +1,9 @@
 //TODO: https://www.npmjs.com/package/html-element
 import { prop_process } from './src/dom-common.js';
-const { setDelete }= prop_process;
+const { setDeleteAttr }= prop_process;
 /** @param {HTMLElement} obj */
-prop_process.setDelete= function(obj, prop, value){
-	if("checked"!==prop) return setDelete(obj, prop, value);
+prop_process.setDeleteAttr= function(obj, prop, value){
+	if("checked"!==prop) return setDeleteAttr(obj, prop, value);
 	if(value) return obj.setAttribute("checked", "");
 	obj.removeAttribute("checked");
 };
