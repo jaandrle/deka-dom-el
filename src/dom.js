@@ -56,7 +56,9 @@ export function assign(element, ...attributes){
 		}
 		if("className"===key) key= "class";
 		switch(key){
-			case "href": case "src": case "class": case "xlink:href":
+			case "href": case "src": case "class":
+				return setRemoveAttr(key, attr);
+			case "xlink:href":
 				return setRemoveAttr(key, attr, "http://www.w3.org/1999/xlink");
 			case "textContent": case "innerText":
 				if(!is_svg) return setDeleteAttr(element, key, attr);

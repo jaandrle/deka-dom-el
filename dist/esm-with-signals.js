@@ -92,7 +92,12 @@ function w(e, ...t) {
 			case "src":
 			case "class":
 			case "xlink:href":
-				return i(f, a, "http://www.w3.org/1999/xlink");
+				return i(
+					f,
+					a,
+					/* this applies only to SVG elements, see setRemove/setRemoveNS */
+					"http://www.w3.org/1999/xlink"
+				);
 			case "textContent":
 			case "innerText":
 				return o ? e.appendChild(document.createTextNode(a)) : j(e, f, a);
