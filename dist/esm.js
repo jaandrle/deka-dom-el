@@ -48,57 +48,57 @@ function H(e) {
 	};
 }
 function I(e, t, ...n) {
-	let r = v(this), c;
-	switch ((Object(t) !== t || r.isSignal(t)) && (t = { textContent: t }), !0) {
+	let r = this, u = v(this), i;
+	switch ((Object(t) !== t || u.isSignal(t)) && (t = { textContent: t }), !0) {
 		case typeof e == "function": {
-			c = e(t || void 0, (l) => l ? (n.unshift(l), void 0) : c);
+			i = e(t || void 0, (f) => f ? (n.unshift(f), void 0) : i);
 			break;
 		}
 		case e === "#text":
-			c = m(document.createTextNode(""), t);
+			i = m.call(r, document.createTextNode(""), t);
 			break;
 		case e === "<>":
-			c = m(document.createDocumentFragment(), t);
+			i = m.call(r, document.createDocumentFragment(), t);
 			break;
 		case x !== "html":
-			c = m(document.createElementNS(x, e), t);
+			i = m.call(r, document.createElementNS(x, e), t);
 			break;
-		case !c:
-			c = m(document.createElement(e), t);
+		case !i:
+			i = m.call(r, document.createElement(e), t);
 	}
-	return n.forEach((d) => d(c)), c;
+	return n.forEach((l) => l(i)), i;
 }
 var { setDeleteAttr: C } = R;
 function m(e, ...t) {
 	let n = this, r = v(this);
 	if (!t.length)
 		return e;
-	let d = (e instanceof SVGElement ? M : F).bind(null, e, "Attribute");
-	return Object.entries(Object.assign({}, ...t)).forEach(function l([f, u]) {
-		u = r.processReactiveAttribute(e, f, u, l);
+	let i = (e instanceof SVGElement ? M : F).bind(null, e, "Attribute");
+	return Object.entries(Object.assign({}, ...t)).forEach(function l([f, d]) {
+		d = r.processReactiveAttribute(e, f, d, l);
 		let [h] = f;
 		if (h === "=")
-			return d(f.slice(1), u);
+			return i(f.slice(1), d);
 		if (h === ".")
-			return D(e, f.slice(1), u);
+			return D(e, f.slice(1), d);
 		if (/(aria|data)([A-Z])/.test(f))
-			return f = f.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase(), d(f, u);
+			return f = f.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase(), i(f, d);
 		switch (f === "className" && (f = "class"), f) {
 			case "xlink:href":
-				return d(f, u, "http://www.w3.org/1999/xlink");
+				return i(f, d, "http://www.w3.org/1999/xlink");
 			case "textContent":
-				return C(e, f, u);
+				return C(e, f, d);
 			case "style":
-				if (typeof u != "object")
+				if (typeof d != "object")
 					break;
 			case "dataset":
-				return O(r, u, D.bind(null, e[f]));
+				return O(r, d, D.bind(null, e[f]));
 			case "ariaset":
-				return O(r, u, (E, o) => d("aria-" + E, o));
+				return O(r, d, (E, o) => i("aria-" + E, o));
 			case "classList":
-				return _.call(n, e, u);
+				return _.call(n, e, d);
 		}
-		return j(e, f) ? C(e, f, u) : d(f, u);
+		return j(e, f) ? C(e, f, d) : i(f, d);
 	}), e;
 }
 function _(e, t) {
@@ -106,7 +106,7 @@ function _(e, t) {
 	return O(
 		n,
 		t,
-		(r, c) => e.classList.toggle(r, c === -1 ? void 0 : !!c)
+		(r, u) => e.classList.toggle(r, u === -1 ? void 0 : !!u)
 	), e;
 }
 function Z(e) {
@@ -126,8 +126,8 @@ function L(e, t) {
 }
 function O(e, t, n) {
 	if (!(typeof t != "object" || t === null))
-		return Object.entries(t).forEach(function([c, d]) {
-			c && (d = e.processReactiveAttribute(t, c, d, (l) => n(...l)), n(c, d));
+		return Object.entries(t).forEach(function([u, i]) {
+			u && (i = e.processReactiveAttribute(t, u, i, (l) => n(...l)), n(u, i));
 		});
 }
 function S(e) {
@@ -136,8 +136,8 @@ function S(e) {
 function F(e, t, n, r) {
 	return e[(p(r) ? "remove" : "set") + t](n, S(r));
 }
-function M(e, t, n, r, c = null) {
-	return e[(p(r) ? "remove" : "set") + t + "NS"](c, n, S(r));
+function M(e, t, n, r, u = null) {
+	return e[(p(r) ? "remove" : "set") + t + "NS"](u, n, S(r));
 }
 function D(e, t, n) {
 	if (Reflect.set(e, t, n), !!p(n))
@@ -150,8 +150,8 @@ function J(e, t, ...n) {
 	return e.dispatchEvent(r);
 }
 function N(e, t, n) {
-	return function(c) {
-		return c.addEventListener(e, t, n), c;
+	return function(u) {
+		return u.addEventListener(e, t, n), u;
 	};
 }
 var b = T();
@@ -167,45 +167,45 @@ N.disconnected = function(e, t) {
 };
 function T() {
 	let e = /* @__PURE__ */ new Map(), t = !1, n = new MutationObserver(function(o) {
-		for (let s of o)
-			if (s.type === "childList") {
-				if (h(s.addedNodes, !0)) {
+		for (let c of o)
+			if (c.type === "childList") {
+				if (h(c.addedNodes, !0)) {
 					l();
 					continue;
 				}
-				E(s.removedNodes, !0) && l();
+				E(c.removedNodes, !0) && l();
 			}
 	});
 	return {
-		onConnected(o, s) {
-			d(), c(o).connected.push(s);
+		onConnected(o, c) {
+			i(), u(o).connected.push(c);
 		},
-		offConnected(o, s) {
+		offConnected(o, c) {
 			if (!e.has(o))
 				return;
-			let i = e.get(o), a = i.connected;
-			a.splice(a.indexOf(s), 1), r(o, i);
+			let s = e.get(o), a = s.connected;
+			a.splice(a.indexOf(c), 1), r(o, s);
 		},
-		onDisconnected(o, s) {
-			d(), c(o).disconnected.push(s);
+		onDisconnected(o, c) {
+			i(), u(o).disconnected.push(c);
 		},
-		offDisconnected(o, s) {
+		offDisconnected(o, c) {
 			if (!e.has(o))
 				return;
-			let i = e.get(o), a = i.disconnected;
-			a.splice(a.indexOf(s), 1), r(o, i);
+			let s = e.get(o), a = s.disconnected;
+			a.splice(a.indexOf(c), 1), r(o, s);
 		}
 	};
-	function r(o, s) {
-		s.connected.length || s.disconnected.length || (e.delete(o), l());
+	function r(o, c) {
+		c.connected.length || c.disconnected.length || (e.delete(o), l());
 	}
-	function c(o) {
+	function u(o) {
 		if (e.has(o))
 			return e.get(o);
-		let s = { connected: [], disconnected: [] };
-		return e.set(o, s), s;
+		let c = { connected: [], disconnected: [] };
+		return e.set(o, c), c;
 	}
-	function d() {
+	function i() {
 		t || (t = !0, n.observe(document.body, { childList: !0, subtree: !0 }));
 	}
 	function l() {
@@ -216,30 +216,30 @@ function T() {
 			(requestIdleCallback || requestAnimationFrame)(o);
 		});
 	}
-	async function u(o) {
+	async function d(o) {
 		e.size > 30 && await f();
-		let s = [];
+		let c = [];
 		if (!(o instanceof Node))
-			return s;
-		for (let i of e.keys())
-			i === o || !(i instanceof Node) || o.contains(i) && s.push(i);
-		return s;
+			return c;
+		for (let s of e.keys())
+			s === o || !(s instanceof Node) || o.contains(s) && c.push(s);
+		return c;
 	}
-	function h(o, s) {
-		for (let i of o) {
-			if (s && u(i).then(h), !e.has(i))
+	function h(o, c) {
+		for (let s of o) {
+			if (c && d(s).then(h), !e.has(s))
 				continue;
-			let a = e.get(i);
-			return a.connected.forEach((A) => A(i)), a.connected.length = 0, a.disconnected.length || e.delete(i), !0;
+			let a = e.get(s);
+			return a.connected.forEach((A) => A(s)), a.connected.length = 0, a.disconnected.length || e.delete(s), !0;
 		}
 		return !1;
 	}
-	function E(o, s) {
-		for (let i of o) {
-			if (s && u(i).then(E), !e.has(i))
+	function E(o, c) {
+		for (let s of o) {
+			if (c && d(s).then(E), !e.has(s))
 				continue;
-			let a = e.get(i);
-			return a.disconnected.forEach((A) => A(i)), a.connected.length = 0, a.disconnected.length = 0, e.delete(i), !0;
+			let a = e.get(s);
+			return a.disconnected.forEach((A) => A(s)), a.connected.length = 0, a.disconnected.length = 0, e.delete(s), !0;
 		}
 		return !1;
 	}

@@ -14,6 +14,7 @@ export function namespace(namespace){
 	};
 }
 export function createElement(tag, attributes, ...connect){
+	const _this= this;
 	const s= signals(this);
 	let el;
 	//TODO Array.isArray(tag) ⇒ set key (cache els)
@@ -25,10 +26,10 @@ export function createElement(tag, attributes, ...connect){
 			el= tag(attributes || undefined, ref);
 			break;
 		}
-		case tag==="#text":           el= assign(document.createTextNode(""), attributes); break;
-		case tag==="<>":              el= assign(document.createDocumentFragment(), attributes); break;
-		case namespace_curr!=="html": el= assign(document.createElementNS(namespace_curr, tag), attributes); break;
-		case !el:                     el= assign(document.createElement(tag), attributes);
+		case tag==="#text":           el= assign.call(_this, document.createTextNode(""), attributes); break;
+		case tag==="<>":              el= assign.call(_this, document.createDocumentFragment(), attributes); break;
+		case namespace_curr!=="html": el= assign.call(_this, document.createElementNS(namespace_curr, tag), attributes); break;
+		case !el:                     el= assign.call(_this, document.createElement(tag), attributes);
 	}
 	connect.forEach(c=> c(el));
 	return el;
