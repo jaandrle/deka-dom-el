@@ -78,43 +78,38 @@ function w(e, ...t) {
 	if (!t.length)
 		return e;
 	let o = e instanceof SVGElement, i = (o ? J : I).bind(null, e, "Attribute");
-	return Object.entries(Object.assign({}, ...t)).forEach(function p([s, a]) {
-		a = r.processReactiveAttribute(e, s, a, p);
-		let [b] = s;
+	return Object.entries(Object.assign({}, ...t)).forEach(function p([f, a]) {
+		a = r.processReactiveAttribute(e, f, a, p);
+		let [b] = f;
 		if (b === "=")
-			return i(s.slice(1), a);
+			return i(f.slice(1), a);
 		if (b === ".")
-			return T(e, s.slice(1), a);
-		if (typeof a == "object" && a !== null && !Array.isArray(a))
-			switch (s) {
-				case "style":
-				case "dataset":
-					return N(r, a, T.bind(null, e[s]));
-				case "ariaset":
-					return N(r, a, (E, c) => i("aria-" + E, c));
-				case "classList":
-					return B.call(n, e, a);
-				default:
-					return Reflect.set(e, s, a);
-			}
-		if (/(aria|data)([A-Z])/.test(s))
-			return s = s.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase(), i(s, a);
-		switch (s === "className" && (s = "class"), s) {
+			return T(e, f.slice(1), a);
+		if (/(aria|data)([A-Z])/.test(f))
+			return f = f.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase(), i(f, a);
+		switch (f === "className" && (f = "class"), f) {
 			case "href":
 			case "src":
 			case "class":
 			case "xlink:href":
-				return i(s, a, "http://www.w3.org/1999/xlink");
+				return i(f, a, "http://www.w3.org/1999/xlink");
 			case "textContent":
 			case "innerText":
-				return o ? e.appendChild(document.createTextNode(a)) : j(e, s, a);
+				return o ? e.appendChild(document.createTextNode(a)) : j(e, f, a);
+			case "style":
+			case "dataset":
+				return N(r, a, T.bind(null, e[f]));
+			case "ariaset":
+				return N(r, a, (E, c) => i("aria-" + E, c));
+			case "classList":
+				return B.call(n, e, a);
 		}
-		return H(e, s) ? j(e, s, a) : i(s, a);
+		return H(e, f) ? j(e, f, a) : i(f, a);
 	}), e;
 }
 function B(e, t) {
 	let n = v(this);
-	return typeof t != "object" || N(
+	return N(
 		n,
 		t,
 		(r, o) => e.classList.toggle(r, o === -1 ? void 0 : !!o)
@@ -136,9 +131,10 @@ function F(e, t, n = 0) {
 	return r || F(e, t, n + 1);
 }
 function N(e, t, n) {
-	return Object.entries(t).forEach(function([o, i]) {
-		o && (i = e.processReactiveAttribute(t, o, i, (p) => n(...p)), n(o, i));
-	});
+	if (typeof t == "object")
+		return Object.entries(t).forEach(function([o, i]) {
+			o && (i = e.processReactiveAttribute(t, o, i, (p) => n(...p)), n(o, i));
+		});
 }
 function M(e) {
 	return Array.isArray(e) ? e.filter(Boolean).join(" ") : e;
@@ -177,43 +173,43 @@ z.disconnected = function(e, t) {
 };
 function Z() {
 	let e = /* @__PURE__ */ new Map(), t = !1, n = new MutationObserver(function(c) {
-		for (let f of c)
-			if (f.type === "childList") {
-				if (b(f.addedNodes, !0)) {
+		for (let s of c)
+			if (s.type === "childList") {
+				if (b(s.addedNodes, !0)) {
 					p();
 					continue;
 				}
-				E(f.removedNodes, !0) && p();
+				E(s.removedNodes, !0) && p();
 			}
 	});
 	return {
-		onConnected(c, f) {
-			i(), o(c).connected.push(f);
+		onConnected(c, s) {
+			i(), o(c).connected.push(s);
 		},
-		offConnected(c, f) {
+		offConnected(c, s) {
 			if (!e.has(c))
 				return;
 			let u = e.get(c), l = u.connected;
-			l.splice(l.indexOf(f), 1), r(c, u);
+			l.splice(l.indexOf(s), 1), r(c, u);
 		},
-		onDisconnected(c, f) {
-			i(), o(c).disconnected.push(f);
+		onDisconnected(c, s) {
+			i(), o(c).disconnected.push(s);
 		},
-		offDisconnected(c, f) {
+		offDisconnected(c, s) {
 			if (!e.has(c))
 				return;
 			let u = e.get(c), l = u.disconnected;
-			l.splice(l.indexOf(f), 1), r(c, u);
+			l.splice(l.indexOf(s), 1), r(c, u);
 		}
 	};
-	function r(c, f) {
-		f.connected.length || f.disconnected.length || (e.delete(c), p());
+	function r(c, s) {
+		s.connected.length || s.disconnected.length || (e.delete(c), p());
 	}
 	function o(c) {
 		if (e.has(c))
 			return e.get(c);
-		let f = { connected: [], disconnected: [] };
-		return e.set(c, f), f;
+		let s = { connected: [], disconnected: [] };
+		return e.set(c, s), s;
 	}
 	function i() {
 		t || (t = !0, n.observe(document.body, { childList: !0, subtree: !0 }));
@@ -221,32 +217,32 @@ function Z() {
 	function p() {
 		!t || e.size || (t = !1, n.disconnect());
 	}
-	function s() {
+	function f() {
 		return new Promise(function(c) {
 			(requestIdleCallback || requestAnimationFrame)(c);
 		});
 	}
 	async function a(c) {
-		e.size > 30 && await s();
-		let f = [];
+		e.size > 30 && await f();
+		let s = [];
 		if (!(c instanceof Node))
-			return f;
+			return s;
 		for (let u of e.keys())
-			u === c || !(u instanceof Node) || c.contains(u) && f.push(u);
-		return f;
+			u === c || !(u instanceof Node) || c.contains(u) && s.push(u);
+		return s;
 	}
-	function b(c, f) {
+	function b(c, s) {
 		for (let u of c) {
-			if (f && a(u).then(b), !e.has(u))
+			if (s && a(u).then(b), !e.has(u))
 				continue;
 			let l = e.get(u);
 			return l.connected.forEach((y) => y(u)), l.connected.length = 0, l.disconnected.length || e.delete(u), !0;
 		}
 		return !1;
 	}
-	function E(c, f) {
+	function E(c, s) {
 		for (let u of c) {
-			if (f && a(u).then(E), !e.has(u))
+			if (s && a(u).then(E), !e.has(u))
 				continue;
 			let l = e.get(u);
 			return l.disconnected.forEach((y) => y(u)), l.connected.length = 0, l.disconnected.length = 0, e.delete(u), !0;
@@ -322,12 +318,12 @@ g.el = function(e, t) {
 	let i = (p) => {
 		if (!n.parentNode || !r.parentNode)
 			return q(e, i);
-		let s = t(p);
-		Array.isArray(s) || (s = [s]);
+		let f = t(p);
+		Array.isArray(f) || (f = [f]);
 		let a = n;
 		for (; (a = n.nextSibling) !== r; )
 			a.remove();
-		n.after(...s);
+		n.after(...f);
 	};
 	return D(e, i), i(e()), o;
 };

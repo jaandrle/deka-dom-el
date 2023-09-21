@@ -44,20 +44,12 @@ export function assign(element, ...attributes){
 	const is_svg= element instanceof SVGElement;
 	const setRemoveAttr= (is_svg ? setRemoveNS : setRemove).bind(null, element, "Attribute");
 	
-	/* jshint maxcomplexity:20 */
+	/* jshint maxcomplexity:17 */
 	Object.entries(Object.assign({}, ...attributes)).forEach(function assignNth([ key, attr ]){
 		attr= s.processReactiveAttribute(element, key, attr, assignNth);
 		const [ k ]= key;
 		if("="===k) return setRemoveAttr(key.slice(1), attr);
 		if("."===k) return setDelete(element, key.slice(1), attr);
-		if(typeof attr === "object" && attr!==null && !Array.isArray(attr)){
-			switch(key){
-				case "style": case "dataset": return forEachEntries(s, attr, setDelete.bind(null, element[key]));
-				case               "ariaset": return forEachEntries(s, attr, (key, val)=> setRemoveAttr("aria-"+key, val));
-				case             "classList": return classListDeclarative.call(_this, element, attr);
-				                     default: return Reflect.set(element, key, attr);
-			}
-		}
 		if(/(aria|data)([A-Z])/.test(key)){
 			key= key.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
 			return setRemoveAttr(key, attr);
@@ -69,6 +61,12 @@ export function assign(element, ...attributes){
 			case "textContent": case "innerText":
 				if(!is_svg) return setDeleteAttr(element, key, attr);
 				return element.appendChild(document.createTextNode(attr));
+			case "style": case "dataset":
+				return forEachEntries(s, attr, setDelete.bind(null, element[key]));
+			case "ariaset":
+				return forEachEntries(s, attr, (key, val)=> setRemoveAttr("aria-"+key, val));
+			case "classList":
+				return classListDeclarative.call(_this, element, attr);
 		}
 		return isPropSetter(element, key) ? setDeleteAttr(element, key, attr) : setRemoveAttr(key, attr);
 	});
@@ -76,8 +74,6 @@ export function assign(element, ...attributes){
 }
 export function classListDeclarative(element, toggle){
 	const s= signals(this);
-	if(typeof toggle !== "object") return element;
-	
 	forEachEntries(s, toggle,
 		(class_name, val)=>
 			element.classList.toggle(class_name, val===-1 ? undefined : Boolean(val)));
@@ -103,6 +99,7 @@ function getPropDescriptor(p, key, level= 0){
 
 /** @template {Record<any, any>} T @param {object} s @param {T} obj @param {(param: [ keyof T, T[keyof T] ])=> void} cb */
 function forEachEntries(s, obj, cb){
+	if(typeof obj !== "object") return;
 	return Object.entries(obj).forEach(function process([ key, val ]){
 		if(!key) return;
 		val= s.processReactiveAttribute(obj, key, val, a=> cb(...a));
