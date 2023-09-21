@@ -26,6 +26,10 @@ type AttrsModified= {
 	 */
 	classList: Record<string,-1|0|1>,
 	/**
+	 * By default simiral to `className`, but also supports `string[]`
+	 * */
+	className: string | (string|boolean|undefined)[];
+	/**
 	 * Sets `aria-*` simiraly to `dataset`
 	 * */
 	ariaset: Record<string,string>,
@@ -40,8 +44,8 @@ type AttrsModified= {
  */
 type ElementAttributes<T extends keyof ElementTagNameMap | ElementTagNameMap[keyof ElementTagNameMap]>=
 	T extends keyof ElementTagNameMap ?
-	Omit<ElementTagNameMap[T],"classList"> & AttrsModified :
-	Omit<T,"classList"> & AttrsModified;
+	Omit<ElementTagNameMap[T],"classList"|"className"> & AttrsModified :
+	Omit<T,"classList"|"className"> & AttrsModified;
 export function assign<El extends Element>(element: El, ...attrs_array: ElementAttributes<El>[]): El
 
 type ElementExtender<El extends Element>= (element: El)=> El;
