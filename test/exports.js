@@ -1,7 +1,7 @@
 import * as dde_dom from "../index.js";
 export * from "../index.js";
-import * as dde_s from "../src/signals.js";
-export * from "../src/signals.js";
+import * as dde_s from "../signals.js";
+export * from "../signals.js";
 // import { empty, namespace, on, dispatch } from "../index.js";
 // import "../dist/dde-with-signals.js";
 // Object.assign(globalThis, dde);

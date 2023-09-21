@@ -1,5 +1,3 @@
-/** @type {Map<string, boolean>} */
-export const prop_cache= new Map(JSON.parse('[["#text,textContent",true],["HTMLElement,textContent",true],["HTMLElement,className",true]]'));
 export const prop_process= { setDeleteAttr };
 import { isUndef } from './helpers.js';
 function setDeleteAttr(obj, prop, val){
@@ -13,6 +11,9 @@ function setDeleteAttr(obj, prop, val){
 		 4. Point 2. with checks for coincidence (e.g. use special string)
 		*/
 	Reflect.set(obj, prop, val);
-	if(isUndef(val) && obj.getAttribute(prop)==="undefined")
-		obj.removeAttribute(prop);
+	if(!isUndef(val)) return;
+	if(obj instanceof HTMLElement && obj.getAttribute(prop)==="undefined")
+		return obj.removeAttribute(prop);
+	if(Reflect.get(obj, prop)==="undefined")
+		return Reflect.set(obj, prop, "");
 }

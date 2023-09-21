@@ -84,9 +84,7 @@ S.el= function(signal, map){
 
 import { typeOf } from './helpers.js';
 export const signals_config= {
-	isTextContent(attributes){
-		return typeOf(attributes)==="string" || ( isSignal(attributes) && typeOf(valueOfSignal(attributes))==="string" );
-	},
+	isSignal,
 	processReactiveAttribute(_, key, attrs, assignNth){
 		//TODO DOC: once the signal is used as attribute, there is no reason to use assign again (if for some reason needed, use imperative listeners clear with `S.clear`)
 		if(!isSignal(attrs)) return attrs;

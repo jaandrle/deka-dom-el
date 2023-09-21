@@ -1,6 +1,6 @@
 export const signals_global= {
-	isTextContent(attributes){ return typeof attributes==="string"; },
-	processReactiveAttribute(el, key, attr, assignNth){ return attr; },
+	isSignal(attributes){ return false; },
+	processReactiveAttribute(obj, key, attr, assignNth){ return attr; },
 };
 export function registerReactivity(def, global= true){
 	if(global) return Object.assign(signals_global, def);

@@ -21,7 +21,7 @@ export function fullNameComponent(){
 		),
 		el("p").append(
 			el("strong", "Full name"),
-			el("#text", ": "),
+			": ",
 			el("#text", full_name)
 		)
 	);
