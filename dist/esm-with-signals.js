@@ -88,6 +88,7 @@ function w(e, ...t) {
 		if (typeof a == "object" && a !== null && !Array.isArray(a))
 			switch (s) {
 				case "style":
+				case "dataset":
 					return N(r, a, T.bind(null, e[s]));
 				case "ariaset":
 					return N(r, a, (E, c) => i("aria-" + E, c));
@@ -100,8 +101,12 @@ function w(e, ...t) {
 			return s = s.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase(), i(s, a);
 		switch (s === "className" && (s = "class"), s) {
 			case "href":
+			case "src":
+			case "class":
+			case "xlink:href":
 				return i(s, a, "http://www.w3.org/1999/xlink");
 			case "textContent":
+			case "innerText":
 				return o ? e.appendChild(document.createTextNode(a)) : j(e, s, a);
 		}
 		return H(e, s) ? j(e, s, a) : i(s, a);

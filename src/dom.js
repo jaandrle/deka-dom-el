@@ -52,10 +52,10 @@ export function assign(element, ...attributes){
 		if("."===k) return setDelete(element, key.slice(1), attr);
 		if(typeof attr === "object" && attr!==null && !Array.isArray(attr)){
 			switch(key){
-				case "style" || "dataset": return forEachEntries(s, attr, setDelete.bind(null, element[key]));
-				case            "ariaset": return forEachEntries(s, attr, (key, val)=> setRemoveAttr("aria-"+key, val));
-				case          "classList": return classListDeclarative.call(_this, element, attr);
-				                  default: return Reflect.set(element, key, attr);
+				case "style": case "dataset": return forEachEntries(s, attr, setDelete.bind(null, element[key]));
+				case               "ariaset": return forEachEntries(s, attr, (key, val)=> setRemoveAttr("aria-"+key, val));
+				case             "classList": return classListDeclarative.call(_this, element, attr);
+				                     default: return Reflect.set(element, key, attr);
 			}
 		}
 		if(/(aria|data)([A-Z])/.test(key)){
@@ -64,9 +64,9 @@ export function assign(element, ...attributes){
 		}
 		if("className"===key) key= "class";
 		switch(key){
-			case "href" || "src" || "class" || "xlink:href":
+			case "href": case "src": case "class": case "xlink:href":
 				return setRemoveAttr(key, attr, "http://www.w3.org/1999/xlink");
-			case "textContent" || "innerText":
+			case "textContent": case "innerText":
 				if(!is_svg) return setDeleteAttr(element, key, attr);
 				return element.appendChild(document.createTextNode(attr));
 		}
