@@ -12,6 +12,7 @@ function setDeleteAttr(obj, prop, val){
 		*/
 	Reflect.set(obj, prop, val);
 	if(!isUndef(val)) return;
+	Reflect.deleteProperty(obj, prop);
 	if(obj instanceof HTMLElement && obj.getAttribute(prop)==="undefined")
 		return obj.removeAttribute(prop);
 	if(Reflect.get(obj, prop)==="undefined")

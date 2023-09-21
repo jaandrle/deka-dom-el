@@ -1,4 +1,4 @@
-[ HTMLElement, DocumentFragment ].forEach(c=> {
+[ HTMLElement, SVGElement, DocumentFragment ].forEach(c=> {
 	const { append }= c.prototype;
 	c.prototype.append= function(...els){ append.apply(this, els); return this; };
 });
