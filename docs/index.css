@@ -1,0 +1,21 @@
+:root {
+	color-scheme: dark light;
+	--body-max-width: 40rem;
+}
+*, ::before, ::after { box-sizing: border-box; }
+body > * {
+	margin-inline: max(.5rem, calc(50% - var(--body-max-width) / 2));
+	font-family: Tahoma, Verdana, Arial, sans-serif;
+}
+h1{
+	text-align: center;
+	text-wrap: balanc;
+}
+.note{
+	font-size: .9rem;
+	font-style: italic;
+}
+.example{
+	--body-max-width: 80rem;
+	height: 20rem;
+}

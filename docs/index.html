@@ -1,0 +1,23 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="index.css"><meta name="description" content="Introducing basic concepts."><meta name="twitter:card" content="summary_large_image"><meta name="twitter:url" content="https://gitea.jaandrle.cz/jaandrle/deka-dom-el"><meta name="twitter:title" content="deka-dom-el"><meta name="twitter:description" content="A low-code library that simplifies the creation of native DOM elements/components using small wrappers and tweaks."><meta name="twitter:creator" content="@jaandrle"><meta name="og:url" content="https://gitea.jaandrle.cz/jaandrle/deka-dom-el"><meta name="og:title" content="deka-dom-el"><meta name="og:description" content="A low-code library that simplifies the creation of native DOM elements/components using small wrappers and tweaks."><meta name="og:creator" content="@jaandrle"><title>`deka-dom-el` — Introduction/Guide</title><script src="https://flems.io/flems.html" type="text/javascript" charset="utf-8"></script></head><body><h1>`deka-dom-el` — Introduction/Guide</h1><p>The library tries to provide pure JavaScript tool(s) to create reactive interfaces.The main goals are:</p><ul><li>provide a&nbsp;small wrapper around the native JavaScript DOM</li><li>keep library size under 10kB</li><li>zero dependencies (if possible)</li><li>prefer a&nbsp;declarative/functional approach</li><li>unopinionated (allow alternative methods)</li></ul><p class="note">It is, in fact, an reimplementation of <a href="https://github.com/jaandrle/dollar_dom_component" title="GitHub repository of library. Motto: Functional DOM components without JSX and virtual DOM.">jaandrle/dollar_dom_component</a>.</p><div id="code-2f13w" class="example"><pre><code class="language-javascript">import { el, S } from "https://cdn.jsdelivr.net/gh/jaandrle/deka-dom-el/dist/esm-with-signals.js";
+const clicks= S(0);
+document.body.append(
+	el("&lt;&gt;").append(
+		el("p", S(()=&gt;
+			"Hello World "+"🎉".repeat(clicks())
+		)),
+		el("button", {
+			type: "button",
+			onclick: ()=&gt; clicks(clicks()+1),
+			textContent: "Fire"
+		})
+	)
+);
+</code></pre></div><script>
+			Flems(document.getElementById("code-2f13w"), {
+				files: [{
+					name: ".js",
+					content: "import { el, S } from \"https://cdn.jsdelivr.net/gh/jaandrle/deka-dom-el/dist/esm-with-signals.js\";\nconst clicks= S(0);\ndocument.body.append(\n\tel(\"<>\").append(\n\t\tel(\"p\", S(()=>\n\t\t\t\"Hello World \"+\"🎉\".repeat(clicks())\n\t\t)),\n\t\tel(\"button\", {\n\t\t\ttype: \"button\",\n\t\t\tonclick: ()=> clicks(clicks()+1),\n\t\t\ttextContent: \"Fire\"\n\t\t})\n\t)\n);\n"
+				}],
+				toolbar: false,
+			})
+		</script><script src="https://cdn.jsdelivr.net/npm/shiki"></script><script src="index.js" type="module"></script></body></html>

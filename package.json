@@ -91,6 +91,7 @@
 	"devDependencies": {
 		"@size-limit/preset-small-lib": "^8.2.6",
 		"esbuild": "^0.19.2",
+		"jsdom": "^22.1.0",
 		"jshint": "^2.13.6",
 		"nodejsscript": "github:jaandrle/nodejsscript#dev-v1",
 		"size-limit-node-esbuild": "^0.2.0"
