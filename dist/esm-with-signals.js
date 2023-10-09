@@ -1,5 +1,5 @@
 // src/signals-common.js
-var E = {
+var w = {
 	isSignal(e) {
 		return !1;
 	},
@@ -7,22 +7,22 @@ var E = {
 		return n;
 	}
 };
-function C(e, t = !0) {
-	return t ? Object.assign(E, e) : (Object.setPrototypeOf(e, E), e);
+function A(e, t = !0) {
+	return t ? Object.assign(w, e) : (Object.setPrototypeOf(e, w), e);
 }
-function x(e) {
-	return E.isPrototypeOf(e) && e !== E ? e : E;
+function S(e) {
+	return w.isPrototypeOf(e) && e !== w ? e : w;
 }
 
 // src/helpers.js
 function m(e) {
 	return typeof e > "u";
 }
-function N(e) {
+function D(e) {
 	let t = typeof e;
 	return t !== "object" ? t : e === null ? "null" : Object.prototype.toString.call(e);
 }
-function L(e, t) {
+function C(e, t) {
 	if (!e || !(e instanceof AbortSignal))
 		return !0;
 	if (!e.aborted)
@@ -32,8 +32,8 @@ function L(e, t) {
 }
 
 // src/dom-common.js
-var P = { setDeleteAttr: W };
-function W(e, t, n) {
+var P = { setDeleteAttr: q };
+function q(e, t, n) {
 	if (Reflect.set(e, t, n), !!m(n)) {
 		if (Reflect.deleteProperty(e, t), e instanceof HTMLElement && e.getAttribute(t) === "undefined")
 			return e.removeAttribute(t);
@@ -43,77 +43,85 @@ function W(e, t, n) {
 }
 
 // src/dom.js
-var w = "html";
-function oe(e) {
-	return w = e === "svg" ? "http://www.w3.org/2000/svg" : e, {
-		append(...t) {
-			return w = "html", t.length === 1 ? t[0] : document.createDocumentFragment().append(...t);
-		}
-	};
-}
-function ce(e, t, ...n) {
-	let r = this, o = x(this), c;
+var b = "html", F = {
+	elNamespace(e) {
+		return b = e === "svg" ? "http://www.w3.org/2000/svg" : e, {
+			append(...t) {
+				return b = "html", t.length === 1 ? t[0] : document.createDocumentFragment().append(...t);
+			}
+		};
+	},
+	get namespace() {
+		return b;
+	},
+	set namespace(e) {
+		return b = e;
+	}
+}, ce = Object.assign((e) => e ? e(document.body) : document.body, F);
+function ie(e, t, ...n) {
+	let r = this, o = S(this), c;
 	switch ((Object(t) !== t || o.isSignal(t)) && (t = { textContent: t }), !0) {
 		case typeof e == "function": {
-			c = e(t || void 0, (s) => s ? (n.unshift(s), void 0) : c);
+			let l = Object.assign((u) => u ? (n.unshift(u), void 0) : c, F);
+			c = e(t || void 0, l), b = "html";
 			break;
 		}
 		case e === "#text":
-			c = S.call(r, document.createTextNode(""), t);
+			c = y.call(r, document.createTextNode(""), t);
 			break;
 		case e === "<>":
-			c = S.call(r, document.createDocumentFragment(), t);
+			c = y.call(r, document.createDocumentFragment(), t);
 			break;
-		case w !== "html":
-			c = S.call(r, document.createElementNS(w, e), t);
+		case b !== "html":
+			c = y.call(r, document.createElementNS(b, e), t);
 			break;
 		case !c:
-			c = S.call(r, document.createElement(e), t);
+			c = y.call(r, document.createElement(e), t);
 	}
-	return n.forEach((p) => p(c)), c;
+	return n.forEach((l) => l(c)), c;
 }
 var { setDeleteAttr: j } = P;
-function S(e, ...t) {
-	let n = this, r = x(this);
+function y(e, ...t) {
+	let n = this, r = S(this);
 	if (!t.length)
 		return e;
 	let c = (e instanceof SVGElement ? I : H).bind(null, e, "Attribute");
-	return Object.entries(Object.assign({}, ...t)).forEach(function p([s, a]) {
-		a = r.processReactiveAttribute(e, s, a, p);
-		let [b] = s;
-		if (b === "=")
-			return c(s.slice(1), a);
-		if (b === ".")
-			return F(e, s.slice(1), a);
-		if (/(aria|data)([A-Z])/.test(s))
-			return s = s.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase(), c(s, a);
-		switch (s === "className" && (s = "class"), s) {
+	return Object.entries(Object.assign({}, ...t)).forEach(function l([u, a]) {
+		a = r.processReactiveAttribute(e, u, a, l);
+		let [v] = u;
+		if (v === "=")
+			return c(u.slice(1), a);
+		if (v === ".")
+			return W(e, u.slice(1), a);
+		if (/(aria|data)([A-Z])/.test(u))
+			return u = u.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase(), c(u, a);
+		switch (u === "className" && (u = "class"), u) {
 			case "xlink:href":
-				return c(s, a, "http://www.w3.org/1999/xlink");
+				return c(u, a, "http://www.w3.org/1999/xlink");
 			case "textContent":
-				return j(e, s, a);
+				return j(e, u, a);
 			case "style":
 				if (typeof a != "object")
 					break;
 			case "dataset":
-				return _(r, a, F.bind(null, e[s]));
+				return L(r, a, W.bind(null, e[u]));
 			case "ariaset":
-				return _(r, a, (v, i) => c("aria-" + v, i));
+				return L(r, a, (x, i) => c("aria-" + x, i));
 			case "classList":
 				return B.call(n, e, a);
 		}
-		return G(e, s) ? j(e, s, a) : c(s, a);
+		return G(e, u) ? j(e, u, a) : c(u, a);
 	}), e;
 }
 function B(e, t) {
-	let n = x(this);
-	return _(
+	let n = S(this);
+	return L(
 		n,
 		t,
 		(r, o) => e.classList.toggle(r, o === -1 ? void 0 : !!o)
 	), e;
 }
-function se(e) {
+function fe(e) {
 	return Array.from(e.children).forEach((t) => t.remove()), e;
 }
 function G(e, t) {
@@ -128,10 +136,10 @@ function M(e, t) {
 	let n = Object.getOwnPropertyDescriptor(e, t);
 	return n || M(e, t);
 }
-function _(e, t, n) {
+function L(e, t, n) {
 	if (!(typeof t != "object" || t === null))
 		return Object.entries(t).forEach(function([o, c]) {
-			o && (c = e.processReactiveAttribute(t, o, c, (p) => n(...p)), n(o, c));
+			o && (c = e.processReactiveAttribute(t, o, c, (l) => n(...l)), n(o, c));
 		});
 }
 function z(e) {
@@ -143,13 +151,13 @@ function H(e, t, n, r) {
 function I(e, t, n, r, o = null) {
 	return e[(m(r) ? "remove" : "set") + t + "NS"](o, n, z(r));
 }
-function F(e, t, n) {
+function W(e, t, n) {
 	if (Reflect.set(e, t, n), !!m(n))
 		return Reflect.deleteProperty(e, t);
 }
 
 // src/events.js
-function ae(e, t, ...n) {
+function de(e, t, ...n) {
 	let r = n.length ? new CustomEvent(t, { detail: n[0] }) : new Event(t);
 	return e.dispatchEvent(r);
 }
@@ -160,92 +168,99 @@ function T(e, t, n) {
 }
 var O = J();
 T.connected = function(e, t) {
-	return function(r) {
-		return typeof r.connectedCallback == "function" ? (r.addEventListener("dde:connected", e, t), r) : (L(t && t.signal, () => O.offConnected(r, e)) && (r.isConnected ? e(new Event("dde:connected")) : O.onConnected(r, e)), r);
+	return typeof t != "object" && (t = {}), t.once = !0, function(r) {
+		return r.addEventListener("dde:connected", e, t), typeof r.connectedCallback == "function" ? r : r.isConnected ? (r.dispatchEvent(new Event("dde:connected")), r) : (C(t.signal, () => O.offConnected(r, e)) && O.onConnected(r, e), r);
 	};
 };
 T.disconnected = function(e, t) {
-	return function(r) {
-		return typeof r.disconnectedCallback == "function" ? (r.addEventListener("dde:disconnected", e, t), r) : (L(t && t.signal, () => O.offDisconnected(r, e)) && O.onDisconnected(r, e), r);
+	return typeof t != "object" && (t = {}), t.once = !0, function(r) {
+		return r.addEventListener("dde:disconnected", e, t), typeof r.disconnectedCallback == "function" || C(t.signal, () => O.offDisconnected(r, e)) && O.onDisconnected(r, e), r;
 	};
 };
 function J() {
 	let e = /* @__PURE__ */ new Map(), t = !1, n = new MutationObserver(function(i) {
-		for (let f of i)
-			if (f.type === "childList") {
-				if (b(f.addedNodes, !0)) {
-					p();
+		for (let s of i)
+			if (s.type === "childList") {
+				if (v(s.addedNodes, !0)) {
+					l();
 					continue;
 				}
-				v(f.removedNodes, !0) && p();
+				x(s.removedNodes, !0) && l();
 			}
 	});
 	return {
-		onConnected(i, f) {
-			c(), o(i).connected.push(f);
+		onConnected(i, s) {
+			c();
+			let f = o(i);
+			f.connected.has(s) || (f.connected.add(s), f.length_c += 1);
 		},
-		offConnected(i, f) {
+		offConnected(i, s) {
 			if (!e.has(i))
 				return;
-			let u = e.get(i), l = u.connected;
-			l.splice(l.indexOf(f), 1), r(i, u);
+			let f = e.get(i);
+			f.connected.has(s) && (f.connected.delete(s), f.length_c -= 1, r(i, f));
 		},
-		onDisconnected(i, f) {
-			c(), o(i).disconnected.push(f);
+		onDisconnected(i, s) {
+			c();
+			let f = o(i);
+			f.disconnected.has(s) || (f.disconnected.add(s), f.length_d += 1);
 		},
-		offDisconnected(i, f) {
+		offDisconnected(i, s) {
 			if (!e.has(i))
 				return;
-			let u = e.get(i), l = u.disconnected;
-			l.splice(l.indexOf(f), 1), r(i, u);
+			let f = e.get(i);
+			f.disconnected.has(s) && (f.disconnected.delete(s), f.length_d -= 1, r(i, f));
 		}
 	};
-	function r(i, f) {
-		f.connected.length || f.disconnected.length || (e.delete(i), p());
+	function r(i, s) {
+		s.length_c || s.length_d || (e.delete(i), l());
 	}
 	function o(i) {
 		if (e.has(i))
 			return e.get(i);
-		let f = { connected: [], disconnected: [] };
-		return e.set(i, f), f;
+		let s = {
+			connected: /* @__PURE__ */ new WeakSet(),
+			length_c: 0,
+			disconnected: /* @__PURE__ */ new WeakSet(),
+			length_d: 0
+		};
+		return e.set(i, s), s;
 	}
 	function c() {
 		t || (t = !0, n.observe(document.body, { childList: !0, subtree: !0 }));
 	}
-	function p() {
+	function l() {
 		!t || e.size || (t = !1, n.disconnect());
 	}
-	function s() {
+	function u() {
 		return new Promise(function(i) {
 			(requestIdleCallback || requestAnimationFrame)(i);
 		});
 	}
 	async function a(i) {
-		e.size > 30 && await s();
-		let f = [];
+		e.size > 30 && await u();
+		let s = [];
 		if (!(i instanceof Node))
-			return f;
-		for (let u of e.keys())
-			u === i || !(u instanceof Node) || i.contains(u) && f.push(u);
+			return s;
+		for (let f of e.keys())
+			f === i || !(f instanceof Node) || i.contains(f) && s.push(f);
+		return s;
+	}
+	function v(i, s) {
+		let f = !1;
+		for (let p of i) {
+			if (s && a(p).then(v), !e.has(p))
+				continue;
+			let E = e.get(p);
+			E.length_c && (p.dispatchEvent(new Event("dde:connected")), E.connected = /* @__PURE__ */ new WeakSet(), E.length_c = 0, E.length_d || e.delete(p), f = !0);
+		}
 		return f;
 	}
-	function b(i, f) {
-		for (let u of i) {
-			if (f && a(u).then(b), !e.has(u))
-				continue;
-			let l = e.get(u);
-			return l.connected.forEach((A) => A(u)), l.connected.length = 0, l.disconnected.length || e.delete(u), !0;
-		}
-		return !1;
-	}
-	function v(i, f) {
-		for (let u of i) {
-			if (f && a(u).then(v), !e.has(u))
-				continue;
-			let l = e.get(u);
-			return l.disconnected.forEach((A) => A(u)), l.connected.length = 0, l.disconnected.length = 0, e.delete(u), !0;
-		}
-		return !1;
+	function x(i, s) {
+		let f = !1;
+		for (let p of i)
+			s && a(p).then(x), !(!e.has(p) || !e.get(p).length_d) && (p.dispatchEvent(new Event("dde:disconnected")), e.delete(p), f = !0);
+		return f;
 	}
 }
 
@@ -259,7 +274,7 @@ function J() {
 
 // src/signals-lib.js
 var d = Symbol.for("Signal");
-function y(e) {
+function _(e) {
 	try {
 		return Reflect.has(e, d);
 	} catch {
@@ -270,10 +285,10 @@ var h = /* @__PURE__ */ new WeakMap();
 function g(e, t) {
 	if (typeof e != "function")
 		return U(e, t);
-	if (y(e))
+	if (_(e))
 		return e;
 	let n = U(""), r = () => n(e());
-	return h.set(r, /* @__PURE__ */ new Set([n])), k(r), n;
+	return h.set(r, /* @__PURE__ */ new Set([n])), K(r), n;
 }
 g.action = function(e, t, ...n) {
 	let r = e[d], { actions: o } = r;
@@ -288,7 +303,7 @@ g.on = function e(t, n, r = {}) {
 	if (!(o && o.aborted)) {
 		if (Array.isArray(t))
 			return t.forEach((c) => e(c, n, r));
-		D(t, n), o && o.addEventListener("abort", () => q(t, n));
+		N(t, n), o && o.addEventListener("abort", () => k(t, n));
 	}
 };
 g.symbols = {
@@ -313,26 +328,26 @@ g.clear = function(...e) {
 g.el = function(e, t) {
 	let n = document.createComment("<#reactive>"), r = document.createComment("</#reactive>"), o = document.createDocumentFragment();
 	o.append(n, r);
-	let c = (p) => {
+	let c = (l) => {
 		if (!n.parentNode || !r.parentNode)
-			return q(e, c);
-		let s = t(p);
-		Array.isArray(s) || (s = [s]);
+			return k(e, c);
+		let u = t(l);
+		Array.isArray(u) || (u = [u]);
 		let a = n;
 		for (; (a = n.nextSibling) !== r; )
 			a.remove();
-		n.after(...s);
+		n.after(...u);
 	};
-	return D(e, c), c(e()), o;
+	return N(e, c), c(e()), o;
 };
 var $ = {
-	isSignal: y,
+	isSignal: _,
 	processReactiveAttribute(e, t, n, r) {
-		return y(n) ? (D(n, (o) => r([t, o])), n()) : n;
+		return _(n) ? (N(n, (o) => r([t, o])), n()) : n;
 	}
 };
 function U(e, t) {
-	let n = (...r) => r.length ? X(n, r[0]) : Q(n);
+	let n = (...r) => r.length ? Y(n, r[0]) : X(n);
 	return Z(n, e, t);
 }
 var V = Object.assign(/* @__PURE__ */ Object.create(null), {
@@ -341,56 +356,56 @@ var V = Object.assign(/* @__PURE__ */ Object.create(null), {
 	}
 });
 function Z(e, t, n) {
-	return N(n) !== "[object Object]" && (n = {}), e[d] = {
+	return D(n) !== "[object Object]" && (n = {}), e[d] = {
 		value: t,
 		actions: n,
 		listeners: /* @__PURE__ */ new Set()
 	}, e.toJSON = () => e(), Object.setPrototypeOf(e[d], V), e;
 }
 var R = [];
-function k(e) {
+function K(e) {
 	let t = function() {
 		R.push(t), e(), R.pop();
 	};
 	h.has(e) && (h.set(t, h.get(e)), h.delete(e)), t();
 }
-function K() {
+function Q() {
 	return R[R.length - 1];
 }
-function Q(e) {
+function X(e) {
 	if (!e[d])
 		return;
-	let { value: t, listeners: n } = e[d], r = K();
+	let { value: t, listeners: n } = e[d], r = Q();
 	return r && n.add(r), h.has(r) && h.get(r).add(e), t;
 }
-function X(e, t) {
+function Y(e, t) {
 	if (!e[d])
 		return;
 	let n = e[d];
 	if (n.value !== t)
 		return n.value = t, n.listeners.forEach((r) => r(t)), t;
 }
-function D(e, t) {
+function N(e, t) {
 	if (e[d])
 		return e[d].listeners.add(t);
 }
-function q(e, t) {
+function k(e, t) {
 	if (e[d])
 		return e[d].listeners.delete(t);
 }
 
 // signals.js
-C($);
+A($);
 export {
 	g as S,
-	S as assign,
+	y as assign,
 	B as classListDeclarative,
-	ce as createElement,
-	ae as dispatchEvent,
-	ce as el,
-	se as empty,
-	y as isSignal,
-	oe as namespace,
+	ie as createElement,
+	de as dispatchEvent,
+	ie as el,
+	fe as empty,
+	_ as isSignal,
 	T as on,
-	C as registerReactivity
+	A as registerReactivity,
+	ce as scope
 };
