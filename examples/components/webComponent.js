@@ -17,7 +17,8 @@ export class CustomHTMLTestElement extends HTMLElement{
 	}
 
 	render({ name, test, preName }, host){
-		host(on.connected(console.log));
+		host(on.connected(()=> console.log(CustomHTMLTestElement)));
+		host(on.disconnected(()=> console.log(CustomHTMLTestElement)));
 		return el("p").append(
 			el("#text", { textContent: name }),
 			el("#text", { textContent: test }),

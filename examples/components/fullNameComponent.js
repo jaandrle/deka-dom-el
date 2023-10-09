@@ -1,15 +1,17 @@
-import { style, el, on, S, namespace } from '../exports.js';
+import { style, el, on, S } from '../exports.js';
 const className= style.host(fullNameComponent).css`
 	:host form{
 		display: flex;
 		flex-flow: column nowrap;
 	}
 `;
-export function fullNameComponent(){
+export function fullNameComponent(_, scope){
 	const labels= [ "Name", "Surname" ];
 	const name= labels.map(_=> S(""));
 	const full_name= S(()=>
 		name.map(l=> l()).filter(Boolean).join(" ") || "-");
+	scope(on.connected(()=> console.log(fullNameComponent)));
+	scope(on.disconnected(()=> console.log(fullNameComponent)))
 
 	return el("div", { className }).append(
 		el("h2", "Simple form:"),
@@ -24,7 +26,7 @@ export function fullNameComponent(){
 			": ",
 			el("#text", full_name)
 		),
-		namespace("svg").append(
+		scope.elNamespace("svg").append(
 			el("svg", { viewBox: "0 0 240 80", style: { height: "80px", display: "block" } }).append(
 				//el("style", {  })
 				el("text", { x: 20, y: 35, textContent: "Text" })

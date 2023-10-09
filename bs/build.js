@@ -25,7 +25,7 @@ function toDDE(file, out){
 	const name= "dde";
 	echo(`\n  ${out} (${file} → globalThis.${name})\n`);
 	
-	let content= s.cat(file).toString().split("export {");
+	let content= s.cat(file).toString().split(/export ?{/);
 	content.splice(1, 0, `\nglobalThis.${name}= {`);
 	content[2]= content[2].replace(/^(\t*)(.*) as ([^,\n]*)(,?)$/mg, "$1$3: $2$4");
 	s.echo([

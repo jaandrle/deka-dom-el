@@ -1,4 +1,4 @@
-import { Signal } from "./src/signals";
+import { Signal } from "./signals";
 //TODO?
 /** Is filled when function is succesfully called ⇒ and returns component's root element. */
 type Host<el extends Element>= (extender?: ElementExtender<el>)=> el | undefined;
@@ -46,19 +46,17 @@ type ElementAttributes<T extends keyof ElementTagNameMap | ElementTagNameMap[key
 	T extends keyof ElementTagNameMap ?
 	Omit<ElementTagNameMap[T],"classList"|"className"> & AttrsModified :
 	Omit<T,"classList"|"className"> & AttrsModified;
-export function assign<El extends Element>(element: El, ...attrs_array: ElementAttributes<El>[]): El
+export function assign<El extends Element>(element: El, ...attrs_array: Partial<ElementAttributes<El>>[]): El
 
 type ElementExtender<El extends Element>= (element: El)=> El;
 type TagNameFragment= "<>";
 export function el<TAG extends keyof ElementTagNameMap>(
 	tag_name: TAG,
-	attrs?: ElementAttributes<ElementTagNameMap[TAG]>,
+	attrs?: Partial<ElementAttributes<ElementTagNameMap[TAG]>>,
 	...extenders: ElementExtender<ElementTagNameMap[TAG]>[]
 ): ElementTagNameMap[TAG]
 export function el<T>(
 	tag_name: TagNameFragment,
-	signal?: Signal<T, any>,
-	cb?: (a: T)=> HTMLElement | HTMLElement[]
 ): DocumentFragment
 export function el<R extends Element, T extends (attrs: any, host: Host<R>)=> R>(
 	fComponent: T,

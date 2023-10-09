@@ -15,25 +15,31 @@ const c_ch_o= connectionsChangesObserverConstructor();
 import { onAbort } from './helpers.js';
 //TODO: cleanUp when event before abort?
 on.connected= function(listener, options){
+	if(typeof options !== "object")
+		options= {};
+	options.once= true;
 	return function registerElement(element){
-		if(typeof element.connectedCallback === "function"){
-			element.addEventListener("dde:connected", listener, options);
+		element.addEventListener("dde:connected", listener, options);
+		if(typeof element.connectedCallback === "function") return element;
+		if(element.isConnected){
+			element.dispatchEvent(new Event("dde:connected"));
 			return element;
 		}
-		const c= onAbort(options && options.signal, ()=> c_ch_o.offConnected(element, listener));
-		if(!c) return element;
-		if(element.isConnected) listener(new Event("dde:connected"));
-		else c_ch_o.onConnected(element, listener);
+
+		const c= onAbort(options.signal, ()=> c_ch_o.offConnected(element, listener));
+		if(c) c_ch_o.onConnected(element, listener);
 		return element;
 	};
 };
 on.disconnected= function(listener, options){
+	if(typeof options !== "object")
+		options= {};
+	options.once= true;
 	return function registerElement(element){
-		if(typeof element.disconnectedCallback === "function"){
-			element.addEventListener("dde:disconnected", listener, options);
-			return element;
-		}
-		const c= onAbort(options && options.signal, ()=> c_ch_o.offDisconnected(element, listener));
+		element.addEventListener("dde:disconnected", listener, options);
+		if(typeof element.disconnectedCallback === "function") return element;
+
+		const c= onAbort(options.signal, ()=> c_ch_o.offDisconnected(element, listener));
 		if(c) c_ch_o.onDisconnected(element, listener);
 		return element;
 	};
@@ -57,37 +63,48 @@ function connectionsChangesObserverConstructor(){
 		onConnected(element, listener){
 			start();
 			const listeners= getElementStore(element);
-			listeners.connected.push(listener);
+			if(listeners.connected.has(listener)) return;
+			listeners.connected.add(listener);
+			listeners.length_c+= 1;
 		},
 		offConnected(element, listener){
 			if(!store.has(element)) return;
 			const ls= store.get(element);
-			const l= ls.connected;
-			l.splice(l.indexOf(listener), 1);
+			if(!ls.connected.has(listener)) return;
+			ls.connected.delete(listener);
+			ls.length_c-= 1;
 			cleanWhenOff(element, ls);
 		},
 		onDisconnected(element, listener){
 			start();
 			const listeners= getElementStore(element);
-			listeners.disconnected.push(listener);
+			if(listeners.disconnected.has(listener)) return;
+			listeners.disconnected.add(listener);
+			listeners.length_d+= 1;
 		},
 		offDisconnected(element, listener){
 			if(!store.has(element)) return;
 			const ls= store.get(element);
-			const l= ls.disconnected;
-			l.splice(l.indexOf(listener), 1);
+			if(!ls.disconnected.has(listener)) return;
+			ls.disconnected.delete(listener);
+			ls.length_d-= 1;
 			cleanWhenOff(element, ls);
 		}
 	};
 	function cleanWhenOff(element, ls){
-		if(ls.connected.length || ls.disconnected.length)
+		if(ls.length_c || ls.length_d)
 			return;
 		store.delete(element);
 		stop();
 	}
 	function getElementStore(element){
 		if(store.has(element)) return store.get(element);
-		const out= { connected: [], disconnected: [] };
+		const out= {
+			connected: new WeakSet(),
+			length_c: 0,
+			disconnected: new WeakSet(),
+			length_d: 0
+		};
 		store.set(element, out);
 		return out;
 	}
@@ -118,31 +135,36 @@ function connectionsChangesObserverConstructor(){
 		return out;
 	}
 	function observerAdded(addedNodes, is_root){
+		let out= false;
 		for(const element of addedNodes){
 			if(is_root) collectChildren(element).then(observerAdded);
 			if(!store.has(element)) continue;
 			
 			const ls= store.get(element);
-			ls.connected.forEach(listener=> listener(element));
-			ls.connected.length= 0;
-			if(!ls.disconnected.length) store.delete(element);
-			return true;
+			if(!ls.length_c) continue;
+			
+			element.dispatchEvent(new Event("dde:connected"));
+			ls.connected= new WeakSet();
+			ls.length_c= 0;
+			if(!ls.length_d) store.delete(element);
+			out= true;
 		}
-		return false;
+		return out;
 	}
 	function observerRemoved(removedNodes, is_root){
+		let out= false;
 		for(const element of removedNodes){
 			if(is_root) collectChildren(element).then(observerRemoved);
 			if(!store.has(element)) continue;
 			
 			const ls= store.get(element);
-			ls.disconnected.forEach(listener=> listener(element));
+			if(!ls.length_d) continue;
 			
-			ls.connected.length= 0;
-			ls.disconnected.length= 0;
+			element.dispatchEvent(new Event("dde:disconnected"));
+			
 			store.delete(element);
-			return true;
+			out= true;
 		}
-		return false;
+		return out;
 	}
 }

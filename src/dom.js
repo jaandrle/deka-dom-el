@@ -2,17 +2,22 @@ import { signals } from "./signals-common.js";
 
 /** @type {"html"|"svg"|string} */
 let namespace_curr= "html";
-export function namespace(namespace){
-	namespace_curr= namespace==="svg" ? "http://www.w3.org/2000/svg" : namespace;
-	return {
-		append(...el){
-			namespace_curr= "html";
-			if(el.length===1) return el[0];
-			const f= document.createDocumentFragment();
-			return f.append(...el);
-		}
-	};
-}
+const scopes= {
+	elNamespace(namespace){
+		namespace_curr= namespace==="svg" ? "http://www.w3.org/2000/svg" : namespace;
+		return {
+			append(...el){
+				namespace_curr= "html";
+				if(el.length===1) return el[0];
+				const f= document.createDocumentFragment();
+				return f.append(...el);
+			}
+		};
+	},
+	get namespace(){ return namespace_curr; },
+	set namespace(v){ return ( namespace_curr= v ); },
+};
+export const scope= Object.assign(c=> c ? c(document.body) : document.body, scopes);
 export function createElement(tag, attributes, ...connect){
 	const _this= this;
 	const s= signals(this);
@@ -22,8 +27,9 @@ export function createElement(tag, attributes, ...connect){
 		attributes= { textContent: attributes };
 	switch(true){
 		case typeof tag==="function": {
-			const ref= c=> c ? (connect.unshift(c), undefined) : el;
-			el= tag(attributes || undefined, ref);
+			const scope= Object.assign(c=> c ? (connect.unshift(c), undefined) : el, scopes);
+			el= tag(attributes || undefined, scope);
+			namespace_curr= "html";
 			break;
 		}
 		case tag==="#text":           el= assign.call(_this, document.createTextNode(""), attributes); break;
