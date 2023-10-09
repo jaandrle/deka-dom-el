@@ -24,16 +24,15 @@ export function example({ src, language= "javascript" }){
 				})
 			)
 		),
-		el("script", `
-			Flems(document.getElementById("${id}"), {
-				files: [{
-					name: ".js",
-					content: ${JSON.stringify(code)}
-				}],
-				toolbar: false,
-			})
-		`)
+		elCode({ id, content: code })
 	);
+}
+function elCode({ id, content }){
+	const options= JSON.stringify({
+		files: [{ name: ".js", content }],
+		toolbar: false
+	});
+	return el("script", `Flems(document.getElementById("${id}"), JSON.parse(${options}));`);
 }
 function register(){
 	if(loaded) return;
