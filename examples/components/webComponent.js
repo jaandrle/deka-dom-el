@@ -1,4 +1,4 @@
-import { el } from "../../index.js";
+import { el, scope } from "../../index.js";
 import { S } from "../../signals.js";
 const { hasOwnProperty }= Object.prototype;
 
@@ -16,9 +16,10 @@ export class CustomHTMLTestElement extends HTMLElement{
 		);
 	}
 
-	render({ name, test, preName }, host){
-		host(on.connected(()=> console.log(CustomHTMLTestElement)));
-		host(on.disconnected(()=> console.log(CustomHTMLTestElement)));
+	render({ name, test, preName }){
+		console.log(scope.state);
+		scope.host(on.connected(()=> console.log(CustomHTMLTestElement)));
+		scope.host(on.disconnected(()=> console.log(CustomHTMLTestElement)));
 		return el("p").append(
 			el("#text", { textContent: name }),
 			el("#text", { textContent: test }),
@@ -36,8 +37,10 @@ customElementsAssign(
 customElements.define("custom-test", CustomHTMLTestElement);
 
 function customElementRender(_this, attrs, render){
-	const host= (...a)=> a.length ? a[0](_this) : _this;
-	return render(attrs, host);
+	scope.push({ scope: _this, host: (...a)=> a.length ? a[0](_this) : _this });
+	const out= render(attrs);
+	scope.pop();
+	return out;
 }
 /** @returns {HTMLElement} */
 function customElementsAssign(class_base, ...automatize){

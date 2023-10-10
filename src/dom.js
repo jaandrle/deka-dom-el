@@ -1,41 +1,51 @@
 import { signals } from "./signals-common.js";
 
-/** @type {"html"|"svg"|string} */
-let namespace_curr= "html";
-const scopes= {
+/** @type {{ namespace: "html"|string, host: function }[]} */
+const scopes= [ { scope: document.body, namespace: "html", host: c=> c ? c(document.body) : document.body } ];
+const namespaceHelper= ns=> ns==="svg" ? "http://www.w3.org/2000/svg" : ns;
+export const scope= {
+	get current(){ return scopes[scopes.length-1]; },
+	get state(){ return [ ...scopes ]; },
+	get host(){ return this.current.host; },
+	get namespace(){ return this.current.namespace; },
+	set namespace(namespace){ return ( this.current.namespace= namespaceHelper(namespace)); },
 	elNamespace(namespace){
-		namespace_curr= namespace==="svg" ? "http://www.w3.org/2000/svg" : namespace;
+		const ns= this.namespace;
+		this.namespace= namespace;
 		return {
-			append(...el){
-				namespace_curr= "html";
-				if(el.length===1) return el[0];
+			append(...els){
+				scope.namespace= ns;
+				if(els.length===1) return els[0];
 				const f= document.createDocumentFragment();
-				return f.append(...el);
+				return f.append(...els);
 			}
 		};
 	},
-	get namespace(){ return namespace_curr; },
-	set namespace(v){ return ( namespace_curr= v ); },
+	push(s= {}){
+		if(s.namespace) s.namespace= namespaceHelper(s.namespace);
+		return scopes.push(Object.assign({}, this.current, s));
+	},
+	pop(){ return scopes.pop(); },
 };
-export const scope= Object.assign(c=> c ? c(document.body) : document.body, scopes);
 export function createElement(tag, attributes, ...connect){
 	const _this= this;
 	const s= signals(this);
+	const { namespace }= scope;
 	let el;
 	//TODO Array.isArray(tag) ⇒ set key (cache els)
 	if(Object(attributes)!==attributes || s.isSignal(attributes))
 		attributes= { textContent: attributes };
 	switch(true){
 		case typeof tag==="function": {
-			const scope= Object.assign(c=> c ? (connect.unshift(c), undefined) : el, scopes);
-			el= tag(attributes || undefined, scope);
-			namespace_curr= "html";
+			scope.push({ scope: tag, host: c=> c ? (connect.unshift(c), undefined) : el });
+			el= tag(attributes || undefined);
+			scope.pop();
 			break;
 		}
-		case tag==="#text":           el= assign.call(_this, document.createTextNode(""), attributes); break;
-		case tag==="<>":              el= assign.call(_this, document.createDocumentFragment(), attributes); break;
-		case namespace_curr!=="html": el= assign.call(_this, document.createElementNS(namespace_curr, tag), attributes); break;
-		case !el:                     el= assign.call(_this, document.createElement(tag), attributes);
+		case tag==="#text":      el= assign.call(_this, document.createTextNode(""), attributes); break;
+		case tag==="<>":         el= assign.call(_this, document.createDocumentFragment(), attributes); break;
+		case namespace!=="html": el= assign.call(_this, document.createElementNS(namespace, tag), attributes); break;
+		case !el:                el= assign.call(_this, document.createElement(tag), attributes);
 	}
 	connect.forEach(c=> c(el));
 	return el;

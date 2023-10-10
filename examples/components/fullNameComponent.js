@@ -1,17 +1,17 @@
-import { style, el, on, S } from '../exports.js';
+import { style, el, on, S, scope } from '../exports.js';
 const className= style.host(fullNameComponent).css`
 	:host form{
 		display: flex;
 		flex-flow: column nowrap;
 	}
 `;
-export function fullNameComponent(_, scope){
+export function fullNameComponent(){
 	const labels= [ "Name", "Surname" ];
 	const name= labels.map(_=> S(""));
 	const full_name= S(()=>
 		name.map(l=> l()).filter(Boolean).join(" ") || "-");
-	scope(on.connected(()=> console.log(fullNameComponent)));
-	scope(on.disconnected(()=> console.log(fullNameComponent)))
+	scope.host(on.connected(()=> console.log(fullNameComponent)));
+	scope.host(on.disconnected(()=> console.log(fullNameComponent)))
 
 	return el("div", { className }).append(
 		el("h2", "Simple form:"),

@@ -1,4 +1,4 @@
-import { style, el, dispatchEvent, on, S } from '../exports.js';
+import { style, el, dispatchEvent, on, S, scope } from '../exports.js';
 const className= style.host(todosComponent).css`
 	:host{
 		display: flex;
@@ -18,7 +18,7 @@ const className= style.host(todosComponent).css`
 export function todosComponent({ todos= [ "Task A" ] }= {}){
 	const todosS= S(todos.map(t=> S(t)), {
 		add(v){ this.value.push(S(v)); },
-		remove(i){ this.value.splice(i, 1); },
+		remove(i){ S.clear(this.value.splice(i, 1)[0]); },
 		[S.symbols.onclear](){ S.clear(...this.value); },
 	});
 	const name= "todoName";
@@ -65,7 +65,8 @@ export function todosComponent({ todos= [ "Task A" ] }= {}){
  *	[ "click" ]
  * >}
  * */
-function todoComponent({ textContent, value }, host){
+function todoComponent({ textContent, value }){
+	const { host }= scope;
 	const onclick= on("click", event=> {
 		const value= Number(event.target.value);
 		event.preventDefault();
