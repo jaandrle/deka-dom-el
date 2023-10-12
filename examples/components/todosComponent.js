@@ -59,11 +59,7 @@ export function todosComponent({ todos= [ "Task A" ] }= {}){
 	)
 }
 /**
- * @type {ddeComponent<
- *	{ textContent: ddeSignal<string, any>, value: number },
- *	HTMLLIElement,
- *	[ "click" ]
- * >}
+ * @dispatch {number} remove
  * */
 function todoComponent({ textContent, value }){
 	const { host }= scope;

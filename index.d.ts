@@ -1,16 +1,6 @@
-import { Signal } from "./signals";
-//TODO?
-/** Is filled when function is succesfully called ⇒ and returns component's root element. */
-type Host<el extends Element>= (extender?: ElementExtender<el>)=> el | undefined;
 declare global {
-	/**
-	 * `ref` is filled when function is succesfully called ⇒ and returns component's root element.
-	 * */
-	type ddeComponent<
-	A extends Record<any, any>,
-	R extends Element,
-	T extends string[] = []
-	>= (attrs: A, ref: Host<R>)=> R & { _events: T };
+	type ddeComponentAttributes= Record<any, any> | undefined | string;
+	type ddeElementExtender<El extends Element>= (element: El)=> El;
 }
 type ElementTagNameMap= HTMLElementTagNameMap & SVGElementTagNameMap & {
 	'#text': Text
@@ -48,52 +38,51 @@ type ElementAttributes<T extends keyof ElementTagNameMap | ElementTagNameMap[key
 	Omit<T,"classList"|"className"> & AttrsModified;
 export function assign<El extends Element>(element: El, ...attrs_array: Partial<ElementAttributes<El>>[]): El
 
-type ElementExtender<El extends Element>= (element: El)=> El;
 type TagNameFragment= "<>";
 export function el<TAG extends keyof ElementTagNameMap>(
 	tag_name: TAG,
 	attrs?: Partial<ElementAttributes<ElementTagNameMap[TAG]>>,
-	...extenders: ElementExtender<ElementTagNameMap[TAG]>[]
+	...extenders: ddeElementExtender<ElementTagNameMap[TAG]>[]
 ): ElementTagNameMap[TAG]
 export function el<T>(
 	tag_name: TagNameFragment,
 ): DocumentFragment
-export function el<R extends Element, T extends (attrs: any, host: Host<R>)=> R>(
-	fComponent: T,
-	attrs?: Parameters<T>,
-	...extenders: ElementExtender<ReturnType<T>>[]
-): ReturnType<T>
+
+export function el<
+	A extends ddeComponentAttributes,
+	C extends (attr: A)=> Element>(
+	fComponent: C,
+	attrs?: A,
+	...extenders: ddeElementExtender<ReturnType<C>>[]
+): ReturnType<C>
 
 export function dispatchEvent(element: HTMLElement, name: keyof DocumentEventMap): void;
 export function dispatchEvent(element: HTMLElement, name: string, data: any): void;
 interface On{
 	<
-		EE extends ElementExtender<Element>,
-		El extends ( EE extends ElementExtender<infer El> ? El : never ),
+		EE extends ddeElementExtender<Element>,
+		El extends ( EE extends ddeElementExtender<infer El> ? El : never ),
 		Event extends keyof DocumentEventMap>(
 			type: Event,
 			listener: (this: El, ev: DocumentEventMap[Event]) => any,
 			options?: AddEventListenerOptions
 		) : EE;
 	connected<
-		EE extends ElementExtender<Element>,
-		El extends ( EE extends ElementExtender<infer El> ? El : never )
+		EE extends ddeElementExtender<Element>,
+		El extends ( EE extends ddeElementExtender<infer El> ? El : never )
 		>(
 			listener: (el: El) => any,
 			options?: AddEventListenerOptions
 		) : EE;
 	disconnected<
-		EE extends ElementExtender<Element>,
-		El extends ( EE extends ElementExtender<infer El> ? El : never )
+		EE extends ddeElementExtender<Element>,
+		El extends ( EE extends ddeElementExtender<infer El> ? El : never )
 		>(
 			listener: (el: El) => any,
 			options?: AddEventListenerOptions
 		) : EE;
 }
 export const on: On;
-
-//TODO?
-export type Fires<T extends string[]>= ( (...a: any[])=> any ) & { events: T };
 
 //TODO for SVG
 declare global{
