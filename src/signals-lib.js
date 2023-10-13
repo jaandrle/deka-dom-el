@@ -46,7 +46,7 @@ S.attribute= function(name, initial= undefined){
 	const out= S(value, {
 		[S.symbols.onclear](){ ac.abort(); }
 	});
-	scope.host(on.attributeChanged(function({ detail }){
+	scope.host(on.attributeChanged(function attributeChangeToSignal({ detail }){
 		const [ name_c, value ]= detail;
 		if(name_c!==name) return;
 		out(value);
@@ -94,6 +94,11 @@ S.el= function(signal, map){
 		mark_start.after(...els);
 	};
 	addSignalListener(signal, reRenderReactiveElement);
+	const { current }= scope;
+	if(!current.prevent)
+		current.host(on.disconnected(()=>
+			/*! Clears `S.el` signal listener in current scope when not needed. */
+			removeSignalListener(signal, reRenderReactiveElement)));
 	reRenderReactiveElement(signal());
 	return out;
 };
@@ -102,9 +107,14 @@ import { typeOf } from './helpers.js';
 export const signals_config= {
 	isSignal,
 	processReactiveAttribute(_, key, attrs, assignNth){
-		//TODO DOC: once the signal is used as attribute, there is no reason to use assign again (if for some reason needed, use imperative listeners clear with `S.clear`)
 		if(!isSignal(attrs)) return attrs;
-		addSignalListener(attrs, attr=> assignNth([ key, attr ]));
+		const l= attr=> assignNth([ key, attr ]);
+		addSignalListener(attrs, l);
+		const { current }= scope;
+		if(!current.prevent)
+			current.host(on.disconnected(()=>
+				/*! Clears signal listener for attribute in `assign` in current scope when not needed. */
+				removeSignalListener(attrs, l)));
 		return attrs();
 	}
 };
@@ -163,9 +173,6 @@ function write(signal, value, force){
 	return value;
 }
 
-function valueOfSignal(signal){
-	return signal[mark].value;
-}
 function addSignalListener(signal, listener){
 	if(!signal[mark]) return;
 	return signal[mark].listeners.add(listener);

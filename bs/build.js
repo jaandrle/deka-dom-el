@@ -10,6 +10,7 @@ for(const file of files){
 		"--bundle",
 		//"--minify",
 		"--minify-syntax --minify-identifiers",
+		"--legal-comments=inline",
 		"--packages=external",
 		"--outfile='::out::'"
 	].join(" "), { file, out });

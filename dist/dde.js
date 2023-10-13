@@ -9,7 +9,7 @@
 			return n;
 		}
 	};
-	function P(e, t = !0) {
+	function T(e, t = !0) {
 		return t ? Object.assign(m, e) : (Object.setPrototypeOf(e, m), e);
 	}
 	function b(e) {
@@ -30,8 +30,8 @@
 	}
 	
 	// src/dom-common.js
-	var C = { setDeleteAttr: j };
-	function j(e, t, n) {
+	var C = { setDeleteAttr: M };
+	function M(e, t, n) {
 		if (Reflect.set(e, t, n), !!g(n)) {
 			if (Reflect.deleteProperty(e, t), e instanceof HTMLElement && e.getAttribute(t) === "undefined")
 				return e.removeAttribute(t);
@@ -41,7 +41,12 @@
 	}
 	
 	// src/dom.js
-	var E = [{ scope: document.body, namespace: "html", host: (e) => e ? e(document.body) : document.body }], R = (e) => e === "svg" ? "http://www.w3.org/2000/svg" : e, x = {
+	var E = [{
+		scope: document.body,
+		namespace: "html",
+		host: (e) => e ? e(document.body) : document.body,
+		prevent: !0
+	}], R = (e) => e === "svg" ? "http://www.w3.org/2000/svg" : e, x = {
 		get current() {
 			return E[E.length - 1];
 		},
@@ -57,6 +62,10 @@
 		set namespace(e) {
 			return this.current.namespace = R(e);
 		},
+		preventDefault() {
+			let { current: e } = this;
+			return e.prevent = !0, e;
+		},
 		elNamespace(e) {
 			let t = this.namespace;
 			return this.namespace = e, {
@@ -66,67 +75,67 @@
 			};
 		},
 		push(e = {}) {
-			return e.namespace && (e.namespace = R(e.namespace)), E.push(Object.assign({}, this.current, e));
+			return e.namespace && (e.namespace = R(e.namespace)), E.push(Object.assign({}, this.current, { prevent: !1 }, e));
 		},
 		pop() {
 			return E.pop();
 		}
 	};
 	function V(e, t, ...n) {
-		let i = this, r = b(this), { namespace: f } = x, d = !1, o;
+		let i = this, r = b(this), { namespace: f } = x, d = !1, c;
 		switch ((Object(t) !== t || r.isSignal(t)) && (t = { textContent: t }), !0) {
 			case typeof e == "function": {
-				d = !0, x.push({ scope: e, host: (a) => a ? (n.unshift(a), void 0) : o }), o = e(t || void 0);
+				d = !0, x.push({ scope: e, host: (a) => a ? (n.unshift(a), void 0) : c }), c = e(t || void 0), (c instanceof HTMLElement ? P : j)(c, "Attribute", "dde-fun", e.name);
 				break;
 			}
 			case e === "#text":
-				o = w.call(i, document.createTextNode(""), t);
+				c = w.call(i, document.createTextNode(""), t);
 				break;
 			case e === "<>":
-				o = w.call(i, document.createDocumentFragment(), t);
+				c = w.call(i, document.createDocumentFragment(), t);
 				break;
 			case f !== "html":
-				o = w.call(i, document.createElementNS(f, e), t);
+				c = w.call(i, document.createElementNS(f, e), t);
 				break;
-			case !o:
-				o = w.call(i, document.createElement(e), t);
+			case !c:
+				c = w.call(i, document.createElement(e), t);
 		}
-		return n.forEach((a) => a(o)), d && x.pop(), o;
+		return n.forEach((a) => a(c)), d && x.pop(), c;
 	}
 	var { setDeleteAttr: S } = C;
 	function w(e, ...t) {
 		let n = this, i = b(this);
 		if (!t.length)
 			return e;
-		let f = (e instanceof SVGElement ? F : W).bind(null, e, "Attribute");
-		return Object.entries(Object.assign({}, ...t)).forEach(function d([o, a]) {
-			a = i.processReactiveAttribute(e, o, a, d);
-			let [l] = o;
+		let f = (e instanceof SVGElement ? j : P).bind(null, e, "Attribute");
+		return Object.entries(Object.assign({}, ...t)).forEach(function d([c, a]) {
+			a = i.processReactiveAttribute(e, c, a, d);
+			let [l] = c;
 			if (l === "=")
-				return f(o.slice(1), a);
+				return f(c.slice(1), a);
 			if (l === ".")
-				return L(e, o.slice(1), a);
-			if (/(aria|data)([A-Z])/.test(o))
-				return o = o.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase(), f(o, a);
-			switch (o === "className" && (o = "class"), o) {
+				return L(e, c.slice(1), a);
+			if (/(aria|data)([A-Z])/.test(c))
+				return c = c.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase(), f(c, a);
+			switch (c === "className" && (c = "class"), c) {
 				case "xlink:href":
-					return f(o, a, "http://www.w3.org/1999/xlink");
+					return f(c, a, "http://www.w3.org/1999/xlink");
 				case "textContent":
-					return S(e, o, a);
+					return S(e, c, a);
 				case "style":
 					if (typeof a != "object")
 						break;
 				case "dataset":
-					return O(i, a, L.bind(null, e[o]));
+					return O(i, a, L.bind(null, e[c]));
 				case "ariaset":
-					return O(i, a, (h, c) => f("aria-" + h, c));
+					return O(i, a, (h, o) => f("aria-" + h, o));
 				case "classList":
-					return T.call(n, e, a);
+					return W.call(n, e, a);
 			}
-			return M(e, o) ? S(e, o, a) : f(o, a);
+			return F(e, c) ? S(e, c, a) : f(c, a);
 		}), e;
 	}
-	function T(e, t) {
+	function W(e, t) {
 		let n = b(this);
 		return O(
 			n,
@@ -137,7 +146,7 @@
 	function $(e) {
 		return Array.from(e.children).forEach((t) => t.remove()), e;
 	}
-	function M(e, t) {
+	function F(e, t) {
 		if (!Reflect.has(e, t))
 			return !1;
 		let n = D(e, t);
@@ -158,10 +167,10 @@
 	function N(e) {
 		return Array.isArray(e) ? e.filter(Boolean).join(" ") : e;
 	}
-	function W(e, t, n, i) {
+	function P(e, t, n, i) {
 		return e[(g(i) ? "remove" : "set") + t](n, N(i));
 	}
-	function F(e, t, n, i, r = null) {
+	function j(e, t, n, i, r = null) {
 		return e[(g(i) ? "remove" : "set") + t + "NS"](r, n, N(i));
 	}
 	function L(e, t, n) {
@@ -179,7 +188,7 @@
 			return r.addEventListener(e, t, n), r;
 		};
 	}
-	var A = q(), U = /* @__PURE__ */ new WeakSet();
+	var A = U(), H = /* @__PURE__ */ new WeakSet();
 	y.connected = function(e, t) {
 		let n = "connected";
 		return typeof t != "object" && (t = {}), t.once = !0, function(r) {
@@ -198,7 +207,7 @@
 		let n = "attributeChanged";
 		return typeof t != "object" && (t = {}), function(r) {
 			let f = "dde:" + n;
-			if (r.addEventListener(f, e, t), r.__dde_lifecycleToEvents || U.has(r))
+			if (r.addEventListener(f, e, t), r.__dde_lifecycleToEvents || H.has(r))
 				return r;
 			let d = new MutationObserver(function(a) {
 				for (let { attributeName: l, target: h } of a)
@@ -209,9 +218,9 @@
 			return _(t.signal, () => d.disconnect()) && d.observe(r, { attributes: !0 }), r;
 		};
 	};
-	function q() {
-		let e = /* @__PURE__ */ new Map(), t = !1, n = new MutationObserver(function(c) {
-			for (let s of c)
+	function U() {
+		let e = /* @__PURE__ */ new Map(), t = !1, n = new MutationObserver(function(o) {
+			for (let s of o)
 				if (s.type === "childList") {
 					if (l(s.addedNodes, !0)) {
 						d();
@@ -221,42 +230,42 @@
 				}
 		});
 		return {
-			onConnected(c, s) {
+			onConnected(o, s) {
 				f();
-				let u = r(c);
+				let u = r(o);
 				u.connected.has(s) || (u.connected.add(s), u.length_c += 1);
 			},
-			offConnected(c, s) {
-				if (!e.has(c))
+			offConnected(o, s) {
+				if (!e.has(o))
 					return;
-				let u = e.get(c);
-				u.connected.has(s) && (u.connected.delete(s), u.length_c -= 1, i(c, u));
+				let u = e.get(o);
+				u.connected.has(s) && (u.connected.delete(s), u.length_c -= 1, i(o, u));
 			},
-			onDisconnected(c, s) {
+			onDisconnected(o, s) {
 				f();
-				let u = r(c);
+				let u = r(o);
 				u.disconnected.has(s) || (u.disconnected.add(s), u.length_d += 1);
 			},
-			offDisconnected(c, s) {
-				if (!e.has(c))
+			offDisconnected(o, s) {
+				if (!e.has(o))
 					return;
-				let u = e.get(c);
-				u.disconnected.has(s) && (u.disconnected.delete(s), u.length_d -= 1, i(c, u));
+				let u = e.get(o);
+				u.disconnected.has(s) && (u.disconnected.delete(s), u.length_d -= 1, i(o, u));
 			}
 		};
-		function i(c, s) {
-			s.length_c || s.length_d || (e.delete(c), d());
+		function i(o, s) {
+			s.length_c || s.length_d || (e.delete(o), d());
 		}
-		function r(c) {
-			if (e.has(c))
-				return e.get(c);
+		function r(o) {
+			if (e.has(o))
+				return e.get(o);
 			let s = {
 				connected: /* @__PURE__ */ new WeakSet(),
 				length_c: 0,
 				disconnected: /* @__PURE__ */ new WeakSet(),
 				length_d: 0
 			};
-			return e.set(c, s), s;
+			return e.set(o, s), s;
 		}
 		function f() {
 			t || (t = !0, n.observe(document.body, { childList: !0, subtree: !0 }));
@@ -264,23 +273,23 @@
 		function d() {
 			!t || e.size || (t = !1, n.disconnect());
 		}
-		function o() {
-			return new Promise(function(c) {
-				(requestIdleCallback || requestAnimationFrame)(c);
+		function c() {
+			return new Promise(function(o) {
+				(requestIdleCallback || requestAnimationFrame)(o);
 			});
 		}
-		async function a(c) {
-			e.size > 30 && await o();
+		async function a(o) {
+			e.size > 30 && await c();
 			let s = [];
-			if (!(c instanceof Node))
+			if (!(o instanceof Node))
 				return s;
 			for (let u of e.keys())
-				u === c || !(u instanceof Node) || c.contains(u) && s.push(u);
+				u === o || !(u instanceof Node) || o.contains(u) && s.push(u);
 			return s;
 		}
-		function l(c, s) {
+		function l(o, s) {
 			let u = !1;
-			for (let p of c) {
+			for (let p of o) {
 				if (s && a(p).then(l), !e.has(p))
 					continue;
 				let v = e.get(p);
@@ -288,9 +297,9 @@
 			}
 			return u;
 		}
-		function h(c, s) {
+		function h(o, s) {
 			let u = !1;
-			for (let p of c)
+			for (let p of o)
 				s && a(p).then(h), !(!e.has(p) || !e.get(p).length_d) && (p.dispatchEvent(new Event("dde:disconnected")), e.delete(p), u = !0);
 			return u;
 		}
@@ -306,13 +315,13 @@
 	
 	globalThis.dde= {
 		assign: w,
-		classListDeclarative: T,
+		classListDeclarative: W,
 		createElement: V,
 		dispatchEvent: Q,
 		el: V,
 		empty: $,
 		on: y,
-		registerReactivity: P,
+		registerReactivity: T,
 		scope: x
 	};
 	

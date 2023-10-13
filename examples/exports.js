@@ -2,12 +2,11 @@ import * as dde_dom from "../index.js";
 export * from "../index.js";
 import * as dde_s from "../signals.js";
 export * from "../signals.js";
-// import { empty, namespace, on, dispatch } from "../index.js";
-// import "../dist/dde-with-signals.js";
-// Object.assign(globalThis, dde);
-// import { el, on, off, S } from "../dist/esm-with-signals.js";
-export const style= createStyle();
 Object.assign(globalThis, dde_dom, dde_s);
+//import * as dde_dom from "../dist/esm-with-signals.js";
+//export * from "../dist/esm-with-signals.js";
+//Object.assign(globalThis, dde_dom);
+export const style= createStyle();
 
 function createStyle(){
 	const element= dde_dom.el("style");

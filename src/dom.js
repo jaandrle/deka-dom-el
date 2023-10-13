@@ -1,7 +1,12 @@
 import { signals } from "./signals-common.js";
 
-/** @type {{ namespace: "html"|string, host: function }[]} */
-const scopes= [ { scope: document.body, namespace: "html", host: c=> c ? c(document.body) : document.body } ];
+/** @type {{ scope: object, prevent: boolean, namespace: "html"|string, host: function }[]} */
+const scopes= [ {
+	scope: document.body,
+	namespace: "html",
+	host: c=> c ? c(document.body) : document.body,
+	prevent: true
+} ];
 const namespaceHelper= ns=> ns==="svg" ? "http://www.w3.org/2000/svg" : ns;
 export const scope= {
 	get current(){ return scopes[scopes.length-1]; },
@@ -9,6 +14,11 @@ export const scope= {
 	get host(){ return this.current.host; },
 	get namespace(){ return this.current.namespace; },
 	set namespace(namespace){ return ( this.current.namespace= namespaceHelper(namespace)); },
+	preventDefault(){
+		const { current }= this;
+		current.prevent= true;
+		return current;
+	},
 	elNamespace(namespace){
 		const ns= this.namespace;
 		this.namespace= namespace;
@@ -23,7 +33,7 @@ export const scope= {
 	},
 	push(s= {}){
 		if(s.namespace) s.namespace= namespaceHelper(s.namespace);
-		return scopes.push(Object.assign({}, this.current, s));
+		return scopes.push(Object.assign({}, this.current, { prevent: false }, s));
 	},
 	pop(){ return scopes.pop(); },
 };
@@ -41,6 +51,7 @@ export function createElement(tag, attributes, ...connect){
 			scoped= true;
 			scope.push({ scope: tag, host: c=> c ? (connect.unshift(c), undefined) : el });
 			el= tag(attributes || undefined);
+			(el instanceof HTMLElement ? setRemove : setRemoveNS)(el, "Attribute", "dde-fun", tag.name);
 			break;
 		}
 		case tag==="#text":      el= assign.call(_this, document.createTextNode(""), attributes); break;
