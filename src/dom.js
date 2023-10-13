@@ -31,15 +31,16 @@ export function createElement(tag, attributes, ...connect){
 	const _this= this;
 	const s= signals(this);
 	const { namespace }= scope;
+	let scoped= false;
 	let el;
 	//TODO Array.isArray(tag) ⇒ set key (cache els)
 	if(Object(attributes)!==attributes || s.isSignal(attributes))
 		attributes= { textContent: attributes };
 	switch(true){
 		case typeof tag==="function": {
+			scoped= true;
 			scope.push({ scope: tag, host: c=> c ? (connect.unshift(c), undefined) : el });
 			el= tag(attributes || undefined);
-			scope.pop();
 			break;
 		}
 		case tag==="#text":      el= assign.call(_this, document.createTextNode(""), attributes); break;
@@ -48,6 +49,7 @@ export function createElement(tag, attributes, ...connect){
 		case !el:                el= assign.call(_this, document.createElement(tag), attributes);
 	}
 	connect.forEach(c=> c(el));
+	if(scoped) scope.pop();
 	return el;
 }
 export { createElement as el };

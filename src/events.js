@@ -24,7 +24,7 @@ on.connected= function(listener, options){
 		const event= "dde:"+name;
 		element.addEventListener(event, listener, options);
 		if(element.__dde_lifecycleToEvents) return element;
-		if(element.isConnected) return ( element.dispatchEvent(new Event(event)), element )
+		if(element.isConnected) return ( element.dispatchEvent(new Event(event)), element );
 
 		const c= onAbort(options.signal, ()=> c_ch_o.offConnected(element, listener));
 		if(c) c_ch_o.onConnected(element, listener);
