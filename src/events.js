@@ -23,11 +23,8 @@ on.connected= function(listener, options){
 	return function registerElement(element){
 		const event= "dde:"+name;
 		element.addEventListener(event, listener, options);
-		if(typeof element[name+"Callback"] === "function") return element;
-		if(element.isConnected){
-			element.dispatchEvent(new Event(event));
-			return element;
-		}
+		if(element.__dde_lifecycleToEvents) return element;
+		if(element.isConnected) return ( element.dispatchEvent(new Event(event)), element )
 
 		const c= onAbort(options.signal, ()=> c_ch_o.offConnected(element, listener));
 		if(c) c_ch_o.onConnected(element, listener);
@@ -42,7 +39,7 @@ on.disconnected= function(listener, options){
 	return function registerElement(element){
 		const event= "dde:"+name;
 		element.addEventListener(event, listener, options);
-		if(typeof element[name+"Callback"] === "function") return element;
+		if(element.__dde_lifecycleToEvents) return element;
 
 		const c= onAbort(options.signal, ()=> c_ch_o.offDisconnected(element, listener));
 		if(c) c_ch_o.onDisconnected(element, listener);
@@ -56,8 +53,8 @@ on.attributeChanged= function(listener, options){
 	return function registerElement(element){
 		const event= "dde:"+name;
 		element.addEventListener(event, listener, options);
-		if(typeof element[name+"Callback"] === "function") return element;
-		if(els_attribute_store.has(element)) return element;
+		if(element.__dde_lifecycleToEvents || els_attribute_store.has(element))
+			return element;
 		
 		const observer= new MutationObserver(function(mutations){
 			for(const { attributeName, target } of mutations)

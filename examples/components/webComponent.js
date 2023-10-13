@@ -74,6 +74,7 @@ function lifecycleToEvents(class_declaration){
 		}));
 		target.apply(thisArg, detail);
 	});
+	class_declaration.prototype.__dde_lifecycleToEvents= true;
 }
 function wrapMethod(obj, method, apply){
 	obj[method]= new Proxy(obj[method] || (()=> {}), { apply });
