@@ -12,17 +12,20 @@ export function on(event, listener, options){
 }
 
 const c_ch_o= connectionsChangesObserverConstructor();
+const els_attribute_store= new WeakSet();
 import { onAbort } from './helpers.js';
 //TODO: cleanUp when event before abort?
 on.connected= function(listener, options){
+	const name= "connected";
 	if(typeof options !== "object")
 		options= {};
 	options.once= true;
 	return function registerElement(element){
-		element.addEventListener("dde:connected", listener, options);
-		if(typeof element.connectedCallback === "function") return element;
+		const event= "dde:"+name;
+		element.addEventListener(event, listener, options);
+		if(typeof element[name+"Callback"] === "function") return element;
 		if(element.isConnected){
-			element.dispatchEvent(new Event("dde:connected"));
+			element.dispatchEvent(new Event(event));
 			return element;
 		}
 
@@ -32,15 +35,37 @@ on.connected= function(listener, options){
 	};
 };
 on.disconnected= function(listener, options){
+	const name= "disconnected";
 	if(typeof options !== "object")
 		options= {};
 	options.once= true;
 	return function registerElement(element){
-		element.addEventListener("dde:disconnected", listener, options);
-		if(typeof element.disconnectedCallback === "function") return element;
+		const event= "dde:"+name;
+		element.addEventListener(event, listener, options);
+		if(typeof element[name+"Callback"] === "function") return element;
 
 		const c= onAbort(options.signal, ()=> c_ch_o.offDisconnected(element, listener));
 		if(c) c_ch_o.onDisconnected(element, listener);
+		return element;
+	};
+};
+on.attributeChanged= function(listener, options){
+	const name= "attributeChanged";
+	if(typeof options !== "object")
+		options= {};
+	return function registerElement(element){
+		const event= "dde:"+name;
+		element.addEventListener(event, listener, options);
+		if(typeof element[name+"Callback"] === "function") return element;
+		if(els_attribute_store.has(element)) return element;
+		
+		const observer= new MutationObserver(function(mutations){
+			for(const { attributeName, target } of mutations)
+				target.dispatchEvent(
+					new CustomEvent(event, { detail: [ attributeName, target.getAttribute(attributeName) ] }));
+		});
+		const c= onAbort(options.signal, ()=> observer.disconnect());
+		if(c) observer.observe(element, { attributes: true });
 		return element;
 	};
 };

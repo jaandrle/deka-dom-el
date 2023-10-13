@@ -37,6 +37,22 @@ S.symbols= {
 	signal: mark,
 	onclear: Symbol.for("Signal.onclear")
 };
+import { on } from "./events.js";
+import { scope } from "./dom.js";
+S.attribute= function(name, initial= undefined){
+	const { host }= scope;
+	const value= host() && host().hasAttribute(name) ? host().getAttribute(name) : initial;
+	const ac= new AbortController();
+	const out= S(value, {
+		[S.symbols.onclear](){ ac.abort(); }
+	});
+	scope.host(on.attributeChanged(function({ detail }){
+		const [ name_c, value ]= detail;
+		if(name_c!==name) return;
+		out(value);
+	}, { signal: ac.signal }));
+	return out;
+};
 S.clear= function(...signals){
 	for(const signal of signals){
 		Reflect.deleteProperty(signal, "toJSON");
@@ -95,7 +111,7 @@ export const signals_config= {
 
 function create(value, actions){
 	const signal=  (...value)=>
-		value.length ? write(signal, value[0]) : read(signal);
+		value.length ? write(signal, ...value) : read(signal);
 	return toSignal(signal, value, actions);
 }
 const protoSigal= Object.assign(Object.create(null), {
@@ -138,10 +154,10 @@ function read(signal){
 	if(deps.has(context)) deps.get(context).add(signal);
 	return value;
 }
-function write(signal, value){
+function write(signal, value, force){
 	if(!signal[mark]) return;
 	const s= signal[mark];
-	if(s.value===value) return;
+	if(!force && s.value===value) return;
 	s.value= value;
 	s.listeners.forEach(l=> l(value));
 	return value;

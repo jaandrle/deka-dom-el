@@ -2,7 +2,6 @@ import { el, scope } from "../../index.js";
 import { S } from "../../signals.js";
 const { hasOwnProperty }= Object.prototype;
 
-const store= attrsPropsToSignals([ "test" ]);
 /**
  * Compatible with `npx-wca test/components/webComponent.js`
  * */
@@ -12,14 +11,19 @@ export class CustomHTMLTestElement extends HTMLElement{
 	}
 	connectedCallback(){
 		this.attachShadow({ mode: "open" }).append(
-			customElementRender(this, store.toRender(this), this.render)
+			customElementRender(this, this.render)
 		);
 	}
 
-	render({ name, test, preName }){
+	render({ test }){
 		console.log(scope.state);
 		scope.host(on.connected(()=> console.log(CustomHTMLTestElement)));
+		scope.host(on.attributeChanged(e=> console.log(e)));
 		scope.host(on.disconnected(()=> console.log(CustomHTMLTestElement)));
+		
+		const name= S.attribute("name");
+		const preName= S.attribute("pre-name");
+		console.log({ name, test, preName});
 		return el("p").append(
 			el("#text", { textContent: name }),
 			el("#text", { textContent: test }),
@@ -31,14 +35,13 @@ export class CustomHTMLTestElement extends HTMLElement{
 customElementsAssign(
 	CustomHTMLTestElement,
 	reflectObservedAttributes,
-	lifecycleToEvents(false),
-	store.connect
+	lifecycleToEvents,
 );
 customElements.define("custom-test", CustomHTMLTestElement);
 
-function customElementRender(_this, attrs, render){
+function customElementRender(_this, render){
 	scope.push({ scope: _this, host: (...a)=> a.length ? a[0](_this) : _this });
-	const out= render(attrs);
+	const out= render(_this);
 	scope.pop();
 	return out;
 }
@@ -57,69 +60,20 @@ function reflectObservedAttributes(c){
 		});
 	}
 }
-function lifecycleToEvents(is_attrs){
-	return function(c){
-		wrapMethod(c.prototype, "connectedCallback", function(target, thisArg, detail){
+function lifecycleToEvents(class_declaration){
+	for (const name of [ "connected", "disconnected" ])
+		wrapMethod(class_declaration.prototype, name+"Callback", function(target, thisArg, detail){
 			target.apply(thisArg, detail);
-			thisArg.dispatchEvent(new Event("dde:connected"));
+			thisArg.dispatchEvent(new Event("dde:"+name));
 		});
-		wrapMethod(c.prototype, "disconnectedCallback", function(target, thisArg, detail){
-			target.apply(thisArg, detail);
-			thisArg.dispatchEvent(new Event("dde:disconnected"));
-		});
-		if(is_attrs)
-			wrapMethod(c.prototype, "attributeChangedCallback", function(target, thisArg, detail){
-				thisArg.dispatchEvent(new CustomEvent("dde:attribute", { detail }));
-				target.apply(thisArg, detail);
-			});
-	};
-}
-function attrsPropsToSignals(props= []){
-	const store_attrs= new WeakMap();
-	const store_props= new WeakMap();
-	return {
-		toRender(target){
-			const out= {};
-			const sattrs= get(store_attrs, target);
-			target.constructor.observedAttributes.forEach(function(name){
-				const name_camel= name.replace(/([a-z])-([a-z])/g, (_, l, r)=> l+r.toUpperCase());
-				if(!hasOwnProperty.call(sattrs, name)) sattrs[name]= S(undefined);
-				out[name_camel]= sattrs[name];
-			});
-			const sprops= get(store_props, target);
-			props.forEach(p=> !hasOwnProperty.call(sprops, p) && (sprops[p]= S(undefined)));
-			return Object.assign(out, sprops);
-		},
-		connect(c){
-			wrapMethod(c.prototype, "attributeChangedCallback", function(target, thisArg, detail){
-				const [ name, _, value ]= detail;
-				const s= get(store_attrs, thisArg);
-				if(s[name]) s[name](value);
-				else s[name]= S(value);
-				
-				target.apply(thisArg, detail);
-			});
-			for(const name of props){
-				Reflect.defineProperty(c.prototype, name, {
-					get(){
-						const s= get(store_props, this);
-						if(s[name]) return s[name]();
-					},
-					set(value){
-						const s= get(store_props, this);
-						if(s[name]) s[name](value);
-						else s[name]= S(value);
-					}
-				});
-			}
-		}
-	};
-	function get(store, t){
-		if(store.has(t)) return store.get(t);
-		const s= {};
-		store.set(t, s);
-		return s;
-	}
+	const name= "attributeChanged";
+	wrapMethod(class_declaration.prototype, name+"Callback", function(target, thisArg, detail){
+		const [ attribute, , value ]= detail;
+		thisArg.dispatchEvent(new CustomEvent("dde:"+name, {
+			detail: [ attribute, value ]
+		}));
+		target.apply(thisArg, detail);
+	});
 }
 function wrapMethod(obj, method, apply){
 	obj[method]= new Proxy(obj[method] || (()=> {}), { apply });
