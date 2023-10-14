@@ -19,8 +19,12 @@ export function todosComponent({ todos= [ "Task A" ] }= {}){
 	const todosS= S(todos.map(t=> S(t)), {
 		add(v){ this.value.push(S(v)); },
 		remove(i){ this.value.splice(i, 1)[0]; },
-		[S.symbols.onclear](){ S.clear(...this.value); },
+		[S.symbols.onclear](){
+			console.log("zde");
+			S.clear(...this.value);
+		},
 	});
+	console.log(todosS);
 	const name= "todoName";
 	const onsubmitAdd= on("submit", event=> {
 		const el= event.target.elements[name];

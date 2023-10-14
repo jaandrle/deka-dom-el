@@ -4,6 +4,8 @@ export function isSignal(candidate){
 	try{ return Reflect.has(candidate, mark); }
 	catch(e){ return false; }
 }
+/** @type {function[]} */
+const stack_watch= [];
 /** @type {WeakMap<function,Set<ddeSignal<any, any>>>} */
 const deps= new WeakMap();
 export function S(value, actions){
@@ -11,10 +13,15 @@ export function S(value, actions){
 		return create(value, actions);
 	if(isSignal(value)) return value;
 	
-	const out= create("");
-	const context= ()=> out(value());
-	deps.set(context, new Set([ out ]));
-	watch(context);
+	const out= create();
+	const contextReWatch= function(){
+		stack_watch.push(contextReWatch);
+		out(value());
+		stack_watch.pop();
+	};
+	deps.set(contextReWatch, new Set([ out ]));
+	contextReWatch();
+	//TODO when `out` is auto-removed (removeSignalsFromElements) there should be also a way to remove contextReWatch from all deps (complicated part is pass `is_full`/`removeSignalListener`)
 	return out;
 }
 S.action= function(signal, name, ...a){
@@ -57,9 +64,7 @@ S.clear= function(...signals){
 	for(const signal of signals){
 		Reflect.deleteProperty(signal, "toJSON");
 		const s= signal[mark];
-		const { onclear }= S.symbols;
-		if(s.actions && s.actions[onclear])
-			s.actions[onclear].call(s);
+		s.onclear.forEach(f=> f.call(s));
 		clearListDeps(signal, s);
 		Reflect.deleteProperty(signal, mark);
 	}
@@ -94,11 +99,7 @@ S.el= function(signal, map){
 		mark_start.after(...els);
 	};
 	addSignalListener(signal, reRenderReactiveElement);
-	const { current }= scope;
-	if(!current.prevent)
-		current.host(on.disconnected(()=>
-			/*! Clears `S.el` signal listener in current scope when not needed. */
-			removeSignalListener(signal, reRenderReactiveElement)));
+	removeSignalsFromElements(signal, reRenderReactiveElement, mark_start, map);
 	reRenderReactiveElement(signal());
 	return out;
 };
@@ -110,14 +111,28 @@ export const signals_config= {
 		if(!isSignal(attrs)) return attrs;
 		const l= attr=> assignNth([ key, attr ]);
 		addSignalListener(attrs, l);
-		const { current }= scope;
-		if(!current.prevent)
-			current.host(on.disconnected(()=>
-				/*! Clears signal listener for attribute in `assign` in current scope when not needed. */
-				removeSignalListener(attrs, l)));
+		removeSignalsFromElements(attrs, l, _, key);
 		return attrs();
 	}
 };
+function removeSignalsFromElements(signal, listener, ...notes){
+	const { current }= scope;
+	if(current.prevent) return;
+	const k= "__dde_reactive";
+	current.host(function(element){
+		if(!element[k]){
+			element[k]= [];
+			on.disconnected(()=>
+				/*!
+				* Clears all signals listeners the current element is depending on (`S.el`, `assign`, …?).
+				* You can investigate the `__dde_reactive` key of the element.
+				* */
+				element[k].forEach(([ _1, _2, s, l ])=> removeSignalListener(s, l, s[mark].host() === element))
+			)(element);
+		}
+		element[k].push([ ...notes, signal, listener ]);
+	});
+}
 
 function create(value, actions){
 	const signal=  (...value)=>
@@ -130,28 +145,22 @@ const protoSigal= Object.assign(Object.create(null), {
 	}
 });
 function toSignal(signal, value, actions){
+	const onclear= [];
 	if(typeOf(actions)!=="[object Object]")
 		actions= {};
+	const { onclear: ocs }= S.symbols;
+	if(actions[ocs]){
+		onclear.push(actions[ocs]);
+		Reflect.deleteProperty(actions, ocs);
+	}
+	const { host }= scope;
 	signal[mark]= {
-		value, actions,
+		value, actions, onclear, host,
 		listeners: new Set()
 	};
 	signal.toJSON= ()=> signal();
 	Object.setPrototypeOf(signal[mark], protoSigal);
 	return signal;
-}
-
-/** @type {function[]} */
-const stack_watch= [];
-function watch(context){
-	const contextReWatch= function(){
-		stack_watch.push(contextReWatch);
-		context();
-		stack_watch.pop();
-	};
-	//reassign deps as final context is contextReWatch
-	if(deps.has(context)){ deps.set(contextReWatch, deps.get(context)); deps.delete(context); }
-	contextReWatch();
 }
 function currentContext(){
 	return stack_watch[stack_watch.length - 1];
@@ -177,7 +186,10 @@ function addSignalListener(signal, listener){
 	if(!signal[mark]) return;
 	return signal[mark].listeners.add(listener);
 }
-function removeSignalListener(signal, listener){
+function removeSignalListener(signal, listener, is_full){
 	if(!signal[mark]) return;
-	return signal[mark].listeners.delete(listener);
+	const out= signal[mark].listeners.delete(listener);
+	if(is_full && signal[mark].listeners.size===0)
+		S.clear(signal);
+	return out;
 }

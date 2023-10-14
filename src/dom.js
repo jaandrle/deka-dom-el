@@ -10,10 +10,10 @@ const scopes= [ {
 const namespaceHelper= ns=> ns==="svg" ? "http://www.w3.org/2000/svg" : ns;
 export const scope= {
 	get current(){ return scopes[scopes.length-1]; },
-	get state(){ return [ ...scopes ]; },
 	get host(){ return this.current.host; },
 	get namespace(){ return this.current.namespace; },
 	set namespace(namespace){ return ( this.current.namespace= namespaceHelper(namespace)); },
+	
 	preventDefault(){
 		const { current }= this;
 		current.prevent= true;
@@ -31,6 +31,8 @@ export const scope= {
 			}
 		};
 	},
+	
+	get state(){ return [ ...scopes ]; },
 	push(s= {}){
 		if(s.namespace) s.namespace= namespaceHelper(s.namespace);
 		return scopes.push(Object.assign({}, this.current, { prevent: false }, s));
@@ -38,29 +40,29 @@ export const scope= {
 	pop(){ return scopes.pop(); },
 };
 export function createElement(tag, attributes, ...connect){
-	const _this= this;
 	const s= signals(this);
 	const { namespace }= scope;
-	let scoped= false;
+	let scoped= 0;
 	let el;
 	//TODO Array.isArray(tag) ⇒ set key (cache els)
 	if(Object(attributes)!==attributes || s.isSignal(attributes))
 		attributes= { textContent: attributes };
 	switch(true){
 		case typeof tag==="function": {
-			scoped= true;
-			scope.push({ scope: tag, host: c=> c ? (connect.unshift(c), undefined) : el });
+			scoped= 1;
+			scope.push({ scope: tag, host: c=> c ? (scoped===1 ? connect.unshift(c) : c(el), undefined) : el });
 			el= tag(attributes || undefined);
 			(el instanceof HTMLElement ? setRemove : setRemoveNS)(el, "Attribute", "dde-fun", tag.name);
 			break;
 		}
-		case tag==="#text":      el= assign.call(_this, document.createTextNode(""), attributes); break;
-		case tag==="<>":         el= assign.call(_this, document.createDocumentFragment(), attributes); break;
-		case namespace!=="html": el= assign.call(_this, document.createElementNS(namespace, tag), attributes); break;
-		case !el:                el= assign.call(_this, document.createElement(tag), attributes);
+		case tag==="#text":      el= assign.call(this, document.createTextNode(""), attributes); break;
+		case tag==="<>":         el= assign.call(this, document.createDocumentFragment(), attributes); break;
+		case namespace!=="html": el= assign.call(this, document.createElementNS(namespace, tag), attributes); break;
+		case !el:                el= assign.call(this, document.createElement(tag), attributes);
 	}
 	connect.forEach(c=> c(el));
 	if(scoped) scope.pop();
+	scoped= 2;
 	return el;
 }
 export { createElement as el };
