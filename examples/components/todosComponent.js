@@ -18,7 +18,7 @@ const className= style.host(todosComponent).css`
 export function todosComponent({ todos= [ "Task A" ] }= {}){
 	const todosS= S(todos.map(t=> S(t)), {
 		add(v){ this.value.push(S(v)); },
-		remove(i){ this.value.splice(i, 1)[0]; }
+		remove(i){ S.clear(this.value.splice(i, 1)[0]); }
 	});
 
 	const name= "todoName";
