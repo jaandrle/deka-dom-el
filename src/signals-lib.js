@@ -6,7 +6,7 @@ export function isSignal(candidate){
 }
 /** @type {function[]} */
 const stack_watch= [];
-/** @type {WeakMap<function,Set<ddeSignal<any, any>>>} */
+/** @type {WeakMap<function|ddeSignal<any, any>,Set<ddeSignal<any, any>>|function>} */
 const deps= new WeakMap();
 export function S(value, actions){
 	if(typeof value!=="function")
@@ -20,8 +20,8 @@ export function S(value, actions){
 		stack_watch.pop();
 	};
 	deps.set(contextReWatch, new Set([ out ]));
+	deps.set(out[mark], contextReWatch);
 	contextReWatch();
-	//TODO when `out` is auto-removed (removeSignalsFromElements) there should be also a way to remove contextReWatch from all deps (complicated part is pass `is_full`/`removeSignalListener`)
 	return out;
 }
 S.action= function(signal, name, ...a){
@@ -124,13 +124,13 @@ function removeSignalsFromElements(signal, listener, ...notes){
 			element[k]= [];
 			on.disconnected(()=>
 				/*!
-				* Clears all signals listeners the current element is depending on (`S.el`, `assign`, …?).
+				 * Clears all signals listeners added in the current scope/host (`S.el`, `assign`, …?).
 				* You can investigate the `__dde_reactive` key of the element.
 				* */
-				element[k].forEach(([ _1, _2, s, l ])=> removeSignalListener(s, l, s[mark].host() === element))
+				element[k].forEach(([ sl ])=> removeSignalListener(...sl, signal[mark]?.host() === element))
 			)(element);
 		}
-		element[k].push([ ...notes, signal, listener ]);
+		element[k].push([ [ signal, listener ], ...notes ]);
 	});
 }
 
@@ -186,10 +186,16 @@ function addSignalListener(signal, listener){
 	if(!signal[mark]) return;
 	return signal[mark].listeners.add(listener);
 }
-function removeSignalListener(signal, listener, is_full){
-	if(!signal[mark]) return;
-	const out= signal[mark].listeners.delete(listener);
-	if(is_full && signal[mark].listeners.size===0)
+function removeSignalListener(signal, listener, clear_when_empty){
+	const s= signal[mark];
+	if(!s) return;
+	const out= s.listeners.delete(listener);
+	if(clear_when_empty && !s.listeners.size){
 		S.clear(signal);
+		if(!deps.has(s)) return out;
+		const c= deps.get(s);
+		if(!deps.has(c)) return out;
+		deps.get(c).forEach(sig=> removeSignalListener(sig, c, true));
+	}
 	return out;
 }
