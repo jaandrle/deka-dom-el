@@ -1,6 +1,6 @@
 export const signals_global= {
 	isSignal(attributes){ return false; },
-	processReactiveAttribute(obj, key, attr, assignNth){ return attr; },
+	processReactiveAttribute(obj, key, attr, set){ return attr; },
 };
 export function registerReactivity(def, global= true){
 	if(global) return Object.assign(signals_global, def);

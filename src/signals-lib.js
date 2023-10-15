@@ -107,9 +107,9 @@ S.el= function(signal, map){
 import { typeOf } from './helpers.js';
 export const signals_config= {
 	isSignal,
-	processReactiveAttribute(_, key, attrs, assignNth){
+	processReactiveAttribute(_, key, attrs, set){
 		if(!isSignal(attrs)) return attrs;
-		const l= attr=> assignNth([ key, attr ]);
+		const l= attr=> set(key, attr);
 		addSignalListener(attrs, l);
 		removeSignalsFromElements(attrs, l, _, key);
 		return attrs();
