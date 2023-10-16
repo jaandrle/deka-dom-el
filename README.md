@@ -1,4 +1,4 @@
-**WIP** (the experimentation phase) | [source code on Gitea](https://gitea.jaandrle.cz/jaandrle/deka-dom-el) | [*mirrored* on GitHub](https://github.com/jaandrle/deka-dom-el)
+**WIP** (the experimentation phase) | [source code on GitHub](https://github.com/jaandrle/deka-dom-el) | [*mirrored* on Gitea](https://gitea.jaandrle.cz/jaandrle/deka-dom-el)
 
 # Deka DOM Elements
 This is reimplementation of [jaandrle/dollar_dom_component: Functional DOM components without JSX and virtual DOM.](https://github.com/jaandrle/dollar_dom_component).
