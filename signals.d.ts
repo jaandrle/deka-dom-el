@@ -35,7 +35,7 @@ interface S {
 		name: N,
 		...params: A[N] extends (...args: infer P)=> any ? P : never
 	): void;
-	clear(...signals: Signal<any, any>): void;
+	clear(...signals: Signal<any, any>[]): void;
 	on<T>(signal: Signal<T, any>, onchange: (a: T)=> void, options?: AddEventListenerOptions): void;
 	symbols: {
 		signal: SymbolSignal;

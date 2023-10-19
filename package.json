@@ -91,6 +91,7 @@
 	],
 	"devDependencies": {
 		"@size-limit/preset-small-lib": "^8.2.6",
+		"dts-bundler": "^0.1.0",
 		"esbuild": "^0.19.2",
 		"jshint": "^2.13.6",
 		"nodejsscript": "github:jaandrle/nodejsscript#dev-v1",
