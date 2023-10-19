@@ -8,7 +8,9 @@ export function isSignal(candidate){
 const stack_watch= [];
 /**
  * ### `WeakMap<function, Set<ddeSignal<any, any>>>`
- * The `Set` is in the form of `[ source, ...depended signals (DSs) ]`. When the DS is cleaned it is removed from DSs, if remains only one (`source`) it is cleared too.
+ * The `Set` is in the form of `[ source, ...depended signals (DSs) ]`.
+ * When the DS is cleaned (`S.clear`) it is removed from DSs,
+ * if remains only one (`source`) it is cleared too.
  * ### `WeakMap<object, function>`
  * This is used for revesed deps, the `function` is also key for `deps`.
  * @type {WeakMap<function|object,Set<ddeSignal<any, any>>|function>}
@@ -62,18 +64,34 @@ S.symbols= {
 };
 import { on } from "./events.js";
 import { scope } from "./dom.js";
+const key_attributes= "__dde_attributes";
 S.attribute= function(name, initial= undefined){
-	const { host }= scope;
-	const value= host() && host().hasAttribute(name) ? host().getAttribute(name) : initial;
-	const ac= new AbortController();
-	const out= S(value, {
-		[S.symbols.onclear](){ ac.abort(); }
+	const out= S(initial);
+	scope.host(element=> {
+		if(element instanceof HTMLElement){
+			if(element.hasAttribute(name)) out(element.getAttribute(name));
+		} else {
+			if(element.hasAttributeNS(null, name)) out(element.getAttributeNS(null, name));
+		}
+		if(element[key_attributes]){
+			element[key_attributes][name]= out;
+			return;
+		}
+		element[key_attributes]= { [name]: out };
+		on.attributeChanged(function attributeChangeToSignal({ detail }){
+			/*! This maps attributes to signals (`S.attribute`).
+			 * Investigate `__dde_attributes` key of the element.*/
+			const [ name, value ]= detail;
+			const curr= element[key_attributes][name];
+			if(curr) curr(value);
+		})(element);
+		on.disconnected(function(){
+			/*! This removes all signals mapped to attributes (`S.attribute`).
+			 * Investigate `__dde_attributes` key of the element.*/
+			S.clear(...Object.values(element[key_attributes]));
+		})(element);
+		return element;
 	});
-	scope.host(on.attributeChanged(function attributeChangeToSignal({ detail }){
-		const [ name_c, value ]= detail;
-		if(name_c!==name) return;
-		out(value);
-	}, { signal: ac.signal }));
 	return out;
 };
 S.clear= function(...signals){
@@ -182,11 +200,16 @@ function toSignal(signal, value, actions){
 		Reflect.deleteProperty(actions, ocs);
 	}
 	const { host }= scope;
-	signal[mark]= {
-		value, actions, onclear, host,
-		listeners: new Set(),
-		defined: new SignalDefined()
-	};
+	Reflect.defineProperty(signal, mark, {
+		value: {
+			value, actions, onclear, host,
+			listeners: new Set(),
+			defined: new SignalDefined()
+		},
+		enumerable: false,
+		writable: false,
+		configurable: true
+	});
 	signal.toJSON= ()=> signal();
 	Object.setPrototypeOf(signal[mark], protoSigal);
 	return signal;
