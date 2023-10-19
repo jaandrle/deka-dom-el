@@ -6,7 +6,13 @@ export function isSignal(candidate){
 }
 /** @type {function[]} */
 const stack_watch= [];
-/** @type {WeakMap<function|ddeSignal<any, any>,Set<ddeSignal<any, any>>|function>} */
+/**
+ * ### `WeakMap<function, Set<ddeSignal<any, any>>>`
+ * The `Set` is in the form of `[ source, ...depended signals (DSs) ]`. When the DS is cleaned it is removed from DSs, if remains only one (`source`) it is cleared too.
+ * ### `WeakMap<object, function>`
+ * This is used for revesed deps, the `function` is also key for `deps`.
+ * @type {WeakMap<function|object,Set<ddeSignal<any, any>>|function>}
+ * */
 const deps= new WeakMap();
 export function S(value, actions){
 	if(typeof value!=="function")
@@ -15,12 +21,22 @@ export function S(value, actions){
 	
 	const out= create();
 	const contextReWatch= function(){
+		const [ origin, ...deps_old ]= deps.get(contextReWatch);
+		deps.set(contextReWatch, new Set([ origin ]));
+
 		stack_watch.push(contextReWatch);
 		out(value());
 		stack_watch.pop();
+
+		if(!deps_old.length) return;
+		const deps_curr= deps.get(contextReWatch);
+		for (const dep_signal of deps_old){
+			if(deps_curr.has(dep_signal)) continue;
+			removeSignalListener(dep_signal, contextReWatch);
+		}
 	};
-	deps.set(contextReWatch, new Set([ out ]));
 	deps.set(out[mark], contextReWatch);
+	deps.set(contextReWatch, new Set([ out ]));
 	contextReWatch();
 	return out;
 }
@@ -82,15 +98,19 @@ S.clear= function(...signals){
 		});
 	}
 };
+const key_reactive= "__dde_reactive";
 S.el= function(signal, map){
-	const mark_start= document.createComment("<#reactive>");
-	const mark_end= document.createComment("</#reactive>");
+	const mark_start= document.createComment(`<dde:reactive>`);
+	const mark_end= document.createComment("</dde:reactive>");
 	const out= document.createDocumentFragment();
 	out.append(mark_start, mark_end);
+	const { current }= scope;
 	const reRenderReactiveElement= v=> {
 		if(!mark_start.parentNode || !mark_end.parentNode)
 			return removeSignalListener(signal, reRenderReactiveElement);
+		scope.push(current);
 		let els= map(v);
+		scope.pop();
 		if(!Array.isArray(els))
 			els= [ els ];
 		let el_r= mark_start;
@@ -107,30 +127,30 @@ S.el= function(signal, map){
 import { typeOf } from './helpers.js';
 export const signals_config= {
 	isSignal,
-	processReactiveAttribute(_, key, attrs, set){
+	processReactiveAttribute(element, key, attrs, set){
 		if(!isSignal(attrs)) return attrs;
 		const l= attr=> set(key, attr);
 		addSignalListener(attrs, l);
-		removeSignalsFromElements(attrs, l, _, key);
+		removeSignalsFromElements(attrs, l, element, key);
 		return attrs();
 	}
 };
 function removeSignalsFromElements(signal, listener, ...notes){
 	const { current }= scope;
 	if(current.prevent) return;
-	const k= "__dde_reactive";
 	current.host(function(element){
-		if(!element[k]){
-			element[k]= [];
+		if(!element[key_reactive]){
+			element[key_reactive]= [];
 			on.disconnected(()=>
 				/*!
 				 * Clears all signals listeners added in the current scope/host (`S.el`, `assign`, …?).
-				* You can investigate the `__dde_reactive` key of the element.
-				* */
-				element[k].forEach(([ sl ])=> removeSignalListener(...sl, signal[mark]?.host() === element))
+				 * You can investigate the `__dde_reactive` key of the element.
+				 * */
+				element[key_reactive].forEach(([ [ signal, listener ] ])=>
+					removeSignalListener(signal, listener, signal[mark]?.host() === element))
 			)(element);
 		}
-		element[k].push([ [ signal, listener ], ...notes ]);
+		element[key_reactive].push([ [ signal, listener ], ...notes ]);
 	});
 }
 
@@ -144,6 +164,14 @@ const protoSigal= Object.assign(Object.create(null), {
 		this.skip= true;
 	}
 });
+class SignalDefined extends Error{
+	constructor(){
+		super();
+		const [ curr, ...rest ]= this.stack.split("\n");
+		const curr_file= curr.slice(curr.indexOf("@"), curr.indexOf(".js:")+4);
+		this.stack= rest.find(l=> !l.includes(curr_file));
+	}
+}
 function toSignal(signal, value, actions){
 	const onclear= [];
 	if(typeOf(actions)!=="[object Object]")
@@ -156,7 +184,8 @@ function toSignal(signal, value, actions){
 	const { host }= scope;
 	signal[mark]= {
 		value, actions, onclear, host,
-		listeners: new Set()
+		listeners: new Set(),
+		defined: new SignalDefined()
 	};
 	signal.toJSON= ()=> signal();
 	Object.setPrototypeOf(signal[mark], protoSigal);
