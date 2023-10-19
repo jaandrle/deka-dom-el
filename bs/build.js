@@ -23,14 +23,17 @@ $.api("", true)
 			f=> s.echo(f).to(out)
 		)(s.cat(out));
 		const file_dts= file_root+".d.ts";
-		s.echo(bundleDTS(file_dts)).to(filesOut(file_dts));
+		const file_dts_out= filesOut(file_dts);
+		echo(`  ${file_dts_out}`)
+		s.echo(bundleDTS(file_dts)).to(file_dts_out);
+		echo("⚡ Done");
 		toDDE(out, filesOut(file, "dde"));
 	}
 	$.exit(0);
 
 	function toDDE(file, out){
 		const name= "dde";
-		echo(`\n  ${out} (${file} → globalThis.${name})\n`);
+		echo(`  ${out} (${file} → globalThis.${name})`);
 		
 		let content= s.cat(file).toString().split(/export ?{/);
 		content.splice(1, 0, `\nglobalThis.${name}= {`);
@@ -42,7 +45,7 @@ $.api("", true)
 			"})();"
 		].join("\n")).to(out);
 		
-		echo("⚡ Done\n");
+		echo("⚡ Done");
 	}
 })
 .parse();
