@@ -43,16 +43,19 @@ export function createElement(tag, attributes, ...connect){
 	const s= signals(this);
 	const { namespace }= scope;
 	let scoped= 0;
-	let el;
+	let el, el_host;
 	//TODO Array.isArray(tag) ⇒ set key (cache els)
 	if(Object(attributes)!==attributes || s.isSignal(attributes))
 		attributes= { textContent: attributes };
 	switch(true){
 		case typeof tag==="function": {
 			scoped= 1;
-			scope.push({ scope: tag, host: c=> c ? (scoped===1 ? connect.unshift(c) : c(el), undefined) : el });
+			scope.push({ scope: tag, host: c=> c ? (scoped===1 ? connect.unshift(c) : c(el_host), undefined) : el_host });
 			el= tag(attributes || undefined);
-			(el instanceof HTMLElement ? setRemove : setRemoveNS)(el, "Attribute", "dde-fun", tag.name);
+			const el_mark= document.createComment(`<dde:mark type="component" name="${tag.name}"/>`);
+			el.prepend(el_mark);
+			if(el instanceof DocumentFragment)
+				el_host= el_mark;
 			break;
 		}
 		case tag==="#text":      el= assign.call(this, document.createTextNode(""), attributes); break;
@@ -60,7 +63,8 @@ export function createElement(tag, attributes, ...connect){
 		case namespace!=="html": el= assign.call(this, document.createElementNS(namespace, tag), attributes); break;
 		case !el:                el= assign.call(this, document.createElement(tag), attributes);
 	}
-	connect.forEach(c=> c(el));
+	if(!el_host) el_host= el;
+	connect.forEach(c=> c(el_host));
 	if(scoped) scope.pop();
 	scoped= 2;
 	return el;

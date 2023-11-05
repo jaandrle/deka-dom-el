@@ -1,4 +1,4 @@
-import { el } from "../jsdom.js";
+import { el } from "deka-dom-el";
 import { head as headCommon } from "./layout/head.html.js";
 export function head(pkg, path_target){
 	return headCommon({
@@ -43,7 +43,7 @@ export function body(pkg){
 			}),
 			".",
 		),
-		example({ src: "./components/examples/helloWorld.js" })
+		el(example, { src: "./components/examples/helloWorld.js" })
 	);
 }
 function pageName(pkg){

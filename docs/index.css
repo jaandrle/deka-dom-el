@@ -1,6 +1,6 @@
 :root {
 	color-scheme: dark light;
-	--body-max-width: 40rem;
+	--body-max-width: 45rem;
 }
 *, ::before, ::after { box-sizing: border-box; }
 body > * {
@@ -17,5 +17,5 @@ h1{
 }
 .example{
 	--body-max-width: 80rem;
-	height: 20rem;
+	height: 25rem;
 }

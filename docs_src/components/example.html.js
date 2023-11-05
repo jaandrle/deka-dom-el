@@ -1,12 +1,12 @@
-let loaded= false;
+let is_register= false;
 import { styles } from "../index.css.js";
 export const css= styles().scope(example).css`
 :host{
 	--body-max-width: 80rem;
-	height: 20rem;
+	height: 25rem;
 }
 `
-import { el } from "../../jsdom.js";
+import { el } from "deka-dom-el";
 export function example({ src, language= "javascript" }){
 	register();
 	const cwd= "components";
@@ -32,12 +32,12 @@ function elCode({ id, content }){
 		files: [{ name: ".js", content }],
 		toolbar: false
 	});
-	return el("script", `Flems(document.getElementById("${id}"), JSON.parse(${options}));`);
+	return el("script", `Flems(document.getElementById("${id}"), JSON.parse(${JSON.stringify(options)}));`);
 }
 function register(){
-	if(loaded) return;
+	if(is_register) return;
 	document.head.append(
 		el("script", { src: "https://flems.io/flems.html", type: "text/javascript", charset: "utf-8" })
 	);
-	loaded= true;
+	is_register= true;
 }

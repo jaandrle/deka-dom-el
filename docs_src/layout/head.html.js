@@ -1,4 +1,4 @@
-import { el } from "../../jsdom.js";
+import { el } from "deka-dom-el";
 /**
  * @param {object} def
  * @param {string} def.id Page `id` is used as stylesheet name.

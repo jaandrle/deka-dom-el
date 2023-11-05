@@ -30,7 +30,7 @@ export function styles(){ return Object.assign(Object.create(s), { content: "" }
 export const common= css`
 :root {
 	color-scheme: dark light;
-	--body-max-width: 40rem;
+	--body-max-width: 45rem;
 }
 *, ::before, ::after { box-sizing: border-box; }
 body > * {

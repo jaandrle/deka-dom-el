@@ -118,8 +118,8 @@ S.clear= function(...signals){
 };
 const key_reactive= "__dde_reactive";
 S.el= function(signal, map){
-	const mark_start= document.createComment(`<dde:reactive>`);
-	const mark_end= document.createComment("</dde:reactive>");
+	const mark_start= document.createComment(`<dde:mark type="reactive">`);
+	const mark_end= document.createComment("</dde:mark>");
 	const out= document.createDocumentFragment();
 	out.append(mark_start, mark_end);
 	const { current }= scope;
