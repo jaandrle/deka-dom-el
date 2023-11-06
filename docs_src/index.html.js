@@ -21,7 +21,7 @@ export const css= styles()
 `
 .include(example_css);
 export function body(pkg){
-	return el("<>").append(
+	return el().append(
 		el("h1", pageName(pkg)),
 		el("p").append(
 			"The library tries to provide pure JavaScript tool(s) to create reactive interfaces. ",

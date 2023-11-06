@@ -48,7 +48,7 @@
 		"latedef": "true",
 		"maxparams": 5,
 		"maxdepth": 3,
-		"maxcomplexity": 12,
+		"maxcomplexity": 13,
 		"globals": {
 			"requestIdleCallback": false,
 			"AbortController": false,

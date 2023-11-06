@@ -38,14 +38,13 @@ type ElementAttributes<T extends keyof ElementTagNameMap | ElementTagNameMap[key
 	Omit<T,"classList"|"className"> & AttrsModified;
 export function assign<El extends Element>(element: El, ...attrs_array: Partial<ElementAttributes<El>>[]): El
 
-type TagNameFragment= "<>";
 export function el<TAG extends keyof ElementTagNameMap>(
 	tag_name: TAG,
 	attrs?: Partial<ElementAttributes<ElementTagNameMap[TAG]>>,
 	...extenders: ddeElementExtender<ElementTagNameMap[TAG]>[]
 ): ElementTagNameMap[TAG]
 export function el<T>(
-	tag_name: TagNameFragment,
+	tag_name?: "<>",
 ): DocumentFragment
 
 export function el<

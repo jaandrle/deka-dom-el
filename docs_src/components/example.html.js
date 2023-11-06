@@ -15,7 +15,7 @@ export function example({ src, language= "javascript" }){
 		.toString()
 		.replaceAll(' from "../../../index-with-signals.js";', ' from "https://cdn.jsdelivr.net/gh/jaandrle/deka-dom-el/dist/esm-with-signals.js";');
 	const id= "code-"+Math.random().toString(36).slice(2, 7);
-	return el("<>").append(
+	return el().append(
 		el("div", { id, className: example.name }).append(
 			el("pre").append(
 				el("code", { className: "language-"+language, textContent: code })

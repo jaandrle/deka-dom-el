@@ -12,7 +12,7 @@ import { el } from "deka-dom-el";
  * @param {object} def
  * */
 export function head({ id, title, description, pkg, path_target }){
-	return el("<>").append(
+	return el().append(
 		el("meta", { name: "viewport", content: "width=device-width, initial-scale=1" }),
 		el("link", { rel: "stylesheet", href: stylesheetHref(path_target, id) }),
 		
@@ -23,7 +23,7 @@ export function head({ id, title, description, pkg, path_target }){
 	);
 }
 function metaTwitter({ name, description, homepage }){
-	return el("<>").append(
+	return el().append(
 		el("meta", { name: "twitter:card", content: "summary_large_image" }),
 		//el("meta", { name: "twitter:domain", content: "" }),
 		el("meta", { name: "twitter:url", content: homepage }),
@@ -34,7 +34,7 @@ function metaTwitter({ name, description, homepage }){
 	);
 }
 function metaFacebook({ name, description, homepage }){
-	return el("<>").append(
+	return el().append(
 		el("meta", { name: "og:url", content: homepage }),
 		el("meta", { name: "og:title", content: name }),
 		el("meta", { name: "og:description", content: description }),

@@ -59,7 +59,7 @@ export function createElement(tag, attributes, ...connect){
 			break;
 		}
 		case tag==="#text":      el= assign.call(this, document.createTextNode(""), attributes); break;
-		case tag==="<>":         el= assign.call(this, document.createDocumentFragment(), attributes); break;
+		case tag==="<>" || !tag: el= assign.call(this, document.createDocumentFragment(), attributes); break;
 		case namespace!=="html": el= assign.call(this, document.createElementNS(namespace, tag), attributes); break;
 		case !el:                el= assign.call(this, document.createElement(tag), attributes);
 	}
