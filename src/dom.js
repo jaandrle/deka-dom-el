@@ -52,10 +52,10 @@ export function createElement(tag, attributes, ...connect){
 			scoped= 1;
 			scope.push({ scope: tag, host: c=> c ? (scoped===1 ? connect.unshift(c) : c(el_host), undefined) : el_host });
 			el= tag(attributes || undefined);
-			const el_mark= document.createComment(`<dde:mark type="component" name="${tag.name}"/>`);
+			const is_fragment= el instanceof DocumentFragment;
+			const el_mark= document.createComment(`<dde:mark type="component" name="${tag.name}" host="${is_fragment ? "this" : "parentElement"}"/>`);
 			el.prepend(el_mark);
-			if(el instanceof DocumentFragment)
-				el_host= el_mark;
+			if(is_fragment) el_host= el_mark;
 			break;
 		}
 		case tag==="#text":      el= assign.call(this, document.createTextNode(""), attributes); break;
@@ -84,7 +84,6 @@ export function assign(element, ...attributes){
 	return element;
 }
 export function assignAttribute(element, key, value){
-	/* jshint maxcomplexity:14 */
 	const { setRemoveAttr, s }= assignContext(element, this);
 	const _this= this;
 	

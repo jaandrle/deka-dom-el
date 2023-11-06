@@ -28,17 +28,25 @@ export function css(...a){
 }
 export function styles(){ return Object.assign(Object.create(s), { content: "" }); }
 export const common= css`
-:root {
-	color-scheme: dark light;
+@import url(https://cdn.simplecss.org/simple.min.css);
+:root{
 	--body-max-width: 45rem;
+	--marked: #fb3779;
+	--code: #0d47a1;
+	--accent: #d81b60;
 }
-*, ::before, ::after { box-sizing: border-box; }
-body > * {
-	margin-inline: max(.5rem, calc(50% - var(--body-max-width) / 2));
-	font-family: Tahoma, Verdana, Arial, sans-serif;
+@media (prefers-color-scheme:dark) {
+    ::backdrop, :root {
+		--accent: #f06292;
+		--code: #62c1f0;
+	}
+}
+body {
+	grid-template-columns: 1fr min(var(--body-max-width), 90%) 1fr;
 }
 h1{
 	text-align: center;
 	text-wrap: balanc;
+	grid-column: 1 / 4;
 }
 `;

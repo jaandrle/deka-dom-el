@@ -2,8 +2,11 @@ let is_registered= false;
 import { styles } from "../index.css.js";
 export const css= styles().scope(example).css`
 :host{
-	--body-max-width: 80rem;
-	height: 25rem;
+	grid-column: 1/4;
+	width: 100%;
+	max-width: calc(9/5 * var(--body-max-width));
+	height: calc(3/5 * var(--body-max-width));
+	margin-inline: auto;
 }
 `
 import { el } from "deka-dom-el";
