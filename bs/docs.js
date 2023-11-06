@@ -12,12 +12,9 @@ const { el }= await register(ssr.dom);
 
 echo("Loading components…");
 const pkg= s.cat("package.json").xargs(JSON.parse);
-const { head, body, css }= await import("../docs_src/index.html.js"); //→											TODO: important to mention in docs!!!
-document.head.append(
-	head(pkg, path_target)
-);
+const { page, css }= await import("../docs_src/index.html.js"); //→											TODO: important to mention in docs!!!
 document.body.append(
-	el(body, pkg),
+	el(page, { pkg, path_target }),
 	el("script", { src: "https://cdn.jsdelivr.net/npm/shiki" }),
 	el("script", { src: "index.js", type: "module" })
 );

@@ -1,14 +1,4 @@
 import { el } from "deka-dom-el";
-import { head as headCommon } from "./layout/head.html.js";
-export function head(pkg, path_target){
-	return headCommon({
-		id: "index",
-		title: pageName(pkg),
-		description: "Introducing basic concepts.",
-		pkg, path_target
-	});
-}
-
 import { styles, common } from "./index.css.js";
 import { example, css as example_css } from "./components/example.html.js";
 export const css= styles()
@@ -20,13 +10,17 @@ export const css= styles()
 }
 `
 .include(example_css);
-export function body(pkg){
+
+import { header } from "./layout/head.html.js";
+export function page({ pkg, path_target }){
 	return el().append(
-		el("h1", pageName(pkg)),
-		el("p").append(
-			"The library tries to provide pure JavaScript tool(s) to create reactive interfaces. ",
-			"The main goals are:"
-		),
+		el(header, {
+			id: "index",
+			title: "Introduction/Guide",
+			description: "Introducing basic concepts.",
+			pkg, path_target
+		}),
+		el("p", "The main goals are:"),
 		el("ul").append(
 			el("li", "provide a small wrappers/utilities around the native JavaScript DOM"),
 			el("li", "keep library size around 10kB at maximum (if possible)"),
@@ -132,7 +126,4 @@ export function body(pkg){
 		el(example, { src: "./components/examples/dekaBasicComponent.js" }),
 		el("p", "It is nice to use similar naming convention as native DOM API.")
 	);
-}
-function pageName(pkg){
-	return `\`${pkg.name}\` — Introduction/Guide`;
 }

@@ -44,9 +44,19 @@ export const common= css`
 body {
 	grid-template-columns: 1fr min(var(--body-max-width), 90%) 1fr;
 }
-h1{
-	text-align: center;
-	text-wrap: balanc;
-	grid-column: 1 / 4;
+nav a.current {
+  color: var(--accent) !important;
+  border-color: var(--accent) !important;
+}
+.icon {
+	vertical-align: sub;
+	padding-right: .25rem;
+	display: inline-block;
+	width: 1em;
+	height: 1.3em;
+	margin-right: 0.2rem;
+	stroke-width: 0;
+	stroke: currentColor;
+	fill: currentColor;
 }
 `;
