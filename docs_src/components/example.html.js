@@ -1,4 +1,4 @@
-let is_register= false;
+let is_registered= false;
 import { styles } from "../index.css.js";
 export const css= styles().scope(example).css`
 :host{
@@ -18,10 +18,7 @@ export function example({ src, language= "javascript" }){
 	return el("<>").append(
 		el("div", { id, className: example.name }).append(
 			el("pre").append(
-				el("code", {
-					className: "language-"+language,
-					textContent: code
-				})
+				el("code", { className: "language-"+language, textContent: code })
 			)
 		),
 		elCode({ id, content: code })
@@ -35,9 +32,9 @@ function elCode({ id, content }){
 	return el("script", `Flems(document.getElementById("${id}"), JSON.parse(${JSON.stringify(options)}));`);
 }
 function register(){
-	if(is_register) return;
+	if(is_registered) return;
 	document.head.append(
 		el("script", { src: "https://flems.io/flems.html", type: "text/javascript", charset: "utf-8" })
 	);
-	is_register= true;
+	is_registered= true;
 }
