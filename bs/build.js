@@ -3,14 +3,18 @@ import { bundle as bundleDTS } from "dts-bundler";
 import compressing from "compressing";
 const files= [ "index", "index-with-signals" ];
 const filesOut= (file, mark= "esm")=> "dist/"+file.replace("index", mark);
+const css= echo.css`
+	.info{ color: gray; }
+`;
 
 $.api("", true)
 .option("--minify", "Level of minification [ full (default), partial ]")
 .action(async function main({ minify= "full" }){
 	for(const file_root of files){
 		const file= file_root+".js";
+		echo("Processing: "+ file);
 		const out= filesOut(file);
-		s.run([
+		const esbuild_output= s.$().run([
 			"npx esbuild '::file::'",
 			"--platform=neutral",
 			"--bundle",
@@ -19,18 +23,21 @@ $.api("", true)
 			"--packages=external",
 			"--outfile='::out::'"
 		].join(" "), { file, out });
+		if(esbuild_output.code)
+			return $.exit(esbuild_output.code, echo(esbuild_output.stderr));
+		echoVariant(esbuild_output.stderr.split("\n")[1].trim()+ " (esbuild)");
 		pipe(
 			f=> f.replace(/^ +/gm, m=> "\t".repeat(m.length/2)),
 			f=> s.echo(f).to(out)
 		)(s.cat(out));
 
 		const file_gzip_out= filesOut(file_root+".gzip.js");
-		echo(`  ${file_gzip_out}`)
+		echoVariant(file_gzip_out);
 		await compressing.gzip.compressFile(out, file_gzip_out);
 
 		const file_dts= file_root+".d.ts";
 		const file_dts_out= filesOut(file_dts);
-		echo(`  ${file_dts_out}`)
+		echoVariant(file_dts_out);
 		s.echo(bundleDTS(file_dts)).to(file_dts_out);
 		
 		await toDDE(out, file_root);
@@ -40,7 +47,7 @@ $.api("", true)
 	async function toDDE(file, file_root){
 		const name= "dde";
 		const out= filesOut(file_root+".js", name);
-		echo(`  ${out} (${file} → globalThis.${name})`);
+		echoVariant(`${out} (${file} → globalThis.${name})`)
 		
 		let content= s.cat(file).toString().split(/export ?{/);
 		content.splice(1, 0, `\nglobalThis.${name}= {`);
@@ -53,8 +60,12 @@ $.api("", true)
 		].join("\n")).to(out);
 
 		const out_gzip= filesOut(file_root+".gzip.js", name);
-		echo(`  ${out_gzip}`);
+		echoVariant(out_gzip);
 		await compressing.gzip.compressFile(out, out_gzip);
 	}
 })
 .parse();
+
+function echoVariant(name){
+	return echo("%c✓ "+name, css.info+css);
+}
