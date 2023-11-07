@@ -1,6 +1,5 @@
 #!/usr/bin/env -S npx nodejsscript
 import { bundle as bundleDTS } from "dts-bundler";
-import compressing from "compressing";
 const files= [ "index", "index-with-signals" ];
 const filesOut= (file, mark= "esm")=> "dist/"+file.replace("index", mark);
 const css= echo.css`
@@ -31,10 +30,6 @@ $.api("", true)
 			f=> s.echo(f).to(out)
 		)(s.cat(out));
 
-		const file_gzip_out= filesOut(file_root+".gzip.js");
-		echoVariant(file_gzip_out);
-		await compressing.gzip.compressFile(out, file_gzip_out);
-
 		const file_dts= file_root+".d.ts";
 		const file_dts_out= filesOut(file_dts);
 		echoVariant(file_dts_out);
@@ -58,10 +53,6 @@ $.api("", true)
 			content.join(""),
 			"})();"
 		].join("\n")).to(out);
-
-		const out_gzip= filesOut(file_root+".gzip.js", name);
-		echoVariant(out_gzip);
-		await compressing.gzip.compressFile(out, out_gzip);
 	}
 })
 .parse();
