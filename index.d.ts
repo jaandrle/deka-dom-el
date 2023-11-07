@@ -1,6 +1,6 @@
 declare global {
 	type ddeComponentAttributes= Record<any, any> | undefined | string;
-	type ddeElementExtender<El extends HTMLElement | SVGElement | Comment | DocumentFragment>= (element: El)=> El;
+	type ddeElementModifier<El extends HTMLElement | SVGElement | Comment | DocumentFragment>= (element: El)=> El;
 }
 type ElementTagNameMap= HTMLElementTagNameMap & { // & SVGElementTagNameMap
 	'#text': Text
@@ -41,7 +41,7 @@ export function assign<El extends Element>(element: El, ...attrs_array: Partial<
 export function el<TAG extends keyof ElementTagNameMap>(
 	tag_name: TAG,
 	attrs?: Partial<ElementAttributes<ElementTagNameMap[TAG]>>,
-	...extenders: ddeElementExtender<ElementTagNameMap[TAG]>[]
+	...modifiers: ddeElementModifier<ElementTagNameMap[TAG]>[]
 ): ElementTagNameMap[TAG]
 export function el<T>(
 	tag_name?: "<>",
@@ -52,36 +52,36 @@ export function el<
 	C extends (attr: A)=> Element | DocumentFragment>(
 	fComponent: C,
 	attrs?: A,
-	...extenders: ddeElementExtender<ReturnType<C>>[]
+	...modifiers: ddeElementModifier<ReturnType<C>>[]
 ): ReturnType<C>
 
 export function el(
 	tag_name: string,
 	attrs?: Record<string, any>,
-	...extenders: ddeElementExtender<HTMLElement | SVGElement>[]
+	...modifiers: ddeElementModifier<HTMLElement | SVGElement>[]
 ): HTMLElement
 
 export function dispatchEvent(element: HTMLElement, name: keyof DocumentEventMap): void;
 export function dispatchEvent(element: HTMLElement, name: string, data: any): void;
 interface On{
 	<
-		EE extends ddeElementExtender<Element>,
-		El extends ( EE extends ddeElementExtender<infer El> ? El : never ),
+		EE extends ddeElementModifier<Element>,
+		El extends ( EE extends ddeElementModifier<infer El> ? El : never ),
 		Event extends keyof DocumentEventMap>(
 			type: Event,
 			listener: (this: El, ev: DocumentEventMap[Event]) => any,
 			options?: AddEventListenerOptions
 		) : EE;
 	connected<
-		EE extends ddeElementExtender<Element>,
-		El extends ( EE extends ddeElementExtender<infer El> ? El : never )
+		EE extends ddeElementModifier<Element>,
+		El extends ( EE extends ddeElementModifier<infer El> ? El : never )
 		>(
 			listener: (el: El) => any,
 			options?: AddEventListenerOptions
 		) : EE;
 	disconnected<
-		EE extends ddeElementExtender<Element>,
-		El extends ( EE extends ddeElementExtender<infer El> ? El : never )
+		EE extends ddeElementModifier<Element>,
+		El extends ( EE extends ddeElementModifier<infer El> ? El : never )
 		>(
 			listener: (el: El) => any,
 			options?: AddEventListenerOptions
@@ -91,7 +91,7 @@ export const on: On;
 
 export const scope: {
 	namespace: string,
-	host: ddeElementExtender<any>,
+	host: ddeElementModifier<any>,
 	elNamespace: (ns: string)=> ({ append(...els: (HTMLElement | SVGElement)[]): HTMLElement | SVGElement | DocumentFragment })
 };
 

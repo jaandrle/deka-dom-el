@@ -39,7 +39,7 @@ export const scope= {
 	},
 	pop(){ return scopes.pop(); },
 };
-export function createElement(tag, attributes, ...connect){
+export function createElement(tag, attributes, ...modifiers){
 	const s= signals(this);
 	const { namespace }= scope;
 	let scoped= 0;
@@ -50,7 +50,7 @@ export function createElement(tag, attributes, ...connect){
 	switch(true){
 		case typeof tag==="function": {
 			scoped= 1;
-			scope.push({ scope: tag, host: c=> c ? (scoped===1 ? connect.unshift(c) : c(el_host), undefined) : el_host });
+			scope.push({ scope: tag, host: c=> c ? (scoped===1 ? modifiers.unshift(c) : c(el_host), undefined) : el_host });
 			el= tag(attributes || undefined);
 			const is_fragment= el instanceof DocumentFragment;
 			const el_mark= document.createComment(`<dde:mark type="component" name="${tag.name}" host="${is_fragment ? "this" : "parentElement"}"/>`);
@@ -64,7 +64,7 @@ export function createElement(tag, attributes, ...connect){
 		case !el:                el= assign.call(this, document.createElement(tag), attributes);
 	}
 	if(!el_host) el_host= el;
-	connect.forEach(c=> c(el_host));
+	modifiers.forEach(c=> c(el_host));
 	if(scoped) scope.pop();
 	scoped= 2;
 	return el;
