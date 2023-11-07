@@ -19,6 +19,12 @@ export function register(dom, keys_aditional= []){
 		globalThis.window= w;
 		w.console= globalThis.console;
 	}
+	if(typeof document.createDocumentFragment().append()==="undefined")
+		[ HTMLElement, SVGElement, DocumentFragment ].forEach(c=> {
+			const { append }= c.prototype;
+			c.prototype.append= function(...els){ append.apply(this, els); return this; };
+		});
+	dom_last= dom;
 
 	return import("./index.js");
 }

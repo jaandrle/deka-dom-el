@@ -1,8 +1,8 @@
 declare global {
 	type ddeComponentAttributes= Record<any, any> | undefined | string;
-	type ddeElementExtender<El extends Element>= (element: El)=> El;
+	type ddeElementExtender<El extends HTMLElement | SVGElement | Comment | DocumentFragment>= (element: El)=> El;
 }
-type ElementTagNameMap= HTMLElementTagNameMap & SVGElementTagNameMap & {
+type ElementTagNameMap= HTMLElementTagNameMap & { // & SVGElementTagNameMap
 	'#text': Text
 }
 type Element= ElementTagNameMap[keyof ElementTagNameMap];
@@ -14,7 +14,7 @@ type AttrsModified= {
 	/**
 	 * Provide option to add/remove/toggle CSS clasess (index of object) using 1/0/-1. In fact `el.classList.toggle(class_name)` for `-1` and `el.classList.toggle(class_name, Boolean(...))` for others.
 	 */
-	classList: Record<string,-1|0|1>,
+	classList: Record<string,-1|0|1|boolean>,
 	/**
 	 * By default simiral to `className`, but also supports `string[]`
 	 * */
@@ -49,11 +49,17 @@ export function el<T>(
 
 export function el<
 	A extends ddeComponentAttributes,
-	C extends (attr: A)=> Element>(
+	C extends (attr: A)=> Element | DocumentFragment>(
 	fComponent: C,
 	attrs?: A,
 	...extenders: ddeElementExtender<ReturnType<C>>[]
 ): ReturnType<C>
+
+export function el(
+	tag_name: string,
+	attrs?: Record<string, any>,
+	...extenders: ddeElementExtender<HTMLElement | SVGElement>[]
+): HTMLElement
 
 export function dispatchEvent(element: HTMLElement, name: keyof DocumentEventMap): void;
 export function dispatchEvent(element: HTMLElement, name: string, data: any): void;
@@ -82,6 +88,12 @@ interface On{
 		) : EE;
 }
 export const on: On;
+
+export const scope: {
+	namespace: string,
+	host: ddeElementExtender<any>,
+	elNamespace: (ns: string)=> ({ append(...els: (HTMLElement | SVGElement)[]): HTMLElement | SVGElement | DocumentFragment })
+};
 
 //TODO for SVG
 declare global{

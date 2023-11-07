@@ -1,0 +1,11 @@
+{
+	"include": [ "*.js", "**/*.js", "../node_modules/nodejsscript/index.d.ts" ],
+	"compilerOptions": {
+		"module": "NodeNext",
+		"noEmit": true,
+		"allowJs": true,
+		"checkJs": true,
+		"downlevelIteration": true,
+		"maxNodeModuleJsDepth": 1
+	}
+}
