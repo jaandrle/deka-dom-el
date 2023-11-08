@@ -29,7 +29,7 @@ In the meaning of size, complexity and usability.
 An another goal is making clear library logic. Starting from pure native JavaScript (DOM API),
 then using small utils (`assign`, `S`, …, `el`, …) and end up with way to write complex code.
 Therefore, you can use any „internal” function to make live with native JavaScript easier
-(`assign`, `classListDeclarative`, `on`, `dispatchEvent`, …, `S`, …) regarding if you don’t
+(`assign`, `classListDeclarative`, `on`, `dispatchEvent`, …, `S`, …) regarding if you
 need complex library/framework.
 
 As consequence of that, it shouldn’t be hard to incorporate the library into existing projects.

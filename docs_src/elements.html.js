@@ -88,7 +88,7 @@ export function page({ pkg, info, path_target, pages, registerClientFile }){
 			el("p", "By default, the native JS has no good way to define HTML template using DOM API:"),
 			el(example, { src: new URL("./components/examples/nativeAppend.js", import.meta.url), page_id, registerClientFile }),
 			el("p").append(
-				"This library therefore ooverwrites the ", el("code", "append"), " method to always return parent element."
+				"This library therefore overwrites the ", el("code", "append"), " method of created elements to always return parent element."
 			),
 			el(example, { src: new URL("./components/examples/dekaAppend.js", import.meta.url), page_id, registerClientFile }),
 			

@@ -1,4 +1,4 @@
-import { style, el, on, S, scope } from '../exports.js';
+import { style, el, elNS, on, S, scope } from '../exports.js';
 const className= style.host(fullNameComponent).css`
 	:host form{
 		display: flex;
@@ -13,6 +13,7 @@ export function fullNameComponent(){
 	scope.host(on.connected(()=> console.log(fullNameComponent)));
 	scope.host(on.disconnected(()=> console.log(fullNameComponent)))
 
+	const elSVG= elNS("http://www.w3.org/2000/svg");
 	return el("div", { className }).append(
 		el("h2", "Simple form:"),
 		el("form", { onsubmit: ev=> ev.preventDefault() }).append(
@@ -26,11 +27,9 @@ export function fullNameComponent(){
 			": ",
 			el("#text", full_name)
 		),
-		scope.elNamespace("svg").append(
-			el("svg", { viewBox: "0 0 240 80", style: { height: "80px", display: "block" } }).append(
-				//el("style", {  })
-				el("text", { x: 20, y: 35, textContent: "Text" })
-			)
+		elSVG("svg", { viewBox: "0 0 240 80", style: { height: "80px", display: "block" } }).append(
+			//elSVG("style", {  })
+			elSVG("text", { x: 20, y: 35, textContent: "Text" })
 		)
 	);
 }

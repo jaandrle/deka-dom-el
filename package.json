@@ -63,7 +63,7 @@
 		},
 		{
 			"path": "./signals.js",
-			"limit": "8.5 kB",
+			"limit": "11 kB",
 			"gzip": false
 		},
 		{

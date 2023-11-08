@@ -1,47 +1,31 @@
 import { signals } from "./signals-common.js";
 
-/** @type {{ scope: object, prevent: boolean, namespace: "html"|string, host: function }[]} */
+/** @type {{ scope: object, prevent: boolean, host: function }[]} */
 const scopes= [ {
 	scope: document.body,
-	namespace: "html",
 	host: c=> c ? c(document.body) : document.body,
 	prevent: true
 } ];
-const namespaceHelper= ns=> ns==="svg" ? "http://www.w3.org/2000/svg" : ns;
 export const scope= {
 	get current(){ return scopes[scopes.length-1]; },
 	get host(){ return this.current.host; },
-	get namespace(){ return this.current.namespace; },
-	set namespace(namespace){ return ( this.current.namespace= namespaceHelper(namespace)); },
 	
 	preventDefault(){
 		const { current }= this;
 		current.prevent= true;
 		return current;
 	},
-	elNamespace(namespace){
-		const ns= this.namespace;
-		this.namespace= namespace;
-		return {
-			append(...els){
-				scope.namespace= ns;
-				if(els.length===1) return els[0];
-				const f= document.createDocumentFragment();
-				return f.append(...els);
-			}
-		};
-	},
 	
 	get state(){ return [ ...scopes ]; },
 	push(s= {}){
-		if(s.namespace) s.namespace= namespaceHelper(s.namespace);
 		return scopes.push(Object.assign({}, this.current, { prevent: false }, s));
 	},
 	pop(){ return scopes.pop(); },
 };
+let namespace;
 export function createElement(tag, attributes, ...modifiers){
+	/* jshint maxcomplexity: 15 */
 	const s= signals(this);
-	const { namespace }= scope;
 	let scoped= 0;
 	let el, el_host;
 	//TODO Array.isArray(tag) ⇒ set key (cache els)
@@ -53,23 +37,56 @@ export function createElement(tag, attributes, ...modifiers){
 			scope.push({ scope: tag, host: c=> c ? (scoped===1 ? modifiers.unshift(c) : c(el_host), undefined) : el_host });
 			el= tag(attributes || undefined);
 			const is_fragment= el instanceof DocumentFragment;
-			const el_mark= document.createComment(`<dde:mark type="component" name="${tag.name}" host="${is_fragment ? "this" : "parentElement"}"/>`);
+			const el_mark= createElement.mark({
+				type: "component",
+				name: tag.name,
+				host: is_fragment ? "this" : ( el.nodeName==="#comment" ? "previousLater" : "parentElement" )
+			});
 			el.prepend(el_mark);
 			if(is_fragment) el_host= el_mark;
 			break;
 		}
 		case tag==="#text":      el= assign.call(this, document.createTextNode(""), attributes); break;
 		case tag==="<>" || !tag: el= assign.call(this, document.createDocumentFragment(), attributes); break;
-		case namespace!=="html": el= assign.call(this, document.createElementNS(namespace, tag), attributes); break;
+		case namespace:          el= assign.call(this, document.createElementNS(namespace, tag), attributes); break;
 		case !el:                el= assign.call(this, document.createElement(tag), attributes);
 	}
+	chainableAppend(el);
 	if(!el_host) el_host= el;
 	modifiers.forEach(c=> c(el_host));
 	if(scoped) scope.pop();
 	scoped= 2;
 	return el;
 }
+/**
+ * @param { { type: "component", name: string, host: "this" | "parentElement" } | { type: "reactive" | "later" } } attrs
+ * @param {boolean} [is_open=false]
+ * */
+createElement.mark= function(attrs, is_open= false){
+	attrs= Object.entries(attrs).map(([ n, v ])=> n+`="${v}"`).join(" ");
+	const end= is_open ? "" : "/";
+	const out= document.createComment(`<dde:mark ${attrs}${end}>`);
+	if(!is_open) out.end= document.createComment("</dde:mark>");
+	return out;
+};
+createElement.later= function(){
+	const el= createElement.mark({ type: "later" });
+	el.append= el.prepend= function(...els){ el.after(...els); return el; };
+	return el;
+};
 export { createElement as el };
+
+//const namespaceHelper= ns=> ns==="svg" ? "http://www.w3.org/2000/svg" : ns;
+export function createElementNS(ns){
+	const _this= this;
+	return function createElementNSCurried(...rest){
+		namespace= ns;
+		const el= createElement.call(_this, ...rest);
+		namespace= undefined;
+		return el;
+	};
+}
+export { createElementNS as elNS };
 
 import { prop_process } from './dom-common.js';
 const { setDeleteAttr }= prop_process;
@@ -161,3 +178,6 @@ function attrArrToStr(attr){ return Array.isArray(attr) ? attr.filter(Boolean).j
 function setRemove(obj, prop, key, val){ return obj[ (isUndef(val) ? "remove" : "set") + prop ](key, attrArrToStr(val)); }
 function setRemoveNS(obj, prop, key, val, ns= null){ return obj[ (isUndef(val) ? "remove" : "set") + prop + "NS" ](ns, key, attrArrToStr(val)); }
 function setDelete(obj, key, val){ Reflect.set(obj, key, val); if(!isUndef(val)) return; return Reflect.deleteProperty(obj, key); }
+
+function append(...els){ this.appendOrig(...els); return this; }
+function chainableAppend(el){ if(el.append===append) return el; el.appendOrig= el.append; el.append= append; return el; }
