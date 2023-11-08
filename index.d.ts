@@ -127,7 +127,7 @@ interface On{
 }
 export const on: On;
 
-type Scope= { scope: Node | Function | Object, host: ddeElementModifier<any>, prevent: boolean }
+type Scope= { scope: Node | Function | Object, host: ddeElementModifier<any>, prevent: boolean, inherit_host: boolean, }
 /** Current scope created last time the `el(Function)` was invoke. (Or {@link scope.push}) */
 export const scope: {
 	current: Scope,
@@ -144,9 +144,9 @@ export const scope: {
 	
 	state: Scope[],
 	/** Adds new child scope. All attributes are inherited by default. */
-	push(scope: Partial<Scope>): ReturnType<Array<Scope>["push"]>
+	push(scope: Partial<Scope>): ReturnType<Array<Scope>["push"]>,
 	/** Removes last/current child scope. */
-	pop(): ReturnType<Array<Scope>["pop"]>
+	pop(): ReturnType<Array<Scope>["pop"]>,
 };
 
 /*

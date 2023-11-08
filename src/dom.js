@@ -4,7 +4,8 @@ import { signals } from "./signals-common.js";
 const scopes= [ {
 	scope: document.body,
 	host: c=> c ? c(document.body) : document.body,
-	prevent: true
+	prevent: true,
+	inherit_host: false,
 } ];
 export const scope= {
 	get current(){ return scopes[scopes.length-1]; },
@@ -24,7 +25,7 @@ export const scope= {
 };
 let namespace;
 export function createElement(tag, attributes, ...modifiers){
-	/* jshint maxcomplexity: 15 */
+	/* jshint maxcomplexity: 16 */
 	const s= signals(this);
 	let scoped= 0;
 	let el, el_host;
@@ -34,7 +35,9 @@ export function createElement(tag, attributes, ...modifiers){
 	switch(true){
 		case typeof tag==="function": {
 			scoped= 1;
-			scope.push({ scope: tag, host: c=> c ? (scoped===1 ? modifiers.unshift(c) : c(el_host), undefined) : el_host });
+			const { inherit_host, host: hostParent }= scope.current;
+			const host= inherit_host ? hostParent : c=> c ? (scoped===1 ? modifiers.unshift(c) : c(el_host), undefined) : el_host;
+			scope.push({ scope: tag, host, inherit_host });
 			el= tag(attributes || undefined);
 			const is_fragment= el instanceof DocumentFragment;
 			const el_mark= createElement.mark({
