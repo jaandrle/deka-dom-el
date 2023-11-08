@@ -19,3 +19,9 @@ export type PageAttrs= {
 	registerClientFile: registerClientFile
 }
 
+import type { CustomHTMLTestElement } from "../examples/components/webComponent.js";
+declare global{
+	interface ddePublicElementTagNameMap{
+		["custom-test"]: CustomHTMLTestElement;
+	}
+}

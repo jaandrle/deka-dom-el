@@ -1,9 +1,14 @@
 type CustomElementTagNameMap= { '#text': Text, '#comment': Comment }
+declare global {
+	interface ddePublicElementTagNameMap{
+	}
+}
 type SupportedElement=
 	  HTMLElementTagNameMap[keyof HTMLElementTagNameMap]
 	| SVGElementTagNameMap[keyof SVGElementTagNameMap]
 	| MathMLElementTagNameMap[keyof MathMLElementTagNameMap]
-	| CustomElementTagNameMap[keyof CustomElementTagNameMap];
+	| CustomElementTagNameMap[keyof CustomElementTagNameMap]
+	| ddePublicElementTagNameMap[keyof ddePublicElementTagNameMap];
 declare global {
 	type ddeComponentAttributes= Record<any, any> | undefined | string;
 	type ddeElementModifier<El extends SupportedElement | DocumentFragment>= (element: El)=> El;
@@ -36,7 +41,7 @@ type AttrsModified= {
  */
 type ElementAttributes<T extends SupportedElement>= Omit<T,keyof AttrsModified> & AttrsModified;
 export function assign<El extends SupportedElement>(element: El, ...attrs_array: Partial<ElementAttributes<El>>[]): El
-type ExtendedHTMLElementTagNameMap= HTMLElementTagNameMap & CustomElementTagNameMap
+type ExtendedHTMLElementTagNameMap= HTMLElementTagNameMap & CustomElementTagNameMap & ddePublicElementTagNameMap
 export function el<TAG extends keyof ExtendedHTMLElementTagNameMap>(
 	tag_name: TAG,
 	attrs?: string | Partial<ElementAttributes<ExtendedHTMLElementTagNameMap[TAG]>>,
@@ -81,6 +86,7 @@ export function elNS(
 export function dispatchEvent(element: SupportedElement, name: keyof DocumentEventMap): void;
 export function dispatchEvent(element: SupportedElement, name: string, data: any): void;
 interface On{
+	/** Listens to the DOM event. See {@link Document.addEventListener} */
 	<
 		EE extends ddeElementModifier<SupportedElement>,
 		El extends ( EE extends ddeElementModifier<infer El> ? El : never ),
@@ -89,6 +95,7 @@ interface On{
 			listener: (this: El, ev: DocumentEventMap[Event]) => any,
 			options?: AddEventListenerOptions
 		) : EE;
+	/** Listens to the element is connected to the live DOM. In case of custom elements uses [`connectedCallback`](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#custom_element_lifecycle_callbacks), or {@link MutationObserver} else where */
 	connected<
 		EE extends ddeElementModifier<SupportedElement>,
 		El extends ( EE extends ddeElementModifier<infer El> ? El : never )
@@ -96,7 +103,16 @@ interface On{
 			listener: (el: El) => any,
 			options?: AddEventListenerOptions
 		) : EE;
+	/** Listens to the element is disconnected from the live DOM. In case of custom elements uses [`disconnectedCallback`](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#custom_element_lifecycle_callbacks), or {@link MutationObserver} else where */
 	disconnected<
+		EE extends ddeElementModifier<SupportedElement>,
+		El extends ( EE extends ddeElementModifier<infer El> ? El : never )
+		>(
+			listener: (el: El) => any,
+			options?: AddEventListenerOptions
+		) : EE;
+	/** Listens to the element attribute changes. In case of custom elements uses [`attributeChangedCallback`](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#custom_element_lifecycle_callbacks), or {@link MutationObserver} else where */
+	attributeChanged<
 		EE extends ddeElementModifier<SupportedElement>,
 		El extends ( EE extends ddeElementModifier<infer El> ? El : never )
 		>(
@@ -105,8 +121,26 @@ interface On{
 		) : EE;
 }
 export const on: On;
+type Scope= { scope: Node | Function | Object, host: ddeElementModifier<any>, prevent: boolean }
+/** Current scope created last time the `el(Function)` was invoke. (Or {@link scope.push}) */
 export const scope: {
+	current: Scope,
+	/** Stops all automatizations. E. g. signals used as attributes in current scope
+	 * registers removing these listeners (and clean signal if no other listeners are detected)
+	 * on `disconnected` event. */
+	preventDefault<T extends boolean>(prevent: T): T,
+	/**
+	 * This represents reference to the current host element — `scope.host()`.
+	 * It can be also used to register Modifier (function to be called when component is initized)
+	 * — `scope.host(on.connected(console.log))`.
+	 * */
 	host: ddeElementModifier<any>,
+	
+	state: Scope[],
+	/** Adds new child scope. All attributes are inherited by default. */
+	push(scope: Partial<Scope>): ReturnType<Array<Scope>["push"]>
+	/** Removes last/current child scope. */
+	pop(): ReturnType<Array<Scope>["pop"]>
 };
 /*
  * TODO TypeScript HACK (better way?)

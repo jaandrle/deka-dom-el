@@ -30,6 +30,10 @@ interface S {
 	 *		by `S.clear`.
 	 * */
 	<V, A extends Actions<V>>(value: V, actions?: A): Signal<V, A>;
+	/**
+	 * Computations signal. This creates a signal which is computed from other signals.
+	 * */
+	<V>(computation: ()=> V): Signal<V, {}>
 	action<S extends Signal<any, Actions<any>>, A extends (S extends Signal<any, infer A> ? A : never), N extends keyof A>(
 		signal: S,
 		name: N,
@@ -41,7 +45,17 @@ interface S {
 		signal: SymbolSignal;
 		onclear: SymbolOnclear;
 	}
-	el<S extends any, T extends HTMLElement>(signal: Signal<S, any>, el: (v: S)=> T): T;
+	/**
+	 * Reactive element, which is rendered based on the given signal.
+	 * ```js
+	 * S.el(signal, value=> value ? el("b", "True") : el("i", "False"));
+	 * S.el(listS, list=> list.map(li=> el("li", li)));
+	 * ```
+	 * */
+	el<S extends any>(signal: Signal<S, any>, el: (v: S)=> Element | Element[]): DocumentFragment;
+
+	/** Mirrors element attributes for current host (both way).  */
+	attribute<T>(name: string, initial?: T): Signal<T, {}>
 }
 export const S: S;
 declare global {

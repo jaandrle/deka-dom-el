@@ -67,7 +67,9 @@ import { scope } from "./dom.js";
 const key_attributes= "__dde_attributes";
 S.attribute= function(name, initial= undefined){
 	const out= S(initial);
+	let host;
 	scope.host(element=> {
+		host= element;
 		if(element instanceof HTMLElement){
 			if(element.hasAttribute(name)) out(element.getAttribute(name));
 		} else {
@@ -83,16 +85,26 @@ S.attribute= function(name, initial= undefined){
 			 * Investigate `__dde_attributes` key of the element.*/
 			const [ name, value ]= detail;
 			const curr= element[key_attributes][name];
-			if(curr) curr(value);
+			if(curr) return curr(value);
 		})(element);
 		on.disconnected(function(){
 			/*! This removes all signals mapped to attributes (`S.attribute`).
 			 * Investigate `__dde_attributes` key of the element.*/
 			S.clear(...Object.values(element[key_attributes]));
+			host= null;
 		})(element);
 		return element;
 	});
-	return out;
+	return new Proxy(out, {
+		apply(target, _, args){
+			if(!args.length) return target();
+			if(!host) return;
+			const value= args[0];
+			if(host instanceof HTMLElement)
+				return host.setAttribute(name, value);
+			return host.setAttributeNS(null, name, value);
+		}
+	});
 };
 S.clear= function(...signals){
 	for(const signal of signals){

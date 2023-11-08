@@ -1,11 +1,17 @@
-import { el, scope } from "../../index.js";
+import { el, on, scope } from "../../index.js";
 import { S } from "../../signals.js";
 const { hasOwnProperty }= Object.prototype;
 
 /**
+ * @typedef CustomHTMLTestElementInterface
+ * @type {object}
+ * @property {string} name
+ * */
+/**
  * Compatible with `npx-wca test/components/webComponent.js`
  * */
 export class CustomHTMLTestElement extends HTMLElement{
+	static tagName= "custom-test";
 	static get observedAttributes(){
 		return [ "name", "pre-name" ];
 	}
@@ -28,37 +34,24 @@ export class CustomHTMLTestElement extends HTMLElement{
 			el("#text", { textContent: name }),
 			el("#text", { textContent: test }),
 			el("#text", { textContent: preName }),
+			el("button", { type: "button", textContent: "pre-name", onclick: ()=> preName("Ahoj") })
 		);
 	}
+	
+	get name(){ return this.getAttribute("name"); }
+	set name(value){ this.setAttribute("name", value); }
+	get preName(){ return this.getAttribute("pre-name"); }
+	set preName(value){ this.setAttribute("pre-name", value); }
 }
 // https://gist.github.com/WebReflection/ec9f6687842aa385477c4afca625bbf4
-customElementsAssign(
-	CustomHTMLTestElement,
-	reflectObservedAttributes,
-	lifecycleToEvents,
-);
-customElements.define("custom-test", CustomHTMLTestElement);
+lifecycleToEvents(CustomHTMLTestElement)
+customElements.define(CustomHTMLTestElement.tagName, CustomHTMLTestElement);
 
 function customElementRender(_this, render){
 	scope.push({ scope: _this, host: (...a)=> a.length ? a[0](_this) : _this });
 	const out= render(_this);
 	scope.pop();
 	return out;
-}
-/** @returns {HTMLElement} */
-function customElementsAssign(class_base, ...automatize){
-	automatize.forEach(a=> a(class_base));
-}
-function reflectObservedAttributes(c){
-	for(const name of c.observedAttributes){
-		const name_camel= name.replace(/([a-z])-([a-z])/g, (_, l, r)=> l+r.toUpperCase());
-		if(hasOwnProperty.call(c.prototype, name_camel))
-			continue;
-		Reflect.defineProperty(c.prototype, name_camel, {
-			get(){ return this.getAttribute(name); },
-			set(value){ this.setAttribute(name, value); }
-		});
-	}
 }
 function lifecycleToEvents(class_declaration){
 	for (const name of [ "connected", "disconnected" ])

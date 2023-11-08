@@ -8,5 +8,5 @@ document.body.append(
 	el("h1", "Experiments:"),
 	el(fullNameComponent),
 	el(todosComponent),
-	el(customElements.getName(CustomHTMLTestElement), { name: "attr" })
+	el(CustomHTMLTestElement.tagName, { name: "attr" })
 );
