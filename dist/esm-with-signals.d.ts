@@ -37,51 +37,47 @@ type AttrsModified= {
 type ElementAttributes<T extends SupportedElement>= Omit<T,keyof AttrsModified> & AttrsModified;
 export function assign<El extends SupportedElement>(element: El, ...attrs_array: Partial<ElementAttributes<El>>[]): El
 type ExtendedHTMLElementTagNameMap= HTMLElementTagNameMap & CustomElementTagNameMap
-interface element<el>{
-	prototype: el;
-	append(...els: (SupportedElement | DocumentFragment | string | element<SupportedElement | DocumentFragment>)[]): el
-}
 export function el<TAG extends keyof ExtendedHTMLElementTagNameMap>(
 	tag_name: TAG,
 	attrs?: string | Partial<ElementAttributes<ExtendedHTMLElementTagNameMap[TAG]>>,
 	...modifiers: ddeElementModifier<ExtendedHTMLElementTagNameMap[TAG]>[]
-): element<ExtendedHTMLElementTagNameMap[TAG]>
+): ExtendedHTMLElementTagNameMap[TAG]
 export function el<T>(
 	tag_name?: "<>",
-): element<DocumentFragment>
+): DocumentFragment
 export function el<
 	A extends ddeComponentAttributes,
 	C extends (attr: A)=> SupportedElement | DocumentFragment>(
 	fComponent: C,
 	attrs?: A,
 	...modifiers: ddeElementModifier<ReturnType<C>>[]
-): element<ReturnType<C>>
+): ReturnType<C>
 export function el(
 	tag_name: string,
 	attrs?: string | Record<string, any>,
 	...modifiers: ddeElementModifier<HTMLElement>[]
-): element<HTMLElement>
+): HTMLElement
 export function elNS(
 	namespace: "http://www.w3.org/2000/svg"
 ): <TAG extends keyof SVGElementTagNameMap, KEYS extends keyof SVGElementTagNameMap[TAG] & { d: string }>(
 	tag_name: TAG,
 	attrs?: string | Partial<{ [key in KEYS]: SVGElementTagNameMap[TAG][key] | string | number | boolean }>,
 	...modifiers: ddeElementModifier<SVGElementTagNameMap[TAG]>[]
-)=> element<SVGElementTagNameMap[TAG]>
+)=> SVGElementTagNameMap[TAG]
 export function elNS(
 	namespace: "http://www.w3.org/1998/Math/MathML"
 ): <TAG extends keyof MathMLElementTagNameMap, KEYS extends keyof MathMLElementTagNameMap[TAG] & { d: string }>(
 	tag_name: TAG,
 	attrs?: string | Partial<{ [key in KEYS]: MathMLElementTagNameMap[TAG][key] | string | number | boolean }>,
 	...modifiers: ddeElementModifier<MathMLElementTagNameMap[TAG]>[]
-)=> element<MathMLElementTagNameMap[TAG]>
+)=> MathMLElementTagNameMap[TAG]
 export function elNS(
 	namespace: string
 ): (
 	tag_name: string,
 	attrs?: string | Record<string, any>,
 	...modifiers: ddeElementModifier<SupportedElement>[]
-)=> element<SupportedElement>
+)=> SupportedElement
 export function dispatchEvent(element: SupportedElement, name: keyof DocumentEventMap): void;
 export function dispatchEvent(element: SupportedElement, name: string, data: any): void;
 interface On{
@@ -112,6 +108,296 @@ export const on: On;
 export const scope: {
 	host: ddeElementModifier<any>,
 };
+/*
+ * TODO TypeScript HACK (better way?)
+ * this doesnt works
+ * ```ts
+ * interface element<el> extends Node{
+ * 	prototype: el;
+ * 	append(...els: (SupportedElement | DocumentFragment | string | element<SupportedElement | DocumentFragment>)[]): el
+ * }
+ * export function el<T>(
+ * 	tag_name?: "<>",
+ * ): element<DocumentFragment>
+ * ```
+ * …as its complains here
+ * ```ts
+ * const d= el("div");
+ * const f= (a: HTMLDivElement)=> a;
+ * f(d); //←
+ * document.head.append( //←
+ * 	el("script", { src: "https://flems.io/flems.html", type: "text/javascript", charset: "utf-8" }),
+ * );
+ * ```
+ * TODO for SVG
+ * */
+type ddeAppend<el>= (...nodes: (Node | string)[])=> el;
+declare global{
+	interface HTMLAnchorElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLAnchorElement>;
+	}
+	interface HTMLElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLElement>;
+	}
+	interface HTMLAreaElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLAreaElement>;
+	}
+	interface HTMLAudioElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLAudioElement>;
+	}
+	interface HTMLBaseElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLBaseElement>;
+	}
+	interface HTMLQuoteElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLQuoteElement>;
+	}
+	interface HTMLBodyElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLBodyElement>;
+	}
+	interface HTMLBRElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLBRElement>;
+	}
+	interface HTMLButtonElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLButtonElement>;
+	}
+	interface HTMLCanvasElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLCanvasElement>;
+	}
+	interface HTMLTableCaptionElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLTableCaptionElement>;
+	}
+	interface HTMLTableColElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLTableColElement>;
+	}
+	interface HTMLTableColElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLTableColElement>;
+	}
+	interface HTMLDataElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLDataElement>;
+	}
+	interface HTMLDataListElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLDataListElement>;
+	}
+	interface HTMLModElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLModElement>;
+	}
+	interface HTMLDetailsElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLDetailsElement>;
+	}
+	interface HTMLDialogElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLDialogElement>;
+	}
+	interface HTMLDivElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLDivElement>;
+	}
+	interface HTMLDListElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLDListElement>;
+	}
+	interface HTMLEmbedElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLEmbedElement>;
+	}
+	interface HTMLFieldSetElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLFieldSetElement>;
+	}
+	interface HTMLFormElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLFormElement>;
+	}
+	interface HTMLHeadingElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLHeadingElement>;
+	}
+	interface HTMLHeadElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLHeadElement>;
+	}
+	interface HTMLHRElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLHRElement>;
+	}
+	interface HTMLHtmlElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLHtmlElement>;
+	}
+	interface HTMLIFrameElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLIFrameElement>;
+	}
+	interface HTMLImageElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLImageElement>;
+	}
+	interface HTMLInputElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLInputElement>;
+	}
+	interface HTMLLabelElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLLabelElement>;
+	}
+	interface HTMLLegendElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLLegendElement>;
+	}
+	interface HTMLLIElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLLIElement>;
+	}
+	interface HTMLLinkElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLLinkElement>;
+	}
+	interface HTMLMapElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLMapElement>;
+	}
+	interface HTMLMenuElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLMenuElement>;
+	}
+	interface HTMLMetaElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLMetaElement>;
+	}
+	interface HTMLMeterElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLMeterElement>;
+	}
+	interface HTMLObjectElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLObjectElement>;
+	}
+	interface HTMLOListElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLOListElement>;
+	}
+	interface HTMLOptGroupElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLOptGroupElement>;
+	}
+	interface HTMLOptionElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLOptionElement>;
+	}
+	interface HTMLOutputElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLOutputElement>;
+	}
+	interface HTMLParagraphElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLParagraphElement>;
+	}
+	interface HTMLPictureElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLPictureElement>;
+	}
+	interface HTMLPreElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLPreElement>;
+	}
+	interface HTMLProgressElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLProgressElement>;
+	}
+	interface HTMLScriptElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLScriptElement>;
+	}
+	interface HTMLSelectElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLSelectElement>;
+	}
+	interface HTMLSlotElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLSlotElement>;
+	}
+	interface HTMLSourceElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLSourceElement>;
+	}
+	interface HTMLSpanElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLSpanElement>;
+	}
+	interface HTMLStyleElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLStyleElement>;
+	}
+	interface HTMLTableElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLTableElement>;
+	}
+	interface HTMLTableSectionElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLTableSectionElement>;
+	}
+	interface HTMLTableCellElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLTableCellElement>;
+	}
+	interface HTMLTemplateElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLTemplateElement>;
+	}
+	interface HTMLTextAreaElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLTextAreaElement>;
+	}
+	interface HTMLTableCellElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLTableCellElement>;
+	}
+	interface HTMLTimeElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLTimeElement>;
+	}
+	interface HTMLTitleElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLTitleElement>;
+	}
+	interface HTMLTableRowElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLTableRowElement>;
+	}
+	interface HTMLTrackElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLTrackElement>;
+	}
+	interface HTMLUListElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLUListElement>;
+	}
+	interface HTMLVideoElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<HTMLVideoElement>;
+	}
+	interface DocumentFragment{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<DocumentFragment>;
+	}
+}
 export type Signal<V, A>= (set?: V)=> V & A;
 type Action<V>= (this: { value: V }, ...a: any[])=> typeof S._ | void;
 type SymbolOnclear= Symbol;

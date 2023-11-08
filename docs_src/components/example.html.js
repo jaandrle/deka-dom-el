@@ -47,6 +47,10 @@ function registerClientPart(page_id, registerClientFile){
 		el("script", { src: "https://flems.io/flems.html", type: "text/javascript", charset: "utf-8" }),
 		//★ el("script", { src: "https://cdn.jsdelivr.net/npm/shiki", defer: true }),
 	);
+	const d= el("div");
+	/** @param {HTMLDivElement} a */
+	const f= (a)=> a;
+	f(d); //←
 	//★ egisterClientFile(
 	//★  new URL("./example.js.js", import.meta.url),
 	//★  el("script", { type: "module" })
