@@ -63,7 +63,7 @@
 		},
 		{
 			"path": "./signals.js",
-			"limit": "11 kB",
+			"limit": "11.5 kB",
 			"gzip": false
 		},
 		{
@@ -73,7 +73,7 @@
 		},
 		{
 			"path": "./examples/components/webComponent.js",
-			"limit": "12.5 kB",
+			"limit": "13 kB",
 			"gzip": false
 		},
 		{

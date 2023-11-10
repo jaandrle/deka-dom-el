@@ -1,6 +1,6 @@
 //TODO: https://www.npmjs.com/package/html-element
 import { enviroment } from './src/dom-common.js';
-enviroment.ssr= true;
+enviroment.ssr= " ssr";
 const { setDeleteAttr }= enviroment;
 /** @param {HTMLElement} obj */
 enviroment.setDeleteAttr= function(obj, prop, value){

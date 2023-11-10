@@ -51,7 +51,7 @@ export function createElement(tag, attributes, ...modifiers){
 		}
 		case tag==="#text":      el= assign.call(this, document.createTextNode(""), attributes); break;
 		case tag==="<>" || !tag: el= assign.call(this, document.createDocumentFragment(), attributes); break;
-		case namespace:          el= assign.call(this, document.createElementNS(namespace, tag), attributes); break;
+		case Boolean(namespace): el= assign.call(this, document.createElementNS(namespace, tag), attributes); break;
 		case !el:                el= assign.call(this, document.createElement(tag), attributes);
 	}
 	chainableAppend(el);
@@ -66,10 +66,9 @@ export function createElement(tag, attributes, ...modifiers){
  * @param {boolean} [is_open=false]
  * */
 createElement.mark= function(attrs, is_open= false){
-	if(enviroment.ssr) attrs.ssr= true;
 	attrs= Object.entries(attrs).map(([ n, v ])=> n+`="${v}"`).join(" ");
 	const end= is_open ? "" : "/";
-	const out= document.createComment(`<dde:mark ${attrs}${end}>`);
+	const out= document.createComment(`<dde:mark ${attrs}${enviroment.ssr}${end}>`);
 	if(!is_open) out.end= document.createComment("</dde:mark>");
 	return out;
 };

@@ -1,4 +1,4 @@
-export const enviroment= { setDeleteAttr, ssr: false };
+export const enviroment= { setDeleteAttr, ssr: "" };
 import { isUndef } from './helpers.js';
 function setDeleteAttr(obj, prop, val){
 	/* Issue
