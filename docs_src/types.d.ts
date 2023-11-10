@@ -2,6 +2,7 @@
 export type Pkg= Record<string, string>
 export type Info= {
 	id: string,
+	href: string,
 	title: string,
 	description: string,
 }

@@ -1,3 +1,5 @@
+import { styles } from "./ssr.js";
+styles.scope(import.meta.url).css`
 @import url(https://cdn.simplecss.org/simple.min.css);
 :root{
 	--body-max-width: 45rem;
@@ -38,21 +40,21 @@ body > nav{
 	flex-flow: column nowrap;
 }
 body > nav {
-	font-size:1rem;
-	line-height:2;
-	padding:1rem 0 0 0
+	font-size: 1rem;
+	line-height: 2;
+	padding: 1rem 0 0 0;
 }
 body > nav ol,
 body > nav ul {
-	align-content:space-around;
-	align-items:center;
-	display:flex;
-	flex-direction:row;
-	flex-wrap:wrap;
-	justify-content:center;
-	list-style-type:none;
-	margin:0;
-	padding:0
+	align-content: space-around;
+	align-items: center;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: center;
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
 }
 body > nav ol li,
 body > nav ul li {
@@ -96,10 +98,13 @@ body > nav a:hover{
 main{
 	grid-area: content;
 	display: grid;
-	grid-template-columns: 1fr min(var(--body-max-width), 90%) 1fr;
+	grid-template-columns:
+	[full-main-start] 1fr
+	[main-start] min(var(--body-max-width), 90%) [main-end]
+	1fr [full-main-end];
 }
 main > *{
-	grid-column: 2;
+	grid-column: main;
 }
 .icon {
 	vertical-align: sub;
@@ -116,10 +121,4 @@ main > *{
 	font-size: .9rem;
 	font-style: italic;
 }
-.example{
-	grid-column: 1/-1;
-	width: 100%;
-	max-width: calc(9/5 * var(--body-max-width));
-	height: calc(3/5 * var(--body-max-width));
-	margin-inline: auto;
-}
+`;

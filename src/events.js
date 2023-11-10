@@ -13,14 +13,17 @@ export function on(event, listener, options){
 
 const c_ch_o= connectionsChangesObserverConstructor();
 const els_attribute_store= new WeakSet();
+import { scope } from "./dom.js";
 import { onAbort } from './helpers.js';
 //TODO: cleanUp when event before abort?
 on.connected= function(listener, options){
+	const { custom_element }= scope.current;
 	const name= "connected";
 	if(typeof options !== "object")
 		options= {};
 	options.once= true;
 	return function registerElement(element){
+		if(custom_element) element= custom_element;
 		const event= "dde:"+name;
 		element.addEventListener(event, listener, options);
 		if(element.__dde_lifecycleToEvents) return element;
@@ -32,11 +35,13 @@ on.connected= function(listener, options){
 	};
 };
 on.disconnected= function(listener, options){
+	const { custom_element }= scope.current;
 	const name= "disconnected";
 	if(typeof options !== "object")
 		options= {};
 	options.once= true;
 	return function registerElement(element){
+		if(custom_element) element= custom_element;
 		const event= "dde:"+name;
 		element.addEventListener(event, listener, options);
 		if(element.__dde_lifecycleToEvents) return element;

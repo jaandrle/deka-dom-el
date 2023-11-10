@@ -1,59 +1,50 @@
-let is_registered= {};
-import { styles } from "../index.css.js";
-export const css= styles().scope(example).css`
+import { styles } from "../ssr.js";
+styles.scope(example).css`
 :host{
-	grid-column: 1/-1;
+	grid-column: full-main;
 	width: 100%;
 	max-width: calc(9/5 * var(--body-max-width));
 	height: calc(3/5 * var(--body-max-width));
 	margin-inline: auto;
 }
+.CodeMirror, .CodeMirror-gutters {
+	background: #212121 !important;
+	border: 1px solid white;
+}
 `
 import { el } from "deka-dom-el";
+import { code } from "./code.html.js";
 /**
  * Prints code to the page and registers flems to make it interactive.
  * @param {object} attrs
  * @param {URL} attrs.src Example code file path
- * @param {string} [attrs.language="javascript"] Language of the code
+ * @param {"js"|"ts"|"html"|"css"} [attrs.language="js"] Language of the code
  * @param {string} attrs.page_id ID of the page
- * @param {import("../types.d.ts").registerClientFile} attrs.registerClientFile
  * */
-export function example({ src, language= "javascript", page_id, registerClientFile }){
-	registerClientPart(page_id, registerClientFile);
-	const code= s.cat(src).toString()
+export function example({ src, language= "js", page_id }){
+	registerClientPart(page_id);
+	const content= s.cat(src).toString()
 		.replaceAll(' from "../../../index-with-signals.js";', ' from "https://cdn.jsdelivr.net/gh/jaandrle/deka-dom-el/dist/esm-with-signals.js";');
 	const id= "code-"+Math.random().toString(36).slice(2, 7);
 	return el().append(
-		el("div", { id, className: example.name }).append(
-			el("pre").append(
-				el("code", { className: "language-"+language, textContent: code })
-			)
-		),
-		elCode({ id, content: code })
+		el(code, { id, content, language, className: example.name }),
+		elCode({ id, content, extension: "."+language })
 	);
 }
-function elCode({ id, content }){
+function elCode({ id, content, extension: name }){
 	const options= JSON.stringify({
-		files: [{ name: ".js", content }],
+		files: [{ name, content }],
 		toolbar: false
 	});
 	return el("script", `Flems(document.getElementById("${id}"), JSON.parse(${JSON.stringify(options)}));`);
 }
-function registerClientPart(page_id, registerClientFile){
+let is_registered= {};
+/** @param {string} page_id */
+function registerClientPart(page_id){
 	if(is_registered[page_id]) return;
 	
-	//★  Highlite code when no flems?
 	document.head.append(
 		el("script", { src: "https://flems.io/flems.html", type: "text/javascript", charset: "utf-8" }),
-		//★ el("script", { src: "https://cdn.jsdelivr.net/npm/shiki", defer: true }),
 	);
-	const d= el("div");
-	/** @param {HTMLDivElement} a */
-	const f= (a)=> a;
-	f(d); //←
-	//★ egisterClientFile(
-	//★  new URL("./example.js.js", import.meta.url),
-	//★  el("script", { type: "module" })
-	//★ ;
 	is_registered[page_id]= true;
 }

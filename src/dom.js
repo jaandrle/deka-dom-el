@@ -1,11 +1,12 @@
 import { signals } from "./signals-common.js";
+import { enviroment } from './dom-common.js';
 
 /** @type {{ scope: object, prevent: boolean, host: function }[]} */
 const scopes= [ {
 	scope: document.body,
 	host: c=> c ? c(document.body) : document.body,
+	custom_element: false,
 	prevent: true,
-	inherit_host: false,
 } ];
 export const scope= {
 	get current(){ return scopes[scopes.length-1]; },
@@ -25,7 +26,7 @@ export const scope= {
 };
 let namespace;
 export function createElement(tag, attributes, ...modifiers){
-	/* jshint maxcomplexity: 16 */
+	/* jshint maxcomplexity: 15 */
 	const s= signals(this);
 	let scoped= 0;
 	let el, el_host;
@@ -35,15 +36,14 @@ export function createElement(tag, attributes, ...modifiers){
 	switch(true){
 		case typeof tag==="function": {
 			scoped= 1;
-			const { inherit_host, host: hostParent }= scope.current;
-			const host= inherit_host ? hostParent : c=> c ? (scoped===1 ? modifiers.unshift(c) : c(el_host), undefined) : el_host;
-			scope.push({ scope: tag, host, inherit_host });
+			scope.push({ scope: tag, host: c=> c ? (scoped===1 ? modifiers.unshift(c) : c(el_host), undefined) : el_host });
 			el= tag(attributes || undefined);
 			const is_fragment= el instanceof DocumentFragment;
+			if(el.nodeName==="#comment") break;
 			const el_mark= createElement.mark({
 				type: "component",
 				name: tag.name,
-				host: is_fragment ? "this" : ( el.nodeName==="#comment" ? "previousLater" : "parentElement" )
+				host: is_fragment ? "this" : "parentElement",
 			});
 			el.prepend(el_mark);
 			if(is_fragment) el_host= el_mark;
@@ -66,6 +66,7 @@ export function createElement(tag, attributes, ...modifiers){
  * @param {boolean} [is_open=false]
  * */
 createElement.mark= function(attrs, is_open= false){
+	if(enviroment.ssr) attrs.ssr= true;
 	attrs= Object.entries(attrs).map(([ n, v ])=> n+`="${v}"`).join(" ");
 	const end= is_open ? "" : "/";
 	const out= document.createComment(`<dde:mark ${attrs}${end}>`);
@@ -91,8 +92,7 @@ export function createElementNS(ns){
 }
 export { createElementNS as elNS };
 
-import { prop_process } from './dom-common.js';
-const { setDeleteAttr }= prop_process;
+const { setDeleteAttr }= enviroment;
 const assign_context= new WeakMap();
 export function assign(element, ...attributes){
 	if(!attributes.length) return element;

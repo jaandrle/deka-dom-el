@@ -1,4 +1,5 @@
-import { el, elNS, scope } from "deka-dom-el";
+import { el, elNS } from "deka-dom-el";
+import { pages } from "../ssr.js";
 /**
  * @param {object} def
  * @param {import("../types.d.ts").Info} def.info
@@ -6,12 +7,12 @@ import { el, elNS, scope } from "deka-dom-el";
  * @param {string} def.pkg.name
  * @param {string} def.pkg.description
  * @param {string} def.pkg.homepage
- * @param {{ root: string, css: string}} def.path_target Final URL where the page will be rendered.
- * @param {import("../types.js").Pages} def.pages
  * */
-export function header({ info: { id, title, description }, pkg, path_target, pages }){
+export function header({ info: { href, title, description }, pkg }){
 	title= `\`${pkg.name}\` — ${title}`;
-	document.head.append(head({ id, title, description, pkg, path_target }));
+	document.head.append(
+		head({ title, description, pkg })
+	);
 	return el().append(
 		el("header").append(
 			el("h1", title),
@@ -23,23 +24,29 @@ export function header({ info: { id, title, description }, pkg, path_target, pag
 				"GitHub"
 			),
 			...pages.map((p, i)=> el("a", {
-				href: p.id==="index" ? "./" : p.id,
+				href: p.href==="index" ? "./" : p.href,
 				textContent: (i+1) + ". " + p.title,
 				title: p.description,
-				classList: { current: p.id===id }
+				classList: { current: p.href===href }
 			}))
 		)
 	);
 }
-function head({ id, title, description, pkg, path_target }){
+function head({ title, description, pkg }){
 	return el().append(
 		el("meta", { name: "viewport", content: "width=device-width, initial-scale=1" }),
-		el("link", { rel: "stylesheet", href: stylesheetHref(path_target, id) }),
-		
 		el("meta", { name: "description", content: description }),
+		el("title", title),
+		el(metaAuthor),
 		el(metaTwitter, pkg),
 		el(metaFacebook, pkg),
-		el("title", title),
+	);
+}
+function metaAuthor(){
+	return el().append(
+		el("meta", { name: "author", content: "Jan Andrle" }),
+		el("link", { type: "text/plain", rel: "author", href: "https://jaandrle.github.io/humans.txt" }),
+		el("meta", { name: "generator", content: "deka-dom-el" }),
 	);
 }
 function metaTwitter({ name, description, homepage }){
@@ -61,9 +68,6 @@ function metaFacebook({ name, description, homepage }){
 		//el("meta", { name: "og:image", content: "" }),
 		el("meta", { name: "og:creator", content: "@jaandrle" }),
 	);
-}
-function stylesheetHref(path_target, name){
-	return path_target.css.replace(path_target.root, "")+name+".css";
 }
 function iconGitHub(){
 	const el= elNS("http://www.w3.org/2000/svg");

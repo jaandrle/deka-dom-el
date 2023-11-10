@@ -48,7 +48,7 @@ lifecycleToEvents(CustomHTMLTestElement)
 customElements.define(CustomHTMLTestElement.tagName, CustomHTMLTestElement);
 
 function customElementRender(_this, render){
-	scope.push({ scope: _this, host: (...a)=> a.length ? a[0](_this) : _this, inherit_host: true });
+	scope.push({ scope: _this, host: (...a)=> a.length ? a[0](_this) : _this, custom_element: _this });
 	const out= render(_this);
 	scope.pop();
 	return out;

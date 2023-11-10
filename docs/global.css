@@ -38,21 +38,21 @@ body > nav{
 	flex-flow: column nowrap;
 }
 body > nav {
-	font-size:1rem;
-	line-height:2;
-	padding:1rem 0 0 0
+	font-size: 1rem;
+	line-height: 2;
+	padding: 1rem 0 0 0;
 }
 body > nav ol,
 body > nav ul {
-	align-content:space-around;
-	align-items:center;
-	display:flex;
-	flex-direction:row;
-	flex-wrap:wrap;
-	justify-content:center;
-	list-style-type:none;
-	margin:0;
-	padding:0
+	align-content: space-around;
+	align-items: center;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: center;
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
 }
 body > nav ol li,
 body > nav ul li {
@@ -96,10 +96,13 @@ body > nav a:hover{
 main{
 	grid-area: content;
 	display: grid;
-	grid-template-columns: 1fr min(var(--body-max-width), 90%) 1fr;
+	grid-template-columns:
+	[full-main-start] 1fr
+	[main-start] min(var(--body-max-width), 90%) [main-end]
+	1fr [full-main-end];
 }
 main > *{
-	grid-column: 2;
+	grid-column: main;
 }
 .icon {
 	vertical-align: sub;
@@ -116,10 +119,49 @@ main > *{
 	font-size: .9rem;
 	font-style: italic;
 }
+.code{
+	--shiki-color-text: #e9eded;
+	--shiki-color-background: #212121;
+	--shiki-token-constant: #82b1ff;
+	--shiki-token-string: #c3e88d;
+	--shiki-token-comment: #546e7a;
+	--shiki-token-keyword: #c792ea;
+	--shiki-token-parameter: #AA0000;
+	--shiki-token-function: #80cbae;
+	--shiki-token-string-expression: #c3e88d;
+	--shiki-token-punctuation: var(--code);
+	--shiki-token-link: #EE0000;
+	white-space: pre;
+}
+.code[data-js=todo]{
+	border: 1px solid var(--border);
+	border-radius: var(--standard-border-radius);
+	margin-bottom: 1rem;
+	
+	margin-top: 18.4px;
+	padding: 1rem 1.4rem;
+}
 .example{
-	grid-column: 1/-1;
+	grid-column: full-main;
 	width: 100%;
 	max-width: calc(9/5 * var(--body-max-width));
 	height: calc(3/5 * var(--body-max-width));
 	margin-inline: auto;
+}
+.CodeMirror, .CodeMirror-gutters {
+	background: #212121 !important;
+	border: 1px solid white;
+}
+.prevNext{
+	display: grid;
+	grid-template-columns: 1fr 2fr 1fr;
+	margin-top: 1rem;
+	border-top: 1px solid var(--border);
+}
+.prevNext [rel=prev]{
+	grid-column: 1;
+}
+.prevNext [rel=next]{
+	grid-column: 3;
+	text-align: right;
 }

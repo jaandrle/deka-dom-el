@@ -121,7 +121,7 @@ interface On{
 		) : EE;
 }
 export const on: On;
-type Scope= { scope: Node | Function | Object, host: ddeElementModifier<any>, prevent: boolean, inherit_host: boolean, }
+type Scope= { scope: Node | Function | Object, host: ddeElementModifier<any>, custom_element: false | HTMLElement, prevent: boolean }
 /** Current scope created last time the `el(Function)` was invoke. (Or {@link scope.push}) */
 export const scope: {
 	current: Scope,
@@ -430,5 +430,9 @@ declare global{
 	interface DocumentFragment{
 		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
 		append: ddeAppend<DocumentFragment>;
+	}
+	interface SVGElement{
+		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
+		append: ddeAppend<SVGElement>;
 	}
 }

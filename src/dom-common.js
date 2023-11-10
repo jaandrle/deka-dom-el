@@ -1,4 +1,4 @@
-export const prop_process= { setDeleteAttr };
+export const enviroment= { setDeleteAttr, ssr: false };
 import { isUndef } from './helpers.js';
 function setDeleteAttr(obj, prop, val){
 	/* Issue

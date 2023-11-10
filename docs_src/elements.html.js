@@ -1,22 +1,16 @@
+import "./global.css.js";
 import { el } from "deka-dom-el";
-import { styles, common } from "./index.css.js";
-import { example, css as example_css } from "./components/example.html.js";
-export const css= styles()
-.include(common)
-.css`
-.note{
-	font-size: .9rem;
-	font-style: italic;
-}
-`
-.include(example_css);
+import { example } from "./components/example.html.js";
 
+/** @param {string} url */
+const fileURL= url=> new URL(url, import.meta.url);
 import { header } from "./layout/head.html.js";
+import { prevNext } from "./components/prevNext.html.js";
 /** @param {import("./types.d.ts").PageAttrs} attrs */
-export function page({ pkg, info, path_target, pages, registerClientFile }){
+export function page({ pkg, info }){
 	const page_id= info.id;
 	return el().append(
-		el(header, { info, pkg, path_target, pages }),
+		el(header, { info, pkg }),
 		el("main").append(
 			el("h2", "Native JavaScript DOM elements creations"),
 			el("p", "Let’s go through all patterns we would like to use and what needs to be improved for better experience."),
@@ -36,12 +30,12 @@ export function page({ pkg, info, path_target, pages, registerClientFile }){
 					el("abbr", { textContent: "IDL", title: "Interface Description Language" })
 				), "."
 			),
-			el(example, { src: new URL("./components/examples/nativeCreateElement.js", import.meta.url), page_id, registerClientFile }),
+			el(example, { src: fileURL("./components/examples/nativeCreateElement.js"), page_id }),
 			el("p").append(
 				"To make this easier, you can use the ", el("code", "el"), " function. ",
 				"Internally in basic examples, it is wrapper around ", el("code", "assign(document.createElement(…), { … })"), "."
 			),
-			el(example, { src: new URL("./components/examples/dekaCreateElement.js", import.meta.url), page_id, registerClientFile }),
+			el(example, { src: fileURL("./components/examples/dekaCreateElement.js"), page_id }),
 			el("p").append(
 				"The ", el("code", "assign"), " function provides improved behaviour of ", el("code", "Object.assign()"), ". ",
 				"You can declaratively sets any IDL and attribute of the given element. ",
@@ -82,27 +76,30 @@ export function page({ pkg, info, path_target, pages, registerClientFile }){
 			el("p").append(
 				"For processing, the ", el("code", "assign"), " internally uses ", el("code", "assignAttribute"), " and ", el("code", "classListDeclarative"), "."
 			),
-			el(example, { src: new URL("./components/examples/dekaAssign.js", import.meta.url), page_id, registerClientFile }),
+			el(example, { src: fileURL("./components/examples/dekaAssign.js"), page_id }),
 			
 			el("h3", "Native JavaScript templating"),
 			el("p", "By default, the native JS has no good way to define HTML template using DOM API:"),
-			el(example, { src: new URL("./components/examples/nativeAppend.js", import.meta.url), page_id, registerClientFile }),
+			el(example, { src: fileURL("./components/examples/nativeAppend.js"), page_id }),
 			el("p").append(
 				"This library therefore overwrites the ", el("code", "append"), " method of created elements to always return parent element."
 			),
-			el(example, { src: new URL("./components/examples/dekaAppend.js", import.meta.url), page_id, registerClientFile }),
+			el(example, { src: fileURL("./components/examples/dekaAppend.js"), page_id }),
 			
 			
-			el("h2", "Creating advanced (reactive) templates and components"),
-			
-			el("h3", "Basic components"),
+			el("h3", "Basic (state-less) components"),
 			el("p").append(
 				"You can use functions for encapsulation (repeating) logic. ",
 				"The ", el("code", "el"), " accepts function as first argument. ",
 				"In that case, the function should return dom elements and the second argument for ", el("code", "el"), " is argument for given element."
 			),
-			el(example, { src: new URL("./components/examples/dekaBasicComponent.js", import.meta.url), page_id, registerClientFile }),
-			el("p", "It is nice to use similar naming convention as native DOM API.")
+			el(example, { src: fileURL("./components/examples/dekaBasicComponent.js"), page_id }),
+			el("p", "It is nice to use similar naming convention as native DOM API."),
+
+			el("h3", "Creating non-HTML elements"),
+			// example & notes
+
+			el(prevNext, info)
 		)
 	);
 }
