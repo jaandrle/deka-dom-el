@@ -1,6 +1,6 @@
 **WIP** (the experimentation phase) | [source code on GitHub](https://github.com/jaandrle/deka-dom-el) | [*mirrored* on Gitea](https://gitea.jaandrle.cz/jaandrle/deka-dom-el)
 
-***Vanilla by default — steroids if needed***
+***Vanilla for flavouring — a full-fledged feast for large projects***
 
 *…use simple DOM API by default and library tools and logic when you need them*
 
@@ -35,8 +35,8 @@ function component({ textContent, className }){
 }
 ```
 # Deka DOM Elements
-Creating reactive elements, components and Web components using [IDL](https://developer.mozilla.org/en-US/docs/Glossary/IDL)/JavaScript DOM API and signals ([Signals — whats going on behind the scenes | by Ryan Hoffnan |
-ITNEXT](https://itnext.io/signals-whats-going-on-behind-the-scenes-ec858589ea63) or [The Evolution of Signals in JavaScript - DEV Community](https://dev.to/this-is-learning/the-evolution-of-signals-in-javascript-8ob)).
+Creating reactive elements, components and Web components using [IDL](https://developer.mozilla.org/en-US/docs/Glossary/IDL)/JavaScript DOM API and signals
+([Signals — whats going on behind the scenes | by Ryan Hoffnan | ITNEXT](https://itnext.io/signals-whats-going-on-behind-the-scenes-ec858589ea63) or [The Evolution of Signals in JavaScript - DEV Community](https://dev.to/this-is-learning/the-evolution-of-signals-in-javascript-8ob)).
 
 ## Inspiration and suggested alternatives
 - my previous library (mostly used internaly): [jaandrle/dollar_dom_component: Functional DOM components without JSX and virtual DOM.](https://github.com/jaandrle/dollar_dom_component)
@@ -70,6 +70,6 @@ To balance these requirements, numerous compromises have been made. To summarize
 ## First steps
 - [**Guide**](https://jaandrle.github.io/deka-dom-el)
 - Documentation
-- Instalation
+- Installation
 	- npm
 	- [dist/](dist/) (`https://cdn.jsdelivr.net/gh/jaandrle/deka-dom-el/dist/`…)
