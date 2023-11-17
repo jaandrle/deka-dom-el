@@ -145,6 +145,8 @@ export const scope: {
 	state: Scope[],
 	/** Adds new child scope. All attributes are inherited by default. */
 	push(scope: Partial<Scope>): ReturnType<Array<Scope>["push"]>,
+	/** Adds root scope as a child of the current scope. */
+	pushRoot(): ReturnType<Array<Scope>["push"]>,
 	/** Removes last/current child scope. */
 	pop(): ReturnType<Array<Scope>["pop"]>,
 };

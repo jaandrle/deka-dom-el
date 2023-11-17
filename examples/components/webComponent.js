@@ -23,17 +23,19 @@ export class CustomHTMLTestElement extends HTMLElement{
 
 	render({ test }){
 		console.log(scope.state);
-		scope.host(on.connected(()=> console.log(CustomHTMLTestElement)));
-		scope.host(on.attributeChanged(e=> console.log(e)));
-		scope.host(on.disconnected(()=> console.log(CustomHTMLTestElement)));
+		scope.host(
+			on.connected(()=> console.log(CustomHTMLTestElement)),
+			on.attributeChanged(e=> console.log(e)),
+			on.disconnected(()=> console.log(CustomHTMLTestElement))
+		);
 		
 		const name= S.attribute("name");
 		const preName= S.attribute("pre-name");
 		console.log({ name, test, preName});
 		return el("p").append(
-			el("#text", { textContent: name }),
-			el("#text", { textContent: test }),
-			el("#text", { textContent: preName }),
+			el("#text", name),
+			el("#text", test),
+			el("#text", preName),
 			el("button", { type: "button", textContent: "pre-name", onclick: ()=> preName("Ahoj") })
 		);
 	}
@@ -48,7 +50,7 @@ lifecycleToEvents(CustomHTMLTestElement)
 customElements.define(CustomHTMLTestElement.tagName, CustomHTMLTestElement);
 
 function customElementRender(_this, render){
-	scope.push({ scope: _this, host: (...a)=> a.length ? a[0](_this) : _this, custom_element: _this });
+	scope.push({ scope: _this, host: (...c)=> c.length ? c.forEach(c=> c(_this)) : _this, custom_element: _this });
 	const out= render(_this);
 	scope.pop();
 	return out;

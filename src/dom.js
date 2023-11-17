@@ -19,11 +19,15 @@ export const scope= {
 	},
 	
 	get state(){ return [ ...scopes ]; },
-	push(s= {}){
-		return scopes.push(Object.assign({}, this.current, { prevent: false }, s));
+	push(s= {}){ return scopes.push(Object.assign({}, this.current, { prevent: false }, s)); },
+	pushRoot(){ return scopes.push(scopes[0]); },
+	pop(){
+		if(scopes.length===1) return;
+		return scopes.pop();
 	},
-	pop(){ return scopes.pop(); },
 };
+function append(...els){ this.appendOrig(...els); return this; }
+export function chainableAppend(el){ if(el.append===append) return el; el.appendOrig= el.append; el.append= append; return el; }
 let namespace;
 export function createElement(tag, attributes, ...modifiers){
 	/* jshint maxcomplexity: 15 */
@@ -36,7 +40,7 @@ export function createElement(tag, attributes, ...modifiers){
 	switch(true){
 		case typeof tag==="function": {
 			scoped= 1;
-			scope.push({ scope: tag, host: c=> c ? (scoped===1 ? modifiers.unshift(c) : c(el_host), undefined) : el_host });
+			scope.push({ scope: tag, host: (...c)=> c.length ? (scoped===1 ? modifiers.unshift(...c) : c.forEach(c=> c(el_host)), undefined) : el_host });
 			el= tag(attributes || undefined);
 			const is_fragment= el instanceof DocumentFragment;
 			if(el.nodeName==="#comment") break;
@@ -71,11 +75,6 @@ createElement.mark= function(attrs, is_open= false){
 	const out= document.createComment(`<dde:mark ${attrs}${enviroment.ssr}${end}>`);
 	if(!is_open) out.end= document.createComment("</dde:mark>");
 	return out;
-};
-createElement.later= function(){
-	const el= createElement.mark({ type: "later" });
-	el.append= el.prepend= function(...els){ el.after(...els); return el; };
-	return el;
 };
 export { createElement as el };
 
@@ -180,6 +179,3 @@ function attrArrToStr(attr){ return Array.isArray(attr) ? attr.filter(Boolean).j
 function setRemove(obj, prop, key, val){ return obj[ (isUndef(val) ? "remove" : "set") + prop ](key, attrArrToStr(val)); }
 function setRemoveNS(obj, prop, key, val, ns= null){ return obj[ (isUndef(val) ? "remove" : "set") + prop + "NS" ](ns, key, attrArrToStr(val)); }
 function setDelete(obj, key, val){ Reflect.set(obj, key, val); if(!isUndef(val)) return; return Reflect.deleteProperty(obj, key); }
-
-function append(...els){ this.appendOrig(...els); return this; }
-function chainableAppend(el){ if(el.append===append) return el; el.appendOrig= el.append; el.append= append; return el; }

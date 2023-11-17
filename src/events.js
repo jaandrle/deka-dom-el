@@ -51,6 +51,15 @@ on.disconnected= function(listener, options){
 		return element;
 	};
 };
+const store_abort= new WeakMap();
+on.disconnectedAsAbort= function(host){
+	if(store_abort.has(host)) return store_abort.get(host);
+
+	const a= new AbortController();
+	store_abort.set(host, a);
+	host(on.disconnected(()=> a.abort()));
+	return a;
+};
 on.attributeChanged= function(listener, options){
 	const name= "attributeChanged";
 	if(typeof options !== "object")

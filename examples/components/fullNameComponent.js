@@ -10,8 +10,10 @@ export function fullNameComponent(){
 	const name= labels.map(_=> S(""));
 	const full_name= S(()=>
 		name.map(l=> l()).filter(Boolean).join(" ") || "-");
-	scope.host(on.connected(()=> console.log(fullNameComponent)));
-	scope.host(on.disconnected(()=> console.log(fullNameComponent)))
+	scope.host(
+		on.connected(()=> console.log(fullNameComponent)),
+		on.disconnected(()=> console.log(fullNameComponent))
+	);
 
 	const elSVG= elNS("http://www.w3.org/2000/svg");
 	return el("div", { className }).append(
