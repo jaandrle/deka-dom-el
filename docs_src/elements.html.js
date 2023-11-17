@@ -28,7 +28,7 @@ export function page({ pkg, info }){
 					title: "MDN page about Interface Description Language"
 				}).append(
 					el("abbr", { textContent: "IDL", title: "Interface Description Language" })
-				), "."
+				), " also known as a JavaScript property."
 			),
 			el(example, { src: fileURL("./components/examples/nativeCreateElement.js"), page_id }),
 			el("p").append(
@@ -94,10 +94,23 @@ export function page({ pkg, info }){
 				"In that case, the function should return dom elements and the second argument for ", el("code", "el"), " is argument for given element."
 			),
 			el(example, { src: fileURL("./components/examples/dekaBasicComponent.js"), page_id }),
-			el("p", "It is nice to use similar naming convention as native DOM API."),
+			el("p").append(
+				"As you can see, in case of state-less/basic components there is no difference",
+				" between calling component function directly or using ", el("code", "el"), " function.",
+			),
+			el("p", { className: "notice" }).append(
+				"It is nice to use similar naming convention as native DOM API. ",
+				"This allows us to use ", el("a", { textContent: "the destructuring assignment syntax", href: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment", title: "Destructuring assignment | MDN" }),
+				" and keep track of the native API (things are best remembered through regular use).",
+			),
 
 			el("h3", "Creating non-HTML elements"),
-			// example & notes
+			el("p").append(
+				"Similarly to the native DOM API (", el("a", { href: "https://developer.mozilla.org/en-US/docs/Web/API/Document/createElementNS", title: "MDN" }).append(el("code", "document.createElementNS")), ") for non-HTML elements",
+				" we need to tell JavaScript which kind of the element to create.",
+				" We can use the ", el("code", "elNS"), " function:"
+			),
+			el(example, { src: fileURL("./components/examples/dekaElNS.js"), page_id }),
 
 			el(prevNext, info)
 		)
