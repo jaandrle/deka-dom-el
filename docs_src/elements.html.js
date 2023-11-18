@@ -30,12 +30,12 @@ export function page({ pkg, info }){
 					el("abbr", { textContent: "IDL", title: "Interface Description Language" })
 				), " also known as a JavaScript property."
 			),
-			el(example, { src: fileURL("./components/examples/nativeCreateElement.js"), page_id }),
+			el(example, { src: fileURL("./components/examples/elements/nativeCreateElement.js"), page_id }),
 			el("p").append(
 				"To make this easier, you can use the ", el("code", "el"), " function. ",
 				"Internally in basic examples, it is wrapper around ", el("code", "assign(document.createElement(…), { … })"), "."
 			),
-			el(example, { src: fileURL("./components/examples/dekaCreateElement.js"), page_id }),
+			el(example, { src: fileURL("./components/examples/elements/dekaCreateElement.js"), page_id }),
 			el("p").append(
 				"The ", el("code", "assign"), " function provides improved behaviour of ", el("code", "Object.assign()"), ". ",
 				"You can declaratively sets any IDL and attribute of the given element. ",
@@ -76,15 +76,15 @@ export function page({ pkg, info }){
 			el("p").append(
 				"For processing, the ", el("code", "assign"), " internally uses ", el("code", "assignAttribute"), " and ", el("code", "classListDeclarative"), "."
 			),
-			el(example, { src: fileURL("./components/examples/dekaAssign.js"), page_id }),
+			el(example, { src: fileURL("./components/examples/elements/dekaAssign.js"), page_id }),
 			
 			el("h3", "Native JavaScript templating"),
 			el("p", "By default, the native JS has no good way to define HTML template using DOM API:"),
-			el(example, { src: fileURL("./components/examples/nativeAppend.js"), page_id }),
+			el(example, { src: fileURL("./components/examples/elements/nativeAppend.js"), page_id }),
 			el("p").append(
 				"This library therefore overwrites the ", el("code", "append"), " method of created elements to always return parent element."
 			),
-			el(example, { src: fileURL("./components/examples/dekaAppend.js"), page_id }),
+			el(example, { src: fileURL("./components/examples/elements/dekaAppend.js"), page_id }),
 			
 			
 			el("h3", "Basic (state-less) components"),
@@ -93,7 +93,7 @@ export function page({ pkg, info }){
 				"The ", el("code", "el"), " accepts function as first argument. ",
 				"In that case, the function should return dom elements and the second argument for ", el("code", "el"), " is argument for given element."
 			),
-			el(example, { src: fileURL("./components/examples/dekaBasicComponent.js"), page_id }),
+			el(example, { src: fileURL("./components/examples/elements/dekaBasicComponent.js"), page_id }),
 			el("p").append(
 				"As you can see, in case of state-less/basic components there is no difference",
 				" between calling component function directly or using ", el("code", "el"), " function.",
@@ -110,7 +110,7 @@ export function page({ pkg, info }){
 				" we need to tell JavaScript which kind of the element to create.",
 				" We can use the ", el("code", "elNS"), " function:"
 			),
-			el(example, { src: fileURL("./components/examples/dekaElNS.js"), page_id }),
+			el(example, { src: fileURL("./components/examples/elements/dekaElNS.js"), page_id }),
 
 			el(prevNext, info)
 		)

@@ -1,4 +1,4 @@
-import { el } from "../../../index-with-signals.js";
+import { el } from "deka-dom-el";
 document.head.append(
 	el("style").append(
 		".class1{ font-weight: bold; }",

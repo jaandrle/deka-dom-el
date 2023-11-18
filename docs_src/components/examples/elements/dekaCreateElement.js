@@ -1,4 +1,4 @@
-import { el, assign } from "../../../index-with-signals.js";
+import { el, assign } from "deka-dom-el";
 const color= "lightcoral";
 document.body.append(
 	el("p", { textContent: "Hello (first time)", style: { color } })

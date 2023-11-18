@@ -1,4 +1,4 @@
-import { elNS, assign } from "../../../index-with-signals.js";
+import { elNS, assign } from "deka-dom-el";
 const elSVG= elNS("http://www.w3.org/2000/svg");
 const elMath= elNS("http://www.w3.org/1998/Math/MathML");
 document.body.append(

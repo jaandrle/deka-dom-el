@@ -24,7 +24,7 @@ import { code } from "./code.html.js";
 export function example({ src, language= "js", page_id }){
 	registerClientPart(page_id);
 	const content= s.cat(src).toString()
-		.replaceAll(' from "../../../index-with-signals.js";', ' from "https://cdn.jsdelivr.net/gh/jaandrle/deka-dom-el/dist/esm-with-signals.js";');
+		.replaceAll(/ from "deka-dom-el(\/signals)?";/g, ' from "https://cdn.jsdelivr.net/gh/jaandrle/deka-dom-el/dist/esm-with-signals.js";');
 	const id= "code-"+Math.random().toString(36).slice(2, 7);
 	return el().append(
 		el(code, { id, content, language, className: example.name }),

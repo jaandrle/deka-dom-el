@@ -1,4 +1,4 @@
-import { assignAttribute, classListDeclarative } from "../../../index-with-signals.js";
+import { assignAttribute, classListDeclarative } from "deka-dom-el";
 const paragraph= document.createElement("p");
 
 assignAttribute(paragraph, "textContent", "Hello, world!");

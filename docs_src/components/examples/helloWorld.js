@@ -1,4 +1,5 @@
-import { el, S } from "../../../index-with-signals.js";
+import { el } from "deka-dom-el";
+import { S } from "deka-dom-el/signals";
 const clicks= S(0);
 document.body.append(
 	el().append(

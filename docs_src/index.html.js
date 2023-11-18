@@ -12,7 +12,7 @@ export function page({ pkg, info }){
 		el("main").append(
 			el("p", "The library tries to provide pure JavaScript tool(s) to create reactive interfaces."),
 			el("p").append(
-				"We start with creating and modifying a static elemnets and end up with UI templates.",
+				"We start with creating and modifying a static elements and end up with UI templates.",
 				" ",
 				el("i").append(
 					"From ", el("code", "document.createElement"), " to ", el("code", "el"), "."
