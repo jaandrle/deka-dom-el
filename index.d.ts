@@ -88,6 +88,8 @@ export function elNS(
 	...modifiers: ddeElementModifier<SupportedElement>[]
 )=> SupportedElement
 
+export function chainableAppend<EL extends SupportedElement>(el: EL): EL;
+
 export function dispatchEvent(element: SupportedElement, name: keyof DocumentEventMap): void;
 export function dispatchEvent(element: SupportedElement, name: string, data: any): void;
 interface On{

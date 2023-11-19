@@ -22,3 +22,14 @@ document.body.append(
 		)
 	)
 );
+
+import { chainableAppend } from "deka-dom-el";
+/** @param {keyof HTMLElementTagNameMap} tag */
+const createElement= tag=> chainableAppend(document.createElement(tag));
+document.body.append(
+	createElement("p").append(
+		createElement("em").append(
+			"You can also use `chainableAppend`!"
+		)
+	)
+);

@@ -26,8 +26,9 @@ export const scope= {
 		return scopes.pop();
 	},
 };
-function append(...els){ this.appendOrig(...els); return this; }
-export function chainableAppend(el){ if(el.append===append) return el; el.appendOrig= el.append; el.append= append; return el; }
+// following chainableAppend implementation is OK as the ElementPrototype.append description already is { writable: true, enumerable: true, configurable: true }
+function append(...els){ this.appendOriginal(...els); return this; }
+export function chainableAppend(el){ if(el.append===append) return el; el.appendOriginal= el.append; el.append= append; return el; }
 let namespace;
 export function createElement(tag, attributes, ...modifiers){
 	/* jshint maxcomplexity: 15 */
@@ -151,7 +152,7 @@ export function empty(el){
 	return el;
 }
 import { isUndef } from "./helpers.js";
-//TODO add cache? `Map<el.tagName+key,isUndef>`
+//TODO add cache? `(Map/Set)<el.tagName+key,isUndef>`
 function isPropSetter(el, key){
 	if(!Reflect.has(el, key)) return false;
 	const des= getPropDescriptor(el, key);
