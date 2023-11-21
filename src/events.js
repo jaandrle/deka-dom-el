@@ -1,7 +1,12 @@
 export { registerReactivity } from './signals-common.js';
 
-export function dispatchEvent(name, options= {}){
+export function dispatchEvent(name, options, host){
+	if(!options) options= {};
 	return function dispatch(element, ...d){
+		if(host){
+			d.unshift(element);
+			element= typeof host==="function"? host() : host;
+		}
 		const event= d.length ? new CustomEvent(name, Object.assign({ detail: d[0] }, options)) : new Event(name, options);
 		return element.dispatchEvent(event);
 	};

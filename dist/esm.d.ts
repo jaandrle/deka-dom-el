@@ -96,6 +96,8 @@ export function chainableAppend<EL extends SupportedElement>(el: EL): EL;
 
 export function dispatchEvent(name: keyof DocumentEventMap | string, options?: EventInit):
 	(element: SupportedElement, data?: any)=> void;
+export function dispatchEvent(name: keyof DocumentEventMap | string, options: EventInit | null, element: SupportedElement | (()=> SupportedElement)):
+	(data?: any)=> void;
 interface On{
 	/** Listens to the DOM event. See {@link Document.addEventListener} */
 	<
