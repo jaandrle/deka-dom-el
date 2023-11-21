@@ -1,11 +1,13 @@
 import "./global.css.js";
 import { el } from "deka-dom-el";
+
+import { header } from "./layout/head.html.js";
 import { example } from "./components/example.html.js";
+import { prevNext } from "./components/prevNext.html.js";
 
 /** @param {string} url */
 const fileURL= url=> new URL(url, import.meta.url);
-import { header } from "./layout/head.html.js";
-import { prevNext } from "./components/prevNext.html.js";
+
 /** @param {import("./types.d.ts").PageAttrs} attrs */
 export function page({ pkg, info }){
 	const page_id= info.id;
@@ -71,6 +73,9 @@ export function page({ pkg, info }){
 					el("em").append(
 						"For example, natievly the element’s ", el("code", "id"), " is removed by setting the IDL to an empty string."
 					)
+				),
+				el("li").append(
+					"You can use ", el("code", "="), " or ", el("code", "."), " to force processing given key as attribute/property of the element."
 				)
 			),
 			el("p").append(

@@ -1,7 +1,7 @@
 import { el, on } from "deka-dom-el";
 const abort_controller= new AbortController();
 const { signal }= abort_controller;
-/** @type {ddeElementModifier<HTMLButtonElement>} */
+/** @type {ddeElementAddon<HTMLButtonElement>} */
 const onclickOff= on("click", ()=> abort_controller.abort(), { signal });
 /** @type {(ref?: HTMLOutputElement)=> HTMLOutputElement | null} */
 const ref= (store=> ref=> ref ? (store= ref) : store)(null);

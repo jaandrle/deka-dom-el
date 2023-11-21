@@ -30,7 +30,7 @@ export const scope= {
 function append(...els){ this.appendOriginal(...els); return this; }
 export function chainableAppend(el){ if(el.append===append) return el; el.appendOriginal= el.append; el.append= append; return el; }
 let namespace;
-export function createElement(tag, attributes, ...modifiers){
+export function createElement(tag, attributes, ...addons){
 	/* jshint maxcomplexity: 15 */
 	const s= signals(this);
 	let scoped= 0;
@@ -41,7 +41,7 @@ export function createElement(tag, attributes, ...modifiers){
 	switch(true){
 		case typeof tag==="function": {
 			scoped= 1;
-			scope.push({ scope: tag, host: (...c)=> c.length ? (scoped===1 ? modifiers.unshift(...c) : c.forEach(c=> c(el_host)), undefined) : el_host });
+			scope.push({ scope: tag, host: (...c)=> c.length ? (scoped===1 ? addons.unshift(...c) : c.forEach(c=> c(el_host)), undefined) : el_host });
 			el= tag(attributes || undefined);
 			const is_fragment= el instanceof DocumentFragment;
 			if(el.nodeName==="#comment") break;
@@ -61,7 +61,7 @@ export function createElement(tag, attributes, ...modifiers){
 	}
 	chainableAppend(el);
 	if(!el_host) el_host= el;
-	modifiers.forEach(c=> c(el_host));
+	addons.forEach(c=> c(el_host));
 	if(scoped) scope.pop();
 	scoped= 2;
 	return el;

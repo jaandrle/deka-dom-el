@@ -5,7 +5,7 @@ export const path_target= {
 export const pages= [
 	{ id: "index", href: "./", title: "Introduction", description: "Introducing a library." },
 	{ id: "elements", href: "elements", title: "Elements", description: "Basic concepts of elements modifications and creations." },
-	{ id: "events", href: "events", title: "Events and Modifiers", description: "Using not only events in UI declaratively." },
+	{ id: "events", href: "events", title: "Events and Addons", description: "Using not only events in UI declaratively." },
 ];
 /**
  * @typedef registerClientFile

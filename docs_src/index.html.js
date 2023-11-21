@@ -1,9 +1,10 @@
-import { el } from "deka-dom-el";
 import "./global.css.js";
-import { example } from "./components/example.html.js";
+import { el } from "deka-dom-el";
 
 import { header } from "./layout/head.html.js";
+import { example } from "./components/example.html.js";
 import { prevNext } from "./components/prevNext.html.js";
+
 /** @param {import("./types.d.ts").PageAttrs} attrs */
 export function page({ pkg, info }){
 	const page_id= info.id;

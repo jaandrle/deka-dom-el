@@ -1,15 +1,22 @@
-import { assignAttribute, classListDeclarative } from "deka-dom-el";
+import { assign, assignAttribute, classListDeclarative } from "deka-dom-el";
 const paragraph= document.createElement("p");
 
 assignAttribute(paragraph, "textContent", "Hello, world!");
+
+assignAttribute(paragraph, "style", "color: red; font-weight: bold;");
 assignAttribute(paragraph, "style", { color: "navy" });
 
 assignAttribute(paragraph, "dataTest1", "v1");
 assignAttribute(paragraph, "dataset", { test2: "v2" });
 
-assignAttribute(paragraph, "ariaLabel", "v1");
-assignAttribute(paragraph, "ariaset", { role: "none" });
-
+assign(paragraph, { //textContent and style see above
+	ariaLabel: "v1", //data* see above
+	ariaset: { role: "none" }, // dataset see above
+	"=onclick": "console.log(event)",
+	onmouseout: console.info,
+	".something": "something",
+	classList: {} //see below
+});
 
 classListDeclarative(paragraph, {
 	classAdd: true,
@@ -20,6 +27,7 @@ classListDeclarative(paragraph, {
 });
 
 console.log(paragraph.outerHTML);
+console.log("paragraph.something=", paragraph.something);
 document.body.append(
 	paragraph
 );

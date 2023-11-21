@@ -1,22 +1,24 @@
 import "./global.css.js";
 import { el } from "deka-dom-el";
+
+import { header } from "./layout/head.html.js";
 import { example } from "./components/example.html.js";
+import { prevNext } from "./components/prevNext.html.js";
 
 /** @param {string} url */
 const fileURL= url=> new URL(url, import.meta.url);
-import { header } from "./layout/head.html.js";
-import { prevNext } from "./components/prevNext.html.js";
+
 /** @param {import("./types.d.ts").PageAttrs} attrs */
 export function page({ pkg, info }){
 	const page_id= info.id;
 	return el().append(
 		el(header, { info, pkg }),
 		el("main").append(
-			el("h2", "Listenning to the native DOM events and other Modifiers"),
+			el("h2", "Listenning to the native DOM events and other Addons"),
 			el("p").append(
 				"We quickly introduce helper to listening to the native DOM events.",
 				" ",
-				"And library syntax/pattern so-called ", el("em", "Modifier"), " to",
+				"And library syntax/pattern so-called ", el("em", "Addon"), " to",
 				" incorporate not only this in UI templates declaratively."
 			),
 			
@@ -43,23 +45,23 @@ export function page({ pkg, info }){
 			),
 			el(example, { src: fileURL("./components/examples/events/abortSignal.js"), page_id }),
 
-			el("h3", "Modifiers"),
+			el("h3", "Addons"),
 			el("p").append(
-				"From practical point of view, ", el("em", "Modifiers"), " are just functions that accept any html element",
+				"From practical point of view, ", el("em", "Addons"), " are just functions that accept any html element",
 				" as their first parameter. You can see that the ", el("code", "on(…)"), " fullfills this requirement."
 			),
 			el("p").append(
-				"You can use Modifiers as ≥3rd argument of ", el("code", "el"), " function. This way is possible to extends",
+				"You can use Addons as ≥3rd argument of ", el("code", "el"), " function. This way is possible to extends",
 				" you templates by additional (3rd party) functionalities. But for now mainly, you can add events listeners:"
 			),
 			el(example, { src: fileURL("./components/examples/events/templateWithListeners.js"), page_id }),
 			el("p").append(
-				"As the example shows, you can also provide types in JSDoc+TypeScript by using global type ", el("code", "ddeElementModifier"), ".",
+				"As the example shows, you can also provide types in JSDoc+TypeScript by using global type ", el("code", "ddeElementAddon"), ".",
 				" ",
-				"Also notice, you can use Modifiers to get element reference.",
+				"Also notice, you can use Addons to get element reference.",
 			),
 			el("h3", "Life cycle events"),
-			el("p", "Modifiers are called immediately when the element is created, event it is not connected to live DOM yet."),
+			el("p", "Addons are called immediately when the element is created, event it is not connected to live DOM yet."),
 			// todo
 
 			// dispatchEvent

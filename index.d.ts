@@ -11,8 +11,9 @@ type SupportedElement=
 	| ddePublicElementTagNameMap[keyof ddePublicElementTagNameMap];
 declare global {
 	type ddeComponentAttributes= Record<any, any> | undefined | string;
-	type ddeElementModifier<El extends SupportedElement | DocumentFragment>= (element: El)=> El;
+	type ddeElementAddon<El extends SupportedElement | DocumentFragment>= (element: El)=> El | void;
 }
+type PascalCase= `${Capitalize<string>}${string}`;
 type AttrsModified= {
 	/**
 	 * Use string like in HTML (internally uses `*.setAttribute("style", *)`), or object representation (like DOM API).
@@ -30,7 +31,7 @@ type AttrsModified= {
 	 * Sets `aria-*` simiraly to `dataset`
 	 * */
 	ariaset: Record<string,string>,
-}
+} & Record<`=${string}` | `data${PascalCase}` | `aria${PascalCase}`, string> & Record<`.${string}`, any>
 /**
  * Just element attributtes
  *
@@ -40,13 +41,15 @@ type AttrsModified= {
  * @private
  */
 type ElementAttributes<T extends SupportedElement>= Omit<T,keyof AttrsModified> & AttrsModified;
+export function classListDeclarative<El extends SupportedElement>(element: El, classList: AttrsModified["classList"]): El
 export function assign<El extends SupportedElement>(element: El, ...attrs_array: Partial<ElementAttributes<El>>[]): El
+export function assignAttribute<El extends SupportedElement, ATT extends keyof ElementAttributes<El>>(element: El, attr: ATT, value: ElementAttributes<El>[ATT]): ElementAttributes<El>[ATT]
 
 type ExtendedHTMLElementTagNameMap= HTMLElementTagNameMap & CustomElementTagNameMap & ddePublicElementTagNameMap
 export function el<TAG extends keyof ExtendedHTMLElementTagNameMap>(
 	tag_name: TAG,
 	attrs?: string | Partial<ElementAttributes<ExtendedHTMLElementTagNameMap[TAG]>>,
-	...modifiers: ddeElementModifier<ExtendedHTMLElementTagNameMap[TAG]>[]
+	...modifiers: ddeElementAddon<ExtendedHTMLElementTagNameMap[TAG]>[]
 ): ExtendedHTMLElementTagNameMap[TAG]
 export function el<T>(
 	tag_name?: "<>",
@@ -57,13 +60,13 @@ export function el<
 	C extends (attr: A)=> SupportedElement | DocumentFragment>(
 	fComponent: C,
 	attrs?: A,
-	...modifiers: ddeElementModifier<ReturnType<C>>[]
+	...modifiers: ddeElementAddon<ReturnType<C>>[]
 ): ReturnType<C>
 
 export function el(
 	tag_name: string,
 	attrs?: string | Record<string, any>,
-	...modifiers: ddeElementModifier<HTMLElement>[]
+	...modifiers: ddeElementAddon<HTMLElement>[]
 ): HTMLElement
 
 export function elNS(
@@ -71,21 +74,21 @@ export function elNS(
 ): <TAG extends keyof SVGElementTagNameMap, KEYS extends keyof SVGElementTagNameMap[TAG] & { d: string }>(
 	tag_name: TAG,
 	attrs?: string | Partial<{ [key in KEYS]: SVGElementTagNameMap[TAG][key] | string | number | boolean }>,
-	...modifiers: ddeElementModifier<SVGElementTagNameMap[TAG]>[]
+	...modifiers: ddeElementAddon<SVGElementTagNameMap[TAG]>[]
 )=> SVGElementTagNameMap[TAG]
 export function elNS(
 	namespace: "http://www.w3.org/1998/Math/MathML"
 ): <TAG extends keyof MathMLElementTagNameMap, KEYS extends keyof MathMLElementTagNameMap[TAG] & { d: string }>(
 	tag_name: TAG,
 	attrs?: string | Partial<{ [key in KEYS]: MathMLElementTagNameMap[TAG][key] | string | number | boolean }>,
-	...modifiers: ddeElementModifier<MathMLElementTagNameMap[TAG]>[]
+	...modifiers: ddeElementAddon<MathMLElementTagNameMap[TAG]>[]
 )=> MathMLElementTagNameMap[TAG]
 export function elNS(
 	namespace: string
 ): (
 	tag_name: string,
 	attrs?: string | Record<string, any>,
-	...modifiers: ddeElementModifier<SupportedElement>[]
+	...modifiers: ddeElementAddon<SupportedElement>[]
 )=> SupportedElement
 
 export function chainableAppend<EL extends SupportedElement>(el: EL): EL;
@@ -95,8 +98,8 @@ export function dispatchEvent(element: SupportedElement, name: string, data: any
 interface On{
 	/** Listens to the DOM event. See {@link Document.addEventListener} */
 	<
-		EE extends ddeElementModifier<SupportedElement>,
-		El extends ( EE extends ddeElementModifier<infer El> ? El : never ),
+		EE extends ddeElementAddon<SupportedElement>,
+		El extends ( EE extends ddeElementAddon<infer El> ? El : never ),
 		Event extends keyof DocumentEventMap>(
 			type: Event,
 			listener: (this: El, ev: DocumentEventMap[Event]) => any,
@@ -104,24 +107,24 @@ interface On{
 		) : EE;
 	/** Listens to the element is connected to the live DOM. In case of custom elements uses [`connectedCallback`](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#custom_element_lifecycle_callbacks), or {@link MutationObserver} else where */
 	connected<
-		EE extends ddeElementModifier<SupportedElement>,
-		El extends ( EE extends ddeElementModifier<infer El> ? El : never )
+		EE extends ddeElementAddon<SupportedElement>,
+		El extends ( EE extends ddeElementAddon<infer El> ? El : never )
 		>(
 			listener: (el: El) => any,
 			options?: AddEventListenerOptions
 		) : EE;
 	/** Listens to the element is disconnected from the live DOM. In case of custom elements uses [`disconnectedCallback`](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#custom_element_lifecycle_callbacks), or {@link MutationObserver} else where */
 	disconnected<
-		EE extends ddeElementModifier<SupportedElement>,
-		El extends ( EE extends ddeElementModifier<infer El> ? El : never )
+		EE extends ddeElementAddon<SupportedElement>,
+		El extends ( EE extends ddeElementAddon<infer El> ? El : never )
 		>(
 			listener: (el: El) => any,
 			options?: AddEventListenerOptions
 		) : EE;
 	/** Listens to the element attribute changes. In case of custom elements uses [`attributeChangedCallback`](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#custom_element_lifecycle_callbacks), or {@link MutationObserver} else where */
 	attributeChanged<
-		EE extends ddeElementModifier<SupportedElement>,
-		El extends ( EE extends ddeElementModifier<infer El> ? El : never )
+		EE extends ddeElementAddon<SupportedElement>,
+		El extends ( EE extends ddeElementAddon<infer El> ? El : never )
 		>(
 			listener: (el: El) => any,
 			options?: AddEventListenerOptions
@@ -129,7 +132,7 @@ interface On{
 }
 export const on: On;
 
-type Scope= { scope: Node | Function | Object, host: ddeElementModifier<any>, custom_element: false | HTMLElement, prevent: boolean }
+type Scope= { scope: Node | Function | Object, host: ddeElementAddon<any>, custom_element: false | HTMLElement, prevent: boolean }
 /** Current scope created last time the `el(Function)` was invoke. (Or {@link scope.push}) */
 export const scope: {
 	current: Scope,
@@ -139,10 +142,10 @@ export const scope: {
 	preventDefault<T extends boolean>(prevent: T): T,
 	/**
 	 * This represents reference to the current host element — `scope.host()`.
-	 * It can be also used to register Modifier (function to be called when component is initized)
+	 * It can be also used to register Addon (function to be called when component is initized)
 	 * — `scope.host(on.connected(console.log))`.
 	 * */
-	host: ddeElementModifier<any>,
+	host: ddeElementAddon<any>,
 	
 	state: Scope[],
 	/** Adds new child scope. All attributes are inherited by default. */
