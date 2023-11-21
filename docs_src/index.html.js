@@ -3,7 +3,7 @@ import { el } from "deka-dom-el";
 
 import { header } from "./layout/head.html.js";
 import { example } from "./components/example.html.js";
-import { prevNext } from "./components/prevNext.html.js";
+import { prevNext } from "./components/pageUtils.html.js";
 
 /** @param {import("./types.d.ts").PageAttrs} attrs */
 export function page({ pkg, info }){

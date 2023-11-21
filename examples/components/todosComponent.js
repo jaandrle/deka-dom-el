@@ -67,7 +67,7 @@ function todoComponent({ textContent, value }){
 		const value= Number(event.target.value);
 		event.preventDefault();
 		event.stopPropagation();
-		dispatchEvent(host(), "remove", value);
+		dispatchEvent("remove")(host(), value);
 	});
 	const is_editable= S(false);
 	const onedited= on("change", ev=> {

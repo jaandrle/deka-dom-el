@@ -16,6 +16,18 @@ styles.scope(prevNext).css`
 `;
 import { el } from "../../index.js";
 /**
+ * @param {Object} attrs
+ * @param {string} attrs.textContent
+ * @param {string} [attrs.id]
+ * */
+export function h3({ textContent, id }){
+	if(!id) id= "h-"+textContent.toLowerCase().replaceAll(/\s/g, "-").replaceAll(/[^a-z-]/g, "");
+	return el("h3", { id }).append(
+		el("a", { textContent: "§", href: "#"+id, tabIndex: -1 }),
+		" ", textContent
+	);
+}
+/**
  * @param {import("../types.d.ts").Info} page
  * */
 export function prevNext(page){

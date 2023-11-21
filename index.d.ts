@@ -10,7 +10,7 @@ type SupportedElement=
 	| CustomElementTagNameMap[keyof CustomElementTagNameMap]
 	| ddePublicElementTagNameMap[keyof ddePublicElementTagNameMap];
 declare global {
-	type ddeComponentAttributes= Record<any, any> | undefined | string;
+	type ddeComponentAttributes= Record<any, any> | undefined;
 	type ddeElementAddon<El extends SupportedElement | DocumentFragment>= (element: El)=> El | void;
 }
 type PascalCase= `${Capitalize<string>}${string}`;
@@ -49,7 +49,7 @@ type ExtendedHTMLElementTagNameMap= HTMLElementTagNameMap & CustomElementTagName
 export function el<TAG extends keyof ExtendedHTMLElementTagNameMap>(
 	tag_name: TAG,
 	attrs?: string | Partial<ElementAttributes<ExtendedHTMLElementTagNameMap[TAG]>>,
-	...modifiers: ddeElementAddon<ExtendedHTMLElementTagNameMap[TAG]>[]
+	...addons: ddeElementAddon<ExtendedHTMLElementTagNameMap[TAG]>[]
 ): ExtendedHTMLElementTagNameMap[TAG]
 export function el<T>(
 	tag_name?: "<>",
@@ -57,16 +57,16 @@ export function el<T>(
 
 export function el<
 	A extends ddeComponentAttributes,
-	C extends (attr: A)=> SupportedElement | DocumentFragment>(
+	C extends (attr: Partial<A>)=> SupportedElement | DocumentFragment>(
 	fComponent: C,
-	attrs?: A,
-	...modifiers: ddeElementAddon<ReturnType<C>>[]
+	attrs?: A | string,
+	...addons: ddeElementAddon<ReturnType<C>>[]
 ): ReturnType<C>
 
 export function el(
 	tag_name: string,
 	attrs?: string | Record<string, any>,
-	...modifiers: ddeElementAddon<HTMLElement>[]
+	...addons: ddeElementAddon<HTMLElement>[]
 ): HTMLElement
 
 export function elNS(
@@ -74,27 +74,27 @@ export function elNS(
 ): <TAG extends keyof SVGElementTagNameMap, KEYS extends keyof SVGElementTagNameMap[TAG] & { d: string }>(
 	tag_name: TAG,
 	attrs?: string | Partial<{ [key in KEYS]: SVGElementTagNameMap[TAG][key] | string | number | boolean }>,
-	...modifiers: ddeElementAddon<SVGElementTagNameMap[TAG]>[]
+	...addons: ddeElementAddon<SVGElementTagNameMap[TAG]>[]
 )=> SVGElementTagNameMap[TAG]
 export function elNS(
 	namespace: "http://www.w3.org/1998/Math/MathML"
 ): <TAG extends keyof MathMLElementTagNameMap, KEYS extends keyof MathMLElementTagNameMap[TAG] & { d: string }>(
 	tag_name: TAG,
 	attrs?: string | Partial<{ [key in KEYS]: MathMLElementTagNameMap[TAG][key] | string | number | boolean }>,
-	...modifiers: ddeElementAddon<MathMLElementTagNameMap[TAG]>[]
+	...addons: ddeElementAddon<MathMLElementTagNameMap[TAG]>[]
 )=> MathMLElementTagNameMap[TAG]
 export function elNS(
 	namespace: string
 ): (
 	tag_name: string,
 	attrs?: string | Record<string, any>,
-	...modifiers: ddeElementAddon<SupportedElement>[]
+	...addons: ddeElementAddon<SupportedElement>[]
 )=> SupportedElement
 
 export function chainableAppend<EL extends SupportedElement>(el: EL): EL;
 
-export function dispatchEvent(element: SupportedElement, name: keyof DocumentEventMap): void;
-export function dispatchEvent(element: SupportedElement, name: string, data: any): void;
+export function dispatchEvent(name: keyof DocumentEventMap | string, options?: EventInit):
+	(element: SupportedElement, data?: any)=> void;
 interface On{
 	/** Listens to the DOM event. See {@link Document.addEventListener} */
 	<
@@ -105,12 +105,19 @@ interface On{
 			listener: (this: El, ev: DocumentEventMap[Event]) => any,
 			options?: AddEventListenerOptions
 		) : EE;
+	<
+		EE extends ddeElementAddon<SupportedElement>,
+		El extends ( EE extends ddeElementAddon<infer El> ? El : never )>(
+			type: string,
+			listener: (this: El, ev: Event | CustomEvent ) => any,
+			options?: AddEventListenerOptions
+		) : EE;
 	/** Listens to the element is connected to the live DOM. In case of custom elements uses [`connectedCallback`](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#custom_element_lifecycle_callbacks), or {@link MutationObserver} else where */
 	connected<
 		EE extends ddeElementAddon<SupportedElement>,
 		El extends ( EE extends ddeElementAddon<infer El> ? El : never )
 		>(
-			listener: (el: El) => any,
+			listener: (this: El, event: CustomEvent<void>) => any,
 			options?: AddEventListenerOptions
 		) : EE;
 	/** Listens to the element is disconnected from the live DOM. In case of custom elements uses [`disconnectedCallback`](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#custom_element_lifecycle_callbacks), or {@link MutationObserver} else where */
@@ -118,7 +125,7 @@ interface On{
 		EE extends ddeElementAddon<SupportedElement>,
 		El extends ( EE extends ddeElementAddon<infer El> ? El : never )
 		>(
-			listener: (el: El) => any,
+			listener: (this: El, event: CustomEvent<void>) => any,
 			options?: AddEventListenerOptions
 		) : EE;
 	/** Listens to the element attribute changes. In case of custom elements uses [`attributeChangedCallback`](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#custom_element_lifecycle_callbacks), or {@link MutationObserver} else where */
@@ -126,7 +133,7 @@ interface On{
 		EE extends ddeElementAddon<SupportedElement>,
 		El extends ( EE extends ddeElementAddon<infer El> ? El : never )
 		>(
-			listener: (el: El) => any,
+			listener: (this: El, event: CustomEvent<[ string, string ]>) => any,
 			options?: AddEventListenerOptions
 		) : EE;
 }

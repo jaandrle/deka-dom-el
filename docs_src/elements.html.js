@@ -3,7 +3,7 @@ import { el } from "deka-dom-el";
 
 import { header } from "./layout/head.html.js";
 import { example } from "./components/example.html.js";
-import { prevNext } from "./components/prevNext.html.js";
+import { h3, prevNext } from "./components/pageUtils.html.js";
 
 /** @param {string} url */
 const fileURL= url=> new URL(url, import.meta.url);
@@ -17,7 +17,7 @@ export function page({ pkg, info }){
 			el("h2", "Native JavaScript DOM elements creations"),
 			el("p", "Let’s go through all patterns we would like to use and what needs to be improved for better experience."),
 			
-			el("h3", "Creating element(s) (with custom attributes)"),
+			el(h3, "Creating element(s) (with custom attributes)"),
 			el("p").append(
 				"You can create a native DOM element by using the ",
 				el("a", { href: "https://developer.mozilla.org/en-US/docs/Web/API/Document/createElement", title: "MDN documentation for document.createElement()" }).append(
@@ -83,7 +83,7 @@ export function page({ pkg, info }){
 			),
 			el(example, { src: fileURL("./components/examples/elements/dekaAssign.js"), page_id }),
 			
-			el("h3", "Native JavaScript templating"),
+			el(h3, "Native JavaScript templating"),
 			el("p", "By default, the native JS has no good way to define HTML template using DOM API:"),
 			el(example, { src: fileURL("./components/examples/elements/nativeAppend.js"), page_id }),
 			el("p").append(
@@ -92,7 +92,7 @@ export function page({ pkg, info }){
 			el(example, { src: fileURL("./components/examples/elements/dekaAppend.js"), page_id }),
 			
 			
-			el("h3", "Basic (state-less) components"),
+			el(h3, "Basic (state-less) components"),
 			el("p").append(
 				"You can use functions for encapsulation (repeating) logic. ",
 				"The ", el("code", "el"), " accepts function as first argument. ",
@@ -109,7 +109,7 @@ export function page({ pkg, info }){
 				" and keep track of the native API (things are best remembered through regular use).",
 			),
 
-			el("h3", "Creating non-HTML elements"),
+			el(h3, "Creating non-HTML elements"),
 			el("p").append(
 				"Similarly to the native DOM API (", el("a", { href: "https://developer.mozilla.org/en-US/docs/Web/API/Document/createElementNS", title: "MDN" }).append(el("code", "document.createElementNS")), ") for non-HTML elements",
 				" we need to tell JavaScript which kind of the element to create.",
