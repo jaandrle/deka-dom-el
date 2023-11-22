@@ -166,6 +166,34 @@ export const scope: {
 	pop(): ReturnType<Array<Scope>["pop"]>,
 };
 
+/*
+ * TODO TypeScript HACK (better way?)
+ * this doesnt works
+ * ```ts
+ * interface element<el> extends Node{
+ * 	prototype: el;
+ * 	append(...els: (SupportedElement | DocumentFragment | string | element<SupportedElement | DocumentFragment>)[]): el
+ * }
+ *
+export function el<T>(
+ * 	tag_name?: "<>",
+ * ): element<DocumentFragment>
+* ```
+ * …as its complains here
+ * ```
+ts
+ *
+const d= el("div");
+*
+const f= (a: HTMLDivElement)=> a;
+* f(d);
+//←
+ * document.head.append( //←
+ * 	el("script", { src: "https://flems.io/flems.html", type: "text/javascript", charset: "utf-8" }),
+ * );
+* ```
+ * TODO for SVG
+ * */
 type ddeAppend<el>= (...nodes: (Node | string)[])=> el;
 declare global{
 	interface HTMLAnchorElement{
@@ -493,8 +521,7 @@ interface S {
 	 * */
 	el<S extends any>(signal: Signal<S, any>, el: (v: S)=> Element | Element[]): DocumentFragment;
 
-	/** Mirrors element attributes for current host (both way).  */
-	attribute<T>(name: string, initial?: T): Signal<T, {}>
+    fromAttribute<T>(element: HTMLElement, name: string, value?: T): Signal<T, {}>;
 }
 export const S: S;
 declare global {

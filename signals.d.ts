@@ -54,8 +54,7 @@ interface S {
 	 * */
 	el<S extends any>(signal: Signal<S, any>, el: (v: S)=> Element | Element[]): DocumentFragment;
 
-	/** Mirrors element attributes for current host (both way).  */
-	attribute<T>(name: string, initial?: T): Signal<T, {}>
+    fromAttribute<T>(element: HTMLElement, name: string, value?: T): Signal<T, {}>;
 }
 export const S: S;
 declare global {

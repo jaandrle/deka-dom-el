@@ -1,14 +1,9 @@
 import { el, on, scope } from "../../index.js";
 import { S } from "../../signals.js";
-const { hasOwnProperty }= Object.prototype;
 
 /**
- * @typedef CustomHTMLTestElementInterface
- * @type {object}
- * @property {string} name
- * */
-/**
- * Compatible with `npx-wca test/components/webComponent.js`
+ * Compatible with `npx -y web-component-analyzer examples/components/webComponent.js`
+ * @element custom-test
  * */
 export class CustomHTMLTestElement extends HTMLElement{
 	static tagName= "custom-test";
@@ -16,32 +11,34 @@ export class CustomHTMLTestElement extends HTMLElement{
 		return [ "name", "pre-name" ];
 	}
 	connectedCallback(){
+		if(!this.hasAttribute("pre-name")) this.setAttribute("pre-name", "default");
 		this.attachShadow({ mode: "open" }).append(
-			customElementRender(this, this.render)
+			customElementRender(this, this.render, observedAttributes(S))
 		);
 	}
 
-	render({ test }){
+	render({ name, preName }){
+		const { host }= scope;
+		const { test }= host();
 		console.log(scope.state);
-		scope.host(
+		host(
 			on.connected(()=> console.log(CustomHTMLTestElement)),
 			on.attributeChanged(e=> console.log(e)),
 			on.disconnected(()=> console.log(CustomHTMLTestElement))
 		);
 		
-		const name= S.attribute("name");
-		const preName= S.attribute("pre-name");
 		console.log({ name, test, preName});
 		return el("p").append(
 			el("#text", name),
-			el("#text", test),
 			el("#text", preName),
 			el("button", { type: "button", textContent: "pre-name", onclick: ()=> preName("Ahoj") })
 		);
 	}
+	test= "A";
 	
 	get name(){ return this.getAttribute("name"); }
 	set name(value){ this.setAttribute("name", value); }
+	/** @attr pre-name */
 	get preName(){ return this.getAttribute("pre-name"); }
 	set preName(value){ this.setAttribute("pre-name", value); }
 }
@@ -49,11 +46,24 @@ export class CustomHTMLTestElement extends HTMLElement{
 lifecycleToEvents(CustomHTMLTestElement)
 customElements.define(CustomHTMLTestElement.tagName, CustomHTMLTestElement);
 
-function customElementRender(_this, render){
+function customElementRender(_this, render, props){
+	console.log(_this.shadowRoot, _this.childList);
 	scope.push({ scope: _this, host: (...c)=> c.length ? c.forEach(c=> c(_this)) : _this, custom_element: _this });
-	const out= render(_this);
+	if(typeof props==="function") props= props(_this);
+	const out= render(props);
 	scope.pop();
 	return out;
+}
+function observedAttributes(options, element){
+	const fromAttribute= typeof options==="undefined" ? (_1, _2, v)=> v : ( options.fromAttribute || options );
+	if(!element) return observedAttributes.bind(null, fromAttribute)
+	return Object.fromEntries(
+		element.constructor.observedAttributes
+		.map(name=> [
+			name.replace(/-./g, m=> m.slice(1).toUpperCase()),
+			fromAttribute(element, name, element.getAttribute(name))
+		])
+	);
 }
 function lifecycleToEvents(class_declaration){
 	for (const name of [ "connected", "disconnected" ])
@@ -70,6 +80,7 @@ function lifecycleToEvents(class_declaration){
 		target.apply(thisArg, detail);
 	});
 	class_declaration.prototype.__dde_lifecycleToEvents= true;
+	return class_declaration;
 }
 function wrapMethod(obj, method, apply){
 	obj[method]= new Proxy(obj[method] || (()=> {}), { apply });

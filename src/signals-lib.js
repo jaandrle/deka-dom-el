@@ -62,50 +62,6 @@ S.symbols= {
 	signal: mark,
 	onclear: Symbol.for("Signal.onclear")
 };
-import { on } from "./events.js";
-import { scope } from "./dom.js";
-const key_attributes= "__dde_attributes";
-S.attribute= function(name, initial= undefined){
-	const out= S(initial);
-	let host;
-	scope.host(element=> {
-		host= element;
-		if(element instanceof HTMLElement){
-			if(element.hasAttribute(name)) out(element.getAttribute(name));
-		} else {
-			if(element.hasAttributeNS(null, name)) out(element.getAttributeNS(null, name));
-		}
-		if(element[key_attributes]){
-			element[key_attributes][name]= out;
-			return;
-		}
-		element[key_attributes]= { [name]: out };
-		on.attributeChanged(function attributeChangeToSignal({ detail }){
-			/*! This maps attributes to signals (`S.attribute`).
-			 * Investigate `__dde_attributes` key of the element.*/
-			const [ name, value ]= detail;
-			const curr= element[key_attributes][name];
-			if(curr) return curr(value);
-		})(element);
-		on.disconnected(function(){
-			/*! This removes all signals mapped to attributes (`S.attribute`).
-			 * Investigate `__dde_attributes` key of the element.*/
-			S.clear(...Object.values(element[key_attributes]));
-			host= null;
-		})(element);
-		return element;
-	});
-	return new Proxy(out, {
-		apply(target, _, args){
-			if(!args.length) return target();
-			if(!host) return;
-			const value= args[0];
-			if(host instanceof HTMLElement)
-				return host.setAttribute(name, value);
-			return host.setAttributeNS(null, name, value);
-		}
-	});
-};
 S.clear= function(...signals){
 	for(const signal of signals){
 		Reflect.deleteProperty(signal, "toJSON");
@@ -130,6 +86,7 @@ S.clear= function(...signals){
 };
 const key_reactive= "__dde_reactive";
 import { el } from "./dom.js";
+import { scope } from "./dom.js";
 S.el= function(signal, map){
 	const mark_start= el.mark({ type: "reactive" }, false);
 	const mark_end= mark_start.end;
@@ -153,6 +110,34 @@ S.el= function(signal, map){
 	removeSignalsFromElements(signal, reRenderReactiveElement, mark_start, map);
 	reRenderReactiveElement(signal());
 	return out;
+};
+import { on } from "./events.js";
+const key_attributes= "__dde_attributes";
+S.fromAttribute= function(element, name, value){
+	if(!element[key_attributes]){ // needs registration
+		element[key_attributes]= {};
+		on.attributeChanged(function attributeChangeToSignal({ detail }){
+			/*! This maps attributes to signals (`S.attribute`).
+			 * Investigate `__dde_attributes` key of the element.*/
+			const [ name, value ]= detail;
+			const curr= element[key_attributes][name];
+			if(curr) return curr(value);
+		})(element);
+		on.disconnected(function(){
+			/*! This removes all signals mapped to attributes (`S.attribute`).
+			 * Investigate `__dde_attributes` key of the element.*/
+			S.clear(...Object.values(element[key_attributes]));
+		})(element);
+	}
+	const store= element[key_attributes];
+	const out= Reflect.has(store, name) ? Reflect.get(store, name) : (store[name]= S(value));
+	return new Proxy(out, {
+		apply(target, _, args){
+			if(!args.length) return target();
+			const value= args[0];
+			return element.setAttribute(name, value);
+		}
+	});
 };
 
 import { typeOf } from './helpers.js';
