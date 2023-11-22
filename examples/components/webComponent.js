@@ -13,19 +13,19 @@ export class CustomHTMLTestElement extends HTMLElement{
 	connectedCallback(){
 		if(!this.hasAttribute("pre-name")) this.setAttribute("pre-name", "default");
 		this.attachShadow({ mode: "open" }).append(
-			customElementRender(this, this.render, observedAttributes(S))
+			customElementRender(this, this.render)
 		);
 	}
 
-	render({ name, preName }){
-		const { host }= scope;
-		const { test }= host();
+	render({ test }){
 		console.log(scope.state);
-		host(
+		scope.host(
 			on.connected(()=> console.log(CustomHTMLTestElement)),
 			on.attributeChanged(e=> console.log(e)),
 			on.disconnected(()=> console.log(CustomHTMLTestElement))
 		);
+		const name= S.attribute("name");
+		const preName= S.attribute("pre-name");
 		
 		console.log({ name, test, preName});
 		return el("p").append(
@@ -46,24 +46,13 @@ export class CustomHTMLTestElement extends HTMLElement{
 lifecycleToEvents(CustomHTMLTestElement)
 customElements.define(CustomHTMLTestElement.tagName, CustomHTMLTestElement);
 
-function customElementRender(_this, render, props){
+function customElementRender(_this, render, props= _this){
 	console.log(_this.shadowRoot, _this.childList);
 	scope.push({ scope: _this, host: (...c)=> c.length ? c.forEach(c=> c(_this)) : _this, custom_element: _this });
 	if(typeof props==="function") props= props(_this);
 	const out= render(props);
 	scope.pop();
 	return out;
-}
-function observedAttributes(options, element){
-	const fromAttribute= typeof options==="undefined" ? (_1, _2, v)=> v : ( options.fromAttribute || options );
-	if(!element) return observedAttributes.bind(null, fromAttribute)
-	return Object.fromEntries(
-		element.constructor.observedAttributes
-		.map(name=> [
-			name.replace(/-./g, m=> m.slice(1).toUpperCase()),
-			fromAttribute(element, name, element.getAttribute(name))
-		])
-	);
 }
 function lifecycleToEvents(class_declaration){
 	for (const name of [ "connected", "disconnected" ])

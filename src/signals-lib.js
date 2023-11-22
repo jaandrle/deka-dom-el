@@ -85,7 +85,7 @@ S.clear= function(...signals){
 	}
 };
 const key_reactive= "__dde_reactive";
-import { el } from "./dom.js";
+import { el, elementAttribute } from "./dom.js";
 import { scope } from "./dom.js";
 S.el= function(signal, map){
 	const mark_start= el.mark({ type: "reactive" }, false);
@@ -113,9 +113,20 @@ S.el= function(signal, map){
 };
 import { on } from "./events.js";
 const key_attributes= "__dde_attributes";
-S.fromAttribute= function(element, name, value){
-	if(!element[key_attributes]){ // needs registration
-		element[key_attributes]= {};
+S.attribute= function(name, initial= null){
+	//TODO host=element & reuse existing
+	const out= S(initial);
+	let element;
+	scope.host(el=> {
+		element= el;
+		if(elementAttribute(element, "has", name)) out(elementAttribute(element, "get", name));
+		else if(initial!==null) elementAttribute(element, "set", name, initial);
+		
+		if(el[key_attributes]){
+			el[key_attributes][name]= out;
+			return;
+		}
+		element[key_attributes]= { [name]: out };
 		on.attributeChanged(function attributeChangeToSignal({ detail }){
 			/*! This maps attributes to signals (`S.attribute`).
 			 * Investigate `__dde_attributes` key of the element.*/
@@ -128,14 +139,12 @@ S.fromAttribute= function(element, name, value){
 			 * Investigate `__dde_attributes` key of the element.*/
 			S.clear(...Object.values(element[key_attributes]));
 		})(element);
-	}
-	const store= element[key_attributes];
-	const out= Reflect.has(store, name) ? Reflect.get(store, name) : (store[name]= S(value));
+	});
 	return new Proxy(out, {
 		apply(target, _, args){
 			if(!args.length) return target();
 			const value= args[0];
-			return element.setAttribute(name, value);
+			return elementAttribute(element, "set", name, value);
 		}
 	});
 };

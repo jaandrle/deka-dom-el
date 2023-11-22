@@ -151,6 +151,11 @@ export function empty(el){
 	Array.from(el.children).forEach(el=> el.remove());
 	return el;
 }
+export function elementAttribute(element, op, key, value){
+	if(element instanceof HTMLElement)
+		return element[op+"Attribute"](key, value);
+	return element[op+"AttributeNS"](null, key, value);
+}
 import { isUndef } from "./helpers.js";
 //TODO add cache? `(Map/Set)<el.tagName+key,isUndef>`
 function isPropSetter(el, key){

@@ -58,7 +58,7 @@
 	"size-limit": [
 		{
 			"path": "./index.js",
-			"limit": "8 kB",
+			"limit": "8.5 kB",
 			"gzip": false
 		},
 		{
