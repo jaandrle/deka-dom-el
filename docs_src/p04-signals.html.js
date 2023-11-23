@@ -14,107 +14,67 @@ export function page({ pkg, info }){
 	return el().append(
 		el(header, { info, pkg }),
 		el("main").append(
-			el("h2", "Listenning to the native DOM events and other Addons"),
+			el("h2", "Using signals to manage reactivity"),
 			el("p").append(
-				"We quickly introduce helper to listening to the native DOM events.",
-				" ",
-				"And library syntax/pattern so-called ", el("em", "Addon"), " to",
-				" incorporate not only this in UI templates declaratively."
+				"How a program responds to variable data or user",
+				" interactions is one of the fundamental problems of programming.",
+				" If we desire to solve the issue in a declarative manner,",
+				" signals may be a viable approach.",
 			),
+			el(example, { src: fileURL("./components/examples/signals/intro.js"), page_id }),
 			
-			el(h3, "Events and listenners"),
+			el(h3, "Introducing signals"),
 			el("p").append(
-				"In JavaScript you can listen to the native DOM events of the given element by using ",
-				el("a", { href: "https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener", title: "addEventListener on MDN" }).append(
-					el("code", "element.addEventListener(type, listener, options)")
-				), ".",
-				" ",
-				"The library provides an alternative (", el("code", "on"), ") accepting the differen order",
-				" of the arguments:"
+				"Using signals, we split program logic into the three parts.",
+				" Firstly (α), we create a variable (constant) representing reactive",
+				" value. Somewhere later, we can register (β) a logic reacting",
+				" to the signal value changes. Similarly, in a remaining part (γ), we",
+				" can update the signal value."
 			),
-			el(example, { src: fileURL("./components/examples/events/compare.js"), page_id }),
 			el("p").append(
-				"…this is actually one of the two differences. The another one is that ", el("code", "on"),
-				" accepts only object as the ", el("code", "options"), " (but it is still optional)."
+				"All this is just an example of ",
+				el("a", { textContent: "Event-driven programming", href: "https://en.wikipedia.org/wiki/Event-driven_programming", title: "Wikipedia: Event-driven programming" }),
+				" and ",
+				el("a", { textContent: "Publish–subscribe pattern", href: "https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern", title: "Wikipedia: Publish–subscribe pattern" }),
+				" (compare for example with ", el("a", { textContent: "fpubsub library", href: "https://www.npmjs.com/package/fpubsub", title: "NPM package: fpubsub" }), ").",
+				" All three parts can be in some manner independent and still connected",
+				" to the same reactive entity."
 			),
-			el("p", { className: "notice" }).append(
-				"The other difference is that there is ", el("strong", "no"), " ", el("code", "off"), " function.",
-				" ",
-				"You can remove listener declaratively using ", el("a", { textContent: "AbortSignal", href: "https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#signal", title: "part of addEventListener on MDN" }),
-				":"
+			el("p").append(
+				"Signals are implemented in the library as functions. To see current value",
+				" of signal, just call it without any arguments ", el("code", "console.log(signal())"), ".",
+				" To update the signal value, pass any argument ", el("code", "signal('a new value')"), ".",
+				" For listenning the signal value changes, use ", el("code", "S.on(signal, console.log)"), "."
 			),
-			el(example, { src: fileURL("./components/examples/events/abortSignal.js"), page_id }),
+			el("p").append(
+				"Similarly to the ", el("code", "on"), " function to register DOM events listener.",
+				" You can use ", el("code", "AbortController"), "/", el("code", "AbortSignal"), " to",
+				" ", el("em", "off"), "/stop listenning. For representing “live” piece of code computation pattern:"
+			),
+			el(example, { src: fileURL("./components/examples/signals/computations-abort.js"), page_id }),
 			el("div", { className: "notice" }).append(
-				el("p", "So, there are (typically) three ways to handle events. You can use:"),
+				el("p", "Mnemonic"),
 				el("ul").append(
-					el("li").append( el("code", `el("button", { textContent: "click me", "=onclick": "console.log(event)" })`)),
-					el("li").append( el("code", `el("button", { textContent: "click me", onclick: console.log })`)),
-					el("li").append( el("code", `el("button", { textContent: "click me" }, on("click", console.log))`))
-				),
-				el("p").append(
-					"In the first example we force to use HTML attribute (it corresponds to ", el("code", `<button onclick="console.log(event)">click me</button>`), ").",
-					" ",
-					el("em", "Side note: this can be useful in case of SSR."),
-					" ",
-					"To study difference, you can read a nice summary here: ", el("a", { href: "https://gist.github.com/WebReflection/b404c36f46371e3b1173bf5492acc944", textContent: "GIST @WebReflection/web_events.md" }), "."
+					el("li").append(
+						el("code", "S(<value>)"), " — signal: reactive value",
+					),
+					el("li").append(
+						el("code", "S(()=> <computation>)"), " — signal: reactive value dependent on calculation using other signals",
+					),
+					el("li").append(
+						el("code", "S.on(<signal>, <listener>[, <options>])"), " — listen to the signal value changes",
+					),
+					el("li").append(
+						el("code", "S.clear(...<signals>)"), " — off and clear signals",
+					),
+					el("li").append(
+						el("code", "S(<value>, <actions>)"), " — signal: pattern to create complex reactive objects/arrays",
+					),
+					el("li").append(
+						el("code", "S.action(<signal>, <action-name>, ...<action-arguments>)"), " — invoke an action for given signal"
+					)
 				)
 			),
-
-			el(h3, "Addons"),
-			el("p").append(
-				"From practical point of view, ", el("em", "Addons"), " are just functions that accept any html element",
-				" as their first parameter. You can see that the ", el("code", "on(…)"), " fullfills this requirement."
-			),
-			el("p").append(
-				"You can use Addons as ≥3rd argument of ", el("code", "el"), " function. This way is possible to extends",
-				" you templates by additional (3rd party) functionalities. But for now mainly, you can add events listeners:"
-			),
-			el(example, { src: fileURL("./components/examples/events/templateWithListeners.js"), page_id }),
-			el("p").append(
-				"As the example shows, you can also provide types in JSDoc+TypeScript by using global type ", el("code", "ddeElementAddon"), ".",
-				" ",
-				"Also notice, you can use Addons to get element reference.",
-			),
-			el(h3, "Life-cycle events"),
-			el("p").append(
-				"Addons are called immediately when the element is created, even it is not connected to live DOM yet.",
-				" ",
-				"Therefore, you can understand the Addon to be “oncreate” event."
-			),
-			el("p").append(
-				"The library provide three additional live-cycle events corresponding to how they are named in",
-				" a case of custom elements: ", el("code", "on.connected"), ", ", el("code", "on.disconnected"),
-				" and ", el("code", "on.attributeChanged"), "."
-			),
-			el(example, { src: fileURL("./components/examples/events/live-cycle.js"), page_id }),
-			el("p").append(
-				"For Custom elements, we will later introduce a way to replace ", el("code", "*Callback"),
-				" syntax with ", el("code", "dde:*"), " events. The ", el("code", "on.*"), " functions then",
-				" listen to the appropriate Custom Elements events (see ", el("a", { textContent: "Custom element lifecycle callbacks | MDN", href: "https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#custom_element_lifecycle_callbacks" }), ")."
-			),
-			el("p").append(
-				"But, in case of regular elemnets the ", el("a", { href: "https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver" }).append(el("code", "MutationObserver"), " | MDN"),
-				" is internaly used to track these events. Therefore, there are some drawbacks:",
-			),
-			el("ul").append(
-				el("li").append(
-					"To proper listener registration, you need to use ", el("code", "on.*"), " not `on(\"dde:*\", …)`!"
-				),
-				el("li").append(
-					"Use sparingly! Internally, library must loop of all registered events and fires event properly.",
-					" ",
-					el("strong", "It is good practice to use the fact that if an element is removed, its children are also removed!"),
-					" ",
-					"In this spirit, we will introduce later the ", el("strong", "host"), " syntax to register",
-					" clean up procedures when the component is removed from the app."
-				),
-			),
-
-			el(h3, "Final notes"),
-			el("p", "The library also provides a method to dispatch the events."),
-			el(example, { src: fileURL("./components/examples/events/compareDispatch.js"), page_id }),
-
-			el(prevNext, info)
 		)
 	);
 }

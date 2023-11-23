@@ -116,6 +116,30 @@ export function page({ pkg, info }){
 				" We can use the ", el("code", "elNS"), " function:"
 			),
 			el(example, { src: fileURL("./components/examples/elements/dekaElNS.js"), page_id }),
+			
+			el("div", { className: "notice" }).append(
+				el("p", "Mnemonic"),
+				el("ul").append(
+					el("li").append(
+						el("code", "assign(<element>, ...<idl-objects>): <element>"), " — assign properties to the element",
+					),
+					el("li").append(
+						el("code", "el(<tag-name>, <primitive>)[.append(...)]: <element-from-tag-name>"), " — simple element containing only text",
+					),
+					el("li").append(
+						el("code", "el(<tag-name>, <idl-object>)[.append(...)]: <element-from-tag-name>"), " — element with more properties",
+					),
+					el("li").append(
+						el("code", "el(<function>, <function-argument(s)>)[.append(...)]: <element-returned-by-function>"), " — using component represented by function",
+					),
+					el("li").append(
+						el("code", "el(<...>, <...>, ...<addons>)"), " — see following page"
+					),
+					el("li").append(
+						el("code", "elNS(<namespace>)(<as-el-see-above>)[.append(...)]: <element-based-on-arguments>"), " — typically SVG elements",
+					)
+				)
+			),
 
 			el(prevNext, info)
 		)
