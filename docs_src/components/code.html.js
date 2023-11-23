@@ -1,6 +1,7 @@
 import { registerClientFile, styles } from "../ssr.js";
-styles.scope(code).css`
-:host{
+const host= "."+code.name;
+styles.css`
+${host}{
 	--shiki-color-text: #e9eded;
 	--shiki-color-background: #212121;
 	--shiki-token-constant: #82b1ff;
@@ -14,7 +15,7 @@ styles.scope(code).css`
 	--shiki-token-link: #EE0000;
 	white-space: pre;
 }
-:host[data-js=todo]{
+${host}[data-js=todo]{
 	border: 1px solid var(--border);
 	border-radius: var(--standard-border-radius);
 	margin-bottom: 1rem;

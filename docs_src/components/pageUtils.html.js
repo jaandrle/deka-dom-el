@@ -1,15 +1,16 @@
 import { pages, styles } from "../ssr.js";
-styles.scope(prevNext).css`
-:host{
+const host= "."+prevNext.name;
+styles.css`
+${host}{
 	display: grid;
 	grid-template-columns: 1fr 2fr 1fr;
 	margin-top: 1rem;
 	border-top: 1px solid var(--border);
 }
-:host [rel=prev]{
+${host} [rel=prev]{
 	grid-column: 1;
 }
-:host [rel=next]{
+${host} [rel=next]{
 	grid-column: 3;
 	text-align: right;
 }

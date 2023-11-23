@@ -9,6 +9,16 @@ document.body.append(
 		el("button", "dde with options", on("click", ddeOptions))
 	)
 );
-function native(){ this.dispatchEvent(new CustomEvent("test", { bubbles: true, detail: "hi" })); }
-function dde(){ dispatchEvent("test")(this.parentElement, "hi"); }
-function ddeOptions(){ dispatchEvent("test", { bubbles: true })(this, "hi"); }
+function native(){
+	this.dispatchEvent(
+		new CustomEvent("test",
+			{ bubbles: true, detail: "hi" }
+		)
+	);
+}
+function dde(){
+	dispatchEvent("test")(this.parentElement, "hi");
+}
+function ddeOptions(){
+	dispatchEvent("test", { bubbles: true })(this, "hi");
+}

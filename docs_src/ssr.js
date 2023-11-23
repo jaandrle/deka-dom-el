@@ -4,8 +4,8 @@ export const path_target= {
 };
 export const pages= [
 	{ id: "index", href: "./", title: "Introduction", description: "Introducing a library." },
-	{ id: "elements", href: "elements", title: "Elements", description: "Basic concepts of elements modifications and creations." },
-	{ id: "events", href: "events", title: "Events and Addons", description: "Using not only events in UI declaratively." },
+	{ id: "p02-elements", href: "p02-elements", title: "Elements", description: "Basic concepts of elements modifications and creations." },
+	{ id: "p03-events", href: "p03-events", title: "Events and Addons", description: "Using not only events in UI declaratively." },
 ];
 /**
  * @typedef registerClientFile
@@ -40,37 +40,20 @@ export function dispatchEvent(name, a){
 		ls.clear();
 }
 
-const scopes= new Set();
 export const styles= {
 	element: null,
 	name: "global.css",
 	get location(){ return path_target.css.replace(path_target.root, "")+this.name; },
 	content: "",
 
-	skip: false,
-	/** @param {function|string} s */
-	scope(s){
-		if(scopes.has(s)){ this.skip= true; return this; }
-		
-		scopes.add(s);
-		if(typeof s==="function") this.host= s.name;
-		return this;
-	},
 	/** @param {Parameters<typeof String.raw>} a */
 	css(...a){
-		if(this.skip){ this.skip= false; return this; }
-		
 		let c= css(...a);
-		if(this.host){
-			c= c.replaceAll(":host", "."+this.host);
-			this.host= "";
-		}
 		if(this.content) this.content+= "\n";
 		this.content+= c;
 		return this;
 	}
 };
-addEventListener("onssrend", ()=> scopes.clear());
 addEventListener("oneachrender", ()=> document.head.append(
 	Object.assign(document.createElement("link"), { rel: "stylesheet", href: styles.location })
 ));

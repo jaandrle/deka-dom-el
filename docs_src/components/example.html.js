@@ -1,6 +1,7 @@
 import { styles } from "../ssr.js";
-styles.scope(example).css`
-:host{
+const host= "."+example.name;
+styles.css`
+${host}{
 	grid-column: full-main;
 	width: 100%;
 	max-width: calc(9/5 * var(--body-max-width));
@@ -14,6 +15,7 @@ styles.scope(example).css`
 `
 import { el } from "deka-dom-el";
 import { code } from "./code.html.js";
+import { relative } from "node:path";
 /**
  * Prints code to the page and registers flems to make it interactive.
  * @param {object} attrs
@@ -25,7 +27,7 @@ export function example({ src, language= "js", page_id }){
 	registerClientPart(page_id);
 	const content= s.cat(src).toString()
 		.replaceAll(/ from "deka-dom-el(\/signals)?";/g, ' from "https://cdn.jsdelivr.net/gh/jaandrle/deka-dom-el/dist/esm-with-signals.js";');
-	const id= "code-"+Math.random().toString(36).slice(2, 7);
+	const id= "code-example-"+generateCodeId(src);
 	return el().append(
 		el(code, { id, content, language, className: example.name }),
 		elCode({ id, content, extension: "."+language })
@@ -47,4 +49,17 @@ function registerClientPart(page_id){
 		el("script", { src: "https://flems.io/flems.html", type: "text/javascript", charset: "utf-8" }),
 	);
 	is_registered[page_id]= true;
+}
+const store_prev= new Map();
+/** @param {URL} src */
+function generateCodeId(src){
+	const candidate= parseInt(relative((new URL("..", import.meta.url)).pathname, src.pathname)
+		.split("")
+		.map(ch=> ch.charCodeAt(0))
+		.join(""), 10)
+		.toString(36)
+		.replace(/000+/g, "");
+	const count= 1 + ( store_prev.get(candidate) || 0 );
+	store_prev.set(candidate, count);
+	return count.toString()+"-"+candidate; 
 }

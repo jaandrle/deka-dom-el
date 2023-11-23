@@ -1,5 +1,5 @@
 import { styles } from "./ssr.js";
-styles.scope(import.meta.url).css`
+styles.css`
 @import url(https://cdn.simplecss.org/simple.min.css);
 :root{
 	--body-max-width: 45rem;
