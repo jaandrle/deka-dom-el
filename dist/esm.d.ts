@@ -46,7 +46,7 @@ export function classListDeclarative<El extends SupportedElement>(element: El, c
 export function assign<El extends SupportedElement>(element: El, ...attrs_array: Partial<ElementAttributes<El>>[]): El
 export function assignAttribute<El extends SupportedElement, ATT extends keyof ElementAttributes<El>>(element: El, attr: ATT, value: ElementAttributes<El>[ATT]): ElementAttributes<El>[ATT]
 
-type ExtendedHTMLElementTagNameMap= HTMLElementTagNameMap & CustomElementTagNameMap & ddePublicElementTagNameMap
+type ExtendedHTMLElementTagNameMap= ddeHTMLElementTagNameMap & CustomElementTagNameMap & ddePublicElementTagNameMap
 export function el<TAG extends keyof ExtendedHTMLElementTagNameMap>(
 	tag_name: TAG,
 	attrs?: string | Partial<ElementAttributes<ExtendedHTMLElementTagNameMap[TAG]>>,
@@ -54,7 +54,7 @@ export function el<TAG extends keyof ExtendedHTMLElementTagNameMap>(
 ): ExtendedHTMLElementTagNameMap[TAG]
 export function el<T>(
 	tag_name?: "<>",
-): DocumentFragment
+): ddeDocumentFragment
 
 export function el<
 	A extends ddeComponentAttributes,
@@ -68,22 +68,22 @@ export function el(
 	tag_name: string,
 	attrs?: string | Record<string, any>,
 	...addons: ddeElementAddon<HTMLElement>[]
-): HTMLElement
+): ddeHTMLElement
 
 export function elNS(
 	namespace: "http://www.w3.org/2000/svg"
-): <TAG extends keyof SVGElementTagNameMap, KEYS extends keyof SVGElementTagNameMap[TAG] & { d: string }>(
+): <TAG, EL extends ( TAG extends keyof ddeSVGElementTagNameMap ? ddeSVGElementTagNameMap[TAG] : ddeSVGElement ), KEYS extends keyof EL & { d: string }>(
 	tag_name: TAG,
-	attrs?: string | Partial<{ [key in KEYS]: SVGElementTagNameMap[TAG][key] | string | number | boolean }>,
-	...addons: ddeElementAddon<SVGElementTagNameMap[TAG]>[]
-)=> SVGElementTagNameMap[TAG]
+	attrs?: string | Partial<{ [key in KEYS]: EL[key] | string | number | boolean }>,
+	...addons: ddeElementAddon<EL>[]
+)=> EL
 export function elNS(
 	namespace: "http://www.w3.org/1998/Math/MathML"
 ): <TAG extends keyof MathMLElementTagNameMap, KEYS extends keyof MathMLElementTagNameMap[TAG] & { d: string }>(
 	tag_name: TAG,
 	attrs?: string | Partial<{ [key in KEYS]: MathMLElementTagNameMap[TAG][key] | string | number | boolean }>,
 	...addons: ddeElementAddon<MathMLElementTagNameMap[TAG]>[]
-)=> MathMLElementTagNameMap[TAG]
+)=> ddeMathMLElement
 export function elNS(
 	namespace: string
 ): (
@@ -93,6 +93,7 @@ export function elNS(
 )=> SupportedElement
 
 export function chainableAppend<EL extends SupportedElement>(el: EL): EL;
+export function simulateSlots<EL extends SupportedElement | DocumentFragment>(el: EL): EL
 
 export function dispatchEvent(name: keyof DocumentEventMap | string, options?: EventInit):
 	(element: SupportedElement, data?: any)=> void;
@@ -166,302 +167,280 @@ export const scope: {
 	pop(): ReturnType<Array<Scope>["pop"]>,
 };
 
-/*
- * TODO TypeScript HACK (better way?)
- * this doesnt works
- * ```ts
- * interface element<el> extends Node{
- * 	prototype: el;
- * 	append(...els: (SupportedElement | DocumentFragment | string | element<SupportedElement | DocumentFragment>)[]): el
- * }
- *
-export function el<T>(
- * 	tag_name?: "<>",
- * ): element<DocumentFragment>
-* ```
- * …as its complains here
- * ```
-ts
- *
-const d= el("div");
-*
-const f= (a: HTMLDivElement)=> a;
-* f(d);
-//←
- * document.head.append( //←
- * 	el("script", { src: "https://flems.io/flems.html", type: "text/javascript", charset: "utf-8" }),
- * );
-* ```
- * TODO for SVG
- * */
+/* TypeScript MEH // TODO for SVG */
 type ddeAppend<el>= (...nodes: (Node | string)[])=> el;
 declare global{
-	interface HTMLAnchorElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLAnchorElement>;
-	}
-	interface HTMLElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLElement>;
-	}
-	interface HTMLAreaElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLAreaElement>;
-	}
-	interface HTMLAudioElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLAudioElement>;
-	}
-	interface HTMLBaseElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLBaseElement>;
-	}
-	interface HTMLQuoteElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLQuoteElement>;
-	}
-	interface HTMLBodyElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLBodyElement>;
-	}
-	interface HTMLBRElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLBRElement>;
-	}
-	interface HTMLButtonElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLButtonElement>;
-	}
-	interface HTMLCanvasElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLCanvasElement>;
-	}
-	interface HTMLTableCaptionElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLTableCaptionElement>;
-	}
-	interface HTMLTableColElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLTableColElement>;
-	}
-	interface HTMLTableColElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLTableColElement>;
-	}
-	interface HTMLDataElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLDataElement>;
-	}
-	interface HTMLDataListElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLDataListElement>;
-	}
-	interface HTMLModElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLModElement>;
-	}
-	interface HTMLDetailsElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLDetailsElement>;
-	}
-	interface HTMLDialogElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLDialogElement>;
-	}
-	interface HTMLDivElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLDivElement>;
-	}
-	interface HTMLDListElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLDListElement>;
-	}
-	interface HTMLEmbedElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLEmbedElement>;
-	}
-	interface HTMLFieldSetElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLFieldSetElement>;
-	}
-	interface HTMLFormElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLFormElement>;
-	}
-	interface HTMLHeadingElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLHeadingElement>;
-	}
-	interface HTMLHeadElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLHeadElement>;
-	}
-	interface HTMLHRElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLHRElement>;
-	}
-	interface HTMLHtmlElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLHtmlElement>;
-	}
-	interface HTMLIFrameElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLIFrameElement>;
-	}
-	interface HTMLImageElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLImageElement>;
-	}
-	interface HTMLInputElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLInputElement>;
-	}
-	interface HTMLLabelElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLLabelElement>;
-	}
-	interface HTMLLegendElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLLegendElement>;
-	}
-	interface HTMLLIElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLLIElement>;
-	}
-	interface HTMLLinkElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLLinkElement>;
-	}
-	interface HTMLMapElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLMapElement>;
-	}
-	interface HTMLMenuElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLMenuElement>;
-	}
-	interface HTMLMetaElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLMetaElement>;
-	}
-	interface HTMLMeterElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLMeterElement>;
-	}
-	interface HTMLObjectElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLObjectElement>;
-	}
-	interface HTMLOListElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLOListElement>;
-	}
-	interface HTMLOptGroupElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLOptGroupElement>;
-	}
-	interface HTMLOptionElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLOptionElement>;
-	}
-	interface HTMLOutputElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLOutputElement>;
-	}
-	interface HTMLParagraphElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLParagraphElement>;
-	}
-	interface HTMLPictureElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLPictureElement>;
-	}
-	interface HTMLPreElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLPreElement>;
-	}
-	interface HTMLProgressElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLProgressElement>;
-	}
-	interface HTMLScriptElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLScriptElement>;
-	}
-	interface HTMLSelectElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLSelectElement>;
-	}
-	interface HTMLSlotElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLSlotElement>;
-	}
-	interface HTMLSourceElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLSourceElement>;
-	}
-	interface HTMLSpanElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLSpanElement>;
-	}
-	interface HTMLStyleElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLStyleElement>;
-	}
-	interface HTMLTableElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLTableElement>;
-	}
-	interface HTMLTableSectionElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLTableSectionElement>;
-	}
-	interface HTMLTableCellElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLTableCellElement>;
-	}
-	interface HTMLTemplateElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLTemplateElement>;
-	}
-	interface HTMLTextAreaElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLTextAreaElement>;
-	}
-	interface HTMLTableCellElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLTableCellElement>;
-	}
-	interface HTMLTimeElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLTimeElement>;
-	}
-	interface HTMLTitleElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLTitleElement>;
-	}
-	interface HTMLTableRowElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLTableRowElement>;
-	}
-	interface HTMLTrackElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLTrackElement>;
-	}
-	interface HTMLUListElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLUListElement>;
-	}
-	interface HTMLVideoElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<HTMLVideoElement>;
-	}
-	interface DocumentFragment{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<DocumentFragment>;
-	}
-	interface SVGElement{
-		/** Elements returned by {@link el} return parent element for `.append` method. **Regullarly created elements are untouched.** */
-		append: ddeAppend<SVGElement>;
-	}
+	interface ddeDocumentFragment extends DocumentFragment{ append: ddeAppend<ddeDocumentFragment>; }
+	interface ddeHTMLElement extends HTMLElement{ append: ddeAppend<ddeHTMLElement>; }
+	interface ddeSVGElement extends SVGElement{ append: ddeAppend<ddeSVGElement>; }
+	interface ddeMathMLElement extends MathMLElement{ append: ddeAppend<ddeMathMLElement>; }
+	
+	interface ddeHTMLElementTagNameMap {
+		"a": ddeHTMLAnchorElement;
+		"area": ddeHTMLAreaElement;
+		"audio": ddeHTMLAudioElement;
+		"base": ddeHTMLBaseElement;
+		"blockquote": ddeHTMLQuoteElement;
+		"body": ddeHTMLBodyElement;
+		"br": ddeHTMLBRElement;
+		"button": ddeHTMLButtonElement;
+		"canvas": ddeHTMLCanvasElement;
+		"caption": ddeHTMLTableCaptionElement;
+		"col": ddeHTMLTableColElement;
+		"colgroup": ddeHTMLTableColElement;
+		"data": ddeHTMLDataElement;
+		"datalist": ddeHTMLDataListElement;
+		"del": ddeHTMLModElement;
+		"details": ddeHTMLDetailsElement;
+		"dialog": ddeHTMLDialogElement;
+		"div": ddeHTMLDivElement;
+		"dl": ddeHTMLDListElement;
+		"embed": ddeHTMLEmbedElement;
+		"fieldset": ddeHTMLFieldSetElement;
+		"form": ddeHTMLFormElement;
+		"h1": ddeHTMLHeadingElement;
+		"h2": ddeHTMLHeadingElement;
+		"h3": ddeHTMLHeadingElement;
+		"h4": ddeHTMLHeadingElement;
+		"h5": ddeHTMLHeadingElement;
+		"h6": ddeHTMLHeadingElement;
+		"head": ddeHTMLHeadElement;
+		"hr": ddeHTMLHRElement;
+		"html": ddeHTMLHtmlElement;
+		"iframe": ddeHTMLIFrameElement;
+		"img": ddeHTMLImageElement;
+		"input": ddeHTMLInputElement;
+		"ins": ddeHTMLModElement;
+		"label": ddeHTMLLabelElement;
+		"legend": ddeHTMLLegendElement;
+		"li": ddeHTMLLIElement;
+		"link": ddeHTMLLinkElement;
+		"map": ddeHTMLMapElement;
+		"menu": ddeHTMLMenuElement;
+		"meta": ddeHTMLMetaElement;
+		"meter": ddeHTMLMeterElement;
+		"object": ddeHTMLObjectElement;
+		"ol": ddeHTMLOListElement;
+		"optgroup": ddeHTMLOptGroupElement;
+		"option": ddeHTMLOptionElement;
+		"output": ddeHTMLOutputElement;
+		"p": ddeHTMLParagraphElement;
+		"picture": ddeHTMLPictureElement;
+		"pre": ddeHTMLPreElement;
+		"progress": ddeHTMLProgressElement;
+		"q": ddeHTMLQuoteElement;
+		"script": ddeHTMLScriptElement;
+		"select": ddeHTMLSelectElement;
+		"slot": ddeHTMLSlotElement;
+		"source": ddeHTMLSourceElement;
+		"span": ddeHTMLSpanElement;
+		"style": ddeHTMLStyleElement;
+		"table": ddeHTMLTableElement;
+		"tbody": ddeHTMLTableSectionElement;
+		"td": ddeHTMLTableCellElement;
+		"template": ddeHTMLTemplateElement;
+		"textarea": ddeHTMLTextAreaElement;
+		"tfoot": ddeHTMLTableSectionElement;
+		"th": ddeHTMLTableCellElement;
+		"thead": ddeHTMLTableSectionElement;
+		"time": ddeHTMLTimeElement;
+		"title": ddeHTMLTitleElement;
+		"tr": ddeHTMLTableRowElement;
+		"track": ddeHTMLTrackElement;
+		"ul": ddeHTMLUListElement;
+		"video": ddeHTMLVideoElement;
+	}
+	interface ddeHTMLAnchorElement extends HTMLAnchorElement{ append: ddeAppend<ddeHTMLAnchorElement>; }
+	interface ddeHTMLAreaElement extends HTMLAreaElement{ append: ddeAppend<ddeHTMLAreaElement>; }
+	interface ddeHTMLAudioElement extends HTMLAudioElement{ append: ddeAppend<ddeHTMLAudioElement>; }
+	interface ddeHTMLBaseElement extends HTMLBaseElement{ append: ddeAppend<ddeHTMLBaseElement>; }
+	interface ddeHTMLQuoteElement extends HTMLQuoteElement{ append: ddeAppend<ddeHTMLQuoteElement>; }
+	interface ddeHTMLBodyElement extends HTMLBodyElement{ append: ddeAppend<ddeHTMLBodyElement>; }
+	interface ddeHTMLBRElement extends HTMLBRElement{ append: ddeAppend<ddeHTMLBRElement>; }
+	interface ddeHTMLButtonElement extends HTMLButtonElement{ append: ddeAppend<ddeHTMLButtonElement>; }
+	interface ddeHTMLCanvasElement extends HTMLCanvasElement{ append: ddeAppend<ddeHTMLCanvasElement>; }
+	interface ddeHTMLTableCaptionElement extends HTMLTableCaptionElement{ append: ddeAppend<ddeHTMLTableCaptionElement>; }
+	interface ddeHTMLTableColElement extends HTMLTableColElement{ append: ddeAppend<ddeHTMLTableColElement>; }
+	interface ddeHTMLTableColElement extends HTMLTableColElement{ append: ddeAppend<ddeHTMLTableColElement>; }
+	interface ddeHTMLDataElement extends HTMLDataElement{ append: ddeAppend<ddeHTMLDataElement>; }
+	interface ddeHTMLDataListElement extends HTMLDataListElement{ append: ddeAppend<ddeHTMLDataListElement>; }
+	interface ddeHTMLModElement extends HTMLModElement{ append: ddeAppend<ddeHTMLModElement>; }
+	interface ddeHTMLDetailsElement extends HTMLDetailsElement{ append: ddeAppend<ddeHTMLDetailsElement>; }
+	interface ddeHTMLDialogElement extends HTMLDialogElement{ append: ddeAppend<ddeHTMLDialogElement>; }
+	interface ddeHTMLDivElement extends HTMLDivElement{ append: ddeAppend<ddeHTMLDivElement>; }
+	interface ddeHTMLDListElement extends HTMLDListElement{ append: ddeAppend<ddeHTMLDListElement>; }
+	interface ddeHTMLEmbedElement extends HTMLEmbedElement{ append: ddeAppend<ddeHTMLEmbedElement>; }
+	interface ddeHTMLFieldSetElement extends HTMLFieldSetElement{ append: ddeAppend<ddeHTMLFieldSetElement>; }
+	interface ddeHTMLFormElement extends HTMLFormElement{ append: ddeAppend<ddeHTMLFormElement>; }
+	interface ddeHTMLHeadingElement extends HTMLHeadingElement{ append: ddeAppend<ddeHTMLHeadingElement>; }
+	interface ddeHTMLHeadElement extends HTMLHeadElement{ append: ddeAppend<ddeHTMLHeadElement>; }
+	interface ddeHTMLHRElement extends HTMLHRElement{ append: ddeAppend<ddeHTMLHRElement>; }
+	interface ddeHTMLHtmlElement extends HTMLHtmlElement{ append: ddeAppend<ddeHTMLHtmlElement>; }
+	interface ddeHTMLIFrameElement extends HTMLIFrameElement{ append: ddeAppend<ddeHTMLIFrameElement>; }
+	interface ddeHTMLImageElement extends HTMLImageElement{ append: ddeAppend<ddeHTMLImageElement>; }
+	interface ddeHTMLInputElement extends HTMLInputElement{ append: ddeAppend<ddeHTMLInputElement>; }
+	interface ddeHTMLLabelElement extends HTMLLabelElement{ append: ddeAppend<ddeHTMLLabelElement>; }
+	interface ddeHTMLLegendElement extends HTMLLegendElement{ append: ddeAppend<ddeHTMLLegendElement>; }
+	interface ddeHTMLLIElement extends HTMLLIElement{ append: ddeAppend<ddeHTMLLIElement>; }
+	interface ddeHTMLLinkElement extends HTMLLinkElement{ append: ddeAppend<ddeHTMLLinkElement>; }
+	interface ddeHTMLMapElement extends HTMLMapElement{ append: ddeAppend<ddeHTMLMapElement>; }
+	interface ddeHTMLMenuElement extends HTMLMenuElement{ append: ddeAppend<ddeHTMLMenuElement>; }
+	interface ddeHTMLMetaElement extends HTMLMetaElement{ append: ddeAppend<ddeHTMLMetaElement>; }
+	interface ddeHTMLMeterElement extends HTMLMeterElement{ append: ddeAppend<ddeHTMLMeterElement>; }
+	interface ddeHTMLObjectElement extends HTMLObjectElement{ append: ddeAppend<ddeHTMLObjectElement>; }
+	interface ddeHTMLOListElement extends HTMLOListElement{ append: ddeAppend<ddeHTMLOListElement>; }
+	interface ddeHTMLOptGroupElement extends HTMLOptGroupElement{ append: ddeAppend<ddeHTMLOptGroupElement>; }
+	interface ddeHTMLOptionElement extends HTMLOptionElement{ append: ddeAppend<ddeHTMLOptionElement>; }
+	interface ddeHTMLOutputElement extends HTMLOutputElement{ append: ddeAppend<ddeHTMLOutputElement>; }
+	interface ddeHTMLParagraphElement extends HTMLParagraphElement{ append: ddeAppend<ddeHTMLParagraphElement>; }
+	interface ddeHTMLPictureElement extends HTMLPictureElement{ append: ddeAppend<ddeHTMLPictureElement>; }
+	interface ddeHTMLPreElement extends HTMLPreElement{ append: ddeAppend<ddeHTMLPreElement>; }
+	interface ddeHTMLProgressElement extends HTMLProgressElement{ append: ddeAppend<ddeHTMLProgressElement>; }
+	interface ddeHTMLScriptElement extends HTMLScriptElement{ append: ddeAppend<ddeHTMLScriptElement>; }
+	interface ddeHTMLSelectElement extends HTMLSelectElement{ append: ddeAppend<ddeHTMLSelectElement>; }
+	interface ddeHTMLSlotElement extends HTMLSlotElement{ append: ddeAppend<ddeHTMLSlotElement>; }
+	interface ddeHTMLSourceElement extends HTMLSourceElement{ append: ddeAppend<ddeHTMLSourceElement>; }
+	interface ddeHTMLSpanElement extends HTMLSpanElement{ append: ddeAppend<ddeHTMLSpanElement>; }
+	interface ddeHTMLStyleElement extends HTMLStyleElement{ append: ddeAppend<ddeHTMLStyleElement>; }
+	interface ddeHTMLTableElement extends HTMLTableElement{ append: ddeAppend<ddeHTMLTableElement>; }
+	interface ddeHTMLTableSectionElement extends HTMLTableSectionElement{ append: ddeAppend<ddeHTMLTableSectionElement>; }
+	interface ddeHTMLTableCellElement extends HTMLTableCellElement{ append: ddeAppend<ddeHTMLTableCellElement>; }
+	interface ddeHTMLTemplateElement extends HTMLTemplateElement{ append: ddeAppend<ddeHTMLTemplateElement>; }
+	interface ddeHTMLTextAreaElement extends HTMLTextAreaElement{ append: ddeAppend<ddeHTMLTextAreaElement>; }
+	interface ddeHTMLTableCellElement extends HTMLTableCellElement{ append: ddeAppend<ddeHTMLTableCellElement>; }
+	interface ddeHTMLTimeElement extends HTMLTimeElement{ append: ddeAppend<ddeHTMLTimeElement>; }
+	interface ddeHTMLTitleElement extends HTMLTitleElement{ append: ddeAppend<ddeHTMLTitleElement>; }
+	interface ddeHTMLTableRowElement extends HTMLTableRowElement{ append: ddeAppend<ddeHTMLTableRowElement>; }
+	interface ddeHTMLTrackElement extends HTMLTrackElement{ append: ddeAppend<ddeHTMLTrackElement>; }
+	interface ddeHTMLUListElement extends HTMLUListElement{ append: ddeAppend<ddeHTMLUListElement>; }
+	interface ddeHTMLVideoElement extends HTMLVideoElement{ append: ddeAppend<ddeHTMLVideoElement>; }
+	
+	interface ddeSVGElementTagNameMap {
+		"a": ddeSVGAElement;
+		"animate": ddeSVGAnimateElement;
+		"animateMotion": ddeSVGAnimateMotionElement;
+		"animateTransform": ddeSVGAnimateTransformElement;
+		"circle": ddeSVGCircleElement;
+		"clipPath": ddeSVGClipPathElement;
+		"defs": ddeSVGDefsElement;
+		"desc": ddeSVGDescElement;
+		"ellipse": ddeSVGEllipseElement;
+		"feBlend": ddeSVGFEBlendElement;
+		"feColorMatrix": ddeSVGFEColorMatrixElement;
+		"feComponentTransfer": ddeSVGFEComponentTransferElement;
+		"feComposite": ddeSVGFECompositeElement;
+		"feConvolveMatrix": ddeSVGFEConvolveMatrixElement;
+		"feDiffuseLighting": ddeSVGFEDiffuseLightingElement;
+		"feDisplacementMap": ddeSVGFEDisplacementMapElement;
+		"feDistantLight": ddeSVGFEDistantLightElement;
+		"feDropShadow": ddeSVGFEDropShadowElement;
+		"feFlood": ddeSVGFEFloodElement;
+		"feFuncA": ddeSVGFEFuncAElement;
+		"feFuncB": ddeSVGFEFuncBElement;
+		"feFuncG": ddeSVGFEFuncGElement;
+		"feFuncR": ddeSVGFEFuncRElement;
+		"feGaussianBlur": ddeSVGFEGaussianBlurElement;
+		"feImage": ddeSVGFEImageElement;
+		"feMerge": ddeSVGFEMergeElement;
+		"feMergeNode": ddeSVGFEMergeNodeElement;
+		"feMorphology": ddeSVGFEMorphologyElement;
+		"feOffset": ddeSVGFEOffsetElement;
+		"fePointLight": ddeSVGFEPointLightElement;
+		"feSpecularLighting": ddeSVGFESpecularLightingElement;
+		"feSpotLight": ddeSVGFESpotLightElement;
+		"feTile": ddeSVGFETileElement;
+		"feTurbulence": ddeSVGFETurbulenceElement;
+		"filter": ddeSVGFilterElement;
+		"foreignObject": ddeSVGForeignObjectElement;
+		"g": ddeSVGGElement;
+		"image": ddeSVGImageElement;
+		"line": ddeSVGLineElement;
+		"linearGradient": ddeSVGLinearGradientElement;
+		"marker": ddeSVGMarkerElement;
+		"mask": ddeSVGMaskElement;
+		"metadata": ddeSVGMetadataElement;
+		"mpath": ddeSVGMPathElement;
+		"path": ddeSVGPathElement;
+		"pattern": ddeSVGPatternElement;
+		"polygon": ddeSVGPolygonElement;
+		"polyline": ddeSVGPolylineElement;
+		"radialGradient": ddeSVGRadialGradientElement;
+		"rect": ddeSVGRectElement;
+		"script": ddeSVGScriptElement;
+		"set": ddeSVGSetElement;
+		"stop": ddeSVGStopElement;
+		"style": ddeSVGStyleElement;
+		"svg": ddeSVGSVGElement;
+		"switch": ddeSVGSwitchElement;
+		"symbol": ddeSVGSymbolElement;
+		"text": ddeSVGTextElement;
+		"textPath": ddeSVGTextPathElement;
+		"title": ddeSVGTitleElement;
+		"tspan": ddeSVGTSpanElement;
+		"use": ddeSVGUseElement;
+		"view": ddeSVGViewElement;
+	}
+	interface ddeSVGAElement extends SVGAElement{ append: ddeAppend<ddeSVGAElement>; }
+	interface ddeSVGAnimateElement extends SVGAnimateElement{ append: ddeAppend<ddeSVGAnimateElement>; }
+	interface ddeSVGAnimateMotionElement extends SVGAnimateMotionElement{ append: ddeAppend<ddeSVGAnimateMotionElement>; }
+	interface ddeSVGAnimateTransformElement extends SVGAnimateTransformElement{ append: ddeAppend<ddeSVGAnimateTransformElement>; }
+	interface ddeSVGCircleElement extends SVGCircleElement{ append: ddeAppend<ddeSVGCircleElement>; }
+	interface ddeSVGClipPathElement extends SVGClipPathElement{ append: ddeAppend<ddeSVGClipPathElement>; }
+	interface ddeSVGDefsElement extends SVGDefsElement{ append: ddeAppend<ddeSVGDefsElement>; }
+	interface ddeSVGDescElement extends SVGDescElement{ append: ddeAppend<ddeSVGDescElement>; }
+	interface ddeSVGEllipseElement extends SVGEllipseElement{ append: ddeAppend<ddeSVGEllipseElement>; }
+	interface ddeSVGFEBlendElement extends SVGFEBlendElement{ append: ddeAppend<ddeSVGFEBlendElement>; }
+	interface ddeSVGFEColorMatrixElement extends SVGFEColorMatrixElement{ append: ddeAppend<ddeSVGFEColorMatrixElement>; }
+	interface ddeSVGFEComponentTransferElement extends SVGFEComponentTransferElement{ append: ddeAppend<ddeSVGFEComponentTransferElement>; }
+	interface ddeSVGFECompositeElement extends SVGFECompositeElement{ append: ddeAppend<ddeSVGFECompositeElement>; }
+	interface ddeSVGFEConvolveMatrixElement extends SVGFEConvolveMatrixElement{ append: ddeAppend<ddeSVGFEConvolveMatrixElement>; }
+	interface ddeSVGFEDiffuseLightingElement extends SVGFEDiffuseLightingElement{ append: ddeAppend<ddeSVGFEDiffuseLightingElement>; }
+	interface ddeSVGFEDisplacementMapElement extends SVGFEDisplacementMapElement{ append: ddeAppend<ddeSVGFEDisplacementMapElement>; }
+	interface ddeSVGFEDistantLightElement extends SVGFEDistantLightElement{ append: ddeAppend<ddeSVGFEDistantLightElement>; }
+	interface ddeSVGFEDropShadowElement extends SVGFEDropShadowElement{ append: ddeAppend<ddeSVGFEDropShadowElement>; }
+	interface ddeSVGFEFloodElement extends SVGFEFloodElement{ append: ddeAppend<ddeSVGFEFloodElement>; }
+	interface ddeSVGFEFuncAElement extends SVGFEFuncAElement{ append: ddeAppend<ddeSVGFEFuncAElement>; }
+	interface ddeSVGFEFuncBElement extends SVGFEFuncBElement{ append: ddeAppend<ddeSVGFEFuncBElement>; }
+	interface ddeSVGFEFuncGElement extends SVGFEFuncGElement{ append: ddeAppend<ddeSVGFEFuncGElement>; }
+	interface ddeSVGFEFuncRElement extends SVGFEFuncRElement{ append: ddeAppend<ddeSVGFEFuncRElement>; }
+	interface ddeSVGFEGaussianBlurElement extends SVGFEGaussianBlurElement{ append: ddeAppend<ddeSVGFEGaussianBlurElement>; }
+	interface ddeSVGFEImageElement extends SVGFEImageElement{ append: ddeAppend<ddeSVGFEImageElement>; }
+	interface ddeSVGFEMergeElement extends SVGFEMergeElement{ append: ddeAppend<ddeSVGFEMergeElement>; }
+	interface ddeSVGFEMergeNodeElement extends SVGFEMergeNodeElement{ append: ddeAppend<ddeSVGFEMergeNodeElement>; }
+	interface ddeSVGFEMorphologyElement extends SVGFEMorphologyElement{ append: ddeAppend<ddeSVGFEMorphologyElement>; }
+	interface ddeSVGFEOffsetElement extends SVGFEOffsetElement{ append: ddeAppend<ddeSVGFEOffsetElement>; }
+	interface ddeSVGFEPointLightElement extends SVGFEPointLightElement{ append: ddeAppend<ddeSVGFEPointLightElement>; }
+	interface ddeSVGFESpecularLightingElement extends SVGFESpecularLightingElement{ append: ddeAppend<ddeSVGFESpecularLightingElement>; }
+	interface ddeSVGFESpotLightElement extends SVGFESpotLightElement{ append: ddeAppend<ddeSVGFESpotLightElement>; }
+	interface ddeSVGFETileElement extends SVGFETileElement{ append: ddeAppend<ddeSVGFETileElement>; }
+	interface ddeSVGFETurbulenceElement extends SVGFETurbulenceElement{ append: ddeAppend<ddeSVGFETurbulenceElement>; }
+	interface ddeSVGFilterElement extends SVGFilterElement{ append: ddeAppend<ddeSVGFilterElement>; }
+	interface ddeSVGForeignObjectElement extends SVGForeignObjectElement{ append: ddeAppend<ddeSVGForeignObjectElement>; }
+	interface ddeSVGGElement extends SVGGElement{ append: ddeAppend<ddeSVGGElement>; }
+	interface ddeSVGImageElement extends SVGImageElement{ append: ddeAppend<ddeSVGImageElement>; }
+	interface ddeSVGLineElement extends SVGLineElement{ append: ddeAppend<ddeSVGLineElement>; }
+	interface ddeSVGLinearGradientElement extends SVGLinearGradientElement{ append: ddeAppend<ddeSVGLinearGradientElement>; }
+	interface ddeSVGMarkerElement extends SVGMarkerElement{ append: ddeAppend<ddeSVGMarkerElement>; }
+	interface ddeSVGMaskElement extends SVGMaskElement{ append: ddeAppend<ddeSVGMaskElement>; }
+	interface ddeSVGMetadataElement extends SVGMetadataElement{ append: ddeAppend<ddeSVGMetadataElement>; }
+	interface ddeSVGMPathElement extends SVGMPathElement{ append: ddeAppend<ddeSVGMPathElement>; }
+	interface ddeSVGPathElement extends SVGPathElement{ append: ddeAppend<ddeSVGPathElement>; }
+	interface ddeSVGPatternElement extends SVGPatternElement{ append: ddeAppend<ddeSVGPatternElement>; }
+	interface ddeSVGPolygonElement extends SVGPolygonElement{ append: ddeAppend<ddeSVGPolygonElement>; }
+	interface ddeSVGPolylineElement extends SVGPolylineElement{ append: ddeAppend<ddeSVGPolylineElement>; }
+	interface ddeSVGRadialGradientElement extends SVGRadialGradientElement{ append: ddeAppend<ddeSVGRadialGradientElement>; }
+	interface ddeSVGRectElement extends SVGRectElement{ append: ddeAppend<ddeSVGRectElement>; }
+	interface ddeSVGScriptElement extends SVGScriptElement{ append: ddeAppend<ddeSVGScriptElement>; }
+	interface ddeSVGSetElement extends SVGSetElement{ append: ddeAppend<ddeSVGSetElement>; }
+	interface ddeSVGStopElement extends SVGStopElement{ append: ddeAppend<ddeSVGStopElement>; }
+	interface ddeSVGStyleElement extends SVGStyleElement{ append: ddeAppend<ddeSVGStyleElement>; }
+	interface ddeSVGSVGElement extends SVGSVGElement{ append: ddeAppend<ddeSVGSVGElement>; }
+	interface ddeSVGSwitchElement extends SVGSwitchElement{ append: ddeAppend<ddeSVGSwitchElement>; }
+	interface ddeSVGSymbolElement extends SVGSymbolElement{ append: ddeAppend<ddeSVGSymbolElement>; }
+	interface ddeSVGTextElement extends SVGTextElement{ append: ddeAppend<ddeSVGTextElement>; }
+	interface ddeSVGTextPathElement extends SVGTextPathElement{ append: ddeAppend<ddeSVGTextPathElement>; }
+	interface ddeSVGTitleElement extends SVGTitleElement{ append: ddeAppend<ddeSVGTitleElement>; }
+	interface ddeSVGTSpanElement extends SVGTSpanElement{ append: ddeAppend<ddeSVGTSpanElement>; }
+	interface ddeSVGUseElement extends SVGUseElement{ append: ddeAppend<ddeSVGUseElement>; }
+	interface ddeSVGViewElement extends SVGViewElement{ append: ddeAppend<ddeSVGViewElement>; }
 }

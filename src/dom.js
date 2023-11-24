@@ -66,6 +66,37 @@ export function createElement(tag, attributes, ...addons){
 	scoped= 2;
 	return el;
 }
+/** @param {HTMLElement} element */
+export function simulateSlots(element){
+	const _default= Symbol.for("default");
+	const slots= Array.from(element.querySelectorAll("slot"))
+		.reduce((out, curr)=> Reflect.set(out, curr.name || _default, curr) && out, {});
+	const has_d= Reflect.has(slots, _default);
+	element.append= new Proxy(element.append, {
+		apply(_1, _2, els){
+			if(!els.length) return element;
+
+			const d= document.createDocumentFragment();
+			for(const el of els){
+				if(!el || !el.slot){ if(has_d) d.appendChild(el); continue; }
+				const name= el.slot;
+				const slot= slots[name];
+				elementAttribute(el, "remove", "slot");
+				if(!slot) continue;
+				slot.replaceWith(el);
+				Reflect.deleteProperty(slots, name);
+			}
+			if(has_d){
+				slots[_default].replaceWith(d);
+				Reflect.deleteProperty(slots, _default);
+			}
+			Object.values(slots)
+				.forEach(slot=> slot.replaceWith(createElement().append(...Array.from(slot.childNodes))));
+			return element;
+		}
+	});
+	return element;
+}
 /**
  * @param { { type: "component", name: string, host: "this" | "parentElement" } | { type: "reactive" | "later" } } attrs
  * @param {boolean} [is_open=false]

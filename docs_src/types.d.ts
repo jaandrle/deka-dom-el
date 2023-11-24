@@ -25,4 +25,5 @@ declare global{
 	interface ddePublicElementTagNameMap{
 		["custom-test"]: CustomHTMLTestElement;
 	}
+	function test(): ddeHTMLParagraphElement
 }
