@@ -145,6 +145,7 @@ main > *{
 	--shiki-token-punctuation: var(--code);
 	--shiki-token-link: #EE0000;
 	white-space: pre;
+	overflow: scroll;
 }
 .code[data-js=todo]{
 	border: 1px solid var(--border);
@@ -164,4 +165,7 @@ main > *{
 .CodeMirror, .CodeMirror-gutters {
 	background: #212121 !important;
 	border: 1px solid white;
+}
+.notice h3{
+	margin-top: 0;
 }

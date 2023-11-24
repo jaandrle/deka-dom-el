@@ -3,6 +3,8 @@ import { simplePage } from "./layout/simplePage.html.js";
 import { el } from "deka-dom-el";
 import { example } from "./components/example.html.js";
 import { h3 } from "./components/pageUtils.html.js";
+import { mnemonicUl } from "./components/mnemonicUl.html.js";
+import { code } from "./components/code.html.js";
 /** @param {string} url */
 const fileURL= url=> new URL(url, import.meta.url);
 /** @param {import("./types.d.ts").PageAttrs} attrs */
@@ -11,6 +13,8 @@ export function page({ pkg, info }){
 	return el(simplePage, { info, pkg }).append(
 		el("h2", "Native JavaScript DOM elements creations"),
 		el("p", "Let’s go through all patterns we would like to use and what needs to be improved for better experience."),
+
+		el(code, { src: fileURL("./components/examples/elements/intro.js"), page_id }),
 		
 		el(h3, "Creating element(s) (with custom attributes)"),
 		el("p").append(
@@ -112,28 +116,25 @@ export function page({ pkg, info }){
 		),
 		el(example, { src: fileURL("./components/examples/elements/dekaElNS.js"), page_id }),
 		
-		el("div", { className: "notice" }).append(
-			el("p", "Mnemonic"),
-			el("ul").append(
-				el("li").append(
-					el("code", "assign(<element>, ...<idl-objects>): <element>"), " — assign properties to the element",
-				),
-				el("li").append(
-					el("code", "el(<tag-name>, <primitive>)[.append(...)]: <element-from-tag-name>"), " — simple element containing only text",
-				),
-				el("li").append(
-					el("code", "el(<tag-name>, <idl-object>)[.append(...)]: <element-from-tag-name>"), " — element with more properties",
-				),
-				el("li").append(
-					el("code", "el(<function>, <function-argument(s)>)[.append(...)]: <element-returned-by-function>"), " — using component represented by function",
-				),
-				el("li").append(
-					el("code", "el(<...>, <...>, ...<addons>)"), " — see following page"
-				),
-				el("li").append(
-					el("code", "elNS(<namespace>)(<as-el-see-above>)[.append(...)]: <element-based-on-arguments>"), " — typically SVG elements",
-				)
+		el(mnemonicUl).append(
+			el("li").append(
+				el("code", "assign(<element>, ...<idl-objects>): <element>"), " — assign properties to the element",
+			),
+			el("li").append(
+				el("code", "el(<tag-name>, <primitive>)[.append(...)]: <element-from-tag-name>"), " — simple element containing only text",
+			),
+			el("li").append(
+				el("code", "el(<tag-name>, <idl-object>)[.append(...)]: <element-from-tag-name>"), " — element with more properties",
+			),
+			el("li").append(
+				el("code", "el(<function>, <function-argument(s)>)[.append(...)]: <element-returned-by-function>"), " — using component represented by function",
+			),
+			el("li").append(
+				el("code", "el(<...>, <...>, ...<addons>)"), " — see following page"
+			),
+			el("li").append(
+				el("code", "elNS(<namespace>)(<as-el-see-above>)[.append(...)]: <element-based-on-arguments>"), " — typically SVG elements",
 			)
-		),
+		)
 	);
 }

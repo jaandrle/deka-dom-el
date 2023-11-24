@@ -3,6 +3,8 @@ import { simplePage } from "./layout/simplePage.html.js";
 import { el } from "deka-dom-el";
 import { example } from "./components/example.html.js";
 import { h3 } from "./components/pageUtils.html.js";
+import { mnemonicUl } from "./components/mnemonicUl.html.js";
+import { code } from "./components/code.html.js";
 /** @param {string} url */
 const fileURL= url=> new URL(url, import.meta.url);
 
@@ -17,7 +19,7 @@ export function page({ pkg, info }){
 			" If we desire to solve the issue in a declarative manner,",
 			" signals may be a viable approach.",
 		),
-		el(example, { src: fileURL("./components/examples/signals/intro.js"), page_id }),
+		el(code, { src: fileURL("./components/examples/signals/intro.js"), page_id }),
 		
 		el(h3, "Introducing signals"),
 		el("p").append(
@@ -27,6 +29,7 @@ export function page({ pkg, info }){
 			" to the signal value changes. Similarly, in a remaining part (γ), we",
 			" can update the signal value."
 		),
+		el(example, { src: fileURL("./components/examples/signals/signals.js"), page_id }),
 		el("p").append(
 			"All this is just an example of ",
 			el("a", { textContent: "Event-driven programming", href: "https://en.wikipedia.org/wiki/Event-driven_programming", title: "Wikipedia: Event-driven programming" }),
@@ -48,27 +51,24 @@ export function page({ pkg, info }){
 			" ", el("em", "off"), "/stop listenning. For representing “live” piece of code computation pattern:"
 		),
 		el(example, { src: fileURL("./components/examples/signals/computations-abort.js"), page_id }),
-		el("div", { className: "notice" }).append(
-			el("p", "Mnemonic"),
-			el("ul").append(
-				el("li").append(
-					el("code", "S(<value>)"), " — signal: reactive value",
-				),
-				el("li").append(
-					el("code", "S(()=> <computation>)"), " — signal: reactive value dependent on calculation using other signals",
-				),
-				el("li").append(
-					el("code", "S.on(<signal>, <listener>[, <options>])"), " — listen to the signal value changes",
-				),
-				el("li").append(
-					el("code", "S.clear(...<signals>)"), " — off and clear signals",
-				),
-				el("li").append(
-					el("code", "S(<value>, <actions>)"), " — signal: pattern to create complex reactive objects/arrays",
-				),
-				el("li").append(
-					el("code", "S.action(<signal>, <action-name>, ...<action-arguments>)"), " — invoke an action for given signal"
-				)
+		el(mnemonicUl).append(
+			el("li").append(
+				el("code", "S(<value>)"), " — signal: reactive value",
+			),
+			el("li").append(
+				el("code", "S(()=> <computation>)"), " — signal: reactive value dependent on calculation using other signals",
+			),
+			el("li").append(
+				el("code", "S.on(<signal>, <listener>[, <options>])"), " — listen to the signal value changes",
+			),
+			el("li").append(
+				el("code", "S.clear(...<signals>)"), " — off and clear signals",
+			),
+			el("li").append(
+				el("code", "S(<value>, <actions>)"), " — signal: pattern to create complex reactive objects/arrays",
+			),
+			el("li").append(
+				el("code", "S.action(<signal>, <action-name>, ...<action-arguments>)"), " — invoke an action for given signal"
 			)
 		),
 	);

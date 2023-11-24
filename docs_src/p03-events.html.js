@@ -3,6 +3,8 @@ import { simplePage } from "./layout/simplePage.html.js";
 import { el } from "deka-dom-el";
 import { example } from "./components/example.html.js";
 import { h3 } from "./components/pageUtils.html.js";
+import { mnemonicUl } from "./components/mnemonicUl.html.js";
+import { code } from "./components/code.html.js";
 /** @param {string} url */
 const fileURL= url=> new URL(url, import.meta.url);
 /** @param {import("./types.d.ts").PageAttrs} attrs */
@@ -16,6 +18,8 @@ export function page({ pkg, info }){
 			"And library syntax/pattern so-called ", el("em", "Addon"), " to",
 			" incorporate not only this in UI templates declaratively."
 		),
+		
+		el(code, { src: fileURL("./components/examples/events/intro.js"), page_id }),
 		
 		el(h3, "Events and listenners"),
 		el("p").append(
@@ -109,23 +113,20 @@ export function page({ pkg, info }){
 		el("p", "The library also provides a method to dispatch the events."),
 		el(example, { src: fileURL("./components/examples/events/compareDispatch.js"), page_id }),
 		
-		el("div", { className: "notice" }).append(
-			el("p", "Mnemonic"),
-			el("ul").append(
-				el("li").append(
-					el("code", "on(<event>, <listener>[, <options>])(<element>)"), " — just ", el("code", "<element>.addEventListener(<event>, <listener>[, <options>])")
-				),
-				el("li").append(
-					el("code", "on.<live-cycle>(<event>, <listener>[, <options>])(<element>)"), " — corresponds to custom elemnets callbacks ", el("code", "<live-cycle>Callback(...){...}"),
-					". To connect to custom element see following page, else it is simulated by MutationObserver."
-				),
-				el("li").append(
-					el("code", "dispatchEvent(<event>[, <options>])(element)"), " — just ", el("code", "<element>.dispatchEvent(new Event(<event>[, <options>]))")
-				),
-				el("li").append(
-					el("code", "dispatchEvent(<event>[, <options>])(element, detail)"), " — just ", el("code", "<element>.dispatchEvent(new CustomEvent(<event>, { detail, ...<options> }))")
-				),
-			)
+		el(mnemonicUl).append(
+			el("li").append(
+				el("code", "on(<event>, <listener>[, <options>])(<element>)"), " — just ", el("code", "<element>.addEventListener(<event>, <listener>[, <options>])")
+			),
+			el("li").append(
+				el("code", "on.<live-cycle>(<event>, <listener>[, <options>])(<element>)"), " — corresponds to custom elemnets callbacks ", el("code", "<live-cycle>Callback(...){...}"),
+				". To connect to custom element see following page, else it is simulated by MutationObserver."
+			),
+			el("li").append(
+				el("code", "dispatchEvent(<event>[, <options>])(element)"), " — just ", el("code", "<element>.dispatchEvent(new Event(<event>[, <options>]))")
+			),
+			el("li").append(
+				el("code", "dispatchEvent(<event>[, <options>])(element, detail)"), " — just ", el("code", "<element>.dispatchEvent(new CustomEvent(<event>, { detail, ...<options> }))")
+			),
 		),
 	);
 }

@@ -14,6 +14,7 @@ ${host}{
 	--shiki-token-punctuation: var(--code);
 	--shiki-token-link: #EE0000;
 	white-space: pre;
+	overflow: scroll;
 }
 ${host}[data-js=todo]{
 	border: 1px solid var(--border);
@@ -30,11 +31,13 @@ import { el } from "deka-dom-el";
  * @param {object} attrs
  * @param {string} [attrs.id]
  * @param {string} [attrs.className]
- * @param {string} attrs.content Example code file path
+ * @param {URL} [attrs.src] Example code file path
+ * @param {string} [attrs.content] Example code
  * @param {"js"|"ts"|"html"|"css"} [attrs.language="js"] Language of the code
  * @param {string} [attrs.page_id] ID of the page, if setted it registers shiki
  * */
-export function code({ id, content, language= "js", className= "code", page_id }){
+export function code({ id, src, content, language= "js", className= host.slice(1), page_id }){
+	if(src) content= s.cat(src);
 	let dataJS;
 	if(page_id){
 		registerClientPart(page_id);
