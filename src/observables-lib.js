@@ -116,7 +116,7 @@ import { on } from "./events.js";
 const key_attributes= "__dde_attributes";
 observable.attribute= function(name, initial= null){
 	//TODO host=element & reuse existing
-	const out= observable(initial);
+	const out= O(initial);
 	let element;
 	scope.host(el=> {
 		element= el;
@@ -138,7 +138,7 @@ observable.attribute= function(name, initial= null){
 		on.disconnected(function(){
 			/*! This removes all observables mapped to attributes (`S.attribute`).
 			 * Investigate `__dde_attributes` key of the element.*/
-			observable.clear(...Object.values(element[key_attributes]));
+			O.clear(...Object.values(element[key_attributes]));
 		})(element);
 	});
 	return new Proxy(out, {
@@ -202,7 +202,7 @@ function toObservable(observable, value, actions){
 	const onclear= [];
 	if(typeOf(actions)!=="[object Object]")
 		actions= {};
-	const { onclear: ocs }= observable.symbols;
+	const { onclear: ocs }= O.symbols;
 	if(actions[ocs]){
 		onclear.push(actions[ocs]);
 		Reflect.deleteProperty(actions, ocs);

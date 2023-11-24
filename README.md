@@ -23,7 +23,7 @@ document.body.append(
 	
 );
 function component({ textContent, className }){
-	const value= S("onchange");
+	const value= O("onchange");
 	
 	return el().append(
 		el("p", { textContent, className }),
@@ -53,7 +53,7 @@ Another goal is to proceed in the best spirit of functional programming. This in
 pure JavaScript (DOM API) and gradually adding auxiliary functions, ranging from “minor” improvements
 to the capability of writing complete declarative reactive UI templates.
 
-As a result, any “internal” function (`assign`, `classListDeclarative`, `on`, `dispatchEvent`, …, `S`, …)
+As a result, any “internal” function (`assign`, `classListDeclarative`, `on`, `dispatchEvent`, …, `O`, …)
 can be used independently, although they are primarily designed for use in combination.  This can also,
 hopefully, help in integrating the library into existing projects.
 
