@@ -1,5 +1,5 @@
 import { el } from "deka-dom-el";
-import { S } from "deka-dom-el/signals";
+import { S } from "deka-dom-el/observables";
 const clicks= S(0);
 document.body.append(
 	el().append(

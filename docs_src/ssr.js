@@ -6,7 +6,7 @@ export const pages= [
 	{ id: "index", href: "./", title: "Introduction", description: "Introducing a library." },
 	{ id: "p02-elements", href: "p02-elements", title: "Elements", description: "Basic concepts of elements modifications and creations." },
 	{ id: "p03-events", href: "p03-events", title: "Events and Addons", description: "Using not only events in UI declaratively." },
-	{ id: "p04-signals", href: "p04-signals", title: "Signals and reactivity", description: "Handling reactivity in UI via signals." },
+	{ id: "p04-observables", href: "p04-observables", title: "Observables and reactivity", description: "Handling reactivity in UI via observables." },
 ];
 /**
  * @typedef registerClientFile

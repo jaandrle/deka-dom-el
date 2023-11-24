@@ -153,10 +153,10 @@ export const scope: {
 	preventDefault<T extends boolean>(prevent: T): T,
 	/**
 	 * This represents reference to the current host element — `scope.host()`.
-	 * It can be also used to register Addon (function to be called when component is initized)
+	 * It can be also used to register Addon(s) (functions to be called when component is initized)
 	 * — `scope.host(on.connected(console.log))`.
 	 * */
-	host: ddeElementAddon<any>,
+	host: (...addons: ddeElementAddon<any>[])=> HTMLElement,
 	
 	state: Scope[],
 	/** Adds new child scope. All attributes are inherited by default. */

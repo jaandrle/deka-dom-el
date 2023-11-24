@@ -1,4 +1,4 @@
-import { style, el, elNS, on, S, scope } from '../exports.js';
+import { style, el, elNS, on, O, scope } from '../exports.js';
 const className= style.host(fullNameComponent).css`
 	:host form{
 		display: flex;
@@ -7,8 +7,8 @@ const className= style.host(fullNameComponent).css`
 `;
 export function fullNameComponent(){
 	const labels= [ "Name", "Surname" ];
-	const name= labels.map(_=> S(""));
-	const full_name= S(()=>
+	const name= labels.map(_=> O(""));
+	const full_name= O(()=>
 		name.map(l=> l()).filter(Boolean).join(" ") || "-");
 	scope.host(
 		on.connected(()=> console.log(fullNameComponent)),

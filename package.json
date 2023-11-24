@@ -24,13 +24,13 @@
 			"import": "./jsdom.js",
 			"types": "./jsdom.d.ts"
 		},
-		"./signals": {
-			"import": "./signals.js",
-			"types": "./signals.d.ts"
+		"./observables": {
+			"import": "./observables.js",
+			"types": "./observables.d.ts"
 		},
-		"./src/signals-lib": {
-			"import": "./src/signals-lib.js",
-			"types": "./src/signals.d.ts"
+		"./src/observables-lib": {
+			"import": "./src/observables-lib.js",
+			"types": "./src/observables.d.ts"
 		}
 	},
 	"files": [
@@ -62,7 +62,7 @@
 			"gzip": false
 		},
 		{
-			"path": "./signals.js",
+			"path": "./observables.js",
 			"limit": "11.5 kB",
 			"gzip": false
 		},

@@ -64,7 +64,7 @@ export function page({ pkg, info }){
 				"This is handy to concat conditional classes."
 			),
 			el("li").append(
-				"Use ", el("code", "classList"), " to toggle specific classes. This will be handy later when the reactivity via signals is beeing introduced.",
+				"Use ", el("code", "classList"), " to toggle specific classes. This will be handy later when the reactivity via observables is beeing introduced.",
 			),
 			el("li").append(
 				"The ", el("code", "assign"), " also accepts the ", el("code", "undefined"), " as a value for any property to remove it from the element declaratively. ",

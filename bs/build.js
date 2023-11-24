@@ -1,6 +1,6 @@
 #!/usr/bin/env -S npx nodejsscript
 import { bundle as bundleDTS } from "dts-bundler";
-const files= [ "index", "index-with-signals" ];
+const files= [ "index", "index-with-observables" ];
 const filesOut= (file, mark= "esm")=> "dist/"+file.replace("index", mark);
 const css= echo.css`
 	.info{ color: gray; }

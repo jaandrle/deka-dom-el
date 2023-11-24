@@ -1,4 +1,4 @@
-import { signals } from "./signals-common.js";
+import { observables } from "./observables-common.js";
 import { enviroment } from './dom-common.js';
 
 /** @type {{ scope: object, prevent: boolean, host: function }[]} */
@@ -32,11 +32,11 @@ export function chainableAppend(el){ if(el.append===append) return el; el.append
 let namespace;
 export function createElement(tag, attributes, ...addons){
 	/* jshint maxcomplexity: 15 */
-	const s= signals(this);
+	const s= observables(this);
 	let scoped= 0;
 	let el, el_host;
 	//TODO Array.isArray(tag) ⇒ set key (cache els)
-	if(Object(attributes)!==attributes || s.isSignal(attributes))
+	if(Object(attributes)!==attributes || s.isObservable(attributes))
 		attributes= { textContent: attributes };
 	switch(true){
 		case typeof tag==="function": {
@@ -168,11 +168,11 @@ function assignContext(element, _this){
 	if(assign_context.has(element)) return assign_context.get(element);
 	const is_svg= element instanceof SVGElement;
 	const setRemoveAttr= (is_svg ? setRemoveNS : setRemove).bind(null, element, "Attribute");
-	const s= signals(_this);
+	const s= observables(_this);
 	return { setRemoveAttr, s };
 }
 export function classListDeclarative(element, toggle){
-	const s= signals(this);
+	const s= observables(this);
 	forEachEntries(s, toggle,
 		(class_name, val)=>
 			element.classList.toggle(class_name, val===-1 ? undefined : Boolean(val)));

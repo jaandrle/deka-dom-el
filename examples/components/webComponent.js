@@ -1,5 +1,5 @@
 import { el, on, scope } from "../../index.js";
-import { S } from "../../signals.js";
+import { O } from "../../observables.js";
 
 /**
  * Compatible with `npx -y web-component-analyzer examples/components/webComponent.js`
@@ -24,8 +24,8 @@ export class CustomHTMLTestElement extends HTMLElement{
 			on.attributeChanged(e=> console.log(e)),
 			on.disconnected(()=> console.log(CustomHTMLTestElement))
 		);
-		const name= S.attribute("name");
-		const preName= S.attribute("pre-name");
+		const name= O.attribute("name");
+		const preName= O.attribute("pre-name");
 		
 		console.log({ name, test, preName});
 		return el("p").append(

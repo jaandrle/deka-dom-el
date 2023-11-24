@@ -1,4 +1,4 @@
-export { registerReactivity } from './signals-common.js';
+export { registerReactivity } from './observables-common.js';
 
 export function dispatchEvent(name, options, host){
 	if(!options) options= {};

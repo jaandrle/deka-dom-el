@@ -35,8 +35,8 @@ function component({ textContent, className }){
 }
 ```
 # Deka DOM Elements
-Creating reactive elements, components and Web components using [IDL](https://developer.mozilla.org/en-US/docs/Glossary/IDL)/JavaScript DOM API and signals
-([Signals — whats going on behind the scenes | by Ryan Hoffnan | ITNEXT](https://itnext.io/signals-whats-going-on-behind-the-scenes-ec858589ea63) or [The Evolution of Signals in JavaScript - DEV Community](https://dev.to/this-is-learning/the-evolution-of-signals-in-javascript-8ob)).
+Creating reactive elements, components and Web components using [IDL](https://developer.mozilla.org/en-US/docs/Glossary/IDL)/JavaScript DOM API and signals/observables
+([Signals — whats going on behind the scenes | by Ryan Hoffnan | ITNEXT](https://itnext.io/signals-whats-going-on-behind-the-scenes-ec858589ea63), [The Evolution of Signals in JavaScript - DEV Community](https://dev.to/this-is-learning/the-evolution-of-signals-in-javascript-8ob) or [Observer pattern - Wikipedia](https://en.wikipedia.org/wiki/Observer_pattern)).
 
 ## Inspiration and suggested alternatives
 - my previous library (mostly used internaly): [jaandrle/dollar_dom_component: Functional DOM components without JSX and virtual DOM.](https://github.com/jaandrle/dollar_dom_component)
@@ -59,7 +59,7 @@ hopefully, help in integrating the library into existing projects.
 
 To balance these requirements, numerous compromises have been made. To summarize:
 - [ ] Library size: 10–15kB minified (the original goal was a maximum of 10kB)
-- [x] Optional use of *signals* with the ability to register *your own signals implementation*
+- [x] Optional use of *observables* with the ability to register *your own signals/observables implementation*
 - [x] *No build step required*
 - [x] Preference for a *declarative/functional* approach
 - [x] Focus on zero/minimal dependencies

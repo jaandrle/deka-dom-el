@@ -1,4 +1,4 @@
-import { style, el, dispatchEvent, on, S, scope } from '../exports.js';
+import { style, el, dispatchEvent, on, O, scope } from '../exports.js';
 const className= style.host(todosComponent).css`
 	:host{
 		display: flex;
@@ -16,23 +16,23 @@ const className= style.host(todosComponent).css`
 `;
 /** @param {{ todos: string[] }} */
 export function todosComponent({ todos= [ "Task A" ] }= {}){
-	const todosS= S(todos.map(t=> S(t)), {
-		add(v){ this.value.push(S(v)); },
-		remove(i){ S.clear(this.value.splice(i, 1)[0]); }
+	const todosS= O(todos.map(t=> O(t)), {
+		add(v){ this.value.push(O(v)); },
+		remove(i){ O.clear(this.value.splice(i, 1)[0]); }
 	});
 
 	const name= "todoName";
 	const onsubmitAdd= on("submit", event=> {
 		const el= event.target.elements[name];
 		event.preventDefault();
-		S.action(todosS, "add", el.value);
+		O.action(todosS, "add", el.value);
 		el.value= "";
 	});
 	const onremove= on("remove", event=>
-		S.action(todosS, "remove", event.detail));
+		O.action(todosS, "remove", event.detail));
 	
 	const ul_todos= el("ul").append(
-		S.el(todosS, ts=> ts
+		O.el(todosS, ts=> ts
 			.map((textContent, value)=>
 				el(todoComponent, { textContent, value, className }, onremove))
 	));
@@ -40,7 +40,7 @@ export function todosComponent({ todos= [ "Task A" ] }= {}){
 		el("div").append(
 			el("h2", "Todos:"),
 			el("h3", "List of todos:"),
-			S.el(todosS, ts=> !ts.length
+			O.el(todosS, ts=> !ts.length
 				? el("p", "No todos yet")
 				: ul_todos),
 			el("p", "Click to the text to edit it.")
@@ -54,7 +54,7 @@ export function todosComponent({ todos= [ "Task A" ] }= {}){
 		),
 		el("div").append(
 			el("h3", "Output (JSON):"),
-			el("output", S(()=> JSON.stringify(todosS, null, "\t")))
+			el("output", O(()=> JSON.stringify(todosS, null, "\t")))
 		)
 	)
 }
@@ -69,13 +69,13 @@ function todoComponent({ textContent, value }){
 		event.stopPropagation();
 		dispatchEvent("remove")(host(), value);
 	});
-	const is_editable= S(false);
+	const is_editable= O(false);
 	const onedited= on("change", ev=> {
 		textContent(ev.target.value);
 		is_editable(false);
 	});
 	return el("li").append(
-		S.el(is_editable, is=> is
+		O.el(is_editable, is=> is
 			? el("input", { value: textContent(), type: "text" }, onedited)
 			: el("span", { textContent, onclick: is_editable.bind(null, true) }),
 		),

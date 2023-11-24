@@ -1,25 +1,25 @@
-export const mark= Symbol.for("Signal");
+export const mark= Symbol.for("observable");
 
-export function isSignal(candidate){
+export function isObservable(candidate){
 	try{ return Reflect.has(candidate, mark); }
 	catch(e){ return false; }
 }
 /** @type {function[]} */
 const stack_watch= [];
 /**
- * ### `WeakMap<function, Set<ddeSignal<any, any>>>`
- * The `Set` is in the form of `[ source, ...depended signals (DSs) ]`.
+ * ### `WeakMap<function, Set<ddeObservable<any, any>>>`
+ * The `Set` is in the form of `[ source, ...depended observables (DSs) ]`.
  * When the DS is cleaned (`S.clear`) it is removed from DSs,
  * if remains only one (`source`) it is cleared too.
  * ### `WeakMap<object, function>`
  * This is used for revesed deps, the `function` is also key for `deps`.
- * @type {WeakMap<function|object,Set<ddeSignal<any, any>>|function>}
+ * @type {WeakMap<function|object,Set<ddeObservable<any, any>>|function>}
  * */
 const deps= new WeakMap();
-export function S(value, actions){
+export function observable(value, actions){
 	if(typeof value!=="function")
 		return create(value, actions);
-	if(isSignal(value)) return value;
+	if(isObservable(value)) return value;
 	
 	const out= create();
 	const contextReWatch= function(){
@@ -32,9 +32,9 @@ export function S(value, actions){
 
 		if(!deps_old.length) return;
 		const deps_curr= deps.get(contextReWatch);
-		for (const dep_signal of deps_old){
-			if(deps_curr.has(dep_signal)) continue;
-			removeSignalListener(dep_signal, contextReWatch);
+		for (const dep_observable of deps_old){
+			if(deps_curr.has(dep_observable)) continue;
+			removeObservableListener(dep_observable, contextReWatch);
 		}
 	};
 	deps.set(out[mark], contextReWatch);
@@ -42,44 +42,45 @@ export function S(value, actions){
 	contextReWatch();
 	return out;
 }
-S.action= function(signal, name, ...a){
-	const s= signal[mark], { actions }= s;
+export { observable as O };
+observable.action= function(observable, name, ...a){
+	const s= observable[mark], { actions }= s;
 	if(!actions || !Reflect.has(actions, name))
-		throw new Error(`'${signal}' has no action with name '${name}'!`);
+		throw new Error(`'${observable}' has no action with name '${name}'!`);
 	actions[name].apply(s, a);
 	if(s.skip) return Reflect.deleteProperty(s, "skip");
 	s.listeners.forEach(l=> l(s.value));
 };
-S.on= function on(signals, listener, options= {}){
-	const { signal: as }= options;
+observable.on= function on(observables, listener, options= {}){
+	const { observable: as }= options;
 	if(as && as.aborted) return;
-	if(Array.isArray(signals)) return signals.forEach(s=> on(s, listener, options));
-	addSignalListener(signals, listener);
-	if(as) as.addEventListener("abort", ()=> removeSignalListener(signals, listener));
-	//TODO cleanup when signal removed
+	if(Array.isArray(observables)) return observables.forEach(s=> on(s, listener, options));
+	addObservableListener(observables, listener);
+	if(as) as.addEventListener("abort", ()=> removeObservableListener(observables, listener));
+	//TODO cleanup when observable removed
 };
-S.symbols= {
-	signal: mark,
-	onclear: Symbol.for("Signal.onclear")
+observable.symbols= {
+	observable: mark,
+	onclear: Symbol.for("Observable.onclear")
 };
-S.clear= function(...signals){
-	for(const signal of signals){
-		Reflect.deleteProperty(signal, "toJSON");
-		const s= signal[mark];
+observable.clear= function(...observables){
+	for(const observable of observables){
+		Reflect.deleteProperty(observable, "toJSON");
+		const s= observable[mark];
 		s.onclear.forEach(f=> f.call(s));
-		clearListDeps(signal, s);
-		Reflect.deleteProperty(signal, mark);
+		clearListDeps(observable, s);
+		Reflect.deleteProperty(observable, mark);
 	}
-	function clearListDeps(signal, s){
+	function clearListDeps(observable, s){
 		s.listeners.forEach(l=> {
 			s.listeners.delete(l);
 			if(!deps.has(l)) return;
 			
 			const ls= deps.get(l);
-			ls.delete(signal);
+			ls.delete(observable);
 			if(ls.size>1) return;
 			
-			S.clear(...ls);
+			observable.clear(...ls);
 			deps.delete(l);
 		});
 	}
@@ -87,7 +88,7 @@ S.clear= function(...signals){
 const key_reactive= "__dde_reactive";
 import { el, elementAttribute } from "./dom.js";
 import { scope } from "./dom.js";
-S.el= function(signal, map){
+observable.el= function(observable, map){
 	const mark_start= el.mark({ type: "reactive" }, false);
 	const mark_end= mark_start.end;
 	const out= document.createDocumentFragment();
@@ -95,7 +96,7 @@ S.el= function(signal, map){
 	const { current }= scope;
 	const reRenderReactiveElement= v=> {
 		if(!mark_start.parentNode || !mark_end.parentNode)
-			return removeSignalListener(signal, reRenderReactiveElement);
+			return removeObservableListener(observable, reRenderReactiveElement);
 		scope.push(current);
 		let els= map(v);
 		scope.pop();
@@ -106,16 +107,16 @@ S.el= function(signal, map){
 			el_r.remove();
 		mark_start.after(...els);
 	};
-	addSignalListener(signal, reRenderReactiveElement);
-	removeSignalsFromElements(signal, reRenderReactiveElement, mark_start, map);
-	reRenderReactiveElement(signal());
+	addObservableListener(observable, reRenderReactiveElement);
+	removeObservablesFromElements(observable, reRenderReactiveElement, mark_start, map);
+	reRenderReactiveElement(observable());
 	return out;
 };
 import { on } from "./events.js";
 const key_attributes= "__dde_attributes";
-S.attribute= function(name, initial= null){
+observable.attribute= function(name, initial= null){
 	//TODO host=element & reuse existing
-	const out= S(initial);
+	const out= observable(initial);
 	let element;
 	scope.host(el=> {
 		element= el;
@@ -127,17 +128,17 @@ S.attribute= function(name, initial= null){
 			return;
 		}
 		element[key_attributes]= { [name]: out };
-		on.attributeChanged(function attributeChangeToSignal({ detail }){
-			/*! This maps attributes to signals (`S.attribute`).
+		on.attributeChanged(function attributeChangeToObservable({ detail }){
+			/*! This maps attributes to observables (`S.attribute`).
 			 * Investigate `__dde_attributes` key of the element.*/
 			const [ name, value ]= detail;
 			const curr= element[key_attributes][name];
 			if(curr) return curr(value);
 		})(element);
 		on.disconnected(function(){
-			/*! This removes all signals mapped to attributes (`S.attribute`).
+			/*! This removes all observables mapped to attributes (`S.attribute`).
 			 * Investigate `__dde_attributes` key of the element.*/
-			S.clear(...Object.values(element[key_attributes]));
+			observable.clear(...Object.values(element[key_attributes]));
 		})(element);
 	});
 	return new Proxy(out, {
@@ -150,17 +151,17 @@ S.attribute= function(name, initial= null){
 };
 
 import { typeOf } from './helpers.js';
-export const signals_config= {
-	isSignal,
+export const observables_config= {
+	isObservable,
 	processReactiveAttribute(element, key, attrs, set){
-		if(!isSignal(attrs)) return attrs;
+		if(!isObservable(attrs)) return attrs;
 		const l= attr=> set(key, attr);
-		addSignalListener(attrs, l);
-		removeSignalsFromElements(attrs, l, element, key);
+		addObservableListener(attrs, l);
+		removeObservablesFromElements(attrs, l, element, key);
 		return attrs();
 	}
 };
-function removeSignalsFromElements(signal, listener, ...notes){
+function removeObservablesFromElements(observable, listener, ...notes){
 	const { current }= scope;
 	if(current.prevent) return;
 	current.host(function(element){
@@ -168,28 +169,28 @@ function removeSignalsFromElements(signal, listener, ...notes){
 			element[key_reactive]= [];
 			on.disconnected(()=>
 				/*!
-				 * Clears all signals listeners added in the current scope/host (`S.el`, `assign`, …?).
+				 * Clears all Observables listeners added in the current scope/host (`S.el`, `assign`, …?).
 				 * You can investigate the `__dde_reactive` key of the element.
 				 * */
-				element[key_reactive].forEach(([ [ signal, listener ] ])=>
-					removeSignalListener(signal, listener, signal[mark]?.host() === element))
+				element[key_reactive].forEach(([ [ observable, listener ] ])=>
+					removeObservableListener(observable, listener, observable[mark]?.host() === element))
 			)(element);
 		}
-		element[key_reactive].push([ [ signal, listener ], ...notes ]);
+		element[key_reactive].push([ [ observable, listener ], ...notes ]);
 	});
 }
 
 function create(value, actions){
-	const signal=  (...value)=>
-		value.length ? write(signal, ...value) : read(signal);
-	return toSignal(signal, value, actions);
+	const observable=  (...value)=>
+		value.length ? write(observable, ...value) : read(observable);
+	return toObservable(observable, value, actions);
 }
 const protoSigal= Object.assign(Object.create(null), {
 	stopPropagation(){
 		this.skip= true;
 	}
 });
-class SignalDefined extends Error{
+class ObservableDefined extends Error{
 	constructor(){
 		super();
 		const [ curr, ...rest ]= this.stack.split("\n");
@@ -197,64 +198,64 @@ class SignalDefined extends Error{
 		this.stack= rest.find(l=> !l.includes(curr_file));
 	}
 }
-function toSignal(signal, value, actions){
+function toObservable(observable, value, actions){
 	const onclear= [];
 	if(typeOf(actions)!=="[object Object]")
 		actions= {};
-	const { onclear: ocs }= S.symbols;
+	const { onclear: ocs }= observable.symbols;
 	if(actions[ocs]){
 		onclear.push(actions[ocs]);
 		Reflect.deleteProperty(actions, ocs);
 	}
 	const { host }= scope;
-	Reflect.defineProperty(signal, mark, {
+	Reflect.defineProperty(observable, mark, {
 		value: {
 			value, actions, onclear, host,
 			listeners: new Set(),
-			defined: new SignalDefined()
+			defined: new ObservableDefined()
 		},
 		enumerable: false,
 		writable: false,
 		configurable: true
 	});
-	signal.toJSON= ()=> signal();
-	Object.setPrototypeOf(signal[mark], protoSigal);
-	return signal;
+	observable.toJSON= ()=> observable();
+	Object.setPrototypeOf(observable[mark], protoSigal);
+	return observable;
 }
 function currentContext(){
 	return stack_watch[stack_watch.length - 1];
 }
-function read(signal){
-	if(!signal[mark]) return;
-	const { value, listeners }= signal[mark];
+function read(observable){
+	if(!observable[mark]) return;
+	const { value, listeners }= observable[mark];
 	const context= currentContext();
 	if(context) listeners.add(context);
-	if(deps.has(context)) deps.get(context).add(signal);
+	if(deps.has(context)) deps.get(context).add(observable);
 	return value;
 }
-function write(signal, value, force){
-	if(!signal[mark]) return;
-	const s= signal[mark];
+function write(observable, value, force){
+	if(!observable[mark]) return;
+	const s= observable[mark];
 	if(!force && s.value===value) return;
 	s.value= value;
 	s.listeners.forEach(l=> l(value));
 	return value;
 }
 
-function addSignalListener(signal, listener){
-	if(!signal[mark]) return;
-	return signal[mark].listeners.add(listener);
+function addObservableListener(observable, listener){
+	if(!observable[mark]) return;
+	return observable[mark].listeners.add(listener);
 }
-function removeSignalListener(signal, listener, clear_when_empty){
-	const s= signal[mark];
+function removeObservableListener(observable, listener, clear_when_empty){
+	const s= observable[mark];
 	if(!s) return;
 	const out= s.listeners.delete(listener);
 	if(clear_when_empty && !s.listeners.size){
-		S.clear(signal);
+		observable.clear(observable);
 		if(!deps.has(s)) return out;
 		const c= deps.get(s);
 		if(!deps.has(c)) return out;
-		deps.get(c).forEach(sig=> removeSignalListener(sig, c, true));
+		deps.get(c).forEach(sig=> removeObservableListener(sig, c, true));
 	}
 	return out;
 }

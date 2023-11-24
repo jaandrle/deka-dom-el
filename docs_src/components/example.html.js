@@ -26,7 +26,7 @@ import { relative } from "node:path";
 export function example({ src, language= "js", page_id }){
 	registerClientPart(page_id);
 	const content= s.cat(src).toString()
-		.replaceAll(/ from "deka-dom-el(\/signals)?";/g, ' from "https://cdn.jsdelivr.net/gh/jaandrle/deka-dom-el/dist/esm-with-signals.js";');
+		.replaceAll(/ from "deka-dom-el(\/observables)?";/g, ' from "https://cdn.jsdelivr.net/gh/jaandrle/deka-dom-el/dist/esm-with-observables.js";');
 	const id= "code-example-"+generateCodeId(src);
 	return el().append(
 		el(code, { id, content, language, className: example.name }),
