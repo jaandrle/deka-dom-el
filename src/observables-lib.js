@@ -43,20 +43,20 @@ export function observable(value, actions){
 	return out;
 }
 export { observable as O };
-observable.action= function(observable, name, ...a){
-	const s= observable[mark], { actions }= s;
+observable.action= function(o, name, ...a){
+	const s= o[mark], { actions }= s;
 	if(!actions || !Reflect.has(actions, name))
-		throw new Error(`'${observable}' has no action with name '${name}'!`);
+		throw new Error(`'${o}' has no action with name '${name}'!`);
 	actions[name].apply(s, a);
 	if(s.skip) return Reflect.deleteProperty(s, "skip");
 	s.listeners.forEach(l=> l(s.value));
 };
-observable.on= function on(observables, listener, options= {}){
-	const { observable: as }= options;
+observable.on= function on(o, listener, options= {}){
+	const { signal: as }= options;
 	if(as && as.aborted) return;
-	if(Array.isArray(observables)) return observables.forEach(s=> on(s, listener, options));
-	addObservableListener(observables, listener);
-	if(as) as.addEventListener("abort", ()=> removeObservableListener(observables, listener));
+	if(Array.isArray(o)) return o.forEach(s=> on(s, listener, options));
+	addObservableListener(o, listener);
+	if(as) as.addEventListener("abort", ()=> removeObservableListener(o, listener));
 	//TODO cleanup when observable removed
 };
 observable.symbols= {
@@ -64,23 +64,23 @@ observable.symbols= {
 	onclear: Symbol.for("Observable.onclear")
 };
 observable.clear= function(...observables){
-	for(const observable of observables){
-		Reflect.deleteProperty(observable, "toJSON");
-		const s= observable[mark];
+	for(const o of observables){
+		Reflect.deleteProperty(o, "toJSON");
+		const s= o[mark];
 		s.onclear.forEach(f=> f.call(s));
-		clearListDeps(observable, s);
-		Reflect.deleteProperty(observable, mark);
+		clearListDeps(o, s);
+		Reflect.deleteProperty(o, mark);
 	}
-	function clearListDeps(observable, s){
+	function clearListDeps(o, s){
 		s.listeners.forEach(l=> {
 			s.listeners.delete(l);
 			if(!deps.has(l)) return;
 			
 			const ls= deps.get(l);
-			ls.delete(observable);
+			ls.delete(o);
 			if(ls.size>1) return;
 			
-			observable.clear(...ls);
+			o.clear(...ls);
 			deps.delete(l);
 		});
 	}
@@ -88,7 +88,7 @@ observable.clear= function(...observables){
 const key_reactive= "__dde_reactive";
 import { el, elementAttribute } from "./dom.js";
 import { scope } from "./dom.js";
-observable.el= function(observable, map){
+observable.el= function(o, map){
 	const mark_start= el.mark({ type: "reactive" }, false);
 	const mark_end= mark_start.end;
 	const out= document.createDocumentFragment();
@@ -96,7 +96,7 @@ observable.el= function(observable, map){
 	const { current }= scope;
 	const reRenderReactiveElement= v=> {
 		if(!mark_start.parentNode || !mark_end.parentNode)
-			return removeObservableListener(observable, reRenderReactiveElement);
+			return removeObservableListener(o, reRenderReactiveElement);
 		scope.push(current);
 		let els= map(v);
 		scope.pop();
@@ -107,16 +107,16 @@ observable.el= function(observable, map){
 			el_r.remove();
 		mark_start.after(...els);
 	};
-	addObservableListener(observable, reRenderReactiveElement);
-	removeObservablesFromElements(observable, reRenderReactiveElement, mark_start, map);
-	reRenderReactiveElement(observable());
+	addObservableListener(o, reRenderReactiveElement);
+	removeObservablesFromElements(o, reRenderReactiveElement, mark_start, map);
+	reRenderReactiveElement(o());
 	return out;
 };
 import { on } from "./events.js";
 const key_attributes= "__dde_attributes";
 observable.attribute= function(name, initial= null){
 	//TODO host=element & reuse existing
-	const out= O(initial);
+	const out= observable(initial);
 	let element;
 	scope.host(el=> {
 		element= el;
@@ -138,7 +138,7 @@ observable.attribute= function(name, initial= null){
 		on.disconnected(function(){
 			/*! This removes all observables mapped to attributes (`S.attribute`).
 			 * Investigate `__dde_attributes` key of the element.*/
-			O.clear(...Object.values(element[key_attributes]));
+			observable.clear(...Object.values(element[key_attributes]));
 		})(element);
 	});
 	return new Proxy(out, {
@@ -161,7 +161,7 @@ export const observables_config= {
 		return attrs();
 	}
 };
-function removeObservablesFromElements(observable, listener, ...notes){
+function removeObservablesFromElements(o, listener, ...notes){
 	const { current }= scope;
 	if(current.prevent) return;
 	current.host(function(element){
@@ -172,18 +172,18 @@ function removeObservablesFromElements(observable, listener, ...notes){
 				 * Clears all Observables listeners added in the current scope/host (`S.el`, `assign`, …?).
 				 * You can investigate the `__dde_reactive` key of the element.
 				 * */
-				element[key_reactive].forEach(([ [ observable, listener ] ])=>
-					removeObservableListener(observable, listener, observable[mark]?.host() === element))
+				element[key_reactive].forEach(([ [ o, listener ] ])=>
+					removeObservableListener(o, listener, o[mark]?.host() === element))
 			)(element);
 		}
-		element[key_reactive].push([ [ observable, listener ], ...notes ]);
+		element[key_reactive].push([ [ o, listener ], ...notes ]);
 	});
 }
 
 function create(value, actions){
-	const observable=  (...value)=>
-		value.length ? write(observable, ...value) : read(observable);
-	return toObservable(observable, value, actions);
+	const o=  (...value)=>
+		value.length ? write(o, ...value) : read(o);
+	return toObservable(o, value, actions);
 }
 const protoSigal= Object.assign(Object.create(null), {
 	stopPropagation(){
@@ -198,17 +198,17 @@ class ObservableDefined extends Error{
 		this.stack= rest.find(l=> !l.includes(curr_file));
 	}
 }
-function toObservable(observable, value, actions){
+function toObservable(o, value, actions){
 	const onclear= [];
 	if(typeOf(actions)!=="[object Object]")
 		actions= {};
-	const { onclear: ocs }= O.symbols;
+	const { onclear: ocs }= observable.symbols;
 	if(actions[ocs]){
 		onclear.push(actions[ocs]);
 		Reflect.deleteProperty(actions, ocs);
 	}
 	const { host }= scope;
-	Reflect.defineProperty(observable, mark, {
+	Reflect.defineProperty(o, mark, {
 		value: {
 			value, actions, onclear, host,
 			listeners: new Set(),
@@ -218,40 +218,40 @@ function toObservable(observable, value, actions){
 		writable: false,
 		configurable: true
 	});
-	observable.toJSON= ()=> observable();
-	Object.setPrototypeOf(observable[mark], protoSigal);
-	return observable;
+	o.toJSON= ()=> o();
+	Object.setPrototypeOf(o[mark], protoSigal);
+	return o;
 }
 function currentContext(){
 	return stack_watch[stack_watch.length - 1];
 }
-function read(observable){
-	if(!observable[mark]) return;
-	const { value, listeners }= observable[mark];
+function read(o){
+	if(!o[mark]) return;
+	const { value, listeners }= o[mark];
 	const context= currentContext();
 	if(context) listeners.add(context);
-	if(deps.has(context)) deps.get(context).add(observable);
+	if(deps.has(context)) deps.get(context).add(o);
 	return value;
 }
-function write(observable, value, force){
-	if(!observable[mark]) return;
-	const s= observable[mark];
+function write(o, value, force){
+	if(!o[mark]) return;
+	const s= o[mark];
 	if(!force && s.value===value) return;
 	s.value= value;
 	s.listeners.forEach(l=> l(value));
 	return value;
 }
 
-function addObservableListener(observable, listener){
-	if(!observable[mark]) return;
-	return observable[mark].listeners.add(listener);
+function addObservableListener(o, listener){
+	if(!o[mark]) return;
+	return o[mark].listeners.add(listener);
 }
-function removeObservableListener(observable, listener, clear_when_empty){
-	const s= observable[mark];
+function removeObservableListener(o, listener, clear_when_empty){
+	const s= o[mark];
 	if(!s) return;
 	const out= s.listeners.delete(listener);
 	if(clear_when_empty && !s.listeners.size){
-		observable.clear(observable);
+		o.clear(o);
 		if(!deps.has(s)) return out;
 		const c= deps.get(s);
 		if(!deps.has(c)) return out;
