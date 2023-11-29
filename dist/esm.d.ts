@@ -1,3 +1,68 @@
+export type Observable<V, A>= (set?: V)=> V & A;
+type Action<V>= (this: { value: V, stopPropagation(): void }, ...a: any[])=> typeof observable._ | void;
+//type SymbolObservable= Symbol;
+type SymbolOnclear= symbol;
+type Actions<V>= Record<string | SymbolOnclear, Action<V>>;
+interface observable{
+	_: Symbol
+	/**
+	 * Simple example:
+	 * ```js
+	 * const hello= S("Hello Observable");
+	 * ```
+	 * …simple todo observable:
+	 * ```js
+	 * const todos= S([], {
+	 * 	add(v){ this.value.push(S(v)); },
+	 * 	remove(i){ this.value.splice(i, 1); },
+	 * 	[S.symbols.onclear](){ S.clear(...this.value); },
+	 * });
+	 * ```
+	 * …computed observable:
+	 * ```js
+	 * const name= S("Jan");
+	 * const surname= S("Andrle");
+	 * const fullname= S(()=> name()+" "+surname());
+	 * ```
+	 * @param value Initial observable value. Or function computing value from other observables.
+	 * @param actions Use to define actions on the observable. Such as add item to the array.
+	 *		There is also a reserved function `S.symbol.onclear` which is called when the observable is cleared
+	 *		by `S.clear`.
+	 * */
+	<V, A extends Actions<V>>(value: V, actions?: A): Observable<V, A>;
+	/**
+	 * Computations observable. This creates a observable which is computed from other observables.
+	 * */
+	<V>(computation: ()=> V): Observable<V, {}>
+	action<S extends Observable<any, Actions<any>>, A extends (S extends Observable<any, infer A> ? A : never), N extends keyof A>(
+		observable: S,
+		name: N,
+		...params: A[N] extends (...args: infer P)=> any ? P : never
+	): void;
+	clear(...observables: Observable<any, any>[]): void;
+	on<T>(observable: Observable<T, any>, onchange: (a: T)=> void, options?: AddEventListenerOptions): void;
+	symbols: {
+		//observable: SymbolObservable;
+		onclear: SymbolOnclear;
+	}
+	/**
+	 * Reactive element, which is rendered based on the given observable.
+	 * ```js
+	 * S.el(observable, value=> value ? el("b", "True") : el("i", "False"));
+	 * S.el(listS, list=> list.map(li=> el("li", li)));
+	 * ```
+	 * */
+	el<S extends any>(observable: Observable<S, any>, el: (v: S)=> Element | Element[] | DocumentFragment): DocumentFragment;
+
+    attribute(name: string, initial?: string): Observable<string, {}>;
+}
+export const observable: observable;
+export const O: observable;
+declare global {
+	type ddeObservable<T, A= {}>= Observable<T, A>;
+	type ddeAction<V>= Action<V>
+	type ddeActions<V>= Actions<V>
+}
 type CustomElementTagNameMap= { '#text': Text, '#comment': Comment }
 declare global {
 	interface ddePublicElementTagNameMap{
@@ -19,20 +84,21 @@ type AttrsModified= {
 	/**
 	 * Use string like in HTML (internally uses `*.setAttribute("style", *)`), or object representation (like DOM API).
 	 */
-	style: string | Partial<CSSStyleDeclaration>
+	style: string | Partial<CSSStyleDeclaration> | Observable<string, any> | Partial<{ [K in keyof CSSStyleDeclaration]: Observable<CSSStyleDeclaration[K], any> }>
 	/**
 	 * Provide option to add/remove/toggle CSS clasess (index of object) using 1/0/-1. In fact `el.classList.toggle(class_name)` for `-1` and `el.classList.toggle(class_name, Boolean(...))` for others.
 	 */
-	classList: Record<string,-1|0|1|boolean>,
+	classList: Record<string,-1|0|1|boolean|Observable<-1|0|1|boolean, any>>,
 	/**
 	 * By default simiral to `className`, but also supports `string[]`
 	 * */
-	className: string | (string|boolean|undefined)[];
+	className: string | (string|boolean|undefined|Observable<string|boolean|undefined, any>)[];
 	/**
 	 * Sets `aria-*` simiraly to `dataset`
 	 * */
-	ariaset: Record<string,string>,
-} & Record<`=${string}` | `data${PascalCase}` | `aria${PascalCase}`, string> & Record<`.${string}`, any>
+	ariaset: Record<string,string|Observable<string, any>>,
+} & Record<`=${string}` | `data${PascalCase}` | `aria${PascalCase}`, string|Observable<string, any>> & Record<`.${string}`, any>
+type _fromElsInterfaces<EL extends SupportedElement>= Omit<EL, keyof AttrsModified>;
 /**
  * Just element attributtes
  *
@@ -41,17 +107,28 @@ type AttrsModified= {
  * There is added support for `data[A-Z].*`/`aria[A-Z].*` to be converted to the kebab-case alternatives.
  * @private
  */
-type ElementAttributes<T extends SupportedElement>= Omit<T,keyof AttrsModified> & AttrsModified;
+type ElementAttributes<T extends SupportedElement>= Partial<_fromElsInterfaces<T> & { [K in keyof _fromElsInterfaces<T>]: Observable<_fromElsInterfaces<T>[K], any> } & AttrsModified>;
 export function classListDeclarative<El extends SupportedElement>(element: El, classList: AttrsModified["classList"]): El
-export function assign<El extends SupportedElement>(element: El, ...attrs_array: Partial<ElementAttributes<El>>[]): El
+export function assign<El extends SupportedElement>(element: El, ...attrs_array: ElementAttributes<El>[]): El
 export function assignAttribute<El extends SupportedElement, ATT extends keyof ElementAttributes<El>>(element: El, attr: ATT, value: ElementAttributes<El>[ATT]): ElementAttributes<El>[ATT]
 
 type ExtendedHTMLElementTagNameMap= ddeHTMLElementTagNameMap & CustomElementTagNameMap & ddePublicElementTagNameMap
-export function el<TAG extends keyof ExtendedHTMLElementTagNameMap>(
+export function el<
+	TAG extends string,
+	EL extends (TAG extends keyof ExtendedHTMLElementTagNameMap ? ExtendedHTMLElementTagNameMap[TAG] : ddeHTMLElement)
+>(
 	tag_name: TAG,
-	attrs?: string | Partial<ElementAttributes<ExtendedHTMLElementTagNameMap[TAG]>>,
-	...addons: ddeElementAddon<ExtendedHTMLElementTagNameMap[TAG]>[]
-): ExtendedHTMLElementTagNameMap[TAG]
+	attrs?: ElementAttributes<EL>,
+	...addons: ddeElementAddon<TAG extends keyof HTMLElementTagNameMap ? HTMLElementTagNameMap[TAG] : EL>[]
+): EL
+export function el<
+	TAG extends string,
+	EL extends (TAG extends keyof ExtendedHTMLElementTagNameMap ? ExtendedHTMLElementTagNameMap[TAG] : ddeHTMLElement)
+>(
+	tag_name: TAG,
+	attrs?: string | Observable<string, any>,
+	...addons: ddeElementAddon<TAG extends keyof HTMLElementTagNameMap ? HTMLElementTagNameMap[TAG] : EL>[]
+): EL
 export function el<T>(
 	tag_name?: "<>",
 ): ddeDocumentFragment
@@ -63,12 +140,7 @@ export function el<
 	attrs?: A | string,
 	...addons: ddeElementAddon<ReturnType<C>>[]
 ): ReturnType<C>
-
-export function el(
-	tag_name: string,
-	attrs?: string | Record<string, any>,
-	...addons: ddeElementAddon<HTMLElement>[]
-): ddeHTMLElement
+export { el as createElement }
 
 export function elNS(
 	namespace: "http://www.w3.org/2000/svg"
@@ -91,6 +163,7 @@ export function elNS(
 	attrs?: string | Record<string, any>,
 	...addons: ddeElementAddon<SupportedElement>[]
 )=> SupportedElement
+export { elNS as createElementNS }
 
 export function chainableAppend<EL extends SupportedElement>(el: EL): EL;
 export function simulateSlots<EL extends SupportedElement | DocumentFragment>(el: EL): EL
@@ -250,71 +323,6 @@ declare global{
 		"ul": ddeHTMLUListElement;
 		"video": ddeHTMLVideoElement;
 	}
-	interface ddeHTMLAnchorElement extends HTMLAnchorElement{ append: ddeAppend<ddeHTMLAnchorElement>; }
-	interface ddeHTMLAreaElement extends HTMLAreaElement{ append: ddeAppend<ddeHTMLAreaElement>; }
-	interface ddeHTMLAudioElement extends HTMLAudioElement{ append: ddeAppend<ddeHTMLAudioElement>; }
-	interface ddeHTMLBaseElement extends HTMLBaseElement{ append: ddeAppend<ddeHTMLBaseElement>; }
-	interface ddeHTMLQuoteElement extends HTMLQuoteElement{ append: ddeAppend<ddeHTMLQuoteElement>; }
-	interface ddeHTMLBodyElement extends HTMLBodyElement{ append: ddeAppend<ddeHTMLBodyElement>; }
-	interface ddeHTMLBRElement extends HTMLBRElement{ append: ddeAppend<ddeHTMLBRElement>; }
-	interface ddeHTMLButtonElement extends HTMLButtonElement{ append: ddeAppend<ddeHTMLButtonElement>; }
-	interface ddeHTMLCanvasElement extends HTMLCanvasElement{ append: ddeAppend<ddeHTMLCanvasElement>; }
-	interface ddeHTMLTableCaptionElement extends HTMLTableCaptionElement{ append: ddeAppend<ddeHTMLTableCaptionElement>; }
-	interface ddeHTMLTableColElement extends HTMLTableColElement{ append: ddeAppend<ddeHTMLTableColElement>; }
-	interface ddeHTMLTableColElement extends HTMLTableColElement{ append: ddeAppend<ddeHTMLTableColElement>; }
-	interface ddeHTMLDataElement extends HTMLDataElement{ append: ddeAppend<ddeHTMLDataElement>; }
-	interface ddeHTMLDataListElement extends HTMLDataListElement{ append: ddeAppend<ddeHTMLDataListElement>; }
-	interface ddeHTMLModElement extends HTMLModElement{ append: ddeAppend<ddeHTMLModElement>; }
-	interface ddeHTMLDetailsElement extends HTMLDetailsElement{ append: ddeAppend<ddeHTMLDetailsElement>; }
-	interface ddeHTMLDialogElement extends HTMLDialogElement{ append: ddeAppend<ddeHTMLDialogElement>; }
-	interface ddeHTMLDivElement extends HTMLDivElement{ append: ddeAppend<ddeHTMLDivElement>; }
-	interface ddeHTMLDListElement extends HTMLDListElement{ append: ddeAppend<ddeHTMLDListElement>; }
-	interface ddeHTMLEmbedElement extends HTMLEmbedElement{ append: ddeAppend<ddeHTMLEmbedElement>; }
-	interface ddeHTMLFieldSetElement extends HTMLFieldSetElement{ append: ddeAppend<ddeHTMLFieldSetElement>; }
-	interface ddeHTMLFormElement extends HTMLFormElement{ append: ddeAppend<ddeHTMLFormElement>; }
-	interface ddeHTMLHeadingElement extends HTMLHeadingElement{ append: ddeAppend<ddeHTMLHeadingElement>; }
-	interface ddeHTMLHeadElement extends HTMLHeadElement{ append: ddeAppend<ddeHTMLHeadElement>; }
-	interface ddeHTMLHRElement extends HTMLHRElement{ append: ddeAppend<ddeHTMLHRElement>; }
-	interface ddeHTMLHtmlElement extends HTMLHtmlElement{ append: ddeAppend<ddeHTMLHtmlElement>; }
-	interface ddeHTMLIFrameElement extends HTMLIFrameElement{ append: ddeAppend<ddeHTMLIFrameElement>; }
-	interface ddeHTMLImageElement extends HTMLImageElement{ append: ddeAppend<ddeHTMLImageElement>; }
-	interface ddeHTMLInputElement extends HTMLInputElement{ append: ddeAppend<ddeHTMLInputElement>; }
-	interface ddeHTMLLabelElement extends HTMLLabelElement{ append: ddeAppend<ddeHTMLLabelElement>; }
-	interface ddeHTMLLegendElement extends HTMLLegendElement{ append: ddeAppend<ddeHTMLLegendElement>; }
-	interface ddeHTMLLIElement extends HTMLLIElement{ append: ddeAppend<ddeHTMLLIElement>; }
-	interface ddeHTMLLinkElement extends HTMLLinkElement{ append: ddeAppend<ddeHTMLLinkElement>; }
-	interface ddeHTMLMapElement extends HTMLMapElement{ append: ddeAppend<ddeHTMLMapElement>; }
-	interface ddeHTMLMenuElement extends HTMLMenuElement{ append: ddeAppend<ddeHTMLMenuElement>; }
-	interface ddeHTMLMetaElement extends HTMLMetaElement{ append: ddeAppend<ddeHTMLMetaElement>; }
-	interface ddeHTMLMeterElement extends HTMLMeterElement{ append: ddeAppend<ddeHTMLMeterElement>; }
-	interface ddeHTMLObjectElement extends HTMLObjectElement{ append: ddeAppend<ddeHTMLObjectElement>; }
-	interface ddeHTMLOListElement extends HTMLOListElement{ append: ddeAppend<ddeHTMLOListElement>; }
-	interface ddeHTMLOptGroupElement extends HTMLOptGroupElement{ append: ddeAppend<ddeHTMLOptGroupElement>; }
-	interface ddeHTMLOptionElement extends HTMLOptionElement{ append: ddeAppend<ddeHTMLOptionElement>; }
-	interface ddeHTMLOutputElement extends HTMLOutputElement{ append: ddeAppend<ddeHTMLOutputElement>; }
-	interface ddeHTMLParagraphElement extends HTMLParagraphElement{ append: ddeAppend<ddeHTMLParagraphElement>; }
-	interface ddeHTMLPictureElement extends HTMLPictureElement{ append: ddeAppend<ddeHTMLPictureElement>; }
-	interface ddeHTMLPreElement extends HTMLPreElement{ append: ddeAppend<ddeHTMLPreElement>; }
-	interface ddeHTMLProgressElement extends HTMLProgressElement{ append: ddeAppend<ddeHTMLProgressElement>; }
-	interface ddeHTMLScriptElement extends HTMLScriptElement{ append: ddeAppend<ddeHTMLScriptElement>; }
-	interface ddeHTMLSelectElement extends HTMLSelectElement{ append: ddeAppend<ddeHTMLSelectElement>; }
-	interface ddeHTMLSlotElement extends HTMLSlotElement{ append: ddeAppend<ddeHTMLSlotElement>; }
-	interface ddeHTMLSourceElement extends HTMLSourceElement{ append: ddeAppend<ddeHTMLSourceElement>; }
-	interface ddeHTMLSpanElement extends HTMLSpanElement{ append: ddeAppend<ddeHTMLSpanElement>; }
-	interface ddeHTMLStyleElement extends HTMLStyleElement{ append: ddeAppend<ddeHTMLStyleElement>; }
-	interface ddeHTMLTableElement extends HTMLTableElement{ append: ddeAppend<ddeHTMLTableElement>; }
-	interface ddeHTMLTableSectionElement extends HTMLTableSectionElement{ append: ddeAppend<ddeHTMLTableSectionElement>; }
-	interface ddeHTMLTableCellElement extends HTMLTableCellElement{ append: ddeAppend<ddeHTMLTableCellElement>; }
-	interface ddeHTMLTemplateElement extends HTMLTemplateElement{ append: ddeAppend<ddeHTMLTemplateElement>; }
-	interface ddeHTMLTextAreaElement extends HTMLTextAreaElement{ append: ddeAppend<ddeHTMLTextAreaElement>; }
-	interface ddeHTMLTableCellElement extends HTMLTableCellElement{ append: ddeAppend<ddeHTMLTableCellElement>; }
-	interface ddeHTMLTimeElement extends HTMLTimeElement{ append: ddeAppend<ddeHTMLTimeElement>; }
-	interface ddeHTMLTitleElement extends HTMLTitleElement{ append: ddeAppend<ddeHTMLTitleElement>; }
-	interface ddeHTMLTableRowElement extends HTMLTableRowElement{ append: ddeAppend<ddeHTMLTableRowElement>; }
-	interface ddeHTMLTrackElement extends HTMLTrackElement{ append: ddeAppend<ddeHTMLTrackElement>; }
-	interface ddeHTMLUListElement extends HTMLUListElement{ append: ddeAppend<ddeHTMLUListElement>; }
-	interface ddeHTMLVideoElement extends HTMLVideoElement{ append: ddeAppend<ddeHTMLVideoElement>; }
-	
 	interface ddeSVGElementTagNameMap {
 		"a": ddeSVGAElement;
 		"animate": ddeSVGAnimateElement;
@@ -380,67 +388,132 @@ declare global{
 		"use": ddeSVGUseElement;
 		"view": ddeSVGViewElement;
 	}
-	interface ddeSVGAElement extends SVGAElement{ append: ddeAppend<ddeSVGAElement>; }
-	interface ddeSVGAnimateElement extends SVGAnimateElement{ append: ddeAppend<ddeSVGAnimateElement>; }
-	interface ddeSVGAnimateMotionElement extends SVGAnimateMotionElement{ append: ddeAppend<ddeSVGAnimateMotionElement>; }
-	interface ddeSVGAnimateTransformElement extends SVGAnimateTransformElement{ append: ddeAppend<ddeSVGAnimateTransformElement>; }
-	interface ddeSVGCircleElement extends SVGCircleElement{ append: ddeAppend<ddeSVGCircleElement>; }
-	interface ddeSVGClipPathElement extends SVGClipPathElement{ append: ddeAppend<ddeSVGClipPathElement>; }
-	interface ddeSVGDefsElement extends SVGDefsElement{ append: ddeAppend<ddeSVGDefsElement>; }
-	interface ddeSVGDescElement extends SVGDescElement{ append: ddeAppend<ddeSVGDescElement>; }
-	interface ddeSVGEllipseElement extends SVGEllipseElement{ append: ddeAppend<ddeSVGEllipseElement>; }
-	interface ddeSVGFEBlendElement extends SVGFEBlendElement{ append: ddeAppend<ddeSVGFEBlendElement>; }
-	interface ddeSVGFEColorMatrixElement extends SVGFEColorMatrixElement{ append: ddeAppend<ddeSVGFEColorMatrixElement>; }
-	interface ddeSVGFEComponentTransferElement extends SVGFEComponentTransferElement{ append: ddeAppend<ddeSVGFEComponentTransferElement>; }
-	interface ddeSVGFECompositeElement extends SVGFECompositeElement{ append: ddeAppend<ddeSVGFECompositeElement>; }
-	interface ddeSVGFEConvolveMatrixElement extends SVGFEConvolveMatrixElement{ append: ddeAppend<ddeSVGFEConvolveMatrixElement>; }
-	interface ddeSVGFEDiffuseLightingElement extends SVGFEDiffuseLightingElement{ append: ddeAppend<ddeSVGFEDiffuseLightingElement>; }
-	interface ddeSVGFEDisplacementMapElement extends SVGFEDisplacementMapElement{ append: ddeAppend<ddeSVGFEDisplacementMapElement>; }
-	interface ddeSVGFEDistantLightElement extends SVGFEDistantLightElement{ append: ddeAppend<ddeSVGFEDistantLightElement>; }
-	interface ddeSVGFEDropShadowElement extends SVGFEDropShadowElement{ append: ddeAppend<ddeSVGFEDropShadowElement>; }
-	interface ddeSVGFEFloodElement extends SVGFEFloodElement{ append: ddeAppend<ddeSVGFEFloodElement>; }
-	interface ddeSVGFEFuncAElement extends SVGFEFuncAElement{ append: ddeAppend<ddeSVGFEFuncAElement>; }
-	interface ddeSVGFEFuncBElement extends SVGFEFuncBElement{ append: ddeAppend<ddeSVGFEFuncBElement>; }
-	interface ddeSVGFEFuncGElement extends SVGFEFuncGElement{ append: ddeAppend<ddeSVGFEFuncGElement>; }
-	interface ddeSVGFEFuncRElement extends SVGFEFuncRElement{ append: ddeAppend<ddeSVGFEFuncRElement>; }
-	interface ddeSVGFEGaussianBlurElement extends SVGFEGaussianBlurElement{ append: ddeAppend<ddeSVGFEGaussianBlurElement>; }
-	interface ddeSVGFEImageElement extends SVGFEImageElement{ append: ddeAppend<ddeSVGFEImageElement>; }
-	interface ddeSVGFEMergeElement extends SVGFEMergeElement{ append: ddeAppend<ddeSVGFEMergeElement>; }
-	interface ddeSVGFEMergeNodeElement extends SVGFEMergeNodeElement{ append: ddeAppend<ddeSVGFEMergeNodeElement>; }
-	interface ddeSVGFEMorphologyElement extends SVGFEMorphologyElement{ append: ddeAppend<ddeSVGFEMorphologyElement>; }
-	interface ddeSVGFEOffsetElement extends SVGFEOffsetElement{ append: ddeAppend<ddeSVGFEOffsetElement>; }
-	interface ddeSVGFEPointLightElement extends SVGFEPointLightElement{ append: ddeAppend<ddeSVGFEPointLightElement>; }
-	interface ddeSVGFESpecularLightingElement extends SVGFESpecularLightingElement{ append: ddeAppend<ddeSVGFESpecularLightingElement>; }
-	interface ddeSVGFESpotLightElement extends SVGFESpotLightElement{ append: ddeAppend<ddeSVGFESpotLightElement>; }
-	interface ddeSVGFETileElement extends SVGFETileElement{ append: ddeAppend<ddeSVGFETileElement>; }
-	interface ddeSVGFETurbulenceElement extends SVGFETurbulenceElement{ append: ddeAppend<ddeSVGFETurbulenceElement>; }
-	interface ddeSVGFilterElement extends SVGFilterElement{ append: ddeAppend<ddeSVGFilterElement>; }
-	interface ddeSVGForeignObjectElement extends SVGForeignObjectElement{ append: ddeAppend<ddeSVGForeignObjectElement>; }
-	interface ddeSVGGElement extends SVGGElement{ append: ddeAppend<ddeSVGGElement>; }
-	interface ddeSVGImageElement extends SVGImageElement{ append: ddeAppend<ddeSVGImageElement>; }
-	interface ddeSVGLineElement extends SVGLineElement{ append: ddeAppend<ddeSVGLineElement>; }
-	interface ddeSVGLinearGradientElement extends SVGLinearGradientElement{ append: ddeAppend<ddeSVGLinearGradientElement>; }
-	interface ddeSVGMarkerElement extends SVGMarkerElement{ append: ddeAppend<ddeSVGMarkerElement>; }
-	interface ddeSVGMaskElement extends SVGMaskElement{ append: ddeAppend<ddeSVGMaskElement>; }
-	interface ddeSVGMetadataElement extends SVGMetadataElement{ append: ddeAppend<ddeSVGMetadataElement>; }
-	interface ddeSVGMPathElement extends SVGMPathElement{ append: ddeAppend<ddeSVGMPathElement>; }
-	interface ddeSVGPathElement extends SVGPathElement{ append: ddeAppend<ddeSVGPathElement>; }
-	interface ddeSVGPatternElement extends SVGPatternElement{ append: ddeAppend<ddeSVGPatternElement>; }
-	interface ddeSVGPolygonElement extends SVGPolygonElement{ append: ddeAppend<ddeSVGPolygonElement>; }
-	interface ddeSVGPolylineElement extends SVGPolylineElement{ append: ddeAppend<ddeSVGPolylineElement>; }
-	interface ddeSVGRadialGradientElement extends SVGRadialGradientElement{ append: ddeAppend<ddeSVGRadialGradientElement>; }
-	interface ddeSVGRectElement extends SVGRectElement{ append: ddeAppend<ddeSVGRectElement>; }
-	interface ddeSVGScriptElement extends SVGScriptElement{ append: ddeAppend<ddeSVGScriptElement>; }
-	interface ddeSVGSetElement extends SVGSetElement{ append: ddeAppend<ddeSVGSetElement>; }
-	interface ddeSVGStopElement extends SVGStopElement{ append: ddeAppend<ddeSVGStopElement>; }
-	interface ddeSVGStyleElement extends SVGStyleElement{ append: ddeAppend<ddeSVGStyleElement>; }
-	interface ddeSVGSVGElement extends SVGSVGElement{ append: ddeAppend<ddeSVGSVGElement>; }
-	interface ddeSVGSwitchElement extends SVGSwitchElement{ append: ddeAppend<ddeSVGSwitchElement>; }
-	interface ddeSVGSymbolElement extends SVGSymbolElement{ append: ddeAppend<ddeSVGSymbolElement>; }
-	interface ddeSVGTextElement extends SVGTextElement{ append: ddeAppend<ddeSVGTextElement>; }
-	interface ddeSVGTextPathElement extends SVGTextPathElement{ append: ddeAppend<ddeSVGTextPathElement>; }
-	interface ddeSVGTitleElement extends SVGTitleElement{ append: ddeAppend<ddeSVGTitleElement>; }
-	interface ddeSVGTSpanElement extends SVGTSpanElement{ append: ddeAppend<ddeSVGTSpanElement>; }
-	interface ddeSVGUseElement extends SVGUseElement{ append: ddeAppend<ddeSVGUseElement>; }
-	interface ddeSVGViewElement extends SVGViewElement{ append: ddeAppend<ddeSVGViewElement>; }
 }
+
+interface ddeHTMLAnchorElement extends HTMLAnchorElement{ append: ddeAppend<ddeHTMLAnchorElement>; }
+interface ddeHTMLAreaElement extends HTMLAreaElement{ append: ddeAppend<ddeHTMLAreaElement>; }
+interface ddeHTMLAudioElement extends HTMLAudioElement{ append: ddeAppend<ddeHTMLAudioElement>; }
+interface ddeHTMLBaseElement extends HTMLBaseElement{ append: ddeAppend<ddeHTMLBaseElement>; }
+interface ddeHTMLQuoteElement extends HTMLQuoteElement{ append: ddeAppend<ddeHTMLQuoteElement>; }
+interface ddeHTMLBodyElement extends HTMLBodyElement{ append: ddeAppend<ddeHTMLBodyElement>; }
+interface ddeHTMLBRElement extends HTMLBRElement{ append: ddeAppend<ddeHTMLBRElement>; }
+interface ddeHTMLButtonElement extends HTMLButtonElement{ append: ddeAppend<ddeHTMLButtonElement>; }
+interface ddeHTMLCanvasElement extends HTMLCanvasElement{ append: ddeAppend<ddeHTMLCanvasElement>; }
+interface ddeHTMLTableCaptionElement extends HTMLTableCaptionElement{ append: ddeAppend<ddeHTMLTableCaptionElement>; }
+interface ddeHTMLTableColElement extends HTMLTableColElement{ append: ddeAppend<ddeHTMLTableColElement>; }
+interface ddeHTMLTableColElement extends HTMLTableColElement{ append: ddeAppend<ddeHTMLTableColElement>; }
+interface ddeHTMLDataElement extends HTMLDataElement{ append: ddeAppend<ddeHTMLDataElement>; }
+interface ddeHTMLDataListElement extends HTMLDataListElement{ append: ddeAppend<ddeHTMLDataListElement>; }
+interface ddeHTMLModElement extends HTMLModElement{ append: ddeAppend<ddeHTMLModElement>; }
+interface ddeHTMLDetailsElement extends HTMLDetailsElement{ append: ddeAppend<ddeHTMLDetailsElement>; }
+interface ddeHTMLDialogElement extends HTMLDialogElement{ append: ddeAppend<ddeHTMLDialogElement>; }
+interface ddeHTMLDivElement extends HTMLDivElement{ append: ddeAppend<ddeHTMLDivElement>; }
+interface ddeHTMLDListElement extends HTMLDListElement{ append: ddeAppend<ddeHTMLDListElement>; }
+interface ddeHTMLEmbedElement extends HTMLEmbedElement{ append: ddeAppend<ddeHTMLEmbedElement>; }
+interface ddeHTMLFieldSetElement extends HTMLFieldSetElement{ append: ddeAppend<ddeHTMLFieldSetElement>; }
+interface ddeHTMLFormElement extends HTMLFormElement{ append: ddeAppend<ddeHTMLFormElement>; }
+interface ddeHTMLHeadingElement extends HTMLHeadingElement{ append: ddeAppend<ddeHTMLHeadingElement>; }
+interface ddeHTMLHeadElement extends HTMLHeadElement{ append: ddeAppend<ddeHTMLHeadElement>; }
+interface ddeHTMLHRElement extends HTMLHRElement{ append: ddeAppend<ddeHTMLHRElement>; }
+interface ddeHTMLHtmlElement extends HTMLHtmlElement{ append: ddeAppend<ddeHTMLHtmlElement>; }
+interface ddeHTMLIFrameElement extends HTMLIFrameElement{ append: ddeAppend<ddeHTMLIFrameElement>; }
+interface ddeHTMLImageElement extends HTMLImageElement{ append: ddeAppend<ddeHTMLImageElement>; }
+interface ddeHTMLInputElement extends HTMLInputElement{ append: ddeAppend<ddeHTMLInputElement>; }
+interface ddeHTMLLabelElement extends HTMLLabelElement{ append: ddeAppend<ddeHTMLLabelElement>; }
+interface ddeHTMLLegendElement extends HTMLLegendElement{ append: ddeAppend<ddeHTMLLegendElement>; }
+interface ddeHTMLLIElement extends HTMLLIElement{ append: ddeAppend<ddeHTMLLIElement>; }
+interface ddeHTMLLinkElement extends HTMLLinkElement{ append: ddeAppend<ddeHTMLLinkElement>; }
+interface ddeHTMLMapElement extends HTMLMapElement{ append: ddeAppend<ddeHTMLMapElement>; }
+interface ddeHTMLMenuElement extends HTMLMenuElement{ append: ddeAppend<ddeHTMLMenuElement>; }
+interface ddeHTMLMetaElement extends HTMLMetaElement{ append: ddeAppend<ddeHTMLMetaElement>; }
+interface ddeHTMLMeterElement extends HTMLMeterElement{ append: ddeAppend<ddeHTMLMeterElement>; }
+interface ddeHTMLObjectElement extends HTMLObjectElement{ append: ddeAppend<ddeHTMLObjectElement>; }
+interface ddeHTMLOListElement extends HTMLOListElement{ append: ddeAppend<ddeHTMLOListElement>; }
+interface ddeHTMLOptGroupElement extends HTMLOptGroupElement{ append: ddeAppend<ddeHTMLOptGroupElement>; }
+interface ddeHTMLOptionElement extends HTMLOptionElement{ append: ddeAppend<ddeHTMLOptionElement>; }
+interface ddeHTMLOutputElement extends HTMLOutputElement{ append: ddeAppend<ddeHTMLOutputElement>; }
+interface ddeHTMLParagraphElement extends HTMLParagraphElement{ append: ddeAppend<ddeHTMLParagraphElement>; }
+interface ddeHTMLPictureElement extends HTMLPictureElement{ append: ddeAppend<ddeHTMLPictureElement>; }
+interface ddeHTMLPreElement extends HTMLPreElement{ append: ddeAppend<ddeHTMLPreElement>; }
+interface ddeHTMLProgressElement extends HTMLProgressElement{ append: ddeAppend<ddeHTMLProgressElement>; }
+interface ddeHTMLScriptElement extends HTMLScriptElement{ append: ddeAppend<ddeHTMLScriptElement>; }
+interface ddeHTMLSelectElement extends HTMLSelectElement{ append: ddeAppend<ddeHTMLSelectElement>; }
+interface ddeHTMLSlotElement extends HTMLSlotElement{ append: ddeAppend<ddeHTMLSlotElement>; }
+interface ddeHTMLSourceElement extends HTMLSourceElement{ append: ddeAppend<ddeHTMLSourceElement>; }
+interface ddeHTMLSpanElement extends HTMLSpanElement{ append: ddeAppend<ddeHTMLSpanElement>; }
+interface ddeHTMLStyleElement extends HTMLStyleElement{ append: ddeAppend<ddeHTMLStyleElement>; }
+interface ddeHTMLTableElement extends HTMLTableElement{ append: ddeAppend<ddeHTMLTableElement>; }
+interface ddeHTMLTableSectionElement extends HTMLTableSectionElement{ append: ddeAppend<ddeHTMLTableSectionElement>; }
+interface ddeHTMLTableCellElement extends HTMLTableCellElement{ append: ddeAppend<ddeHTMLTableCellElement>; }
+interface ddeHTMLTemplateElement extends HTMLTemplateElement{ append: ddeAppend<ddeHTMLTemplateElement>; }
+interface ddeHTMLTextAreaElement extends HTMLTextAreaElement{ append: ddeAppend<ddeHTMLTextAreaElement>; }
+interface ddeHTMLTableCellElement extends HTMLTableCellElement{ append: ddeAppend<ddeHTMLTableCellElement>; }
+interface ddeHTMLTimeElement extends HTMLTimeElement{ append: ddeAppend<ddeHTMLTimeElement>; }
+interface ddeHTMLTitleElement extends HTMLTitleElement{ append: ddeAppend<ddeHTMLTitleElement>; }
+interface ddeHTMLTableRowElement extends HTMLTableRowElement{ append: ddeAppend<ddeHTMLTableRowElement>; }
+interface ddeHTMLTrackElement extends HTMLTrackElement{ append: ddeAppend<ddeHTMLTrackElement>; }
+interface ddeHTMLUListElement extends HTMLUListElement{ append: ddeAppend<ddeHTMLUListElement>; }
+interface ddeHTMLVideoElement extends HTMLVideoElement{ append: ddeAppend<ddeHTMLVideoElement>; }
+interface ddeSVGAElement extends SVGAElement{ append: ddeAppend<ddeSVGAElement>; }
+interface ddeSVGAnimateElement extends SVGAnimateElement{ append: ddeAppend<ddeSVGAnimateElement>; }
+interface ddeSVGAnimateMotionElement extends SVGAnimateMotionElement{ append: ddeAppend<ddeSVGAnimateMotionElement>; }
+interface ddeSVGAnimateTransformElement extends SVGAnimateTransformElement{ append: ddeAppend<ddeSVGAnimateTransformElement>; }
+interface ddeSVGCircleElement extends SVGCircleElement{ append: ddeAppend<ddeSVGCircleElement>; }
+interface ddeSVGClipPathElement extends SVGClipPathElement{ append: ddeAppend<ddeSVGClipPathElement>; }
+interface ddeSVGDefsElement extends SVGDefsElement{ append: ddeAppend<ddeSVGDefsElement>; }
+interface ddeSVGDescElement extends SVGDescElement{ append: ddeAppend<ddeSVGDescElement>; }
+interface ddeSVGEllipseElement extends SVGEllipseElement{ append: ddeAppend<ddeSVGEllipseElement>; }
+interface ddeSVGFEBlendElement extends SVGFEBlendElement{ append: ddeAppend<ddeSVGFEBlendElement>; }
+interface ddeSVGFEColorMatrixElement extends SVGFEColorMatrixElement{ append: ddeAppend<ddeSVGFEColorMatrixElement>; }
+interface ddeSVGFEComponentTransferElement extends SVGFEComponentTransferElement{ append: ddeAppend<ddeSVGFEComponentTransferElement>; }
+interface ddeSVGFECompositeElement extends SVGFECompositeElement{ append: ddeAppend<ddeSVGFECompositeElement>; }
+interface ddeSVGFEConvolveMatrixElement extends SVGFEConvolveMatrixElement{ append: ddeAppend<ddeSVGFEConvolveMatrixElement>; }
+interface ddeSVGFEDiffuseLightingElement extends SVGFEDiffuseLightingElement{ append: ddeAppend<ddeSVGFEDiffuseLightingElement>; }
+interface ddeSVGFEDisplacementMapElement extends SVGFEDisplacementMapElement{ append: ddeAppend<ddeSVGFEDisplacementMapElement>; }
+interface ddeSVGFEDistantLightElement extends SVGFEDistantLightElement{ append: ddeAppend<ddeSVGFEDistantLightElement>; }
+interface ddeSVGFEDropShadowElement extends SVGFEDropShadowElement{ append: ddeAppend<ddeSVGFEDropShadowElement>; }
+interface ddeSVGFEFloodElement extends SVGFEFloodElement{ append: ddeAppend<ddeSVGFEFloodElement>; }
+interface ddeSVGFEFuncAElement extends SVGFEFuncAElement{ append: ddeAppend<ddeSVGFEFuncAElement>; }
+interface ddeSVGFEFuncBElement extends SVGFEFuncBElement{ append: ddeAppend<ddeSVGFEFuncBElement>; }
+interface ddeSVGFEFuncGElement extends SVGFEFuncGElement{ append: ddeAppend<ddeSVGFEFuncGElement>; }
+interface ddeSVGFEFuncRElement extends SVGFEFuncRElement{ append: ddeAppend<ddeSVGFEFuncRElement>; }
+interface ddeSVGFEGaussianBlurElement extends SVGFEGaussianBlurElement{ append: ddeAppend<ddeSVGFEGaussianBlurElement>; }
+interface ddeSVGFEImageElement extends SVGFEImageElement{ append: ddeAppend<ddeSVGFEImageElement>; }
+interface ddeSVGFEMergeElement extends SVGFEMergeElement{ append: ddeAppend<ddeSVGFEMergeElement>; }
+interface ddeSVGFEMergeNodeElement extends SVGFEMergeNodeElement{ append: ddeAppend<ddeSVGFEMergeNodeElement>; }
+interface ddeSVGFEMorphologyElement extends SVGFEMorphologyElement{ append: ddeAppend<ddeSVGFEMorphologyElement>; }
+interface ddeSVGFEOffsetElement extends SVGFEOffsetElement{ append: ddeAppend<ddeSVGFEOffsetElement>; }
+interface ddeSVGFEPointLightElement extends SVGFEPointLightElement{ append: ddeAppend<ddeSVGFEPointLightElement>; }
+interface ddeSVGFESpecularLightingElement extends SVGFESpecularLightingElement{ append: ddeAppend<ddeSVGFESpecularLightingElement>; }
+interface ddeSVGFESpotLightElement extends SVGFESpotLightElement{ append: ddeAppend<ddeSVGFESpotLightElement>; }
+interface ddeSVGFETileElement extends SVGFETileElement{ append: ddeAppend<ddeSVGFETileElement>; }
+interface ddeSVGFETurbulenceElement extends SVGFETurbulenceElement{ append: ddeAppend<ddeSVGFETurbulenceElement>; }
+interface ddeSVGFilterElement extends SVGFilterElement{ append: ddeAppend<ddeSVGFilterElement>; }
+interface ddeSVGForeignObjectElement extends SVGForeignObjectElement{ append: ddeAppend<ddeSVGForeignObjectElement>; }
+interface ddeSVGGElement extends SVGGElement{ append: ddeAppend<ddeSVGGElement>; }
+interface ddeSVGImageElement extends SVGImageElement{ append: ddeAppend<ddeSVGImageElement>; }
+interface ddeSVGLineElement extends SVGLineElement{ append: ddeAppend<ddeSVGLineElement>; }
+interface ddeSVGLinearGradientElement extends SVGLinearGradientElement{ append: ddeAppend<ddeSVGLinearGradientElement>; }
+interface ddeSVGMarkerElement extends SVGMarkerElement{ append: ddeAppend<ddeSVGMarkerElement>; }
+interface ddeSVGMaskElement extends SVGMaskElement{ append: ddeAppend<ddeSVGMaskElement>; }
+interface ddeSVGMetadataElement extends SVGMetadataElement{ append: ddeAppend<ddeSVGMetadataElement>; }
+interface ddeSVGMPathElement extends SVGMPathElement{ append: ddeAppend<ddeSVGMPathElement>; }
+interface ddeSVGPathElement extends SVGPathElement{ append: ddeAppend<ddeSVGPathElement>; }
+interface ddeSVGPatternElement extends SVGPatternElement{ append: ddeAppend<ddeSVGPatternElement>; }
+interface ddeSVGPolygonElement extends SVGPolygonElement{ append: ddeAppend<ddeSVGPolygonElement>; }
+interface ddeSVGPolylineElement extends SVGPolylineElement{ append: ddeAppend<ddeSVGPolylineElement>; }
+interface ddeSVGRadialGradientElement extends SVGRadialGradientElement{ append: ddeAppend<ddeSVGRadialGradientElement>; }
+interface ddeSVGRectElement extends SVGRectElement{ append: ddeAppend<ddeSVGRectElement>; }
+interface ddeSVGScriptElement extends SVGScriptElement{ append: ddeAppend<ddeSVGScriptElement>; }
+interface ddeSVGSetElement extends SVGSetElement{ append: ddeAppend<ddeSVGSetElement>; }
+interface ddeSVGStopElement extends SVGStopElement{ append: ddeAppend<ddeSVGStopElement>; }
+interface ddeSVGStyleElement extends SVGStyleElement{ append: ddeAppend<ddeSVGStyleElement>; }
+interface ddeSVGSVGElement extends SVGSVGElement{ append: ddeAppend<ddeSVGSVGElement>; }
+interface ddeSVGSwitchElement extends SVGSwitchElement{ append: ddeAppend<ddeSVGSwitchElement>; }
+interface ddeSVGSymbolElement extends SVGSymbolElement{ append: ddeAppend<ddeSVGSymbolElement>; }
+interface ddeSVGTextElement extends SVGTextElement{ append: ddeAppend<ddeSVGTextElement>; }
+interface ddeSVGTextPathElement extends SVGTextPathElement{ append: ddeAppend<ddeSVGTextPathElement>; }
+interface ddeSVGTitleElement extends SVGTitleElement{ append: ddeAppend<ddeSVGTitleElement>; }
+interface ddeSVGTSpanElement extends SVGTSpanElement{ append: ddeAppend<ddeSVGTSpanElement>; }
+interface ddeSVGUseElement extends SVGUseElement{ append: ddeAppend<ddeSVGUseElement>; }
+interface ddeSVGViewElement extends SVGViewElement{ append: ddeAppend<ddeSVGViewElement>; }

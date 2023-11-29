@@ -60,7 +60,7 @@ observable.on= function on(o, listener, options= {}){
 	//TODO cleanup when observable removed
 };
 observable.symbols= {
-	observable: mark,
+	//observable: mark,
 	onclear: Symbol.for("Observable.onclear")
 };
 observable.clear= function(...observables){

@@ -1,8 +1,8 @@
 export type Observable<V, A>= (set?: V)=> V & A;
-type Action<V>= (this: { value: V }, ...a: any[])=> typeof observable._ | void;
-type SymbolOnclear= Symbol;
-type SymbolObservable= Symbol;
-type Actions<V>= Record<string, Action<V>>;
+type Action<V>= (this: { value: V, stopPropagation(): void }, ...a: any[])=> typeof observable._ | void;
+//type SymbolObservable= Symbol;
+type SymbolOnclear= symbol;
+type Actions<V>= Record<string | SymbolOnclear, Action<V>>;
 interface observable{
 	_: Symbol
 	/**
@@ -42,7 +42,7 @@ interface observable{
 	clear(...observables: Observable<any, any>[]): void;
 	on<T>(observable: Observable<T, any>, onchange: (a: T)=> void, options?: AddEventListenerOptions): void;
 	symbols: {
-		observable: SymbolObservable;
+		//observable: SymbolObservable;
 		onclear: SymbolOnclear;
 	}
 	/**
@@ -52,7 +52,7 @@ interface observable{
 	 * S.el(listS, list=> list.map(li=> el("li", li)));
 	 * ```
 	 * */
-	el<S extends any>(observable: Observable<S, any>, el: (v: S)=> Element | Element[]): DocumentFragment;
+	el<S extends any>(observable: Observable<S, any>, el: (v: S)=> Element | Element[] | DocumentFragment): DocumentFragment;
 
     attribute(name: string, initial?: string): Observable<string, {}>;
 }
@@ -60,5 +60,6 @@ export const observable: observable;
 export const O: observable;
 declare global {
 	type ddeObservable<T, A= {}>= Observable<T, A>;
+	type ddeAction<V>= Action<V>
 	type ddeActions<V>= Actions<V>
 }

@@ -8,7 +8,7 @@ O.on(observable, v=> console.log("observable", v), { signal: ac.signal });
 O.on(double, v=> console.log("double", v), { signal: ac.signal });
 
 observable(observable()+1);
-const interval= 5000;
+const interval= 5 * 1000;
 const id= setInterval(()=> observable(observable()+1), interval);
 ac.signal.addEventListener("abort",
 	()=> setTimeout(()=> clearInterval(id), 2*interval));

@@ -3,7 +3,7 @@ import { simplePage } from "./layout/simplePage.html.js";
 import { el } from "deka-dom-el";
 import { example } from "./components/example.html.js";
 import { h3 } from "./components/pageUtils.html.js";
-import { mnemonicUl } from "./components/mnemonicUl.html.js";
+import { mnemonic } from "./components/mnemonic/elements-init.js";
 import { code } from "./components/code.html.js";
 /** @param {string} url */
 const fileURL= url=> new URL(url, import.meta.url);
@@ -116,25 +116,6 @@ export function page({ pkg, info }){
 		),
 		el(example, { src: fileURL("./components/examples/elements/dekaElNS.js"), page_id }),
 		
-		el(mnemonicUl).append(
-			el("li").append(
-				el("code", "assign(<element>, ...<idl-objects>): <element>"), " — assign properties to the element",
-			),
-			el("li").append(
-				el("code", "el(<tag-name>, <primitive>)[.append(...)]: <element-from-tag-name>"), " — simple element containing only text",
-			),
-			el("li").append(
-				el("code", "el(<tag-name>, <idl-object>)[.append(...)]: <element-from-tag-name>"), " — element with more properties",
-			),
-			el("li").append(
-				el("code", "el(<function>, <function-argument(s)>)[.append(...)]: <element-returned-by-function>"), " — using component represented by function",
-			),
-			el("li").append(
-				el("code", "el(<...>, <...>, ...<addons>)"), " — see following page"
-			),
-			el("li").append(
-				el("code", "elNS(<namespace>)(<as-el-see-above>)[.append(...)]: <element-based-on-arguments>"), " — typically SVG elements",
-			)
-		)
+		el(mnemonic)
 	);
 }

@@ -3,7 +3,7 @@ import { simplePage } from "./layout/simplePage.html.js";
 import { el } from "deka-dom-el";
 import { example } from "./components/example.html.js";
 import { h3 } from "./components/pageUtils.html.js";
-import { mnemonicUl } from "./components/mnemonicUl.html.js";
+import { mnemonic } from "./components/mnemonic/observables-init.js";
 import { code } from "./components/code.html.js";
 /** @param {string} url */
 const fileURL= url=> new URL(url, import.meta.url);
@@ -48,28 +48,54 @@ export function page({ pkg, info }){
 		el("p").append(
 			"Similarly to the ", el("code", "on"), " function to register DOM events listener.",
 			" You can use ", el("code", "AbortController"), "/", el("code", "AbortSignal"), " to",
-			" ", el("em", "off"), "/stop listenning. For representing “live” piece of code computation pattern:"
+			" ", el("em", "off"), "/stop listenning. In example, you also found the way for representing",
+			" “live” piece of code computation pattern (derived observable):"
 		),
 		el(example, { src: fileURL("./components/examples/observables/computations-abort.js"), page_id }),
-		el(mnemonicUl).append(
-			el("li").append(
-				el("code", "O(<value>)"), " — observable: reactive value",
-			),
-			el("li").append(
-				el("code", "O(()=> <computation>)"), " — observable: reactive value dependent on calculation using other observables",
-			),
-			el("li").append(
-				el("code", "O.on(<observable>, <listener>[, <options>])"), " — listen to the observable value changes",
-			),
-			el("li").append(
-				el("code", "O.clear(...<observables>)"), " — off and clear observables",
-			),
-			el("li").append(
-				el("code", "O(<value>, <actions>)"), " — observable: pattern to create complex reactive objects/arrays",
-			),
-			el("li").append(
-				el("code", "O.action(<observable>, <action-name>, ...<action-arguments>)"), " — invoke an action for given observable"
-			)
+
+		el(h3, "Observables and actions"),
+		el("p").append(
+			el("code", "O(/* primitive */)"), " allows you to declare simple reactive variables, typically",
+			" around ", el("em", "immutable"), " ", el("a", { textContent: "primitive types", title: "Primitive | MDN", href: "https://developer.mozilla.org/en-US/docs/Glossary/Primitive" }), ".",
+			" ",
+			"However, it may also be necessary to use reactive arrays, objects, or other complex reactive structures."
 		),
+		el(example, { src: fileURL("./components/examples/observables/actions-demo.js"), page_id }),
+		el("p", "…but typical user-case is object/array (maps, sets and other mutable objects):"),
+		el(example, { src: fileURL("./components/examples/observables/actions-todos.js"), page_id }),
+		el("p").append(
+			"In some way, you can compare it with ", el("a", { textContent: "useReducer", href: "https://react.dev/reference/react/useReducer", title: "useReducer hook | React docs" }),
+			" hook from React. So, the ", el("code", "O(<data>, <actions>)"), " pattern creates",
+			" a store “machine”. We can then invoke (dispatch) registered action by calling",
+			" ", el("code", "O.action(<observable>, <name>, ...<args>)"), " after the action call",
+			" the observable calls all its listeners. This can be stopped by calling ", el("code", "this.stopPropagation()"),
+			" in the method representing the given action. As it can be seen in examples, the “store” value is",
+			" available also in the function for given action (", el("code", "this.value"), ")."
+		),
+
+		el(h3, "Reactive DOM attributes and elements"),
+		el("p", "There are on basic level two distinc situation to mirror dynamic value into the DOM/UI"),
+		el("ol").append(
+			el("li", "to change some attribute(s) of existing element(s)"),
+			el("li", "to generate elements itself dynamically – this covers conditions and loops")
+		),
+		el(example, { src: fileURL("./components/examples/observables/dom-attrs.js"), page_id }),
+		el("p").append(
+			"To derived attribute based on value of observable variable just use the observable as",
+			" a value of the attribute (", el("code", "assign(element, { attribute: O('value') })"), ").",
+			" ", el("code", "assign"), "/", el("code", "el"), " provides ways to glue reactive attributes/classes",
+			" more granularly into the DOM. Just use dedicated build-in attributes ", el("code", "dataset"), ", ",
+			el("code", "ariaset"), " and ", el("code", "classList"), "."
+		),
+		el("p").append(
+			"For computation, you can use the derived observable (see above) like ", el("code", "assign(element, { textContent: O(()=> 'Hello '+WorldObservable()) })"), "."
+		),
+		el("p").append(
+			"To represent part of the template filled dynamically based on the observable value use ", el("code", "O.el(observable, DOMgenerator)"), ".",
+			" This was already used in the todo example above or see:"
+		),
+		el(example, { src: fileURL("./components/examples/observables/dom-el.js"), page_id }),
+
+		el(mnemonic)
 	);
 }

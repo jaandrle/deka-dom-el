@@ -4,5 +4,9 @@ const observable= O(0);
 // β — just reacts on observable changes
 O.on(observable, console.log);
 // γ — just updates the value
-observable(observable()+1);
-setInterval(()=> observable(observable()+1), 5000);
+const update= ()=> observable(observable()+1);
+
+update();
+const interval= 5*1000;
+setTimeout(clearInterval, 10*interval,
+	setInterval(update, interval));

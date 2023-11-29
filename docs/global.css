@@ -18,7 +18,7 @@ body {
 @media (min-width:768px) {
 	body{
 		grid-template-rows: auto auto;
-		grid-template-columns: calc(var(--body-max-width) / 3) auto;
+		grid-template-columns: calc(10 * var(--body-max-width) / 27) auto;
 		grid-template-areas:
 			"header header"
 			"sidebar content"

@@ -7,8 +7,8 @@ ${host} h3{
 }
 `;
 import { el, simulateSlots } from "deka-dom-el";
-/** @param {Object} props @param {string} props.textContent */
-export function mnemonicUl({ textContent= "" }){
+/** @param {Object} [props] @param {string} [props.textContent] */
+export function mnemonicUl({ textContent= "" }= {}){
 	if(textContent) textContent= " – "+textContent
 	return simulateSlots(el("div", { className: "notice" }).append(
 		el(h3, "Mnemonic"+textContent),
