@@ -7,6 +7,7 @@ export const pages= [
 	{ id: "p02-elements", href: "p02-elements", title: "Elements", description: "Basic concepts of elements modifications and creations." },
 	{ id: "p03-events", href: "p03-events", title: "Events and Addons", description: "Using not only events in UI declaratively." },
 	{ id: "p04-observables", href: "p04-observables", title: "Observables and reactivity", description: "Handling reactivity in UI via observables." },
+	{ id: "p05-scopes", href: "p05-scopes", title: "Scopes and components", description: "Organizing UI into components" },
 ];
 /**
  * @typedef registerClientFile

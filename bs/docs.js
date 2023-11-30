@@ -10,16 +10,19 @@ const pkg= s.cat("package.json").xargs(JSON.parse);
 for(const info of pages){
 	const { id }= info;
 	echo(`Generating ${id}.html…`);
-	const ssr= createHTMl("");
-	const { el }= await register(ssr.dom);
+	const serverDOM= createHTMl("");
+	serverDOM.registerGlobally(
+		"HTMLScriptElement"
+	);
+	const { el }= await register(serverDOM.dom);
 	const { page }= await import(`../docs_src/${id}.html.js`); //→											TODO: important to mention in docs!!!
-	document.body.append(
+	serverDOM.document.body.append(
 		el(page, { pkg, info }),
 	);
 
 	echo.use("-R", `Writing ${id}.html…`);
 	dispatchEvent("oneachrender", document);
-	s.echo(ssr.serialize()).to(path_target.root+id+".html");
+	s.echo(serverDOM.serialize()).to(path_target.root+id+".html");
 }
 s.echo(styles.content).to(path_target.css+styles.name);
 dispatchEvent("onssrend");

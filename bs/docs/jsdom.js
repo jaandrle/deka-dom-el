@@ -4,6 +4,7 @@ let keys= [];
 let dom= null;
 import { relative } from 'node:path';
 import { writeFileSync } from 'node:fs';
+/** @param {string} html */
 export function createHTMl(html, options= {}){
 	if(!html) html= html_default;
 	if(dom) cleanHTML();
@@ -12,23 +13,30 @@ export function createHTMl(html, options= {}){
 	
 	dom= new JSDOM(html, options);
 	const window= dom.window;
-	if(!keys.length)
-		keys= Object.getOwnPropertyNames(window).filter((k) => !k.startsWith('_') && !(k in globalThis));
-	keys.forEach(key=> globalThis[key]= window[key]);
-	globalThis.document= window.document
-	globalThis.window= window
-	window.console= globalThis.console
 	return {
 		dom,
 		writeToFS({ html, css }){
 			if(css) this.style.writeToFile(css, relative(html, css).slice(1));
 			if(html) writeFileSync(html, dom.serialize());
 		},
-		serialize(){ return dom.serialize(); }
+		/** @param {string[]} [names] */
+		registerGlobally(...names){
+			keys.push(...names);
+			if(!keys.length)
+				keys= Object.getOwnPropertyNames(window).filter((k) => !k.startsWith('_') && !(k in globalThis));
+			keys.forEach(key=> globalThis[key]= window[key]);
+			globalThis.document= window.document
+			globalThis.window= window
+			window.console= globalThis.console
+			return this;
+		},
+		serialize(){ return dom.serialize(); },
+		window, document: window.document
 	};
 }
 export function cleanHTML(){
 	if(!dom) return;
 	keys.forEach(key=> delete globalThis[key]);
+	keys.length= 0;
 	dom= false;
 }
