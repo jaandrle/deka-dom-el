@@ -1,5 +1,5 @@
 <!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="Organizing UI into components"><title>`deka-dom-el` — Scopes and components</title><!--<dde:mark type="component" name="metaAuthor" host="this" ssr/>--><meta name="author" content="Jan Andrle"><link type="text/plain" rel="author" href="https://jaandrle.github.io/humans.txt"><meta name="generator" content="deka-dom-el"><!--<dde:mark type="component" name="metaTwitter" host="this" ssr/>--><meta name="twitter:card" content="summary_large_image"><meta name="twitter:url" content="https://github.com/jaandrle/deka-dom-el"><meta name="twitter:title" content="deka-dom-el"><meta name="twitter:description" content="A low-code library that simplifies the creation of native DOM elements/components using small wrappers and tweaks."><meta name="twitter:creator" content="@jaandrle"><!--<dde:mark type="component" name="metaFacebook" host="this" ssr/>--><meta name="og:url" content="https://github.com/jaandrle/deka-dom-el"><meta name="og:title" content="deka-dom-el"><meta name="og:description" content="A low-code library that simplifies the creation of native DOM elements/components using small wrappers and tweaks."><meta name="og:creator" content="@jaandrle"><script src="https://cdn.jsdelivr.net/npm/shiki" defer=""></script><script type="module" src="code.js.js"></script><script src="https://flems.io/flems.html" type="text/javascript" charset="utf-8"></script><link rel="stylesheet" href="global.css"></head><body><!--<dde:mark type="component" name="page" host="this" ssr/>--><!--<dde:mark type="component" name="simplePage" host="this" ssr/>--><!--<dde:mark type="component" name="header" host="this" ssr/>--><header><h1>`deka-dom-el` — Scopes and components</h1><p>Organizing UI into components</p></header><nav><a href="https://github.com/jaandrle/deka-dom-el"><svg class="icon" viewBox="0 0 32 32"><!--<dde:mark type="component" name="iconGitHub" host="parentElement" ssr/>--><path d="M 16,0.395c -8.836,0 -16,7.163 -16,16c 0,7.069 4.585,13.067 10.942,15.182c 0.8,0.148 1.094,-0.347 1.094,-0.77c 0,-0.381 -0.015,-1.642 -0.022,-2.979c -4.452,0.968 -5.391,-1.888 -5.391,-1.888c -0.728,-1.849 -1.776,-2.341 -1.776,-2.341c -1.452,-0.993 0.11,-0.973 0.11,-0.973c 1.606,0.113 2.452,1.649 2.452,1.649c 1.427,2.446 3.743,1.739 4.656,1.33c 0.143,-1.034 0.558,-1.74 1.016,-2.14c -3.554,-0.404 -7.29,-1.777 -7.29,-7.907c 0,-1.747 0.625,-3.174 1.649,-4.295c -0.166,-0.403 -0.714,-2.03 0.155,-4.234c 0,0 1.344,-0.43 4.401,1.64c 1.276,-0.355 2.645,-0.532 4.005,-0.539c 1.359,0.006 2.729,0.184 4.008,0.539c 3.054,-2.07 4.395,-1.64 4.395,-1.64c 0.871,2.204 0.323,3.831 0.157,4.234c 1.026,1.12 1.647,2.548 1.647,4.295c 0,6.145 -3.743,7.498 -7.306,7.895c 0.574,0.497 1.085,1.47 1.085,2.963c 0,2.141 -0.019,3.864 -0.019,4.391c 0,0.426 0.288,0.925 1.099,0.768c 6.354,-2.118 10.933,-8.113 10.933,-15.18c 0,-8.837 -7.164,-16 -16,-16Z"></path></svg>GitHub</a><a href="./" title="Introducing a&nbsp;library.">1. Introduction</a><a href="p02-elements" title="Basic concepts of elements modifications and creations.">2. Elements</a><a href="p03-events" title="Using not only events in UI declaratively.">3. Events and Addons</a><a href="p04-observables" title="Handling reactivity in UI via observables.">4. Observables and reactivity</a><a href="p05-scopes" title="Organizing UI into components" class="current">5. Scopes and components</a></nav><main><h2>Using functions as UI components</h2><p>For state-less components we can use functions as UI components (see “Elements” page). But in real life, we may need to handle the component live-cycle and provide JavaScript the way to properly use the <a href="https://developer.mozilla.org/en-US/docs/Glossary/Garbage_collection" title="Garbage collection | MDN">Garbage collection</a>.</p><div class="code" data-js="todo"><!--<dde:mark type="component" name="code" host="parentElement" ssr/>--><code class="language-js">// use NPM or for example https://cdn.jsdelivr.net/gh/jaandrle/deka-dom-el/dist/esm-with-observables.js
-import { scope, el, on } from "deka-dom-el";
+import { scope, el } from "deka-dom-el";
 /** @type {ddeElementAddon} */
 </code></div><p>The library therefore use <em>scopes</em> to provide these functionalities.</p><h3 id="h-scopes-and-hosts"><!--<dde:mark type="component" name="h3" host="parentElement" ssr/>--><a href="#h-scopes-and-hosts" tabindex="-1">#</a> Scopes and hosts</h3><p>The <strong>host</strong> is the name for the element representing the component. This is typically element returned by function. To get reference, you can use <code>scope.host()</code> to applly addons just use <code>scope.host(...&lt;addons&gt;)</code>.</p><!--<dde:mark type="component" name="example" host="this" ssr/>--><div id="code-example-1-8meex5b3tyo" class="example"><!--<dde:mark type="component" name="code" host="parentElement" ssr/>--><code class="language-js">import { el, on, scope } from "https://cdn.jsdelivr.net/gh/jaandrle/deka-dom-el/dist/esm-with-observables.js";
 const { host }= scope;
@@ -34,7 +34,7 @@ function component(){
 		el("strong", "Component")
 	);
 }
-</code></div><script>Flems(document.getElementById("code-example-1-8meex5b3tyo"), JSON.parse("{\"files\":[{\"name\":\".js\",\"content\":\"import { el, on, scope } from \\\"https://cdn.jsdelivr.net/gh/jaandrle/deka-dom-el/dist/esm-with-observables.js\\\";\\nconst { host }= scope;\\nhost(\\n\\telement=> console.log(\\n\\t\\t\\\"This represents Addon/oninit for root\\\",\\n\\t\\telement.outerHTML\\n\\t)\\n);\\nconsole.log(\\n\\t\\\"This represents the reference to the host element of root\\\",\\n\\thost().outerHTML\\n);\\ndocument.body.append(\\n\\tel(component)\\n);\\nfunction component(){\\n\\tconst { host }= scope;\\n\\thost(\\n\\t\\telement=> console.log(\\n\\t\\t\\t\\\"This represents Addon/oninit for the component\\\",\\n\\t\\t\\telement.outerHTML\\n\\t\\t)\\n\\t);\\n\\tconst onclick= on(\\\"click\\\", function(ev){\\n\\t\\tconsole.log(\\n\\t\\t\\t\\\"This represents the reference to the host element of the component\\\",\\n\\t\\t\\thost().outerHTML\\n\\t\\t);\\n\\t})\\n\\treturn el(\\\"div\\\", null, onclick).append(\\n\\t\\tel(\\\"strong\\\", \\\"Component\\\")\\n\\t);\\n}\\n\"}],\"toolbar\":false}"));</script><p>To better understanding we implement function <code>elClass</code> helping to create component as class instances.</p><!--<dde:mark type="component" name="example" host="this" ssr/>--><div id="code-example-3-b6a1hbrxh7s" class="example"><!--<dde:mark type="component" name="code" host="parentElement" ssr/>--><code class="language-js">import { chainableAppend, el, scope } from "https://cdn.jsdelivr.net/gh/jaandrle/deka-dom-el/dist/esm-with-observables.js";
+</code></div><script>Flems(document.getElementById("code-example-1-8meex5b3tyo"), JSON.parse("{\"files\":[{\"name\":\".js\",\"content\":\"import { el, on, scope } from \\\"https://cdn.jsdelivr.net/gh/jaandrle/deka-dom-el/dist/esm-with-observables.js\\\";\\nconst { host }= scope;\\nhost(\\n\\telement=> console.log(\\n\\t\\t\\\"This represents Addon/oninit for root\\\",\\n\\t\\telement.outerHTML\\n\\t)\\n);\\nconsole.log(\\n\\t\\\"This represents the reference to the host element of root\\\",\\n\\thost().outerHTML\\n);\\ndocument.body.append(\\n\\tel(component)\\n);\\nfunction component(){\\n\\tconst { host }= scope;\\n\\thost(\\n\\t\\telement=> console.log(\\n\\t\\t\\t\\\"This represents Addon/oninit for the component\\\",\\n\\t\\t\\telement.outerHTML\\n\\t\\t)\\n\\t);\\n\\tconst onclick= on(\\\"click\\\", function(ev){\\n\\t\\tconsole.log(\\n\\t\\t\\t\\\"This represents the reference to the host element of the component\\\",\\n\\t\\t\\thost().outerHTML\\n\\t\\t);\\n\\t})\\n\\treturn el(\\\"div\\\", null, onclick).append(\\n\\t\\tel(\\\"strong\\\", \\\"Component\\\")\\n\\t);\\n}\\n\"}],\"toolbar\":false}"));</script><p>To better understanding we implement function <code>elClass</code> helping to create component as class instances.</p><!--<dde:mark type="component" name="example" host="this" ssr/>--><div id="code-example-3-b6a1hbrxh7s" class="example"><!--<dde:mark type="component" name="code" host="parentElement" ssr/>--><code class="language-js">import { el } from "https://cdn.jsdelivr.net/gh/jaandrle/deka-dom-el/dist/esm-with-observables.js";
 class Test {
 	constructor(params){
 		this._params= params;
@@ -49,22 +49,25 @@ document.body.append(
 	elClass(Test, { textContent: "Hello World" })
 );
 
-function elClass(c, props, ...addons){
+import { chainableAppend, scope } from "https://cdn.jsdelivr.net/gh/jaandrle/deka-dom-el/dist/esm-with-observables.js";
+function elClass(_class, attributes, ...addons){
 	let element, element_host;
 	scope.push({
-		scope: c, //just informative purposes
-		host: (...c)=&gt; c.length
-		? (!element
-			? addons.unshift(...c)
-			: c.forEach(c=&gt; c(element_host)), undefined)
-		: element_host
+		scope: _class, //just informative purposes
+		host: (...addons_append)=&gt; addons_append.length
+			? (
+				!element
+				? addons.unshift(...addons_append)
+				: addons_append.forEach(c=&gt; c(element_host))
+			, undefined)
+			: element_host
 	});
-	const C= new c(props);
-	element= C.render();
-	const is_fragment= el instanceof DocumentFragment;
+	const instance= new _class(attributes);
+	element= instance.render();
+	const is_fragment= element instanceof DocumentFragment;
 	const el_mark= el.mark({ //this creates html comment `&lt;dde:mark …/&gt;`
 		type: "class-component",
-		name: C.name,
+		name: _class.name,
 		host: is_fragment ? "this" : "parentElement",
 	});
 	element.prepend(el_mark);
@@ -75,4 +78,106 @@ function elClass(c, props, ...addons){
 	scope.pop();
 	return element;
 }
-</code></div><script>Flems(document.getElementById("code-example-3-b6a1hbrxh7s"), JSON.parse("{\"files\":[{\"name\":\".js\",\"content\":\"import { chainableAppend, el, scope } from \\\"https://cdn.jsdelivr.net/gh/jaandrle/deka-dom-el/dist/esm-with-observables.js\\\";\\nclass Test {\\n\\tconstructor(params){\\n\\t\\tthis._params= params;\\n\\t}\\n\\trender(){\\n\\t\\treturn el(\\\"div\\\").append(\\n\\t\\t\\tthis._params.textContent\\n\\t\\t);\\n\\t}\\n}\\ndocument.body.append(\\n\\telClass(Test, { textContent: \\\"Hello World\\\" })\\n);\\n\\nfunction elClass(c, props, ...addons){\\n\\tlet element, element_host;\\n\\tscope.push({\\n\\t\\tscope: c, //just informative purposes\\n\\t\\thost: (...c)=> c.length\\n\\t\\t? (!element\\n\\t\\t\\t? addons.unshift(...c)\\n\\t\\t\\t: c.forEach(c=> c(element_host)), undefined)\\n\\t\\t: element_host\\n\\t});\\n\\tconst C= new c(props);\\n\\telement= C.render();\\n\\tconst is_fragment= el instanceof DocumentFragment;\\n\\tconst el_mark= el.mark({ //this creates html comment `<dde:mark …/>`\\n\\t\\ttype: \\\"class-component\\\",\\n\\t\\tname: C.name,\\n\\t\\thost: is_fragment ? \\\"this\\\" : \\\"parentElement\\\",\\n\\t});\\n\\telement.prepend(el_mark);\\n\\tif(is_fragment) element_host= el_mark;\\n\\t\\n\\tchainableAppend(element);\\n\\taddons.forEach(c=> c(element_host));\\n\\tscope.pop();\\n\\treturn element;\\n}\\n\"}],\"toolbar\":false}"));</script><div class="notice"><!--<dde:mark type="component" name="mnemonic" host="parentElement" ssr/>--><h3 id="h-mnemonic"><!--<dde:mark type="component" name="h3" host="parentElement" ssr/>--><a href="#h-mnemonic" tabindex="-1">#</a> Mnemonic</h3><ul><li><code>el(&lt;function&gt;, &lt;function-argument(s)&gt;)[.append(...)]: &lt;element-returned-by-function&gt;</code> — using component represented by function</li><li><code>scope.host()</code> — get current component reference</li><li><code>scope.host(...&lt;addons&gt;)</code> — use addons to current component</li></ul></div><div class="prevNext"><!--<dde:mark type="component" name="prevNext" host="parentElement" ssr/>--><a rel="prev" href="p04-observables" title="Handling reactivity in UI via observables."><!--<dde:mark type="component" name="pageLink" host="parentElement" ssr/>-->Observables and reactivity (previous)</a><!--<dde:mark type="component" name="pageLink" host="this" ssr/>--></div></main></body></html>
+</code></div><script>Flems(document.getElementById("code-example-3-b6a1hbrxh7s"), JSON.parse("{\"files\":[{\"name\":\".js\",\"content\":\"import { el } from \\\"https://cdn.jsdelivr.net/gh/jaandrle/deka-dom-el/dist/esm-with-observables.js\\\";\\nclass Test {\\n\\tconstructor(params){\\n\\t\\tthis._params= params;\\n\\t}\\n\\trender(){\\n\\t\\treturn el(\\\"div\\\").append(\\n\\t\\t\\tthis._params.textContent\\n\\t\\t);\\n\\t}\\n}\\ndocument.body.append(\\n\\telClass(Test, { textContent: \\\"Hello World\\\" })\\n);\\n\\nimport { chainableAppend, scope } from \\\"https://cdn.jsdelivr.net/gh/jaandrle/deka-dom-el/dist/esm-with-observables.js\\\";\\nfunction elClass(_class, attributes, ...addons){\\n\\tlet element, element_host;\\n\\tscope.push({\\n\\t\\tscope: _class, //just informative purposes\\n\\t\\thost: (...addons_append)=> addons_append.length\\n\\t\\t\\t? (\\n\\t\\t\\t\\t!element\\n\\t\\t\\t\\t? addons.unshift(...addons_append)\\n\\t\\t\\t\\t: addons_append.forEach(c=> c(element_host))\\n\\t\\t\\t, undefined)\\n\\t\\t\\t: element_host\\n\\t});\\n\\tconst instance= new _class(attributes);\\n\\telement= instance.render();\\n\\tconst is_fragment= element instanceof DocumentFragment;\\n\\tconst el_mark= el.mark({ //this creates html comment `<dde:mark …/>`\\n\\t\\ttype: \\\"class-component\\\",\\n\\t\\tname: _class.name,\\n\\t\\thost: is_fragment ? \\\"this\\\" : \\\"parentElement\\\",\\n\\t});\\n\\telement.prepend(el_mark);\\n\\tif(is_fragment) element_host= el_mark;\\n\\t\\n\\tchainableAppend(element);\\n\\taddons.forEach(c=> c(element_host));\\n\\tscope.pop();\\n\\treturn element;\\n}\\n\"}],\"toolbar\":false}"));</script><p>As you can see, the <code>scope.host()</code> is stored temporarily and synchronously. Therefore, at least in the beginning of using library, it is the good practise to store <code>host</code> in the root of your component. As it may be changed, typically when there is asynchronous code in the component.</p><div class="code" data-js="todo"><!--<dde:mark type="component" name="code" host="parentElement" ssr/>--><code class="language-js">import { el, scope, on, dispatchEvent } from "deka-dom-el";
+document.body.append(
+	el(component)
+);
+function component(){
+	const { host }= scope; // good practise!
+
+	host(
+		console.log,
+		on("click", function redispatch(){
+			// this `host` ↘ still corresponds to the host ↖ of the component
+			dispatchEvent("redispatch")(host());
+		})
+	);
+	// this `host` ↘ still corresponds to the host ↖ of the component
+	setTimeout(()=&gt; dispatchEvent("timeout")(host()), 750)
+	return el("p", "Clickable paragraph!");
+}
+</code></div><h3 id="h-scopes-observables-and-cleaning-magic"><!--<dde:mark type="component" name="h3" host="parentElement" ssr/>--><a href="#h-scopes-observables-and-cleaning-magic" tabindex="-1">#</a> Scopes, observables and cleaning magic</h3><p>The <code>host</code> is internally used to register the cleaning procedure, when the component (<code>host</code> element) is removed from the DOM.</p><!--<dde:mark type="component" name="example" host="this" ssr/>--><div id="code-example-1-5am55s7aitw" class="example"><!--<dde:mark type="component" name="code" host="parentElement" ssr/>--><code class="language-js">import { el, empty } from "https://cdn.jsdelivr.net/gh/jaandrle/deka-dom-el/dist/esm-with-observables.js";
+document.body.append(
+	el(component),
+	el("button", {
+		textContent: "Remove",
+		onclick: ()=&gt; empty(document.body),
+		type: "button"
+	})
+);
+import { on } from "https://cdn.jsdelivr.net/gh/jaandrle/deka-dom-el/dist/esm-with-observables.js";
+import { O } from "https://cdn.jsdelivr.net/gh/jaandrle/deka-dom-el/dist/esm-with-observables.js";
+function component(){
+	const textContent= O("Click to change text.");
+
+	const onclickChange= on("click", function redispatch(){
+		textContent("Text changed! "+(new Date()).toString())
+	});
+	return el("p", textContent, onclickChange);
+}
+</code></div><script>Flems(document.getElementById("code-example-1-5am55s7aitw"), JSON.parse("{\"files\":[{\"name\":\".js\",\"content\":\"import { el, empty } from \\\"https://cdn.jsdelivr.net/gh/jaandrle/deka-dom-el/dist/esm-with-observables.js\\\";\\ndocument.body.append(\\n\\tel(component),\\n\\tel(\\\"button\\\", {\\n\\t\\ttextContent: \\\"Remove\\\",\\n\\t\\tonclick: ()=> empty(document.body),\\n\\t\\ttype: \\\"button\\\"\\n\\t})\\n);\\nimport { on } from \\\"https://cdn.jsdelivr.net/gh/jaandrle/deka-dom-el/dist/esm-with-observables.js\\\";\\nimport { O } from \\\"https://cdn.jsdelivr.net/gh/jaandrle/deka-dom-el/dist/esm-with-observables.js\\\";\\nfunction component(){\\n\\tconst textContent= O(\\\"Click to change text.\\\");\\n\\n\\tconst onclickChange= on(\\\"click\\\", function redispatch(){\\n\\t\\ttextContent(\\\"Text changed! \\\"+(new Date()).toString())\\n\\t});\\n\\treturn el(\\\"p\\\", textContent, onclickChange);\\n}\\n\"}],\"toolbar\":false}"));</script><p>The text content of the paragraph is changing when the value of the observable <code>textContent</code> is changed. Internally, there is association between <code>textContent</code> and the paragraph similar to using <code>S.on(textContent, /* update the paragraph */)</code>.</p><p>This listener must be removed when the component is removed from the DOM. To do it, the library assign internally <code>on.disconnect(/* remove the listener */)(host())</code> to the host element.</p><p class="notice">The library DOM API and observables works ideally when used declaratively. It means, you split your app logic into three parts as it was itroduced in <a href="http://localhost:40911/docs/p04-observables#h-introducing-observables">Observables</a>.</p><div class="code" data-js="todo"><!--<dde:mark type="component" name="code" host="parentElement" ssr/>--><code class="language-js">/* PSEUDO-CODE!!! */
+import { el } from "deka-dom-el";
+import { O } from "deka-dom-el/observables";
+function component(){
+	/* prepare changeable data */
+	const dataA= O("data");
+	const dataB= O("data");
+	/* define data flow (can be asynchronous) */
+	fetchAPI().then(data_new=&gt; dataA(data_new));
+	setTimeout(()=&gt; dataB("DATA"));
+	/* declarative UI */
+	return el().append(
+		el("h1", {
+			textContent: "Example",
+			/* declarative attribute(s) */
+			classList: { declarative: dataB }
+		}),
+		el("ul").append(
+			/* declarative element(s) */
+			O.el(dataA, data=&gt; data.map(d=&gt; el("li", d)))
+		),
+		el("ul").append(
+			/* declarative component(s) */
+			O.el(dataA, data=&gt; data.map(d=&gt; el(subcomponent, d)))
+		)
+	);
+}
+function subcomponent({ id }){
+	/* prepare changeable data */
+	const textContent= O("…");
+	/* define data flow (can be asynchronous) */
+	fetchAPI(id).then(text=&gt; textContent(text));
+	/* declarative UI */
+	return el("li", { textContent, dataId: id });
+}
+</code></div><p>Strictly speaking, the imperative way of using the library is not prohibited. Just be careful (rather avoid) mixing declarative approach (using observables) and imperative manipulation of elements.</p><div class="code" data-js="todo"><!--<dde:mark type="component" name="code" host="parentElement" ssr/>--><code class="language-js">/* PSEUDO-CODE!!! */
+import { el, on, scope } from "deka-dom-el";
+function component(){
+	const ul= el("ul");
+	const ac= new AbortController();
+	fetchAPI({ signal: ac.signal }).then(data=&gt; {
+		data.forEach(d=&gt; ul.append(el("li", d)));
+	});
+	scope.host(
+		/* element was remove before data fetched */
+		on.disconnected(()=&gt; ac.abort())
+	);
+	return ul;
+	/**
+	 * NEVER EVER!!
+	 * let data;
+	 * fetchAPI().then(d=&gt; data= O(d));
+	 *
+	 * OR NEVER EVER!!
+	 * const ul= el("ul");
+	 * fetchAPI().then(d=&gt; {
+	 *	const data= O("data");
+	 *	ul.append(el("li", data));
+	 * });
+	 * 
+	 * // THE HOST IS PROBABLY DIFFERENT THAN
+	 * // YOU EXPECT AND OBSERVABLES MAY BE
+	 * // UNEXPECTEDLY REMOVED!!!
+	 * */
+}
+</code></div><div class="notice"><!--<dde:mark type="component" name="mnemonic" host="parentElement" ssr/>--><h3 id="h-mnemonic"><!--<dde:mark type="component" name="h3" host="parentElement" ssr/>--><a href="#h-mnemonic" tabindex="-1">#</a> Mnemonic</h3><ul><li><code>el(&lt;function&gt;, &lt;function-argument(s)&gt;)[.append(...)]: &lt;element-returned-by-function&gt;</code> — using component represented by function</li><li><code>scope.host()</code> — get current component reference</li><li><code>scope.host(...&lt;addons&gt;)</code> — use addons to current component</li></ul></div><div class="prevNext"><!--<dde:mark type="component" name="prevNext" host="parentElement" ssr/>--><a rel="prev" href="p04-observables" title="Handling reactivity in UI via observables."><!--<dde:mark type="component" name="pageLink" host="parentElement" ssr/>-->Observables and reactivity (previous)</a><!--<dde:mark type="component" name="pageLink" host="this" ssr/>--></div></main></body></html>

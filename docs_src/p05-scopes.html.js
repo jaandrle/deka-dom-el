@@ -35,6 +35,40 @@ export function page({ pkg, info }){
 			" component as class instances."
 		),
 		el(example, { src: fileURL("./components/examples/scopes/class-component.js"), page_id }),
+		el("p").append(
+			"As you can see, the ", el("code", "scope.host()"), " is stored temporarily and synchronously.",
+			" Therefore, at least in the beginning of using library, it is the good practise to store",
+			" ", el("code", "host"), " in the root of your component. As it may be changed, typically when",
+			" there is asynchronous code in the component."
+		),
+		el(code, { src: fileURL("./components/examples/scopes/good-practise.js"), page_id }),
+
+		el(h3, "Scopes, observables and cleaning magic"),
+		el("p").append(
+			"The ", el("code", "host"), " is internally used to register the cleaning procedure,",
+			" when the component (", el("code", "host"), " element) is removed from the DOM."
+		),
+		el(example, { src: fileURL("./components/examples/scopes/cleaning.js"), page_id }),
+		el("p").append(
+			"The text content of the paragraph is changing when the value of the observable ", el("code", "textContent"),
+			" is changed. Internally, there is association between ", el("code", "textContent"), " and the paragraph",
+			" similar to using ", el("code", "S.on(textContent, /* update the paragraph */)"), "."
+		),
+		el("p").append(
+			"This listener must be removed when the component is removed from the DOM. To do it, the library",
+			" assign internally ", el("code", "on.disconnect(/* remove the listener */)(host())"), " to the host element."
+		),
+		el("p", { className: "notice" }).append(
+			"The library DOM API and observables works ideally when used declaratively.",
+			" It means, you split your app logic into three parts as it was itroduced in ", el("a", { textContent: "Observables", href: "http://localhost:40911/docs/p04-observables#h-introducing-observables" }), "."
+		),
+		el(code, { src: fileURL("./components/examples/scopes/declarative.js"), page_id }),
+		el("p").append(
+			"Strictly speaking, the imperative way of using the library is not prohibited.",
+			" Just be careful (rather avoid) mixing declarative approach (using observables)",
+			" and imperative manipulation of elements.",
+		),
+		el(code, { src: fileURL("./components/examples/scopes/imperative.js"), page_id }),
 
 		el(mnemonic)
 	);
