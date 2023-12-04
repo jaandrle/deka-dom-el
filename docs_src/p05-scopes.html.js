@@ -56,7 +56,7 @@ export function page({ pkg, info }){
 		),
 		el("p").append(
 			"This listener must be removed when the component is removed from the DOM. To do it, the library",
-			" assign internally ", el("code", "on.disconnect(/* remove the listener */)(host())"), " to the host element."
+			" assign internally ", el("code", "on.disconnected(/* remove the listener */)(host())"), " to the host element."
 		),
 		el("p", { className: "notice" }).append(
 			"The library DOM API and observables works ideally when used declaratively.",
