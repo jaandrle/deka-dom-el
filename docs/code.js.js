@@ -1,4 +1,4 @@
-const highlighter= await shiki.getHighlighter({
+const highlighter= await globalThis.shiki.getHighlighter({
 	theme: "css-variables",
 	langs: ["js", "ts", "css", "html", "shell"],
 });

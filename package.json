@@ -1,6 +1,6 @@
 {
 	"name": "deka-dom-el",
-	"version": "0.7.2",
+	"version": "0.7.3",
 	"description": "A low-code library that simplifies the creation of native DOM elements/components using small wrappers and tweaks.",
 	"author": "Jan Andrle <andrle.jan@centrum.cz>",
 	"license": "MIT",
@@ -20,17 +20,17 @@
 			"import": "./index.js",
 			"types": "./index.d.ts"
 		},
-		"./jsdom": {
-			"import": "./jsdom.js",
-			"types": "./jsdom.d.ts"
-		},
 		"./observables": {
 			"import": "./observables.js",
 			"types": "./observables.d.ts"
 		},
+		"./jsdom": {
+			"import": "./jsdom.js",
+			"types": "./jsdom.d.ts"
+		},
 		"./src/observables-lib": {
 			"import": "./src/observables-lib.js",
-			"types": "./src/observables.d.ts"
+			"types": "./src/observables-lib.d.ts"
 		}
 	},
 	"files": [
@@ -59,27 +59,32 @@
 		{
 			"path": "./index.js",
 			"limit": "9 kB",
-			"gzip": false
+			"gzip": false,
+			"brotli": false
+
 		},
 		{
 			"path": "./observables.js",
 			"limit": "11.5 kB",
-			"gzip": false
+			"gzip": false,
+			"brotli": false
+
 		},
 		{
 			"path": "./jsdom.js",
 			"limit": "10 kB",
-			"gzip": false
+			"gzip": false,
+			"brotli": false
 		},
 		{
 			"path": "./examples/components/webComponent.js",
 			"limit": "13 kB",
-			"gzip": false
+			"gzip": false,
+			"brotli": false
 		},
 		{
 			"path": "./examples/components/webComponent.js",
-			"limit": "5 kB",
-			"gzip": true
+			"limit": "5 kB"
 		}
 	],
 	"modifyEsbuildConfig": {
@@ -95,12 +100,12 @@
 		"typescript"
 	],
 	"devDependencies": {
-		"@size-limit/preset-small-lib": "^8.2.6",
+		"@size-limit/preset-small-lib": "^11.0.1",
 		"dts-bundler": "^0.1.0",
-		"esbuild": "^0.19.2",
-		"jsdom": "^22.1.0",
+		"esbuild": "^0.19.9",
+		"jsdom": "^23.0.1",
 		"jshint": "^2.13.6",
 		"nodejsscript": "github:jaandrle/nodejsscript#dev-v1",
-		"size-limit-node-esbuild": "^0.2.0"
+		"size-limit-node-esbuild": "^0.3.0"
 	}
 }

@@ -48,31 +48,24 @@ export function classListDeclarative<El extends SupportedElement>(element: El, c
 export function assign<El extends SupportedElement>(element: El, ...attrs_array: ElementAttributes<El>[]): El
 export function assignAttribute<El extends SupportedElement, ATT extends keyof ElementAttributes<El>>(element: El, attr: ATT, value: ElementAttributes<El>[ATT]): ElementAttributes<El>[ATT]
 
-type ExtendedHTMLElementTagNameMap= ddeHTMLElementTagNameMap & CustomElementTagNameMap & ddePublicElementTagNameMap
+type ExtendedHTMLElementTagNameMap= HTMLElementTagNameMap & CustomElementTagNameMap & ddePublicElementTagNameMap
 export function el<
-	TAG extends string,
-	EL extends (TAG extends keyof ExtendedHTMLElementTagNameMap ? ExtendedHTMLElementTagNameMap[TAG] : ddeHTMLElement)
+	TAG extends keyof ExtendedHTMLElementTagNameMap & string,
+	EL extends (TAG extends keyof ExtendedHTMLElementTagNameMap ? ExtendedHTMLElementTagNameMap[TAG] : HTMLElement)
 >(
 	tag_name: TAG,
-	attrs?: ElementAttributes<EL>,
-	...addons: ddeElementAddon<TAG extends keyof HTMLElementTagNameMap ? HTMLElementTagNameMap[TAG] : EL>[]
-): EL
-export function el<
-	TAG extends string,
-	EL extends (TAG extends keyof ExtendedHTMLElementTagNameMap ? ExtendedHTMLElementTagNameMap[TAG] : ddeHTMLElement)
->(
-	tag_name: TAG,
-	attrs?: string | Observable<string, any>,
-	...addons: ddeElementAddon<TAG extends keyof HTMLElementTagNameMap ? HTMLElementTagNameMap[TAG] : EL>[]
-): EL
-export function el<T>(
+	attrs?: string | Observable<string, any> | ElementAttributes<EL>,
+	...addons: ddeElementAddon<EL>[]
+): TAG extends keyof ddeHTMLElementTagNameMap ? ddeHTMLElementTagNameMap[TAG] : ddeHTMLElement
+export function el(
 	tag_name?: "<>",
 ): ddeDocumentFragment
 
 export function el<
 	A extends ddeComponentAttributes,
-	C extends (attr: Partial<A>)=> SupportedElement | DocumentFragment>(
-	fComponent: C,
+	C extends (attr: Partial<A>)=> SupportedElement | DocumentFragment
+>(
+	component: C,
 	attrs?: A | string,
 	...addons: ddeElementAddon<ReturnType<C>>[]
 ): ReturnType<C>

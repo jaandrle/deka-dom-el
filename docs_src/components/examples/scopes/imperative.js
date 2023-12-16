@@ -1,12 +1,13 @@
 /* PSEUDO-CODE!!! */
 import { el, on, scope } from "deka-dom-el";
 function component(){
+	const { host }= scope;
 	const ul= el("ul");
 	const ac= new AbortController();
 	fetchAPI({ signal: ac.signal }).then(data=> {
 		data.forEach(d=> ul.append(el("li", d)));
 	});
-	scope.host(
+	host(
 		/* element was remove before data fetched */
 		on.disconnected(()=> ac.abort())
 	);

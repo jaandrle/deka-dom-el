@@ -153,12 +153,13 @@ function subcomponent({ id }){
 </code></div><p>Strictly speaking, the imperative way of using the library is not prohibited. Just be careful (rather avoid) mixing declarative approach (using observables) and imperative manipulation of elements.</p><div class="code" data-js="todo"><!--<dde:mark type="component" name="code" host="parentElement" ssr/>--><code class="language-js">/* PSEUDO-CODE!!! */
 import { el, on, scope } from "deka-dom-el";
 function component(){
+	const { host }= scope;
 	const ul= el("ul");
 	const ac= new AbortController();
 	fetchAPI({ signal: ac.signal }).then(data=&gt; {
 		data.forEach(d=&gt; ul.append(el("li", d)));
 	});
-	scope.host(
+	host(
 		/* element was remove before data fetched */
 		on.disconnected(()=&gt; ac.abort())
 	);
