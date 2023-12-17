@@ -3,10 +3,7 @@ import { pages } from "../ssr.js";
 /**
  * @param {object} def
  * @param {import("../types.d.ts").Info} def.info
- * @param {object} def.pkg Package information.
- * @param {string} def.pkg.name
- * @param {string} def.pkg.description
- * @param {string} def.pkg.homepage
+ * @param {import("../types.d.ts").Pkg} def.pkg Package information.
  * */
 export function header({ info: { href, title, description }, pkg }){
 	title= `\`${pkg.name}\` — ${title}`;

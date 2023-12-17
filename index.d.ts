@@ -43,18 +43,19 @@ type _fromElsInterfaces<EL extends SupportedElement>= Omit<EL, keyof AttrsModifi
  * There is added support for `data[A-Z].*`/`aria[A-Z].*` to be converted to the kebab-case alternatives.
  * @private
  */
-type ElementAttributes<T extends SupportedElement>= Partial<_fromElsInterfaces<T> & { [K in keyof _fromElsInterfaces<T>]: Observable<_fromElsInterfaces<T>[K], any> } & AttrsModified>;
+type ElementAttributes<T extends SupportedElement>= Partial<_fromElsInterfaces<T> & { [K in keyof _fromElsInterfaces<T>]: Observable<_fromElsInterfaces<T>[K], any> } & AttrsModified> & Record<string, any>;
 export function classListDeclarative<El extends SupportedElement>(element: El, classList: AttrsModified["classList"]): El
 export function assign<El extends SupportedElement>(element: El, ...attrs_array: ElementAttributes<El>[]): El
 export function assignAttribute<El extends SupportedElement, ATT extends keyof ElementAttributes<El>>(element: El, attr: ATT, value: ElementAttributes<El>[ATT]): ElementAttributes<El>[ATT]
 
 type ExtendedHTMLElementTagNameMap= HTMLElementTagNameMap & CustomElementTagNameMap & ddePublicElementTagNameMap
+type textContent= string | ( (set?: string)=> string ); // TODO: for some reason `Observable<string, any>` leads to `attrs?: any`
 export function el<
 	TAG extends keyof ExtendedHTMLElementTagNameMap & string,
 	EL extends (TAG extends keyof ExtendedHTMLElementTagNameMap ? ExtendedHTMLElementTagNameMap[TAG] : HTMLElement)
 >(
 	tag_name: TAG,
-	attrs?: string | Observable<string, any> | ElementAttributes<EL>,
+	attrs?: ElementAttributes<EL> | textContent,
 	...addons: ddeElementAddon<EL>[]
 ): TAG extends keyof ddeHTMLElementTagNameMap ? ddeHTMLElementTagNameMap[TAG] : ddeHTMLElement
 export function el(
@@ -62,34 +63,39 @@ export function el(
 ): ddeDocumentFragment
 
 export function el<
-	A extends ddeComponentAttributes,
-	C extends (attr: Partial<A>)=> SupportedElement | DocumentFragment
+	C extends (attr: ddeComponentAttributes)=> SupportedElement | ddeDocumentFragment
 >(
 	component: C,
-	attrs?: A | string,
+	attrs?: Parameters<C>[0] | textContent,
 	...addons: ddeElementAddon<ReturnType<C>>[]
-): ReturnType<C>
+): ReturnType<C> extends ddeHTMLElementTagNameMap[keyof ddeHTMLElementTagNameMap] ? ReturnType<C> : ddeHTMLElement
 export { el as createElement }
 
 export function elNS(
 	namespace: "http://www.w3.org/2000/svg"
-): <TAG, EL extends ( TAG extends keyof ddeSVGElementTagNameMap ? ddeSVGElementTagNameMap[TAG] : ddeSVGElement ), KEYS extends keyof EL & { d: string }>(
+): <
+	TAG extends keyof SVGElementTagNameMap & string,
+	EL extends ( TAG extends keyof SVGElementTagNameMap ? SVGElementTagNameMap[TAG] : SVGElement ),
+>(
 	tag_name: TAG,
-	attrs?: string | Partial<{ [key in KEYS]: EL[key] | string | number | boolean }>,
+	attrs?: ElementAttributes<EL> | textContent,
 	...addons: ddeElementAddon<EL>[]
-)=> EL
+)=>  TAG extends keyof ddeSVGElementTagNameMap ? ddeSVGElementTagNameMap[TAG] : ddeSVGElement
 export function elNS(
 	namespace: "http://www.w3.org/1998/Math/MathML"
-): <TAG extends keyof MathMLElementTagNameMap, KEYS extends keyof MathMLElementTagNameMap[TAG] & { d: string }>(
+): <
+	TAG extends keyof MathMLElementTagNameMap & string,
+	EL extends ( TAG extends keyof MathMLElementTagNameMap ? MathMLElementTagNameMap[TAG] : MathMLElement ),
+>(
 	tag_name: TAG,
-	attrs?: string | Partial<{ [key in KEYS]: MathMLElementTagNameMap[TAG][key] | string | number | boolean }>,
-	...addons: ddeElementAddon<MathMLElementTagNameMap[TAG]>[]
+	attrs?: string | textContent | Partial<{ [key in keyof EL]: EL[key] | Observable<EL[key], any> | string | number | boolean }>,
+	...addons: ddeElementAddon<EL>[]
 )=> ddeMathMLElement
 export function elNS(
 	namespace: string
 ): (
 	tag_name: string,
-	attrs?: string | Record<string, any>,
+	attrs?: string | textContent | Record<string, any>,
 	...addons: ddeElementAddon<SupportedElement>[]
 )=> SupportedElement
 export { elNS as createElementNS }
