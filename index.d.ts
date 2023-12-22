@@ -68,7 +68,7 @@ export function el<
 	component: C,
 	attrs?: Parameters<C>[0] | textContent,
 	...addons: ddeElementAddon<ReturnType<C>>[]
-): ReturnType<C> extends ddeHTMLElementTagNameMap[keyof ddeHTMLElementTagNameMap] ? ReturnType<C> : ddeHTMLElement
+): ReturnType<C> extends ddeHTMLElementTagNameMap[keyof ddeHTMLElementTagNameMap] ? ReturnType<C> : ( ReturnType<C> extends ddeDocumentFragment ? ReturnType<C> : ddeHTMLElement )
 export { el as createElement }
 
 export function elNS(

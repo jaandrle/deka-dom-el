@@ -66,14 +66,14 @@ export function createElement(tag, attributes, ...addons){
 	scoped= 2;
 	return el;
 }
-/** @param {HTMLElement} element */
-export function simulateSlots(element){
+/** @param {HTMLElement} element @param {HTMLElement} [root] */
+export function simulateSlots(element, root= element, mapper= undefined){
 	const _default= Symbol.for("default");
-	const slots= Array.from(element.querySelectorAll("slot"))
+	const slots= Array.from(root.querySelectorAll("slot"))
 		.reduce((out, curr)=> Reflect.set(out, curr.name || _default, curr) && out, {});
 	const has_d= Reflect.has(slots, _default);
 	element.append= new Proxy(element.append, {
-		apply(_1, _2, els){
+		apply(orig, _, els){
 			if(!els.length) return element;
 
 			const d= document.createDocumentFragment();
@@ -83,19 +83,28 @@ export function simulateSlots(element){
 				const slot= slots[name];
 				elementAttribute(el, "remove", "slot");
 				if(!slot) continue;
-				slot.replaceWith(el);
+				simulateSlotReplace(slot, el, mapper);
 				Reflect.deleteProperty(slots, name);
 			}
 			if(has_d){
 				slots[_default].replaceWith(d);
 				Reflect.deleteProperty(slots, _default);
 			}
-			Object.values(slots)
-				.forEach(slot=> slot.replaceWith(createElement().append(...Array.from(slot.childNodes))));
+			element.append= orig; //TODO: better memory management, but non-native behavior!
 			return element;
 		}
 	});
-	return element;
+	if(element!==root){
+		const els= Array.from(element.childNodes);
+		els.forEach(el=> el.remove());
+		element.append(...els);
+	}
+	return root;
+}
+function simulateSlotReplace(slot, element, mapper){
+	if(mapper) mapper(slot, element);
+	try{ slot.replaceWith(assign(element, { className: [ element.className, slot.className ], dataset: { ...slot.dataset } })); }
+	catch(_){ slot.replaceWith(element); }
 }
 /**
  * @param { { type: "component", name: string, host: "this" | "parentElement" } | { type: "reactive" | "later" } } attrs

@@ -31,7 +31,7 @@ export function fullNameComponent(){
 		),
 		elSVG("svg", { viewBox: "0 0 240 80", style: { height: "80px", display: "block" } }).append(
 			//elSVG("style", {  })
-			elSVG("text", { x: 20, y: 35, textContent: "Text" })
+			elSVG("text", { x: 20, y: 35, textContent: "Text" }),
 		)
 	);
 }

@@ -1,6 +1,6 @@
 {
 	"name": "deka-dom-el",
-	"version": "0.7.3",
+	"version": "0.7.5",
 	"description": "A low-code library that simplifies the creation of native DOM elements/components using small wrappers and tweaks.",
 	"author": "Jan Andrle <andrle.jan@centrum.cz>",
 	"license": "MIT",
@@ -58,7 +58,7 @@
 	"size-limit": [
 		{
 			"path": "./index.js",
-			"limit": "9 kB",
+			"limit": "9.75 kB",
 			"gzip": false,
 			"brotli": false
 
@@ -71,19 +71,7 @@
 
 		},
 		{
-			"path": "./jsdom.js",
-			"limit": "10 kB",
-			"gzip": false,
-			"brotli": false
-		},
-		{
-			"path": "./examples/components/webComponent.js",
-			"limit": "13 kB",
-			"gzip": false,
-			"brotli": false
-		},
-		{
-			"path": "./examples/components/webComponent.js",
+			"path": "./index-with-observables.js",
 			"limit": "5 kB"
 		}
 	],
