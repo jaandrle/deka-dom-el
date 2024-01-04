@@ -1,10 +1,11 @@
 import { scope } from "./dom.js";
-export function customElementRender(custom_element, render, props= custom_element){
+export function customElementRender(custom_element, render, props= observedAttributes){
 	scope.push({
 		scope: custom_element,
 		host: (...c)=> c.length ? c.forEach(c=> c(custom_element)) : custom_element,
 		custom_element
 	});
+	if(typeof props==="function") props= props(custom_element);
 	const out= render.call(custom_element, props);
 	scope.pop();
 	return out;
@@ -30,4 +31,18 @@ export function lifecycleToEvents(class_declaration){
 export { lifecycleToEvents as customElementWithDDE };
 function wrapMethod(obj, method, apply){
 	obj[method]= new Proxy(obj[method] || (()=> {}), { apply });
+}
+
+function observedAttribute(instance, name){
+	const out= (...args)=> !args.length
+		? instance.getAttribute(name)
+		: instance.setAttribute(name, ...args);
+	out.attribute= name;
+	return out;
+}
+export function observedAttributes(instance){
+	const { observedAttributes= [] }= instance.constructor;
+	return observedAttributes
+		.map(name=> [ name.replace(/-./g, x=> x[1].toUpperCase()), name ])
+		.reduce((out, [ key, name ])=> ( Reflect.set(out, key, observedAttribute(instance, name)), out ), {});
 }

@@ -1,4 +1,4 @@
-import { style, el, O } from '../exports.js';
+import { style, el, O, isObservable } from '../exports.js';
 const className= style.host(thirdParty).css`
 	:host {
 		color: green;
@@ -22,12 +22,13 @@ export function thirdParty(){
 	// Array.from((new URL(location)).searchParams.entries())
 	// 	.forEach(([ key, value ])=> O.action(store, "set", key, value));
 	// O.on(store, data=> history.replaceState("", "", "?"+(new URLSearchParams(JSON.parse(JSON.stringify(data)))).toString()));
-	useAdapter(store, store_adapter, {
+	useStore(store_adapter, {
 		onread(data){
 			Array.from(data.entries())
 				.forEach(([ key, value ])=> O.action(store, "set", key, value));
+			return store;
 		}
-	});
+	})();
 	return el("input", {
 		className,
 		value: store().value(),
@@ -36,9 +37,14 @@ export function thirdParty(){
 	});
 }
 
-function useAdapter(observable, adapter, { onread, onbeforewrite }= {}){
-	if(!onread) onread= observable;
+function useStore(adapter_in, { onread, onbeforewrite }= {}){
+	const adapter= typeof adapter_in === "function" ? { read: adapter_in } : adapter_in;
+	if(!onread) onread= O;
 	if(!onbeforewrite) onbeforewrite= data=> JSON.parse(JSON.stringify(data));
-	onread(adapter.read()); //TODO OK as synchronous
-	O.on(observable, data=> adapter.write(onbeforewrite(data)));
+	return function useStoreInner(data_read){
+		const observable= onread(adapter.read(data_read)); //TODO OK as synchronous
+		if(adapter.write && isObservable(observable))
+			O.on(observable, data=> adapter.write(onbeforewrite(data)));
+		return observable;
+	};
 }

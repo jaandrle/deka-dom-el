@@ -12,12 +12,13 @@ export class CustomHTMLTestElement extends HTMLElement{
 	}
 	connectedCallback(){
 		if(!this.hasAttribute("pre-name")) this.setAttribute("pre-name", "default");
+		console.log(observedAttributes(this));
 		this.attachShadow({ mode: "open" }).append(
 			customElementRender(this, this.render)
 		);
 	}
 
-	render({ test }){
+	render(test){
 		console.log(scope.state);
 		scope.host(
 			on.connected(()=> console.log(CustomHTMLTestElement)),

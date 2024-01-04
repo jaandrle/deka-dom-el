@@ -18,16 +18,16 @@ const stack_watch= [];
 const deps= new WeakMap();
 export function observable(value, actions){
 	if(typeof value!=="function")
-		return create(value, actions);
+		return create(false, value, actions);
 	if(isObservable(value)) return value;
 	
-	const out= create();
+	const out= create(true);
 	const contextReWatch= function(){
 		const [ origin, ...deps_old ]= deps.get(contextReWatch);
 		deps.set(contextReWatch, new Set([ origin ]));
 
 		stack_watch.push(contextReWatch);
-		out(value());
+		write(out, value());
 		stack_watch.pop();
 
 		if(!deps_old.length) return;
@@ -180,9 +180,10 @@ function removeObservablesFromElements(o, listener, ...notes){
 	});
 }
 
-function create(value, actions){
-	const o=  (...value)=>
-		value.length ? write(o, ...value) : read(o);
+function create(is_readonly, value, actions){
+	const o= is_readonly
+		? ()=> read(o)
+		: (...value)=> value.length ? write(o, ...value) : read(o);
 	return toObservable(o, value, actions);
 }
 const protoSigal= Object.assign(Object.create(null), {
