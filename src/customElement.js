@@ -43,6 +43,10 @@ function observedAttribute(instance, name){
 export function observedAttributes(instance){
 	const { observedAttributes= [] }= instance.constructor;
 	return observedAttributes
-		.map(name=> [ name.replace(/-./g, x=> x[1].toUpperCase()), name ])
-		.reduce((out, [ key, name ])=> ( Reflect.set(out, key, observedAttribute(instance, name)), out ), {});
+		.reduce(function(out, name){
+			Reflect.set(out, kebabToCamel(name), observedAttribute(instance, name));
+			return out;
+		}, {});
+	;
 }
+function kebabToCamel(name){ return name.replace(/-./g, x=> x[1].toUpperCase()); }
