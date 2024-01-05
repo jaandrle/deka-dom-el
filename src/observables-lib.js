@@ -249,7 +249,7 @@ function removeObservableListener(o, listener, clear_when_empty){
 	if(!s) return;
 	const out= s.listeners.delete(listener);
 	if(clear_when_empty && !s.listeners.size){
-		o.clear(o);
+		observable.clear(o);
 		if(!deps.has(s)) return out;
 		const c= deps.get(s);
 		if(!deps.has(c)) return out;
