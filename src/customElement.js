@@ -5,7 +5,7 @@ export function customElementRender(custom_element, render, props= observedAttri
 		host: (...c)=> c.length ? c.forEach(c=> c(custom_element)) : custom_element,
 		custom_element
 	});
-	if(typeof props==="function") props= props(custom_element);
+	if(typeof props==="function") props= props.call(custom_element, custom_element);
 	const out= render.call(custom_element, props);
 	scope.pop();
 	return out;
@@ -33,20 +33,7 @@ function wrapMethod(obj, method, apply){
 	obj[method]= new Proxy(obj[method] || (()=> {}), { apply });
 }
 
-function observedAttribute(instance, name){
-	const out= (...args)=> !args.length
-		? instance.getAttribute(name)
-		: instance.setAttribute(name, ...args);
-	out.attribute= name;
-	return out;
-}
+import { observedAttributes as oA } from "./helpers.js";
 export function observedAttributes(instance){
-	const { observedAttributes= [] }= instance.constructor;
-	return observedAttributes
-		.reduce(function(out, name){
-			Reflect.set(out, kebabToCamel(name), observedAttribute(instance, name));
-			return out;
-		}, {});
-	;
+	return oA(instance, (i, n)=> i.getAttribute(n));
 }
-function kebabToCamel(name){ return name.replace(/-./g, x=> x[1].toUpperCase()); }

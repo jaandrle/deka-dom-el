@@ -84,6 +84,7 @@ on.attributeChanged= function(listener, options){
 		});
 		const c= onAbort(options.signal, ()=> observer.disconnect());
 		if(c) observer.observe(element, { attributes: true });
+		//TODO: clean up when element disconnected
 		return element;
 	};
 };
