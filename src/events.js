@@ -202,8 +202,9 @@ function connectionsChangesObserverConstructor(){
 			if(!store.has(element)) continue;
 			
 			const ls= store.get(element);
-			if(!ls.length_d) continue;
+			if(!ls.length_d||element.isConnected) continue;
 			
+			console.log(element);
 			element.dispatchEvent(new Event("dde:disconnected"));
 			
 			store.delete(element);
