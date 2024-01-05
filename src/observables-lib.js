@@ -86,12 +86,13 @@ observable.clear= function(...observables){
 	}
 };
 const key_reactive= "__dde_reactive";
-import { el, elementAttribute } from "./dom.js";
+import { enviroment as env } from "./dom-common.js";
+import { el } from "./dom.js";
 import { scope } from "./dom.js";
 observable.el= function(o, map){
 	const mark_start= el.mark({ type: "reactive" }, false);
 	const mark_end= mark_start.end;
-	const out= document.createDocumentFragment();
+	const out= env.doc.createDocumentFragment();
 	out.append(mark_start, mark_end);
 	const { current }= scope;
 	const reRenderReactiveElement= v=> {
@@ -249,7 +250,7 @@ function removeObservableListener(o, listener, clear_when_empty){
 	if(!s) return;
 	const out= s.listeners.delete(listener);
 	if(clear_when_empty && !s.listeners.size){
-		o.clear(o);
+		observable.clear(o);
 		if(!deps.has(s)) return out;
 		const c= deps.get(s);
 		if(!deps.has(c)) return out;

@@ -1,22 +1,22 @@
 //TODO: https://www.npmjs.com/package/html-element
-import { enviroment } from './src/dom-common.js';
-enviroment.ssr= " ssr";
-const { setDeleteAttr }= enviroment;
+import { enviroment as env } from './src/dom-common.js';
+env.ssr= " ssr";
+const { setDeleteAttr }= env;
 /** @param {HTMLElement} obj */
-enviroment.setDeleteAttr= function(obj, prop, value){
+env.setDeleteAttr= function(obj, prop, value){
 	if("value"===prop) return obj.setAttribute(prop, value);
 	if("checked"!==prop) return setDeleteAttr(obj, prop, value);
 	if(value) return obj.setAttribute(prop, "");
 	obj.removeAttribute(prop);
 };
-const keys= [ "HTMLElement", "SVGElement", "DocumentFragment", "MutationObserver", "document" ];
+const keys= { elH: "HTMLElement", elS: "SVGElement", elF: "DocumentFragment", Mut: "MutationObserver", doc: "document" };
 let dom_last;
 
 export function register(dom, keys_aditional= []){
 	if(dom_last!==dom){
 		keys.push(...keys_aditional);
 		const w= dom.window;
-		keys.forEach(key=> globalThis[key]= w[key]);
+		Object.entries(keys).forEach(([ kE, kW ])=> env[kE]= w[kW]);
 		globalThis.window= w;
 		w.console= globalThis.console;
 	}

@@ -1,4 +1,5 @@
 export { registerReactivity } from './observables-common.js';
+import { enviroment as env } from './dom-common.js';
 
 export function dispatchEvent(name, options, host){
 	if(!options) options= {};
@@ -18,7 +19,9 @@ export function on(event, listener, options){
 	};
 }
 
-const c_ch_o= connectionsChangesObserverConstructor();
+const c_ch_o= env.Mut ? connectionsChangesObserverConstructor() : new Proxy({}, {
+	get(){ return ()=> {}; }
+});
 const els_attribute_store= new WeakSet();
 import { scope } from "./dom.js";
 import { onAbort } from './helpers.js';
@@ -77,7 +80,9 @@ on.attributeChanged= function(listener, options){
 		if(element.__dde_lifecycleToEvents || els_attribute_store.has(element))
 			return element;
 		
-		const observer= new MutationObserver(function(mutations){
+		if(!env.Mut) return element;
+		
+		const observer= new env.Mut(function(mutations){
 			for(const { attributeName, target } of mutations)
 				target.dispatchEvent(
 					new CustomEvent(event, { detail: [ attributeName, target.getAttribute(attributeName) ] }));
@@ -92,7 +97,7 @@ on.attributeChanged= function(listener, options){
 function connectionsChangesObserverConstructor(){
 	const store= new Map();
 	let is_observing= false;
-	const observer= new MutationObserver(function(mutations){
+	const observer= new env.Mut(function(mutations){
 		for(const mutation of mutations){
 			if(mutation.type!=="childList") continue;
 			if(observerAdded(mutation.addedNodes, true)){
@@ -155,7 +160,7 @@ function connectionsChangesObserverConstructor(){
 	function start(){
 		if(is_observing) return;
 		is_observing= true;
-		observer.observe(document.body, { childList: true, subtree: true });
+		observer.observe(env.doc.body, { childList: true, subtree: true });
 	}
 	function stop(){
 		if(!is_observing || store.size) return;
