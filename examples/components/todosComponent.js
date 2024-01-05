@@ -31,6 +31,7 @@ export function todosComponent({ todos= [ "Task A" ] }= {}){
 	const onremove= on("remove", event=>
 		O.action(todosS, "remove", event.detail));
 	
+	//TODO: Not supported because of connectionsChangesObserverConstructor→collectChildren!!!
 	const ul_todos= el("ul").append(
 		O.el(todosS, ts=> ts
 			.map((textContent, value)=>
@@ -42,7 +43,12 @@ export function todosComponent({ todos= [ "Task A" ] }= {}){
 			el("h3", "List of todos:"),
 			O.el(todosS, ts=> !ts.length
 				? el("p", "No todos yet")
-				: ul_todos),
+				: ul_todos
+				//: el("ul").append(
+				//	...ts.map((textContent, value)=>
+				//		el(todoComponent, { textContent, value, className }, onremove))
+				//)
+			),
 			el("p", "Click to the text to edit it.")
 		),
 		el("form", null, onsubmitAdd).append(
