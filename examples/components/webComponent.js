@@ -13,24 +13,29 @@ export class CustomHTMLTestElement extends HTMLElement{
 	connectedCallback(){
 		if(!this.hasAttribute("pre-name")) this.setAttribute("pre-name", "default");
 		this.attachShadow({ mode: "open" }).append(
-			customElementRender(this, this.render)
+			customElementRender(this, this.render, this.attributes)
 		);
 	}
 
-	render({ test }){
+	attributes(element){
+		const observed= O.observedAttributes(element);
+		return Object.assign({ test: element.test }, observed);
+	}
+	render({ name, preName, test }){
 		console.log(scope.state);
 		scope.host(
 			on.connected(()=> console.log(CustomHTMLTestElement)),
 			on.attributeChanged(e=> console.log(e)),
 			on.disconnected(()=> console.log(CustomHTMLTestElement))
 		);
-		const name= O.attribute("name");
-		const preName= O.attribute("pre-name");
-		
-		console.log({ name, test, preName});
+		const text= text=> el().append(
+			el("#text", text),
+			" | "
+		);
 		return el("p").append(
-			el("#text", name),
-			el("#text", preName),
+			text(test),
+			text(name),
+			text(preName),
 			el("button", { type: "button", textContent: "pre-name", onclick: ()=> preName("Ahoj") })
 		);
 	}

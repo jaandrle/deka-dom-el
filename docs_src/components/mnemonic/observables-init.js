@@ -7,7 +7,7 @@ export function mnemonic(){
 			el("code", "O(<value>)"), " — observable: reactive value",
 		),
 		el("li").append(
-			el("code", "O(()=> <computation>)"), " — observable: reactive value dependent on calculation using other observables",
+			el("code", "O(()=> <computation>)"), " — read-only observable: reactive value dependent on calculation using other observables",
 		),
 		el("li").append(
 			el("code", "O.on(<observable>, <listener>[, <options>])"), " — listen to the observable value changes",

@@ -88,7 +88,9 @@ export function page({ pkg, info }){
 			el("code", "ariaset"), " and ", el("code", "classList"), "."
 		),
 		el("p").append(
-			"For computation, you can use the derived observable (see above) like ", el("code", "assign(element, { textContent: O(()=> 'Hello '+WorldObservable()) })"), "."
+			"For computation, you can use the “derived observable” (see above) like ", el("code", "assign(element, { textContent: O(()=> 'Hello '+WorldObservable()) })"), ".",
+			" ",
+			"This is read-only observable its value is computed based on given function and updated when any observable used in the function changes."
 		),
 		el("p").append(
 			"To represent part of the template filled dynamically based on the observable value use ", el("code", "O.el(observable, DOMgenerator)"), ".",

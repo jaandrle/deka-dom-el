@@ -15,3 +15,12 @@ export function onAbort(signal, listener){
 		signal.removeEventListener("abort", listener);
 	};
 }
+export function observedAttributes(instance, observedAttribute){
+	const { observedAttributes= [] }= instance.constructor;
+	return observedAttributes
+		.reduce(function(out, name){
+			Reflect.set(out, kebabToCamel(name), observedAttribute(instance, name));
+			return out;
+		}, {});
+}
+function kebabToCamel(name){ return name.replace(/-./g, x=> x[1].toUpperCase()); }

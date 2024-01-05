@@ -9,7 +9,7 @@ const stack_watch= [];
 /**
  * ### `WeakMap<function, Set<ddeObservable<any, any>>>`
  * The `Set` is in the form of `[ source, ...depended observables (DSs) ]`.
- * When the DS is cleaned (`S.clear`) it is removed from DSs,
+ * When the DS is cleaned (`O.clear`) it is removed from DSs,
  * if remains only one (`source`) it is cleared too.
  * ### `WeakMap<object, function>`
  * This is used for revesed deps, the `function` is also key for `deps`.
@@ -18,16 +18,16 @@ const stack_watch= [];
 const deps= new WeakMap();
 export function observable(value, actions){
 	if(typeof value!=="function")
-		return create(value, actions);
+		return create(false, value, actions);
 	if(isObservable(value)) return value;
 	
-	const out= create();
+	const out= create(true);
 	const contextReWatch= function(){
 		const [ origin, ...deps_old ]= deps.get(contextReWatch);
 		deps.set(contextReWatch, new Set([ origin ]));
 
 		stack_watch.push(contextReWatch);
-		out(value());
+		write(out, value());
 		stack_watch.pop();
 
 		if(!deps_old.length) return;
@@ -113,41 +113,38 @@ observable.el= function(o, map){
 	return out;
 };
 import { on } from "./events.js";
+import { observedAttributes } from "./helpers.js";
+function observedAttribute(instance, name){
+	const out= (...args)=> !args.length
+		? instance.getAttribute(name)
+		: instance.setAttribute(name, ...args);
+	out.attribute= name;
+	return out;
+}
 const key_attributes= "__dde_attributes";
-observable.attribute= function(name, initial= null){
-	//TODO host=element & reuse existing
-	const out= observable(initial);
-	let element;
-	scope.host(el=> {
-		element= el;
-		if(elementAttribute(element, "has", name)) out(elementAttribute(element, "get", name));
-		else if(initial!==null) elementAttribute(element, "set", name, initial);
-		
-		if(el[key_attributes]){
-			el[key_attributes][name]= out;
-			return;
-		}
-		element[key_attributes]= { [name]: out };
-		on.attributeChanged(function attributeChangeToObservable({ detail }){
-			/*! This maps attributes to observables (`S.attribute`).
-			 * Investigate `__dde_attributes` key of the element.*/
-			const [ name, value ]= detail;
-			const curr= element[key_attributes][name];
-			if(curr) return curr(value);
-		})(element);
-		on.disconnected(function(){
-			/*! This removes all observables mapped to attributes (`S.attribute`).
-			 * Investigate `__dde_attributes` key of the element.*/
-			observable.clear(...Object.values(element[key_attributes]));
-		})(element);
+observable.observedAttributes= function(element){
+	const attrs= observedAttributes(element, observedAttribute);
+	const store= element[key_attributes]= {};
+	const actions= {
+		_set(value){ this.value= value; },
+	};
+	Object.keys(attrs).forEach(name=> {
+		const attr= attrs[name]= toObservable(attrs[name], attrs[name](), actions);
+		store[attr.attribute]= attr;
 	});
-	return new Proxy(out, {
-		apply(target, _, args){
-			if(!args.length) return target();
-			const value= args[0];
-			return elementAttribute(element, "set", name, value);
-		}
-	});
+	on.attributeChanged(function attributeChangeToObservable({ detail }){
+		/*! This maps attributes to observables (`O.observedAttributes`).
+			* Investigate `__dde_attributes` key of the element.*/
+		const [ name, value ]= detail;
+		const curr= element[key_attributes][name];
+		if(curr) return observable.action(curr, "_set", value);
+	})(element);
+	on.disconnected(function(){
+		/*! This removes all observables mapped to attributes (`O.observedAttributes`).
+			* Investigate `__dde_attributes` key of the element.*/
+		observable.clear(...Object.values(element[key_attributes]));
+	})(element);
+	return attrs;
 };
 
 import { typeOf } from './helpers.js';
@@ -169,7 +166,7 @@ function removeObservablesFromElements(o, listener, ...notes){
 			element[key_reactive]= [];
 			on.disconnected(()=>
 				/*!
-				 * Clears all Observables listeners added in the current scope/host (`S.el`, `assign`, …?).
+				 * Clears all Observables listeners added in the current scope/host (`O.el`, `assign`, …?).
 				 * You can investigate the `__dde_reactive` key of the element.
 				 * */
 				element[key_reactive].forEach(([ [ o, listener ] ])=>
@@ -180,9 +177,10 @@ function removeObservablesFromElements(o, listener, ...notes){
 	});
 }
 
-function create(value, actions){
-	const o=  (...value)=>
-		value.length ? write(o, ...value) : read(o);
+function create(is_readonly, value, actions){
+	const o= is_readonly
+		? ()=> read(o)
+		: (...value)=> value.length ? write(o, ...value) : read(o);
 	return toObservable(o, value, actions);
 }
 const protoSigal= Object.assign(Object.create(null), {
