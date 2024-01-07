@@ -19,7 +19,7 @@ export function on(event, listener, options){
 	};
 }
 
-const c_ch_o= env.Mut ? connectionsChangesObserverConstructor() : new Proxy({}, {
+const c_ch_o= env.M ? connectionsChangesObserverConstructor() : new Proxy({}, {
 	get(){ return ()=> {}; }
 });
 const els_attribute_store= new WeakSet();
@@ -80,9 +80,9 @@ on.attributeChanged= function(listener, options){
 		if(element.__dde_lifecycleToEvents || els_attribute_store.has(element))
 			return element;
 		
-		if(!env.Mut) return element;
+		if(!env.M) return element;
 		
-		const observer= new env.Mut(function(mutations){
+		const observer= new env.M(function(mutations){
 			for(const { attributeName, target } of mutations)
 				target.dispatchEvent(
 					new CustomEvent(event, { detail: [ attributeName, target.getAttribute(attributeName) ] }));
@@ -97,7 +97,7 @@ on.attributeChanged= function(listener, options){
 function connectionsChangesObserverConstructor(){
 	const store= new Map();
 	let is_observing= false;
-	const observer= new env.Mut(function(mutations){
+	const observer= new env.M(function(mutations){
 		for(const mutation of mutations){
 			if(mutation.type!=="childList") continue;
 			if(observerAdded(mutation.addedNodes, true)){
@@ -160,7 +160,7 @@ function connectionsChangesObserverConstructor(){
 	function start(){
 		if(is_observing) return;
 		is_observing= true;
-		observer.observe(env.doc.body, { childList: true, subtree: true });
+		observer.observe(env.D.body, { childList: true, subtree: true });
 	}
 	function stop(){
 		if(!is_observing || store.size) return;

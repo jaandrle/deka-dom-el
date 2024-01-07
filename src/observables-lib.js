@@ -92,7 +92,7 @@ import { scope } from "./dom.js";
 observable.el= function(o, map){
 	const mark_start= el.mark({ type: "reactive" }, false);
 	const mark_end= mark_start.end;
-	const out= env.doc.createDocumentFragment();
+	const out= env.D.createDocumentFragment();
 	out.append(mark_start, mark_end);
 	const { current }= scope;
 	const reRenderReactiveElement= v=> {

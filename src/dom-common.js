@@ -1,11 +1,11 @@
 export const enviroment= {
 	setDeleteAttr,
 	ssr: "",
-	doc: globalThis.document,
-	elF: globalThis.DocumentFragment,
-	elH: globalThis.HTMLElement,
-	elS: globalThis.SVGElement,
-	Mut: globalThis.MutationObserver,
+	D: globalThis.document,
+	F: globalThis.DocumentFragment,
+	H: globalThis.HTMLElement,
+	S: globalThis.SVGElement,
+	M: globalThis.MutationObserver,
 };
 import { isUndef } from './helpers.js';
 function setDeleteAttr(obj, prop, val){
@@ -21,7 +21,7 @@ function setDeleteAttr(obj, prop, val){
 	Reflect.set(obj, prop, val);
 	if(!isUndef(val)) return;
 	Reflect.deleteProperty(obj, prop);
-	if(obj instanceof enviroment.elH && obj.getAttribute(prop)==="undefined")
+	if(obj instanceof enviroment.H && obj.getAttribute(prop)==="undefined")
 		return obj.removeAttribute(prop);
 	if(Reflect.get(obj, prop)==="undefined")
 		return Reflect.set(obj, prop, "");
