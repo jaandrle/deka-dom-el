@@ -59,7 +59,7 @@
 	"size-limit": [
 		{
 			"path": "./index.js",
-			"limit": "9.85 kB",
+			"limit": "9.9 kB",
 			"gzip": false,
 			"brotli": false
 

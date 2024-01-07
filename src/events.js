@@ -171,13 +171,13 @@ function connectionsChangesObserverConstructor(){
 	function requestIdle(){ return new Promise(function(resolve){
 		(requestIdleCallback || requestAnimationFrame)(resolve);
 	}); }
-	async function collectChildren(element){
+	async function collectChildren(element, filter){
 		if(store.size > 30)//TODO limit?
 			await requestIdle();
 		const out= [];
 		if(!(element instanceof Node)) return out;
 		for(const el of store.keys()){
-			if(el===element || !(el instanceof Node)) continue;
+			if(el===element || !(el instanceof Node) || filter(el)) continue;
 			if(element.contains(el))
 				out.push(el);
 		}
@@ -186,7 +186,7 @@ function connectionsChangesObserverConstructor(){
 	function observerAdded(addedNodes, is_root){
 		let out= false;
 		for(const element of addedNodes){
-			if(is_root) collectChildren(element).then(observerAdded);
+			if(is_root) collectChildren(element, el=> !el.isConnectedd).then(observerAdded);
 			if(!store.has(element)) continue;
 			
 			const ls= store.get(element);
@@ -203,7 +203,7 @@ function connectionsChangesObserverConstructor(){
 	function observerRemoved(removedNodes, is_root){
 		let out= false;
 		for(const element of removedNodes){
-			if(is_root) collectChildren(element).then(observerRemoved);
+			if(is_root) collectChildren(element, el=> el.isConnectedd).then(observerRemoved);
 			if(!store.has(element)) continue;
 			
 			const ls= store.get(element);
