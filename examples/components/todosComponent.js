@@ -16,7 +16,7 @@ const className= style.host(todosComponent).css`
 `;
 /** @param {{ todos: string[] }} */
 export function todosComponent({ todos= [ "Task A" ] }= {}){
-	const todosS= O(todos.map(t=> O(t)), {
+	const todosO= O(todos.map(t=> O(t)), {
 		add(v){ this.value.push(O(v)); },
 		remove(i){ O.clear(this.value.splice(i, 1)[0]); }
 	});
@@ -25,24 +25,31 @@ export function todosComponent({ todos= [ "Task A" ] }= {}){
 	const onsubmitAdd= on("submit", event=> {
 		const el= event.target.elements[name];
 		event.preventDefault();
-		O.action(todosS, "add", el.value);
+		O.action(todosO, "add", el.value);
 		el.value= "";
 	});
 	const onremove= on("remove", event=>
-		O.action(todosS, "remove", event.detail));
+		O.action(todosO, "remove", event.detail));
 	
-	const ul_todos= el("ul").append(
-		O.el(todosS, ts=> ts
+	const ul_todos_version= 1; // ul_todos_v1/ul_todos_v2
+	const ul_todos_v1= el("ul").append(
+		O.el(todosO, ts=> ts
 			.map((textContent, value)=>
 				el(todoComponent, { textContent, value, className }, onremove))
 	));
+	const ul_todos_v2= (ts)=> el("ul").append(
+		...ts.map((textContent, value)=>
+			el(todoComponent, { textContent, value, className }, onremove))
+	);
+	
 	return el("div", { className }).append(
 		el("div").append(
 			el("h2", "Todos:"),
 			el("h3", "List of todos:"),
-			O.el(todosS, ts=> !ts.length
+			O.el(todosO, ts=> !ts.length
 				? el("p", "No todos yet")
-				: ul_todos),
+				: ( (ul_todos_version-1) ? ul_todos_v1 : ul_todos_v2(ts) )
+			),
 			el("p", "Click to the text to edit it.")
 		),
 		el("form", null, onsubmitAdd).append(
@@ -54,12 +61,12 @@ export function todosComponent({ todos= [ "Task A" ] }= {}){
 		),
 		el("div").append(
 			el("h3", "Output (JSON):"),
-			el("output", O(()=> JSON.stringify(todosS, null, "\t")))
+			el("output", O(()=> JSON.stringify(todosO, null, "\t")))
 		)
 	)
 }
 /**
- * @dispatch {number} remove
+ * @dispatchs {number} remove
  * */
 function todoComponent({ textContent, value }){
 	const { host }= scope;
