@@ -1,23 +1,25 @@
 //TODO: https://www.npmjs.com/package/html-element
-import { enviroment } from './src/dom-common.js';
-enviroment.ssr= " ssr";
-const { setDeleteAttr }= enviroment;
+import { enviroment as env } from './src/dom-common.js';
+env.ssr= " ssr";
+const { setDeleteAttr }= env;
 /** @param {HTMLElement} obj */
-enviroment.setDeleteAttr= function(obj, prop, value){
+env.setDeleteAttr= function(obj, prop, value){
 	if("value"===prop) return obj.setAttribute(prop, value);
 	if("checked"!==prop) return setDeleteAttr(obj, prop, value);
 	if(value) return obj.setAttribute(prop, "");
 	obj.removeAttribute(prop);
 };
-const keys= [ "HTMLElement", "SVGElement", "DocumentFragment", "MutationObserver", "document" ];
+const keys= { H: "HTMLElement", S: "SVGElement", F: "DocumentFragment", M: "MutationObserver", D: "document" };
+let env_bk= {};
 let dom_last;
 
-export function register(dom, keys_aditional= []){
+export function register(dom){
 	if(dom_last!==dom){
-		keys.push(...keys_aditional);
 		const w= dom.window;
-		keys.forEach(key=> globalThis[key]= w[key]);
-		globalThis.window= w;
+		Object.entries(keys).forEach(([ kE, kW ])=> {
+			env_bk[kE]= env[kE];
+			env[kE]= w[kW];
+		});
 		w.console= globalThis.console;
 	}
 	dom_last= dom;
@@ -28,8 +30,8 @@ export function unregister(){
 	if(!dom_last)
 		return false;
 	
-	keys.forEach(key=> Reflect.deleteProperty(globalThis, key));
-	Reflect.deleteProperty(globalThis, "window");
+	Object.assign(env, env_bk);
+	env_bk= {};
 	dom_last= undefined;
 	return true;
 }

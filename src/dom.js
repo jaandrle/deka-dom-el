@@ -1,10 +1,10 @@
 import { observables } from "./observables-common.js";
-import { enviroment } from './dom-common.js';
+import { enviroment as env } from './dom-common.js';
 
 /** @type {{ scope: object, prevent: boolean, host: function }[]} */
 const scopes= [ {
-	scope: document.body,
-	host: c=> c ? c(document.body) : document.body,
+	get scope(){ return  env.D.body; },
+	host: c=> c ? c(env.D.body) : env.D.body,
 	custom_element: false,
 	prevent: true,
 } ];
@@ -43,7 +43,7 @@ export function createElement(tag, attributes, ...addons){
 			scoped= 1;
 			scope.push({ scope: tag, host: (...c)=> c.length ? (scoped===1 ? addons.unshift(...c) : c.forEach(c=> c(el_host)), undefined) : el_host });
 			el= tag(attributes || undefined);
-			const is_fragment= el instanceof DocumentFragment;
+			const is_fragment= el instanceof env.F;
 			if(el.nodeName==="#comment") break;
 			const el_mark= createElement.mark({
 				type: "component",
@@ -54,10 +54,10 @@ export function createElement(tag, attributes, ...addons){
 			if(is_fragment) el_host= el_mark;
 			break;
 		}
-		case tag==="#text":      el= assign.call(this, document.createTextNode(""), attributes); break;
-		case tag==="<>" || !tag: el= assign.call(this, document.createDocumentFragment(), attributes); break;
-		case Boolean(namespace): el= assign.call(this, document.createElementNS(namespace, tag), attributes); break;
-		case !el:                el= assign.call(this, document.createElement(tag), attributes);
+		case tag==="#text":      el= assign.call(this, env.D.createTextNode(""), attributes); break;
+		case tag==="<>" || !tag: el= assign.call(this, env.D.createDocumentFragment(), attributes); break;
+		case Boolean(namespace): el= assign.call(this, env.D.createElementNS(namespace, tag), attributes); break;
+		case !el:                el= assign.call(this, env.D.createElement(tag), attributes);
 	}
 	chainableAppend(el);
 	if(!el_host) el_host= el;
@@ -76,7 +76,7 @@ export function simulateSlots(element, root= element, mapper= undefined){
 		apply(orig, _, els){
 			if(!els.length) return element;
 
-			const d= document.createDocumentFragment();
+			const d= env.D.createDocumentFragment();
 			for(const el of els){
 				if(!el || !el.slot){ if(has_d) d.appendChild(el); continue; }
 				const name= el.slot;
@@ -113,8 +113,8 @@ function simulateSlotReplace(slot, element, mapper){
 createElement.mark= function(attrs, is_open= false){
 	attrs= Object.entries(attrs).map(([ n, v ])=> n+`="${v}"`).join(" ");
 	const end= is_open ? "" : "/";
-	const out= document.createComment(`<dde:mark ${attrs}${enviroment.ssr}${end}>`);
-	if(!is_open) out.end= document.createComment("</dde:mark>");
+	const out= env.D.createComment(`<dde:mark ${attrs}${env.ssr}${end}>`);
+	if(!is_open) out.end= env.D.createComment("</dde:mark>");
 	return out;
 };
 export { createElement as el };
@@ -131,8 +131,8 @@ export function createElementNS(ns){
 }
 export { createElementNS as elNS };
 
-const { setDeleteAttr }= enviroment;
 const assign_context= new WeakMap();
+const { setDeleteAttr }= env;
 export function assign(element, ...attributes){
 	if(!attributes.length) return element;
 	assign_context.set(element, assignContext(element, this));
@@ -175,7 +175,7 @@ export function assignAttribute(element, key, value){
 }
 function assignContext(element, _this){
 	if(assign_context.has(element)) return assign_context.get(element);
-	const is_svg= element instanceof SVGElement;
+	const is_svg= element instanceof env.S;
 	const setRemoveAttr= (is_svg ? setRemoveNS : setRemove).bind(null, element, "Attribute");
 	const s= observables(_this);
 	return { setRemoveAttr, s };
@@ -192,7 +192,7 @@ export function empty(el){
 	return el;
 }
 export function elementAttribute(element, op, key, value){
-	if(element instanceof HTMLElement)
+	if(element instanceof env.H)
 		return element[op+"Attribute"](key, value);
 	return element[op+"AttributeNS"](null, key, value);
 }
