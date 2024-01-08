@@ -114,7 +114,7 @@ createElement.mark= function(attrs, is_open= false){
 	attrs= Object.entries(attrs).map(([ n, v ])=> n+`="${v}"`).join(" ");
 	const end= is_open ? "" : "/";
 	const out= env.D.createComment(`<dde:mark ${attrs}${env.ssr}${end}>`);
-	if(!is_open) out.end= env.D.createComment("</dde:mark>");
+	if(is_open) out.end= env.D.createComment("</dde:mark>");
 	return out;
 };
 export { createElement as el };

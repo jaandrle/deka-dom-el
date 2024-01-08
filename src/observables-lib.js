@@ -90,7 +90,7 @@ import { enviroment as env } from "./dom-common.js";
 import { el } from "./dom.js";
 import { scope } from "./dom.js";
 observable.el= function(o, map){
-	const mark_start= el.mark({ type: "reactive" }, false);
+	const mark_start= el.mark({ type: "reactive" }, true);
 	const mark_end= mark_start.end;
 	const out= env.D.createDocumentFragment();
 	out.append(mark_start, mark_end);
@@ -115,35 +115,34 @@ observable.el= function(o, map){
 };
 import { on } from "./events.js";
 import { observedAttributes } from "./helpers.js";
-function observedAttribute(instance, name){
-	const out= (...args)=> !args.length
-		? instance.getAttribute(name)
-		: instance.setAttribute(name, ...args);
-	out.attribute= name;
-	return out;
+const observedAttributeActions= {
+	_set(value){ this.value= value; },
+};
+function observedAttribute(store){
+	return function(instance, name){
+		const varO= (...args)=> !args.length
+			? instance.getAttribute(name)
+			: instance.setAttribute(name, ...args);
+		const out= toObservable(varO, varO(), observedAttributeActions);
+		store[name]= out;
+		return out;
+	};
 }
 const key_attributes= "__dde_attributes";
 observable.observedAttributes= function(element){
-	const attrs= observedAttributes(element, observedAttribute);
 	const store= element[key_attributes]= {};
-	const actions= {
-		_set(value){ this.value= value; },
-	};
-	Object.keys(attrs).forEach(name=> {
-		const attr= attrs[name]= toObservable(attrs[name], attrs[name](), actions);
-		store[attr.attribute]= attr;
-	});
+	const attrs= observedAttributes(element, observedAttribute(store));
 	on.attributeChanged(function attributeChangeToObservable({ detail }){
 		/*! This maps attributes to observables (`O.observedAttributes`).
 			* Investigate `__dde_attributes` key of the element.*/
 		const [ name, value ]= detail;
-		const curr= element[key_attributes][name];
+		const curr= this[key_attributes][name];
 		if(curr) return observable.action(curr, "_set", value);
 	})(element);
 	on.disconnected(function(){
 		/*! This removes all observables mapped to attributes (`O.observedAttributes`).
 			* Investigate `__dde_attributes` key of the element.*/
-		observable.clear(...Object.values(element[key_attributes]));
+		observable.clear(...Object.values(this[key_attributes]));
 	})(element);
 	return attrs;
 };
@@ -179,10 +178,10 @@ function removeObservablesFromElements(o, listener, ...notes){
 }
 
 function create(is_readonly, value, actions){
-	const o= is_readonly
-		? ()=> read(o)
-		: (...value)=> value.length ? write(o, ...value) : read(o);
-	return toObservable(o, value, actions);
+	const varO= is_readonly
+		? ()=> read(varO)
+		: (...value)=> value.length ? write(varO, ...value) : read(varO);
+	return toObservable(varO, value, actions);
 }
 const protoSigal= Object.assign(Object.create(null), {
 	stopPropagation(){

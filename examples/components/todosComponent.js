@@ -37,7 +37,7 @@ export function todosComponent({ todos= [ "Task A" ] }= {}){
 			.map((textContent, value)=>
 				el(todoComponent, { textContent, value, className }, onremove))
 	));
-	const ul_todos_v2= (ts)=> el("ul").append(
+	const ul_todos_v2= ts=> el("ul").append(
 		...ts.map((textContent, value)=>
 			el(todoComponent, { textContent, value, className }, onremove))
 	);
@@ -48,7 +48,7 @@ export function todosComponent({ todos= [ "Task A" ] }= {}){
 			el("h3", "List of todos:"),
 			O.el(todosO, ts=> !ts.length
 				? el("p", "No todos yet")
-				: ( (ul_todos_version-1) ? ul_todos_v1 : ul_todos_v2(ts) )
+				: ( !(ul_todos_version-1) ? ul_todos_v1 : ul_todos_v2(ts) )
 			),
 			el("p", "Click to the text to edit it.")
 		),
