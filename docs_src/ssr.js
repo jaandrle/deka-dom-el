@@ -8,6 +8,7 @@ export const pages= [
 	{ id: "p03-events", href: "p03-events", title: "Events and Addons", description: "Using not only events in UI declaratively." },
 	{ id: "p04-observables", href: "p04-observables", title: "Observables and reactivity", description: "Handling reactivity in UI via observables." },
 	{ id: "p05-scopes", href: "p05-scopes", title: "Scopes and components", description: "Organizing UI into components" },
+	{ id: "p06-customElement", href: "p06-customElement", title: "Custom elements", description: "Using custom elements in combinantion with DDE" },
 ];
 /**
  * @typedef registerClientFile

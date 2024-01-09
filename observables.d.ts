@@ -54,7 +54,7 @@ interface observable{
 	 * */
 	el<S extends any>(observable: Observable<S, any>, el: (v: S)=> Element | Element[] | DocumentFragment): DocumentFragment;
 
-    attribute(name: string, initial?: string): Observable<string, {}>;
+    observedAttributes(custom_element: HTMLElement): Record<string, Observable<any, any>>;
 }
 export const observable: observable;
 export const O: observable;

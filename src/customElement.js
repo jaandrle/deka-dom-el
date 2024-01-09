@@ -27,7 +27,6 @@ export function lifecycleToEvents(class_declaration){
 	class_declaration.prototype.__dde_lifecycleToEvents= true;
 	return class_declaration;
 }
-// https://gist.github.com/WebReflection/ec9f6687842aa385477c4afca625bbf4
 export { lifecycleToEvents as customElementWithDDE };
 function wrapMethod(obj, method, apply){
 	obj[method]= new Proxy(obj[method] || (()=> {}), { apply });
