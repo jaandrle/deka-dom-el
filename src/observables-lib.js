@@ -161,7 +161,11 @@ export const observables_config= {
 	isObservable,
 	processReactiveAttribute(element, key, attrs, set){
 		if(!isObservable(attrs)) return attrs;
-		const l= attr=> set(key, attr);
+		const l= attr=> {
+			if(!element.isConnected)
+				return removeObservableListener(attrs, l);
+			set(key, attr);
+		};
 		addObservableListener(attrs, l);
 		removeObservablesFromElements(attrs, l, element, key);
 		return attrs();
