@@ -81,24 +81,11 @@ function todoComponent({ textContent, value }){
 		textContent(ev.target.value);
 		is_editable(false);
 	});
-	const memo= initMemo(host);
 	return el("li").append(
 		O.el(is_editable, is=> is
-			? memo("view", ()=> el("input", { value: textContent(), type: "text" }, onedited))
-			: memo("edit", ()=> el("span", { textContent, onclick: is_editable.bind(null, true) }))
+			? el("input", { value: textContent(), type: "text" }, onedited)
+			: el("span", { textContent, onclick: is_editable.bind(null, true) })
 		),
 		el("button", { type: "button", value, textContent: "-" }, onclick)
 	);
-}
-function initMemo(host){
-	const memos= new Map();
-	host(on.disconnected(()=> memos.clear()));
-	return function useMemo(key, fn){
-		let memo= memos.get(key);
-		if(!memo){
-			memo= fn();
-			memos.set(key, memo);
-		}
-		return memo;
-	}
 }
