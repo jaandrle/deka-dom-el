@@ -1,5 +1,5 @@
 export { registerReactivity } from './observables-common.js';
-import { enviroment as env, keyDM, keyLTE } from './dom-common.js';
+import { enviroment as env, keyLTE } from './dom-common.js';
 
 export function dispatchEvent(name, options, host){
 	if(!options) options= {};
@@ -32,8 +32,7 @@ on.connected= function(listener, options){
 	const name= "connected";
 	if(typeof options !== "object")
 		options= {};
-	if(typeof options.once !== "boolean")
-		options.once= true;
+	options.once= true;
 	return function registerElement(element){
 		if(custom_element) element= custom_element;
 		const event= "dde:"+name;
@@ -51,11 +50,9 @@ on.disconnected= function(listener, options){
 	const name= "disconnected";
 	if(typeof options !== "object")
 		options= {};
-	if(typeof options.once !== "boolean")
-		options.once= true;
+	options.once= true;
 	return function registerElement(element){
 		if(custom_element) element= custom_element;
-		if(!element[keyDM]) element[keyDM]= "dde";
 		const event= "dde:"+name;
 		element.addEventListener(event, listener, options);
 		if(element[keyLTE]) return element;
@@ -212,11 +209,7 @@ function connectionsChangesObserverConstructor(){
 			
 			const ls= store.get(element);
 			if(!ls.length_d) continue;
-			const dispatch= dispatchRemove(element);
-			if(element[keyDM]==="dde")
-				(queueMicrotask || setTimeout)(dispatch);
-			else
-				dispatch();
+			(queueMicrotask || setTimeout)(dispatchRemove(element));
 			out= true;
 		}
 		return out;

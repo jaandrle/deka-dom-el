@@ -1,4 +1,4 @@
-import { keyDM, keyLTE } from "./dom-common.js";
+import { keyLTE } from "./dom-common.js";
 import { scope } from "./dom.js";
 export function customElementRender(custom_element, render, props= observedAttributes){
 	scope.push({
@@ -16,14 +16,11 @@ export function lifecycleToEvents(class_declaration){
 		target.apply(thisArg, detail);
 		thisArg.dispatchEvent(new Event("dde:connected"));
 	});
-	if(!class_declaration.prototype[keyDM])
-		class_declaration.prototype[keyDM]= "dde";
 	wrapMethod(class_declaration.prototype, "disconnectedCallback", function(target, thisArg, detail){
 		target.apply(thisArg, detail);
-		const dispatch= ()=> thisArg.dispatchEvent(new Event("dde:disconnected"));
-		if(thisArg[keyDM]!=="dde")
-			return dispatch();
-		(queueMicrotask || setTimeout)(()=> !thisArg.isConnected && dispatch());
+		(queueMicrotask || setTimeout)(
+			()=> !thisArg.isConnected && thisArg.dispatchEvent(new Event("dde:disconnected"))
+		);
 	});
 	wrapMethod(class_declaration.prototype, "attributeChangedCallback", function(target, thisArg, detail){
 		const [ attribute, , value ]= detail;
