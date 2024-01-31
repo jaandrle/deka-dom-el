@@ -180,6 +180,7 @@ export function customElementRender<
 	P extends any = Record<string, any>
 >(
 	custom_element: EL,
+	target: ShadowRoot | EL,
 	render: (props: P)=> SupportedElement,
 	props?: P | ((...args: any[])=> P)
 ): EL

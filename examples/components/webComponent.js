@@ -12,9 +12,7 @@ export class CustomHTMLTestElement extends HTMLElement{
 	}
 	connectedCallback(){
 		if(!this.hasAttribute("pre-name")) this.setAttribute("pre-name", "default");
-		this.attachShadow({ mode: "open" }).append(
-			customElementRender(this, this.render, this.attributes)
-		);
+		customElementRender(this, this.attachShadow({ mode: "open" }), this.render, this.attributes)
 	}
 
 	attributes(element){
@@ -23,6 +21,7 @@ export class CustomHTMLTestElement extends HTMLElement{
 	}
 	render({ name, preName, test }){
 		console.log(scope.state);
+		console.log({ name, preName, test });
 		scope.host(
 			on.connected(()=> console.log(CustomHTMLTestElement)),
 			on.attributeChanged(e=> console.log(e)),
@@ -63,7 +62,7 @@ export class CustomSlottingHTMLElement extends HTMLElement{
 		));
 	}
 	connectedCallback(){
-		this.append(customElementRender(this, this.render));
+		customElementRender(this, this, this.render);
 	}
 }
 customElementWithDDE(CustomSlottingHTMLElement);

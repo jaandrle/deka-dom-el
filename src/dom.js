@@ -5,7 +5,6 @@ import { enviroment as env } from './dom-common.js';
 const scopes= [ {
 	get scope(){ return  env.D.body; },
 	host: c=> c ? c(env.D.body) : env.D.body,
-	custom_element: false,
 	prevent: true,
 } ];
 export const scope= {

@@ -96,7 +96,7 @@ observable.el= function(o, map){
 	out.append(mark_start, mark_end);
 	const { current }= scope;
 	const reRenderReactiveElement= v=> {
-		if(!mark_start.parentNode || !mark_end.parentNode)
+		if(!mark_start.parentNode || !mark_end.parentNode) // isConnected or wasn’t yet rendered
 			return removeObservableListener(o, reRenderReactiveElement);
 		scope.push(current);
 		let els= map(v);
@@ -107,12 +107,21 @@ observable.el= function(o, map){
 		while(( el_r= mark_start.nextSibling ) !== mark_end)
 			el_r.remove();
 		mark_start.after(...els);
+		if(mark_start.isConnected)
+			requestCleanUpReactives(current.host());
 	};
 	addObservableListener(o, reRenderReactiveElement);
 	removeObservablesFromElements(o, reRenderReactiveElement, mark_start, map);
 	reRenderReactiveElement(o());
 	return out;
 };
+function requestCleanUpReactives(host){
+	if(!host || !host[key_reactive]) return;
+	(requestIdleCallback || setTimeout)(function(){
+		host[key_reactive]= host[key_reactive]
+			.filter(([ o, el ])=> el.isConnected ? true : (removeObservableListener(...o), false));
+	});
+}
 import { on } from "./events.js";
 import { observedAttributes } from "./helpers.js";
 const observedAttributeActions= {
@@ -152,7 +161,11 @@ export const observables_config= {
 	isObservable,
 	processReactiveAttribute(element, key, attrs, set){
 		if(!isObservable(attrs)) return attrs;
-		const l= attr=> set(key, attr);
+		const l= attr=> {
+			if(!element.isConnected)
+				return removeObservableListener(attrs, l);
+			set(key, attr);
+		};
 		addObservableListener(attrs, l);
 		removeObservablesFromElements(attrs, l, element, key);
 		return attrs();

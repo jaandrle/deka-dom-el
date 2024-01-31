@@ -26,3 +26,4 @@ function setDeleteAttr(obj, prop, val){
 	if(Reflect.get(obj, prop)==="undefined")
 		return Reflect.set(obj, prop, "");
 }
+export const keyLTE= "__dde_lifecycleToEvents"; //boolean

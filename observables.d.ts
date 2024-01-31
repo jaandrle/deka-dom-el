@@ -3,6 +3,7 @@ type Action<V>= (this: { value: V, stopPropagation(): void }, ...a: any[])=> typ
 //type SymbolObservable= Symbol;
 type SymbolOnclear= symbol;
 type Actions<V>= Record<string | SymbolOnclear, Action<V>>;
+type OnListenerOptions= Pick<AddEventListenerOptions, "signal"> & { first_time?: boolean };
 interface observable{
 	_: Symbol
 	/**
@@ -40,7 +41,7 @@ interface observable{
 		...params: A[N] extends (...args: infer P)=> any ? P : never
 	): void;
 	clear(...observables: Observable<any, any>[]): void;
-	on<T>(observable: Observable<T, any>, onchange: (a: T)=> void, options?: AddEventListenerOptions): void;
+	on<T>(observable: Observable<T, any>, onchange: (a: T)=> void, options?: OnListenerOptions): void;
 	symbols: {
 		//observable: SymbolObservable;
 		onclear: SymbolOnclear;
