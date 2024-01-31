@@ -1,4 +1,4 @@
-import { enviroment as env } from './dom-common.js';
+import { enviroment as env, evc, evd } from './dom-common.js';
 export const c_ch_o= env.M ? connectionsChangesObserverConstructor() : new Proxy({}, {
 	get(){ return ()=> {}; }
 });
@@ -107,7 +107,7 @@ function connectionsChangesObserverConstructor(){
 			const ls= store.get(element);
 			if(!ls.length_c) continue;
 			
-			element.dispatchEvent(new Event("dde:connected"));
+			element.dispatchEvent(new Event(evc));
 			ls.connected= new WeakSet();
 			ls.length_c= 0;
 			if(!ls.length_d) store.delete(element);
@@ -131,7 +131,7 @@ function connectionsChangesObserverConstructor(){
 	function dispatchRemove(element){
 		return ()=> {
 			if(element.isConnected) return;
-			element.dispatchEvent(new Event("dde:disconnected"));
+			element.dispatchEvent(new Event(evd));
 			store.delete(element);
 		};
 	}

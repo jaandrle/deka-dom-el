@@ -21,7 +21,6 @@ export class CustomHTMLTestElement extends HTMLElement{
 	}
 	render({ name, preName, test }){
 		console.log(scope.state);
-		console.log({ name, preName, test });
 		scope.host(
 			on.connected(()=> console.log(CustomHTMLTestElement)),
 			on.attributeChanged(e=> console.log(e)),

@@ -1,5 +1,5 @@
 export { registerReactivity } from './observables-common.js';
-import { enviroment as env, keyLTE } from './dom-common.js';
+import { enviroment as env, keyLTE, evc, evd, eva } from './dom-common.js';
 
 export function dispatchEvent(name, options, host){
 	if(!options) options= {};
@@ -20,23 +20,16 @@ export function on(event, listener, options){
 }
 
 import { c_ch_o } from "./events-observer.js";
-const els_attribute_store= new WeakSet();
-import { scope } from "./dom.js";
 import { onAbort } from './helpers.js';
+const lifeOptions= obj=> Object.assign({}, typeof obj==="object" ? obj : null, { once: true });
 //TODO: cleanUp when event before abort?
 //TODO: docs (e.g.) https://nolanlawson.com/2024/01/13/web-component-gotcha-constructor-vs-connectedcallback/
 on.connected= function(listener, options){
-	const { custom_element }= scope.current;
-	const name= "connected";
-	if(typeof options !== "object")
-		options= {};
-	options.once= true;
+	options= lifeOptions(options);
 	return function registerElement(element){
-		if(custom_element) element= custom_element;
-		const event= "dde:"+name;
-		element.addEventListener(event, listener, options);
+		element.addEventListener(evc, listener, options);
 		if(element[keyLTE]) return element;
-		if(element.isConnected) return ( element.dispatchEvent(new Event(event)), element );
+		if(element.isConnected) return ( element.dispatchEvent(new Event(evc)), element );
 
 		const c= onAbort(options.signal, ()=> c_ch_o.offConnected(element, listener));
 		if(c) c_ch_o.onConnected(element, listener);
@@ -44,15 +37,9 @@ on.connected= function(listener, options){
 	};
 };
 on.disconnected= function(listener, options){
-	const { custom_element }= scope.current;
-	const name= "disconnected";
-	if(typeof options !== "object")
-		options= {};
-	options.once= true;
+	options= lifeOptions(options);
 	return function registerElement(element){
-		if(custom_element) element= custom_element;
-		const event= "dde:"+name;
-		element.addEventListener(event, listener, options);
+		element.addEventListener(evd, listener, options);
 		if(element[keyLTE]) return element;
 
 		const c= onAbort(options.signal, ()=> c_ch_o.offDisconnected(element, listener));
@@ -69,13 +56,12 @@ on.disconnectedAsAbort= function(host){
 	host(on.disconnected(()=> a.abort()));
 	return a;
 };
+const els_attribute_store= new WeakSet();
 on.attributeChanged= function(listener, options){
-	const name= "attributeChanged";
 	if(typeof options !== "object")
 		options= {};
 	return function registerElement(element){
-		const event= "dde:"+name;
-		element.addEventListener(event, listener, options);
+		element.addEventListener(eva, listener, options);
 		if(element[keyLTE] || els_attribute_store.has(element))
 			return element;
 		
@@ -84,7 +70,7 @@ on.attributeChanged= function(listener, options){
 		const observer= new env.M(function(mutations){
 			for(const { attributeName, target } of mutations)
 				target.dispatchEvent(
-					new CustomEvent(event, { detail: [ attributeName, target.getAttribute(attributeName) ] }));
+					new CustomEvent(eva, { detail: [ attributeName, target.getAttribute(attributeName) ] }));
 		});
 		const c= onAbort(options.signal, ()=> observer.disconnect());
 		if(c) observer.observe(element, { attributes: true });
