@@ -73,6 +73,12 @@
 		},
 		{
 			"path": "./index-with-observables.js",
+			"limit": "15 kB",
+			"gzip": false,
+			"brotli": false
+		},
+		{
+			"path": "./index-with-observables.js",
 			"limit": "5 kB"
 		}
 	],

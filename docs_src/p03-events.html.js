@@ -108,6 +108,17 @@ export function page({ pkg, info }){
 				" clean up procedures when the component is removed from the app."
 			),
 		),
+		el("p").append(
+			"To provide intuitive behaviour, similar also to how the life-cycle events works in other",
+			" frameworks/libraries, deka-dom-el library ensures that ", el("code", "on.connected"),
+			" and ", el("code", "on.disconnected"), " are called only once and only when the element",
+			" is (dis)connected to live DOM. The solution is inspired by ", el("a", { textContent: "Vue", href: "https://vuejs.org/guide/extras/web-components.html#lifecycle", title: "Vue and Web Components | Lifecycle" }), ".",
+			" For using native behaviour re-(dis)connecting element, use:"
+		),
+		el("ul").append(
+			el("li").append("custom ", el("code", "MutationObserver"), " or logic in (dis)", el(code, "connectedCallback"), " or…"),
+			el("li").append("re-add ", el("code", "on.connected"), " or ", el("code", "on.disconnected"), " listeners.")
+		),
 
 		el(h3, "Final notes"),
 		el("p", "The library also provides a method to dispatch the events."),

@@ -84,7 +84,7 @@ function todoComponent({ textContent, value }){
 	return el("li").append(
 		O.el(is_editable, is=> is
 			? el("input", { value: textContent(), type: "text" }, onedited)
-			: el("span", { textContent, onclick: is_editable.bind(null, true) }),
+			: el("span", { textContent, onclick: is_editable.bind(null, true) })
 		),
 		el("button", { type: "button", value, textContent: "-" }, onclick)
 	);
