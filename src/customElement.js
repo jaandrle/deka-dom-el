@@ -1,3 +1,4 @@
+import { keyLTE } from "./dom-common.js";
 import { scope } from "./dom.js";
 export function customElementRender(custom_element, render, props= observedAttributes){
 	scope.push({
@@ -11,20 +12,24 @@ export function customElementRender(custom_element, render, props= observedAttri
 	return out;
 }
 export function lifecycleToEvents(class_declaration){
-	for (const name of [ "connected", "disconnected" ])
-		wrapMethod(class_declaration.prototype, name+"Callback", function(target, thisArg, detail){
-			target.apply(thisArg, detail);
-			thisArg.dispatchEvent(new Event("dde:"+name));
-		});
-	const name= "attributeChanged";
-	wrapMethod(class_declaration.prototype, name+"Callback", function(target, thisArg, detail){
+	wrapMethod(class_declaration.prototype, "connectedCallback", function(target, thisArg, detail){
+		target.apply(thisArg, detail);
+		thisArg.dispatchEvent(new Event("dde:connected"));
+	});
+	wrapMethod(class_declaration.prototype, "disconnectedCallback", function(target, thisArg, detail){
+		target.apply(thisArg, detail);
+		(queueMicrotask || setTimeout)(
+			()=> !thisArg.isConnected && thisArg.dispatchEvent(new Event("dde:disconnected"))
+		);
+	});
+	wrapMethod(class_declaration.prototype, "attributeChangedCallback", function(target, thisArg, detail){
 		const [ attribute, , value ]= detail;
-		thisArg.dispatchEvent(new CustomEvent("dde:"+name, {
+		thisArg.dispatchEvent(new CustomEvent("dde:attributeChanged", {
 			detail: [ attribute, value ]
 		}));
 		target.apply(thisArg, detail);
 	});
-	class_declaration.prototype.__dde_lifecycleToEvents= true;
+	class_declaration.prototype[keyLTE]= true;
 	return class_declaration;
 }
 export { lifecycleToEvents as customElementWithDDE };

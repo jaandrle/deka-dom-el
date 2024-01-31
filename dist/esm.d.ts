@@ -54,7 +54,7 @@ interface observable{
 	 * */
 	el<S extends any>(observable: Observable<S, any>, el: (v: S)=> Element | Element[] | DocumentFragment): DocumentFragment;
 
-    attribute(name: string, initial?: string): Observable<string, {}>;
+    observedAttributes(custom_element: HTMLElement): Record<string, Observable<any, any>>;
 }
 export const observable: observable;
 export const O: observable;
@@ -64,16 +64,11 @@ declare global {
 	type ddeActions<V>= Actions<V>
 }
 type CustomElementTagNameMap= { '#text': Text, '#comment': Comment }
-declare global {
-	interface ddePublicElementTagNameMap{
-	}
-}
 type SupportedElement=
 	  HTMLElementTagNameMap[keyof HTMLElementTagNameMap]
 	| SVGElementTagNameMap[keyof SVGElementTagNameMap]
 	| MathMLElementTagNameMap[keyof MathMLElementTagNameMap]
 	| CustomElementTagNameMap[keyof CustomElementTagNameMap]
-	| ddePublicElementTagNameMap[keyof ddePublicElementTagNameMap];
 declare global {
 	type ddeComponentAttributes= Record<any, any> | undefined;
 	type ddeElementAddon<El extends SupportedElement | DocumentFragment>= (element: El)=> El | void;
@@ -112,7 +107,7 @@ export function classListDeclarative<El extends SupportedElement>(element: El, c
 export function assign<El extends SupportedElement>(element: El, ...attrs_array: ElementAttributes<El>[]): El
 export function assignAttribute<El extends SupportedElement, ATT extends keyof ElementAttributes<El>>(element: El, attr: ATT, value: ElementAttributes<El>[ATT]): ElementAttributes<El>[ATT]
 
-type ExtendedHTMLElementTagNameMap= HTMLElementTagNameMap & CustomElementTagNameMap & ddePublicElementTagNameMap
+type ExtendedHTMLElementTagNameMap= HTMLElementTagNameMap & CustomElementTagNameMap;
 type textContent= string | ( (set?: string)=> string ); // TODO: for some reason `Observable<string, any>` leads to `attrs?: any`
 export function el<
 	TAG extends keyof ExtendedHTMLElementTagNameMap & string,
@@ -239,9 +234,22 @@ export const scope: {
 	pop(): ReturnType<Array<Scope>["pop"]>,
 };
 
-/* TypeScript MEH // TODO for SVG */
-type ddeAppend<el>= (...nodes: (Node | string)[])=> el;
+export function customElementRender<
+	EL extends HTMLElement,
+	P extends any = Record<string, any>
+>(
+	custom_element: EL,
+	render: (props: P)=> SupportedElement,
+	props?: P | ((...args: any[])=> P)
+): EL
+export function customElementWithDDE<EL extends HTMLElement>(custom_element: EL): EL
+export function lifecycleToEvents<EL extends HTMLElement>(custom_element: EL): EL
+export function observedAttributes(custom_element: HTMLElement): Record<string, string>
+
+/* TypeScript MEH */
 declare global{
+	type ddeAppend<el>= (...nodes: (Node | string)[])=> el;
+	
 	interface ddeDocumentFragment extends DocumentFragment{ append: ddeAppend<ddeDocumentFragment>; }
 	interface ddeHTMLElement extends HTMLElement{ append: ddeAppend<ddeHTMLElement>; }
 	interface ddeSVGElement extends SVGElement{ append: ddeAppend<ddeSVGElement>; }

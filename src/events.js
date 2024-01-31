@@ -1,5 +1,5 @@
 export { registerReactivity } from './observables-common.js';
-import { enviroment as env } from './dom-common.js';
+import { enviroment as env, keyLTE } from './dom-common.js';
 
 export function dispatchEvent(name, options, host){
 	if(!options) options= {};
@@ -26,6 +26,7 @@ const els_attribute_store= new WeakSet();
 import { scope } from "./dom.js";
 import { onAbort } from './helpers.js';
 //TODO: cleanUp when event before abort?
+//TODO: docs (e.g.) https://nolanlawson.com/2024/01/13/web-component-gotcha-constructor-vs-connectedcallback/
 on.connected= function(listener, options){
 	const { custom_element }= scope.current;
 	const name= "connected";
@@ -36,7 +37,7 @@ on.connected= function(listener, options){
 		if(custom_element) element= custom_element;
 		const event= "dde:"+name;
 		element.addEventListener(event, listener, options);
-		if(element.__dde_lifecycleToEvents) return element;
+		if(element[keyLTE]) return element;
 		if(element.isConnected) return ( element.dispatchEvent(new Event(event)), element );
 
 		const c= onAbort(options.signal, ()=> c_ch_o.offConnected(element, listener));
@@ -54,7 +55,7 @@ on.disconnected= function(listener, options){
 		if(custom_element) element= custom_element;
 		const event= "dde:"+name;
 		element.addEventListener(event, listener, options);
-		if(element.__dde_lifecycleToEvents) return element;
+		if(element[keyLTE]) return element;
 
 		const c= onAbort(options.signal, ()=> c_ch_o.offDisconnected(element, listener));
 		if(c) c_ch_o.onDisconnected(element, listener);
@@ -77,7 +78,7 @@ on.attributeChanged= function(listener, options){
 	return function registerElement(element){
 		const event= "dde:"+name;
 		element.addEventListener(event, listener, options);
-		if(element.__dde_lifecycleToEvents || els_attribute_store.has(element))
+		if(element[keyLTE] || els_attribute_store.has(element))
 			return element;
 		
 		if(!env.M) return element;
@@ -171,13 +172,13 @@ function connectionsChangesObserverConstructor(){
 	function requestIdle(){ return new Promise(function(resolve){
 		(requestIdleCallback || requestAnimationFrame)(resolve);
 	}); }
-	async function collectChildren(element, filter){
+	async function collectChildren(element){
 		if(store.size > 30)//TODO limit?
 			await requestIdle();
 		const out= [];
 		if(!(element instanceof Node)) return out;
 		for(const el of store.keys()){
-			if(el===element || !(el instanceof Node) || filter(el)) continue;
+			if(el===element || !(el instanceof Node)) continue;
 			if(element.contains(el))
 				out.push(el);
 		}
@@ -186,7 +187,7 @@ function connectionsChangesObserverConstructor(){
 	function observerAdded(addedNodes, is_root){
 		let out= false;
 		for(const element of addedNodes){
-			if(is_root) collectChildren(element, el=> !el.isConnectedd).then(observerAdded);
+			if(is_root) collectChildren(element).then(observerAdded);
 			if(!store.has(element)) continue;
 			
 			const ls= store.get(element);
@@ -203,17 +204,21 @@ function connectionsChangesObserverConstructor(){
 	function observerRemoved(removedNodes, is_root){
 		let out= false;
 		for(const element of removedNodes){
-			if(is_root) collectChildren(element, el=> el.isConnectedd).then(observerRemoved);
+			if(is_root) collectChildren(element).then(observerRemoved);
 			if(!store.has(element)) continue;
 			
 			const ls= store.get(element);
 			if(!ls.length_d) continue;
-			
-			element.dispatchEvent(new Event("dde:disconnected"));
-			
-			store.delete(element);
+			(queueMicrotask || setTimeout)(dispatchRemove(element));
 			out= true;
 		}
 		return out;
+	}
+	function dispatchRemove(element){
+		return ()=> {
+			if(element.isConnected) return;
+			element.dispatchEvent(new Event("dde:disconnected"));
+			store.delete(element);
+		};
 	}
 }
