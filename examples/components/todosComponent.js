@@ -16,10 +16,12 @@ const className= style.host(todosComponent).css`
 `;
 /** @param {{ todos: string[] }} */
 export function todosComponent({ todos= [ "Task A" ] }= {}){
-	const todosO= O(todos.map(t=> O(t)), {
-		add(v){ this.value.push(O(v)); },
-		remove(i){ O.clear(this.value.splice(i, 1)[0]); }
+	let key= 0;
+	const todosO= O(new Map(), {
+		add(v){ this.value.set(key++, O(v)); },
+		remove(key){ O.clear(this.value.get(key)); this.value.delete(key); }
 	});
+	todos.forEach(text=> O.action(todosO, "add", text));
 
 	const name= "todoName";
 	const onsubmitAdd= on("submit", event=> {
@@ -31,24 +33,16 @@ export function todosComponent({ todos= [ "Task A" ] }= {}){
 	const onremove= on("remove", event=>
 		O.action(todosO, "remove", event.detail));
 	
-	const ul_todos_version= 1; // ul_todos_v1/ul_todos_v2
-	const ul_todos_v1= el("ul").append(
-		O.el(todosO, ts=> ts
-			.map((textContent, value)=>
-				el(todoComponent, { textContent, value, className }, onremove))
-	));
-	const ul_todos_v2= ts=> el("ul").append(
-		...ts.map((textContent, value)=>
-			el(todoComponent, { textContent, value, className }, onremove))
-	);
-	
 	return el("div", { className }).append(
 		el("div").append(
 			el("h2", "Todos:"),
 			el("h3", "List of todos:"),
-			O.el(todosO, ts=> !ts.length
+			O.el(todosO, (ts, memo)=> !ts.size
 				? el("p", "No todos yet")
-				: ( !(ul_todos_version-1) ? ul_todos_v1 : ul_todos_v2(ts) )
+				: el("ul").append(
+					...Array.from(ts).map(([ value, textContent ])=>
+						memo(value, ()=> el(todoComponent, { textContent, value, className }, onremove)))
+				)
 			),
 			el("p", "Click to the text to edit it.")
 		),
@@ -61,7 +55,7 @@ export function todosComponent({ todos= [ "Task A" ] }= {}){
 		),
 		el("div").append(
 			el("h3", "Output (JSON):"),
-			el("output", O(()=> JSON.stringify(todosO, null, "\t")))
+			el("output", O(()=> JSON.stringify(Array.from(todosO()), null, "\t")))
 		)
 	)
 }

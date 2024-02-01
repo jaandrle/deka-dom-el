@@ -89,24 +89,38 @@ const key_reactive= "__dde_reactive";
 import { enviroment as env } from "./dom-common.js";
 import { el } from "./dom.js";
 import { scope } from "./dom.js";
+const hasOwn= Object.prototype.hasOwnProperty;
 observable.el= function(o, map){
 	const mark_start= el.mark({ type: "reactive" }, true);
 	const mark_end= mark_start.end;
 	const out= env.D.createDocumentFragment();
 	out.append(mark_start, mark_end);
 	const { current }= scope;
+	let cache= {};
 	const reRenderReactiveElement= v=> {
 		if(!mark_start.parentNode || !mark_end.parentNode) // isConnected or wasn’t yet rendered
 			return removeObservableListener(o, reRenderReactiveElement);
+		const cache_tmp= cache; // will be reused in the useCache or removed in the while loop on the end
+		cache= {};
 		scope.push(current);
-		let els= map(v);
+		let els= map(v, function useCache(key, fun){
+			let value;
+			if(hasOwn.call(cache_tmp, key)){
+				value= cache_tmp[key];
+				delete cache_tmp[key];
+			} else
+				value= fun();
+			cache[key]= value;
+			return value;
+		});
 		scope.pop();
 		if(!Array.isArray(els))
 			els= [ els ];
-		let el_r= mark_start;
-		while(( el_r= mark_start.nextSibling ) !== mark_end)
-			el_r.remove();
 		mark_start.after(...els);
+		const el_last_keep= els[els.length-1];
+		let el_r;
+		while(( el_r= el_last_keep.nextSibling ) !== mark_end)
+			el_r.remove();
 		if(mark_start.isConnected)
 			requestCleanUpReactives(current.host());
 	};
