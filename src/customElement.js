@@ -23,7 +23,7 @@ export function lifecycleToEvents(class_declaration){
 	});
 	wrapMethod(class_declaration.prototype, "disconnectedCallback", function(target, thisArg, detail){
 		target.apply(thisArg, detail);
-		(queueMicrotask || setTimeout)(
+		(globalThis.queueMicrotask || setTimeout)(
 			()=> !thisArg.isConnected && thisArg.dispatchEvent(new Event(evd))
 		);
 	});
