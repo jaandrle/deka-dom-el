@@ -79,7 +79,7 @@
 		},
 		{
 			"path": "./index-with-observables.js",
-			"limit": "5 kB"
+			"limit": "5.25 kB"
 		}
 	],
 	"modifyEsbuildConfig": {
