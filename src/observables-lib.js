@@ -1,7 +1,8 @@
 export const mark= "__dde_observable";
+import { hasOwn } from "./helpers.js";
 
 export function isObservable(candidate){
-	try{ return Reflect.has(candidate, mark); }
+	try{ return hasOwn(candidate, mark); }
 	catch(e){ return false; }
 }
 /** @type {function[]} */
@@ -45,10 +46,10 @@ export function observable(value, actions){
 export { observable as O };
 observable.action= function(o, name, ...a){
 	const s= o[mark], { actions }= s;
-	if(!actions || !Reflect.has(actions, name))
+	if(!actions || !(name in actions))
 		throw new Error(`'${o}' has no action with name '${name}'!`);
 	actions[name].apply(s, a);
-	if(s.skip) return Reflect.deleteProperty(s, "skip");
+	if(s.skip) return (delete s.skip);
 	s.listeners.forEach(l=> l(s.value));
 };
 observable.on= function on(o, listener, options= {}){
@@ -65,11 +66,12 @@ observable.symbols= {
 };
 observable.clear= function(...observables){
 	for(const o of observables){
-		Reflect.deleteProperty(o, "toJSON");
 		const s= o[mark];
+		if(!s) continue;
+		delete o.toJSON;
 		s.onclear.forEach(f=> f.call(s));
 		clearListDeps(o, s);
-		Reflect.deleteProperty(o, mark);
+		delete o[mark];
 	}
 	function clearListDeps(o, s){
 		s.listeners.forEach(l=> {
@@ -89,24 +91,38 @@ const key_reactive= "__dde_reactive";
 import { enviroment as env } from "./dom-common.js";
 import { el } from "./dom.js";
 import { scope } from "./dom.js";
+// TODO: third argument for handle `cache_tmp` in re-render
 observable.el= function(o, map){
 	const mark_start= el.mark({ type: "reactive" }, true);
 	const mark_end= mark_start.end;
 	const out= env.D.createDocumentFragment();
 	out.append(mark_start, mark_end);
 	const { current }= scope;
+	let cache= {};
 	const reRenderReactiveElement= v=> {
-		if(!mark_start.parentNode || !mark_end.parentNode) // isConnected or wasn’t yet rendered
+		if(!mark_start.parentNode || !mark_end.parentNode) // === `isConnected` or wasn’t yet rendered
 			return removeObservableListener(o, reRenderReactiveElement);
+		const cache_tmp= cache; // will be reused in the useCache or removed in the while loop on the end
+		cache= {};
 		scope.push(current);
-		let els= map(v);
+		let els= map(v, function useCache(key, fun){
+			let value;
+			if(hasOwn(cache_tmp, key)){
+				value= cache_tmp[key];
+				delete cache_tmp[key];
+			} else
+				value= fun();
+			cache[key]= value;
+			return value;
+		});
 		scope.pop();
 		if(!Array.isArray(els))
 			els= [ els ];
-		let el_r= mark_start;
-		while(( el_r= mark_start.nextSibling ) !== mark_end)
-			el_r.remove();
 		mark_start.after(...els);
+		const el_last_keep= els[els.length-1];
+		let el_r;
+		while(( el_r= el_last_keep.nextSibling ) !== mark_end)
+			el_r.remove();
 		if(mark_start.isConnected)
 			requestCleanUpReactives(current.host());
 	};
@@ -183,7 +199,7 @@ function removeObservablesFromElements(o, listener, ...notes){
 				 * You can investigate the `__dde_reactive` key of the element.
 				 * */
 				element[key_reactive].forEach(([ [ o, listener ] ])=>
-					removeObservableListener(o, listener, o[mark]?.host() === element))
+					removeObservableListener(o, listener, o[mark] && o[mark].host && o[mark].host() === element))
 			)(element);
 		}
 		element[key_reactive].push([ [ o, listener ], ...notes ]);
@@ -216,7 +232,7 @@ function toObservable(o, value, actions, readonly= false){
 	const { onclear: ocs }= observable.symbols;
 	if(actions[ocs]){
 		onclear.push(actions[ocs]);
-		Reflect.deleteProperty(actions, ocs);
+		delete actions[ocs];
 	}
 	const { host }= scope;
 	Reflect.defineProperty(o, mark, {

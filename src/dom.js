@@ -65,12 +65,13 @@ export function createElement(tag, attributes, ...addons){
 	scoped= 2;
 	return el;
 }
+import { hasOwn } from "./helpers.js";
 /** @param {HTMLElement} element @param {HTMLElement} [root] */
 export function simulateSlots(element, root= element, mapper= undefined){
 	const _default= Symbol.for("default");
 	const slots= Array.from(root.querySelectorAll("slot"))
 		.reduce((out, curr)=> Reflect.set(out, curr.name || _default, curr) && out, {});
-	const has_d= Reflect.has(slots, _default);
+	const has_d= hasOwn(slots, _default);
 	element.append= new Proxy(element.append, {
 		apply(orig, _, els){
 			if(!els.length) return element;
@@ -198,7 +199,7 @@ export function elementAttribute(element, op, key, value){
 import { isUndef } from "./helpers.js";
 //TODO add cache? `(Map/Set)<el.tagName+key,isUndef>`
 function isPropSetter(el, key){
-	if(!Reflect.has(el, key)) return false;
+	if(!(key in el)) return false;
 	const des= getPropDescriptor(el, key);
 	return !isUndef(des.set);
 }
