@@ -123,7 +123,7 @@ function connectionsChangesObserverConstructor(){
 			
 			const ls= store.get(element);
 			if(!ls.length_d) continue;
-			(queueMicrotask || setTimeout)(dispatchRemove(element));
+			(globalThis.queueMicrotask || setTimeout)(dispatchRemove(element));
 			out= true;
 		}
 		return out;

@@ -1,4 +1,4 @@
-export const mark= Symbol.for("observable");
+export const mark= "__dde_observable";
 
 export function isObservable(candidate){
 	try{ return Reflect.has(candidate, mark); }
@@ -194,7 +194,7 @@ function create(is_readonly, value, actions){
 	const varO= is_readonly
 		? ()=> read(varO)
 		: (...value)=> value.length ? write(varO, ...value) : read(varO);
-	return toObservable(varO, value, actions);
+	return toObservable(varO, value, actions, is_readonly);
 }
 const protoSigal= Object.assign(Object.create(null), {
 	stopPropagation(){
@@ -209,7 +209,7 @@ class ObservableDefined extends Error{
 		this.stack= rest.find(l=> !l.includes(curr_file));
 	}
 }
-function toObservable(o, value, actions){
+function toObservable(o, value, actions, readonly= false){
 	const onclear= [];
 	if(typeOf(actions)!=="[object Object]")
 		actions= {};
@@ -223,7 +223,8 @@ function toObservable(o, value, actions){
 		value: {
 			value, actions, onclear, host,
 			listeners: new Set(),
-			defined: new ObservableDefined()
+			defined: (new ObservableDefined()).stack,
+			readonly
 		},
 		enumerable: false,
 		writable: false,
