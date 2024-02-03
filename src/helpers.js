@@ -1,3 +1,4 @@
+export const hasOwn= (...a)=> Object.prototype.hasOwnProperty.call(...a);
 export function isUndef(value){ return typeof value==="undefined"; }
 export function typeOf(v){
 	const t= typeof v;
@@ -19,7 +20,7 @@ export function observedAttributes(instance, observedAttribute){
 	const { observedAttributes= [] }= instance.constructor;
 	return observedAttributes
 		.reduce(function(out, name){
-			Reflect.set(out, kebabToCamel(name), observedAttribute(instance, name));
+			out[kebabToCamel(name)]= observedAttribute(instance, name);
 			return out;
 		}, {});
 }
