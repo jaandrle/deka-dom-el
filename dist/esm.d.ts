@@ -245,7 +245,7 @@ export function customElementRender<
 	props?: P | ((...args: any[])=> P)
 ): EL
 export function customElementWithDDE<EL extends HTMLElement>(custom_element: EL): EL
-export function lifecycleToEvents<EL extends HTMLElement>(custom_element: EL): EL
+export function lifecyclesToEvents<EL extends HTMLElement>(custom_element: EL): EL
 export function observedAttributes(custom_element: HTMLElement): Record<string, string>
 
 /* TypeScript MEH */

@@ -9,4 +9,4 @@ import { O } from "deka-dom-el/observables";
 O.observedAttributes;
 
 // “internal” utils
-import { lifecycleToEvents } from "deka-dom-el";
+import { lifecyclesToEvents } from "deka-dom-el";

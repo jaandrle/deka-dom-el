@@ -8,7 +8,7 @@ export function customElementRender(custom_element, target, render, props= obser
 	});
 	if(typeof props==="function") props= props.call(custom_element, custom_element);
 	const is_lte= custom_element[keyLTE];
-	if(!is_lte) lifecycleToEvents(custom_element);
+	if(!is_lte) lifecyclesToEvents(custom_element);
 	const out= render.call(custom_element, props);
 	if(!is_lte) custom_element.dispatchEvent(new Event(evc));
 	if(target.nodeType===11 && typeof target.mode==="string") // is ShadowRoot
@@ -16,7 +16,7 @@ export function customElementRender(custom_element, target, render, props= obser
 	scope.pop();
 	return target.append(out);
 }
-export function lifecycleToEvents(class_declaration){
+export function lifecyclesToEvents(class_declaration){
 	wrapMethod(class_declaration.prototype, "connectedCallback", function(target, thisArg, detail){
 		target.apply(thisArg, detail);
 		thisArg.dispatchEvent(new Event(evc));
@@ -37,7 +37,7 @@ export function lifecycleToEvents(class_declaration){
 	class_declaration.prototype[keyLTE]= true;
 	return class_declaration;
 }
-export { lifecycleToEvents as customElementWithDDE };
+export { lifecyclesToEvents as customElementWithDDE };
 function wrapMethod(obj, method, apply){
 	obj[method]= new Proxy(obj[method] || (()=> {}), { apply });
 }
