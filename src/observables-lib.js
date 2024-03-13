@@ -118,11 +118,13 @@ observable.el= function(o, map){
 		scope.pop();
 		if(!Array.isArray(els))
 			els= [ els ];
+		const el_start_rm= document.createComment("");
+		els.push(el_start_rm);
 		mark_start.after(...els);
-		const el_last_keep= els[els.length-1];
 		let el_r;
-		while(( el_r= el_last_keep.nextSibling ) !== mark_end)
+		while(( el_r= el_start_rm.nextSibling ) && el_r !== mark_end)
 			el_r.remove();
+		el_start_rm.remove();
 		if(mark_start.isConnected)
 			requestCleanUpReactives(current.host());
 	};
@@ -146,9 +148,9 @@ const observedAttributeActions= {
 function observedAttribute(store){
 	return function(instance, name){
 		const varO= (...args)=> !args.length
-			? instance.getAttribute(name)
+			? read(varO)
 			: instance.setAttribute(name, ...args);
-		const out= toObservable(varO, varO(), observedAttributeActions);
+		const out= toObservable(varO, instance.getAttribute(name), observedAttributeActions);
 		store[name]= out;
 		return out;
 	};
@@ -247,6 +249,7 @@ function toObservable(o, value, actions, readonly= false){
 		configurable: true
 	});
 	o.toJSON= ()=> o();
+	o.valueOf= ()=> o[mark] && o[mark].value;
 	Object.setPrototypeOf(o[mark], protoSigal);
 	return o;
 }
