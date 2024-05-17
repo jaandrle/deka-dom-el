@@ -1,4 +1,4 @@
-import { el, empty } from "deka-dom-el";
+import { el, empty, on } from "deka-dom-el";
 document.body.append(
 	el(component),
 	el("button", {
@@ -7,7 +7,6 @@ document.body.append(
 		type: "button"
 	})
 );
-import { on } from "deka-dom-el";
 import { O } from "deka-dom-el/observables";
 function component(){
 	const textContent= O("Click to change text.");
