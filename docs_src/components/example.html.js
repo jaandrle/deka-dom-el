@@ -12,7 +12,10 @@ ${host}{
 	background: #212121 !important;
 	border: 1px solid white;
 }
-`
+`;
+
+const dde_content= s.cat(new URL("../../dist/esm-with-observables.js", import.meta.url)).toString();
+
 import { el } from "deka-dom-el";
 import { code } from "./code.html.js";
 import { relative } from "node:path";
@@ -26,7 +29,7 @@ import { relative } from "node:path";
 export function example({ src, language= "js", page_id }){
 	registerClientPart(page_id);
 	const content= s.cat(src).toString()
-		.replaceAll(/ from "deka-dom-el(\/observables)?";/g, ' from "https://cdn.jsdelivr.net/gh/jaandrle/deka-dom-el/dist/esm-with-observables.js";');
+		.replaceAll(/ from "deka-dom-el(\/observables)?";/g, ' from "./esm-with-observables.js";');
 	const id= "code-example-"+generateCodeId(src);
 	return el().append(
 		el(code, { id, content, language, className: example.name }),
@@ -35,7 +38,7 @@ export function example({ src, language= "js", page_id }){
 }
 function elCode({ id, content, extension: name }){
 	const options= JSON.stringify({
-		files: [{ name, content }],
+		files: [{ name, content }, { name: "esm-with-observables.js", content: dde_content }],
 		toolbar: false
 	});
 	return el("script", `Flems(document.getElementById("${id}"), JSON.parse(${JSON.stringify(options)}));`);
