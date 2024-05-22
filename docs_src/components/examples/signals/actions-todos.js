@@ -1,14 +1,14 @@
-import { O } from "deka-dom-el/observables";
-const todos= O([], {
+import { S } from "deka-dom-el/signals";
+const todos= S([], {
 	push(item){
-		this.value.push(O(item));
+		this.value.push(S(item));
 	},
 	pop(){
 		const removed= this.value.pop();
-		if(removed) O.clear(removed);
+		if(removed) S.clear(removed);
 	},
-	[O.symbols.onclear](){ // this covers `O.clear(todos)`
-		O.clear(...this.value);
+	[S.symbols.onclear](){ // this covers `O.clear(todos)`
+		S.clear(...this.value);
 	}
 });
 
@@ -19,7 +19,7 @@ const onsubmit= on("submit", function(event){
 	const data= new FormData(this);
 	switch (data.get("op")){
 		case "A"/*dd*/:
-			O.action(todos, "push", data.get("todo"));
+			S.action(todos, "push", data.get("todo"));
 			break;
 		case "E"/*dit*/: {
 			const last= todos().at(-1);
@@ -28,13 +28,13 @@ const onsubmit= on("submit", function(event){
 			break;
 		}
 		case "R"/*emove*/:
-			O.action(todos, "pop");
+			S.action(todos, "pop");
 			break;
 	}
 });
 document.body.append(
 	el("ul").append(
-		O.el(todos, todos=>
+		S.el(todos, todos=>
 			todos.map(textContent=> el("li", textContent)))
 	),
 	el("form", null, onsubmit).append(

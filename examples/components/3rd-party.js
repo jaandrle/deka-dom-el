@@ -1,4 +1,4 @@
-import { style, el, O, isObservable } from '../exports.js';
+import { style, el, S, isSignal } from '../exports.js';
 const className= style.host(thirdParty).css`
 	:host {
 		color: green;
@@ -10,22 +10,22 @@ const store_adapter= {
 	write(data){ console.log(data); history.replaceState("", "", "?"+(new URLSearchParams(data)).toString()); }
 };
 export function thirdParty(){
-	const store= O({
-		value: O("initial")
+	const store= S({
+		value: S("initial")
 	}, {
 		set(key, value){
-			const p=  this.value[key] || O();
+			const p=  this.value[key] || S();
 			p(value);
 			this.value[key]= p;
 		}
 	});
 	// Array.from((new URL(location)).searchParams.entries())
-	// 	.forEach(([ key, value ])=> O.action(store, "set", key, value));
-	// O.on(store, data=> history.replaceState("", "", "?"+(new URLSearchParams(JSON.parse(JSON.stringify(data)))).toString()));
+	// 	.forEach(([ key, value ])=> S.action(store, "set", key, value));
+	// S.on(store, data=> history.replaceState("", "", "?"+(new URLSearchParams(JSON.parse(JSON.stringify(data)))).toString()));
 	useStore(store_adapter, {
 		onread(data){
 			Array.from(data.entries())
-				.forEach(([ key, value ])=> O.action(store, "set", key, value));
+				.forEach(([ key, value ])=> S.action(store, "set", key, value));
 			return store;
 		}
 	})();
@@ -33,18 +33,18 @@ export function thirdParty(){
 		className,
 		value: store().value(),
 		type: "text",
-		onchange: ev=> O.action(store, "set", "value", ev.target.value)
+		onchange: ev=> S.action(store, "set", "value", ev.target.value)
 	});
 }
 
 function useStore(adapter_in, { onread, onbeforewrite }= {}){
 	const adapter= typeof adapter_in === "function" ? { read: adapter_in } : adapter_in;
-	if(!onread) onread= O;
+	if(!onread) onread= S;
 	if(!onbeforewrite) onbeforewrite= data=> JSON.parse(JSON.stringify(data));
 	return function useStoreInner(data_read){
-		const observable= onread(adapter.read(data_read)); //TODO OK as synchronous
-		if(adapter.write && isObservable(observable))
-			O.on(observable, data=> adapter.write(onbeforewrite(data)));
-		return observable;
+		const signal= onread(adapter.read(data_read)); //TODO OK as synchronous
+		if(adapter.write && isSignal(signal))
+			S.on(signal, data=> adapter.write(onbeforewrite(data)));
+		return signal;
 	};
 }

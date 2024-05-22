@@ -23,7 +23,7 @@ document.body.append(
 	
 );
 function component({ textContent, className }){
-	const value= O("onchange");
+	const value= S("onchange");
 	
 	return el().append(
 		el("p", { textContent, className }),
@@ -35,8 +35,7 @@ function component({ textContent, className }){
 }
 ```
 # Deka DOM Elements
-Creating reactive elements, components and Web components using [IDL](https://developer.mozilla.org/en-US/docs/Glossary/IDL)/JavaScript DOM API and signals/observables
-([Signals — whats going on behind the scenes | by Ryan Hoffnan | ITNEXT](https://itnext.io/signals-whats-going-on-behind-the-scenes-ec858589ea63), [The Evolution of Signals in JavaScript - DEV Community](https://dev.to/this-is-learning/the-evolution-of-signals-in-javascript-8ob) or [Observer pattern - Wikipedia](https://en.wikipedia.org/wiki/Observer_pattern)).
+Creating reactive elements, components and Web components using [IDL](https://developer.mozilla.org/en-US/docs/Glossary/IDL)/JavaScript DOM API and [**signals/observables**](#signals).
 
 ## Inspiration and suggested alternatives
 - my previous library (mostly used internaly): [jaandrle/dollar_dom_component: Functional DOM components without JSX and virtual DOM.](https://github.com/jaandrle/dollar_dom_component)
@@ -73,3 +72,9 @@ To balance these requirements, numerous compromises have been made. To summarize
 - Installation
 	- npm
 	- [dist/](dist/) (`https://cdn.jsdelivr.net/gh/jaandrle/deka-dom-el/dist/`…)
+
+## Signals
+- [Signals — whats going on behind the scenes | by Ryan Hoffnan | ITNEXT](https://itnext.io/signals-whats-going-on-behind-the-scenes-ec858589ea63)
+- [The Evolution of Signals in JavaScript - DEV Community](https://dev.to/this-is-learning/the-evolution-of-signals-in-javascript-8ob)
+- there is also [tc39/proposal-signals: A proposal to add signals to JavaScript.](https://github.com/tc39/proposal-signals)
+- [Observer pattern - Wikipedia](https://en.wikipedia.org/wiki/Observer_pattern)

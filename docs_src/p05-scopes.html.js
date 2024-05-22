@@ -47,14 +47,14 @@ export function page({ pkg, info }){
 		),
 		el(code, { src: fileURL("./components/examples/scopes/good-practise.js"), page_id }),
 
-		el(h3, "Scopes, observables and cleaning magic"),
+		el(h3, "Scopes, signals and cleaning magic"),
 		el("p").append(
 			"The ", el("code", "host"), " is internally used to register the cleaning procedure,",
 			" when the component (", el("code", "host"), " element) is removed from the DOM."
 		),
 		el(example, { src: fileURL("./components/examples/scopes/cleaning.js"), page_id }),
 		el("p").append(
-			"The text content of the paragraph is changing when the value of the observable ", el("code", "textContent"),
+			"The text content of the paragraph is changing when the value of the signal ", el("code", "textContent"),
 			" is changed. Internally, there is association between ", el("code", "textContent"), " and the paragraph",
 			" similar to using ", el("code", "S.on(textContent, /* update the paragraph */)"), "."
 		),
@@ -63,13 +63,13 @@ export function page({ pkg, info }){
 			" assign internally ", el("code", "on.disconnected(/* remove the listener */)(host())"), " to the host element."
 		),
 		el("p", { className: "notice" }).append(
-			"The library DOM API and observables works ideally when used declaratively.",
-			" It means, you split your app logic into three parts as it was itroduced in ", el("a", { textContent: "Observables", href: "http://localhost:40911/docs/p04-observables#h-introducing-observables" }), "."
+			"The library DOM API and signals works ideally when used declaratively.",
+			" It means, you split your app logic into three parts as it was itroduced in ", el("a", { textContent: "Signals", href: "http://localhost:40911/docs/p04-signals#h-introducing-signals" }), "."
 		),
 		el(code, { src: fileURL("./components/examples/scopes/declarative.js"), page_id }),
 		el("p").append(
 			"Strictly speaking, the imperative way of using the library is not prohibited.",
-			" Just be careful (rather avoid) mixing declarative approach (using observables)",
+			" Just be careful (rather avoid) mixing declarative approach (using signals)",
 			" and imperative manipulation of elements.",
 		),
 		el(code, { src: fileURL("./components/examples/scopes/imperative.js"), page_id }),

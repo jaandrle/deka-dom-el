@@ -1,9 +1,9 @@
 import { el } from "deka-dom-el";
-import { O } from "deka-dom-el/observables";
-const clicks= O(0);
+import { S } from "deka-dom-el/signals";
+const clicks= S(0);
 document.body.append(
 	el().append(
-		el("p", O(()=>
+		el("p", S(()=>
 			"Hello World "+"🎉".repeat(clicks())
 		)),
 		el("button", {

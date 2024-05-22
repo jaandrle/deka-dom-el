@@ -1,10 +1,10 @@
 import * as dde_dom from "../index.js";
 export * from "../index.js";
-import * as dde_s from "../observables.js";
-export * from "../observables.js";
+import * as dde_s from "../signals.js";
+export * from "../signals.js";
 Object.assign(globalThis, dde_dom, dde_s);
-//import * as dde_dom from "../dist/esm-with-observables.js";
-//export * from "../dist/esm-with-observables.js";
+//import * as dde_dom from "../dist/esm-with-signals.js";
+//export * from "../dist/esm-with-signals.js";
 //Object.assign(globalThis, dde_dom);
 export const style= createStyle();
 

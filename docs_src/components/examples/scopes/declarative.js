@@ -1,10 +1,10 @@
 /* PSEUDO-CODE!!! */
 import { el } from "deka-dom-el";
-import { O } from "deka-dom-el/observables";
+import { S } from "deka-dom-el/signals";
 function component(){
 	/* prepare changeable data */
-	const dataA= O("data");
-	const dataB= O("data");
+	const dataA= S("data");
+	const dataB= S("data");
 	/* define data flow (can be asynchronous) */
 	fetchAPI().then(data_new=> dataA(data_new));
 	setTimeout(()=> dataB("DATA"));
@@ -17,17 +17,17 @@ function component(){
 		}),
 		el("ul").append(
 			/* declarative element(s) */
-			O.el(dataA, data=> data.map(d=> el("li", d)))
+			S.el(dataA, data=> data.map(d=> el("li", d)))
 		),
 		el("ul").append(
 			/* declarative component(s) */
-			O.el(dataA, data=> data.map(d=> el(subcomponent, d)))
+			S.el(dataA, data=> data.map(d=> el(subcomponent, d)))
 		)
 	);
 }
 function subcomponent({ id }){
 	/* prepare changeable data */
-	const textContent= O("…");
+	const textContent= S("…");
 	/* define data flow (can be asynchronous) */
 	fetchAPI(id).then(text=> textContent(text));
 	/* declarative UI */
