@@ -1,6 +1,10 @@
-import { simplePage } from "./layout/simplePage.html.js";
+export const info= {
+	title: "Elements",
+	description: "Basic concepts of elements modifications and creations.",
+};
 
 import { el } from "deka-dom-el";
+import { simplePage } from "./layout/simplePage.html.js";
 import { example } from "./components/example.html.js";
 import { h3 } from "./components/pageUtils.html.js";
 import { mnemonic } from "./components/mnemonic/elements-init.js";

@@ -1,6 +1,10 @@
-import { simplePage } from "./layout/simplePage.html.js";
+export const info= {
+	title: "Scopes and components",
+	description: "Organizing UI into components",
+};
 
 import { el } from "deka-dom-el";
+import { simplePage } from "./layout/simplePage.html.js";
 import { example } from "./components/example.html.js";
 import { h3 } from "./components/pageUtils.html.js";
 import { mnemonic } from "./components/mnemonic/scopes-init.js";

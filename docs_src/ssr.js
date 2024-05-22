@@ -2,14 +2,11 @@ export const path_target= {
 	root: "docs/",
 	css: "docs/"
 };
-export const pages= [
-	{ id: "index", href: "./", title: "Introduction", description: "Introducing a library." },
-	{ id: "p02-elements", href: "p02-elements", title: "Elements", description: "Basic concepts of elements modifications and creations." },
-	{ id: "p03-events", href: "p03-events", title: "Events and Addons", description: "Using not only events in UI declaratively." },
-	{ id: "p04-observables", href: "p04-observables", title: "Observables and reactivity", description: "Handling reactivity in UI via observables." },
-	{ id: "p05-scopes", href: "p05-scopes", title: "Scopes and components", description: "Organizing UI into components" },
-	{ id: "p06-customElement", href: "p06-customElement", title: "Custom elements", description: "Using custom elements in combinantion with DDE" },
-];
+/**
+ * This variable will be filled with the list of pages during the build process (see `bs/docs.js`).
+ * @type {import("./types.d.ts").Info[]}
+ * */
+export let pages= [];
 /**
  * @typedef registerClientFile
  * @type {function}

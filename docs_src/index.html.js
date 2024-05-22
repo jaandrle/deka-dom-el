@@ -1,6 +1,11 @@
-import { simplePage } from "./layout/simplePage.html.js";
+export const info= {
+	href: "./",
+	title: "Introduction",
+	description: "Introducing a library.",
+};
 
 import { el } from "deka-dom-el";
+import { simplePage } from "./layout/simplePage.html.js";
 import { example } from "./components/example.html.js";
 /** @param {import("./types.d.ts").PageAttrs} attrs */
 export function page({ pkg, info }){

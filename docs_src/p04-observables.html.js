@@ -1,6 +1,10 @@
-import { simplePage } from "./layout/simplePage.html.js";
+export const info= {
+	title: "Observables and reactivity",
+	description: "Handling reactivity in UI via observables.",
+};
 
 import { el } from "deka-dom-el";
+import { simplePage } from "./layout/simplePage.html.js";
 import { example } from "./components/example.html.js";
 import { h3 } from "./components/pageUtils.html.js";
 import { mnemonic } from "./components/mnemonic/observables-init.js";
