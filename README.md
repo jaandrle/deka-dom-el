@@ -52,13 +52,13 @@ Another goal is to proceed in the best spirit of functional programming. This in
 pure JavaScript (DOM API) and gradually adding auxiliary functions, ranging from “minor” improvements
 to the capability of writing complete declarative reactive UI templates.
 
-As a result, any “internal” function (`assign`, `classListDeclarative`, `on`, `dispatchEvent`, …, `O`, …)
+As a result, any “internal” function (`assign`, `classListDeclarative`, `on`, `dispatchEvent`, …, `S`, …)
 can be used independently, although they are primarily designed for use in combination.  This can also,
 hopefully, help in integrating the library into existing projects.
 
 To balance these requirements, numerous compromises have been made. To summarize:
 - [ ] Library size: 10–15kB minified (the original goal was a maximum of 10kB)
-- [x] Optional use of *observables* with the ability to register *your own signals/observables implementation*
+- [x] Optional use of *signals* with the ability to register *your own signals/observables implementation*
 - [x] *No build step required*
 - [x] Preference for a *declarative/functional* approach
 - [x] Focus on zero/minimal dependencies
