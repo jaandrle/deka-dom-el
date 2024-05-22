@@ -1,10 +1,10 @@
-import { O } from "deka-dom-el/observables";
-const count= O(0);
+import { S } from "deka-dom-el/signals";
+const count= S(0);
 
 import { el } from "deka-dom-el";
 document.body.append(
-	el("p", O(()=> "Currently: "+count())),
-	el("p", { classList: { red: O(()=> count()%2) }, dataset: { count }, textContent: "Attributes example" })
+	el("p", S(()=> "Currently: "+count())),
+	el("p", { classList: { red: S(()=> count()%2) }, dataset: { count }, textContent: "Attributes example" })
 );
 document.head.append(
 	el("style", ".red { color: red; }")

@@ -1,6 +1,11 @@
-import { simplePage } from "./layout/simplePage.html.js";
+export const info= {
+	href: "./",
+	title: "Introduction",
+	description: "Introducing a library.",
+};
 
 import { el } from "deka-dom-el";
+import { simplePage } from "./layout/simplePage.html.js";
 import { example } from "./components/example.html.js";
 /** @param {import("./types.d.ts").PageAttrs} attrs */
 export function page({ pkg, info }){
@@ -23,10 +28,10 @@ export function page({ pkg, info }){
 		el("p").append(
 			"Next step is providing interactivity not only for our UI templates.",
 			" ",
-			"We introduce observables (", el("code", "O"), ") and how them incorporate to UI templates.",
+			"We introduce signals (", el("code", "O"), ") and how them incorporate to UI templates.",
 		),
 		el("p").append(
-			"Now we will clarify how the observables are incorporated into our templates with regard ",
+			"Now we will clarify how the signals are incorporated into our templates with regard ",
 			"to application performance. This is not the only reason the library uses ",
 			el("code", "scope"), "s. We will look at how they work in components represented ",
 			"in JavaScript by functions."

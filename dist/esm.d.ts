@@ -1,17 +1,17 @@
-export type Observable<V, A>= (set?: V)=> V & A;
-type Action<V>= (this: { value: V, stopPropagation(): void }, ...a: any[])=> typeof observable._ | void;
-//type SymbolObservable= Symbol;
+export type Signal<V, A>= (set?: V)=> V & A;
+type Action<V>= (this: { value: V, stopPropagation(): void }, ...a: any[])=> typeof signal._ | void;
+//type SymbolSignal= Symbol;
 type SymbolOnclear= symbol;
 type Actions<V>= Record<string | SymbolOnclear, Action<V>>;
 type OnListenerOptions= Pick<AddEventListenerOptions, "signal"> & { first_time?: boolean };
-interface observable{
+interface signal{
 	_: Symbol
 	/**
 	 * Simple example:
 	 * ```js
-	 * const hello= S("Hello Observable");
+	 * const hello= S("Hello Signal");
 	 * ```
-	 * …simple todo observable:
+	 * …simple todo signal:
 	 * ```js
 	 * const todos= S([], {
 	 * 	add(v){ this.value.push(S(v)); },
@@ -19,48 +19,48 @@ interface observable{
 	 * 	[S.symbols.onclear](){ S.clear(...this.value); },
 	 * });
 	 * ```
-	 * …computed observable:
+	 * …computed signal:
 	 * ```js
 	 * const name= S("Jan");
 	 * const surname= S("Andrle");
 	 * const fullname= S(()=> name()+" "+surname());
 	 * ```
-	 * @param value Initial observable value. Or function computing value from other observables.
-	 * @param actions Use to define actions on the observable. Such as add item to the array.
-	 *		There is also a reserved function `S.symbol.onclear` which is called when the observable is cleared
+	 * @param value Initial signal value. Or function computing value from other signals.
+	 * @param actions Use to define actions on the signal. Such as add item to the array.
+	 *		There is also a reserved function `S.symbol.onclear` which is called when the signal is cleared
 	 *		by `S.clear`.
 	 * */
-	<V, A extends Actions<V>>(value: V, actions?: A): Observable<V, A>;
+	<V, A extends Actions<V>>(value: V, actions?: A): Signal<V, A>;
 	/**
-	 * Computations observable. This creates a observable which is computed from other observables.
+	 * Computations signal. This creates a signal which is computed from other signals.
 	 * */
-	<V>(computation: ()=> V): Observable<V, {}>
-	action<S extends Observable<any, Actions<any>>, A extends (S extends Observable<any, infer A> ? A : never), N extends keyof A>(
-		observable: S,
+	<V>(computation: ()=> V): Signal<V, {}>
+	action<S extends Signal<any, Actions<any>>, A extends (S extends Signal<any, infer A> ? A : never), N extends keyof A>(
+		signal: S,
 		name: N,
 		...params: A[N] extends (...args: infer P)=> any ? P : never
 	): void;
-	clear(...observables: Observable<any, any>[]): void;
-	on<T>(observable: Observable<T, any>, onchange: (a: T)=> void, options?: OnListenerOptions): void;
+	clear(...signals: Signal<any, any>[]): void;
+	on<T>(signal: Signal<T, any>, onchange: (a: T)=> void, options?: OnListenerOptions): void;
 	symbols: {
-		//observable: SymbolObservable;
+		//signal: SymbolSignal;
 		onclear: SymbolOnclear;
 	}
 	/**
-	 * Reactive element, which is rendered based on the given observable.
+	 * Reactive element, which is rendered based on the given signal.
 	 * ```js
-	 * S.el(observable, value=> value ? el("b", "True") : el("i", "False"));
+	 * S.el(signal, value=> value ? el("b", "True") : el("i", "False"));
 	 * S.el(listS, list=> list.map(li=> el("li", li)));
 	 * ```
 	 * */
-	el<S extends any>(observable: Observable<S, any>, el: (v: S)=> Element | Element[] | DocumentFragment): DocumentFragment;
+	el<S extends any>(signal: Signal<S, any>, el: (v: S)=> Element | Element[] | DocumentFragment): DocumentFragment;
 
-    observedAttributes(custom_element: HTMLElement): Record<string, Observable<any, any>>;
+    observedAttributes(custom_element: HTMLElement): Record<string, Signal<any, any>>;
 }
-export const observable: observable;
-export const O: observable;
+export const signal: signal;
+export const S: signal;
 declare global {
-	type ddeObservable<T, A= {}>= Observable<T, A>;
+	type ddeSignal<T, A= {}>= Signal<T, A>;
 	type ddeAction<V>= Action<V>
 	type ddeActions<V>= Actions<V>
 }
@@ -80,20 +80,20 @@ type AttrsModified= {
 	/**
 	 * Use string like in HTML (internally uses `*.setAttribute("style", *)`), or object representation (like DOM API).
 	 */
-	style: string | Partial<CSSStyleDeclaration> | Observable<string, any> | Partial<{ [K in keyof CSSStyleDeclaration]: Observable<CSSStyleDeclaration[K], any> }>
+	style: string | Partial<CSSStyleDeclaration> | Signal<string, any> | Partial<{ [K in keyof CSSStyleDeclaration]: Signal<CSSStyleDeclaration[K], any> }>
 	/**
 	 * Provide option to add/remove/toggle CSS clasess (index of object) using 1/0/-1. In fact `el.classList.toggle(class_name)` for `-1` and `el.classList.toggle(class_name, Boolean(...))` for others.
 	 */
-	classList: Record<string,-1|0|1|boolean|Observable<-1|0|1|boolean, any>>,
+	classList: Record<string,-1|0|1|boolean|Signal<-1|0|1|boolean, any>>,
 	/**
 	 * By default simiral to `className`, but also supports `string[]`
 	 * */
-	className: string | (string|boolean|undefined|Observable<string|boolean|undefined, any>)[];
+	className: string | (string|boolean|undefined|Signal<string|boolean|undefined, any>)[];
 	/**
 	 * Sets `aria-*` simiraly to `dataset`
 	 * */
-	ariaset: Record<string,string|Observable<string, any>>,
-} & Record<`=${string}` | `data${PascalCase}` | `aria${PascalCase}`, string|Observable<string, any>> & Record<`.${string}`, any>
+	ariaset: Record<string,string|Signal<string, any>>,
+} & Record<`=${string}` | `data${PascalCase}` | `aria${PascalCase}`, string|Signal<string, any>> & Record<`.${string}`, any>
 type _fromElsInterfaces<EL extends SupportedElement>= Omit<EL, keyof AttrsModified>;
 /**
  * Just element attributtes
@@ -103,13 +103,13 @@ type _fromElsInterfaces<EL extends SupportedElement>= Omit<EL, keyof AttrsModifi
  * There is added support for `data[A-Z].*`/`aria[A-Z].*` to be converted to the kebab-case alternatives.
  * @private
  */
-type ElementAttributes<T extends SupportedElement>= Partial<_fromElsInterfaces<T> & { [K in keyof _fromElsInterfaces<T>]: Observable<_fromElsInterfaces<T>[K], any> } & AttrsModified> & Record<string, any>;
+type ElementAttributes<T extends SupportedElement>= Partial<_fromElsInterfaces<T> & { [K in keyof _fromElsInterfaces<T>]: Signal<_fromElsInterfaces<T>[K], any> } & AttrsModified> & Record<string, any>;
 export function classListDeclarative<El extends SupportedElement>(element: El, classList: AttrsModified["classList"]): El
 export function assign<El extends SupportedElement>(element: El, ...attrs_array: ElementAttributes<El>[]): El
 export function assignAttribute<El extends SupportedElement, ATT extends keyof ElementAttributes<El>>(element: El, attr: ATT, value: ElementAttributes<El>[ATT]): ElementAttributes<El>[ATT]
 
 type ExtendedHTMLElementTagNameMap= HTMLElementTagNameMap & CustomElementTagNameMap;
-type textContent= string | ( (set?: string)=> string ); // TODO: for some reason `Observable<string, any>` leads to `attrs?: any`
+type textContent= string | ( (set?: string)=> string ); // TODO: for some reason `Signal<string, any>` leads to `attrs?: any`
 export function el<
 	TAG extends keyof ExtendedHTMLElementTagNameMap & string,
 	EL extends (TAG extends keyof ExtendedHTMLElementTagNameMap ? ExtendedHTMLElementTagNameMap[TAG] : HTMLElement)
@@ -148,7 +148,7 @@ export function elNS(
 	EL extends ( TAG extends keyof MathMLElementTagNameMap ? MathMLElementTagNameMap[TAG] : MathMLElement ),
 >(
 	tag_name: TAG,
-	attrs?: string | textContent | Partial<{ [key in keyof EL]: EL[key] | Observable<EL[key], any> | string | number | boolean }>,
+	attrs?: string | textContent | Partial<{ [key in keyof EL]: EL[key] | Signal<EL[key], any> | string | number | boolean }>,
 	...addons: ddeElementAddon<EL>[]
 )=> ddeMathMLElement
 export function elNS(

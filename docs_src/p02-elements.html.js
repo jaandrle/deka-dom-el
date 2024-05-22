@@ -1,6 +1,10 @@
-import { simplePage } from "./layout/simplePage.html.js";
+export const info= {
+	title: "Elements",
+	description: "Basic concepts of elements modifications and creations.",
+};
 
 import { el } from "deka-dom-el";
+import { simplePage } from "./layout/simplePage.html.js";
 import { example } from "./components/example.html.js";
 import { h3 } from "./components/pageUtils.html.js";
 import { mnemonic } from "./components/mnemonic/elements-init.js";
@@ -64,7 +68,7 @@ export function page({ pkg, info }){
 				"This is handy to concat conditional classes."
 			),
 			el("li").append(
-				"Use ", el("code", "classList"), " to toggle specific classes. This will be handy later when the reactivity via observables is beeing introduced.",
+				"Use ", el("code", "classList"), " to toggle specific classes. This will be handy later when the reactivity via signals is beeing introduced.",
 			),
 			el("li").append(
 				"The ", el("code", "assign"), " also accepts the ", el("code", "undefined"), " as a value for any property to remove it from the element declaratively. ",

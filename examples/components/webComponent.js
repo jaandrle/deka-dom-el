@@ -1,5 +1,5 @@
 import { el, on, customElementRender, customElementWithDDE, scope, simulateSlots } from "../../index.js";
-import { O } from "../../observables.js";
+import { S } from "../../signals.js";
 
 /**
  * Compatible with `npx -y web-component-analyzer examples/components/webComponent.js`
@@ -16,7 +16,7 @@ export class CustomHTMLTestElement extends HTMLElement{
 	}
 
 	attributes(element){
-		const observed= O.observedAttributes(element);
+		const observed= S.observedAttributes(element);
 		return Object.assign({ test: element.test }, observed);
 	}
 	render({ name, preName, test }){

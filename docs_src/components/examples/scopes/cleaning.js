@@ -7,9 +7,9 @@ document.body.append(
 		type: "button"
 	})
 );
-import { O } from "deka-dom-el/observables";
+import { S } from "deka-dom-el/signals";
 function component(){
-	const textContent= O("Click to change text.");
+	const textContent= S("Click to change text.");
 
 	const onclickChange= on("click", function redispatch(){
 		textContent("Text changed! "+(new Date()).toString())

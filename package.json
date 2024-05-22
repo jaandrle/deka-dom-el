@@ -1,6 +1,6 @@
 {
 	"name": "deka-dom-el",
-	"version": "0.7.8",
+	"version": "0.8.0",
 	"description": "A low-code library that simplifies the creation of native DOM elements/components using small wrappers and tweaks.",
 	"author": "Jan Andrle <andrle.jan@centrum.cz>",
 	"license": "MIT",
@@ -20,17 +20,17 @@
 			"import": "./index.js",
 			"types": "./index.d.ts"
 		},
-		"./observables": {
-			"import": "./observables.js",
-			"types": "./observables.d.ts"
+		"./signals": {
+			"import": "./signals.js",
+			"types": "./signals.d.ts"
 		},
 		"./jsdom": {
 			"import": "./jsdom.js",
 			"types": "./jsdom.d.ts"
 		},
-		"./src/observables-lib": {
-			"import": "./src/observables-lib.js",
-			"types": "./src/observables-lib.d.ts"
+		"./src/signals-lib": {
+			"import": "./src/signals-lib.js",
+			"types": "./src/signals-lib.d.ts"
 		}
 	},
 	"files": [
@@ -65,20 +65,20 @@
 
 		},
 		{
-			"path": "./observables.js",
+			"path": "./signals.js",
 			"limit": "12 kB",
 			"gzip": false,
 			"brotli": false
 
 		},
 		{
-			"path": "./index-with-observables.js",
+			"path": "./index-with-signals.js",
 			"limit": "15 kB",
 			"gzip": false,
 			"brotli": false
 		},
 		{
-			"path": "./index-with-observables.js",
+			"path": "./index-with-signals.js",
 			"limit": "5.25 kB"
 		}
 	],

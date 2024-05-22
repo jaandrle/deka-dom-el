@@ -1,14 +1,14 @@
 #!/usr/bin/env -S npx nodejsscript
 import { bundle as bundleDTS } from "dts-bundler";
-const files= [ "index", "index-with-observables" ];
+const files= [ "index", "index-with-signals" ];
 const filesOut= (file, mark= "esm")=> "dist/"+file.replace("index", mark);
 const css= echo.css`
 	.info{ color: gray; }
 `;
 
 $.api("", true)
-.option("--minify", "Level of minification [ full (default), partial ]")
-.action(async function main({ minify= "full" }){
+.option("--minify", "Level of minification [ full, partial (default) ]")
+.action(async function main({ minify= "partial" }){
 	for(const file_root of files){
 		const file= file_root+".js";
 		echo("Processing: "+ file);
