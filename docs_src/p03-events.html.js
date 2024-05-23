@@ -120,7 +120,7 @@ export function page({ pkg, info }){
 			" For using native behaviour re-(dis)connecting element, use:"
 		),
 		el("ul").append(
-			el("li").append("custom ", el("code", "MutationObserver"), " or logic in (dis)", el(code, "connectedCallback"), " or…"),
+			el("li").append("custom ", el("code", "MutationObserver"), " or logic in (dis)", el("code", "connectedCallback"), " or…"),
 			el("li").append("re-add ", el("code", "on.connected"), " or ", el("code", "on.disconnected"), " listeners.")
 		),
 

@@ -28,7 +28,7 @@ export function page({ pkg, info }){
 		el("p").append(
 			"Next step is providing interactivity not only for our UI templates.",
 			" ",
-			"We introduce signals (", el("code", "O"), ") and how them incorporate to UI templates.",
+			"We introduce signals (", el("code", "S"), ") and how them incorporate to UI templates.",
 		),
 		el("p").append(
 			"Now we will clarify how the signals are incorporated into our templates with regard ",

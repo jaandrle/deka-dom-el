@@ -5,7 +5,7 @@ import {
 	observedAttributes,
 } from "deka-dom-el";
 /** @type {ddePublicElementTagNameMap} */
-import { O as S } from "deka-dom-el/signals";
+import { S } from "deka-dom-el/signals";
 S.observedAttributes;
 
 // “internal” utils
