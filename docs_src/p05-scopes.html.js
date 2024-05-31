@@ -11,7 +11,18 @@ import { mnemonic } from "./components/mnemonic/scopes-init.js";
 import { code } from "./components/code.html.js";
 /** @param {string} url */
 const fileURL= url=> new URL(url, import.meta.url);
-
+const references= {
+	/** Garbage collection on MDN */
+	garbage_collection: {
+		title: "MDN documentation page for Garbage collection",
+		href: "https://developer.mozilla.org/en-US/docs/Glossary/Garbage_collection",
+	},
+	/** Signals */
+	signals: {
+		title: "Signals section on this library",
+		href: "./p04-signals#h-introducing-signals",
+	}
+};
 /** @param {import("./types.d.ts").PageAttrs} attrs */
 export function page({ pkg, info }){
 	const page_id= info.id;
@@ -20,7 +31,7 @@ export function page({ pkg, info }){
 		el("p").append(
 			"For state-less components we can use functions as UI components (see “Elements” page).",
 			" But in real life, we may need to handle the component live-cycle and provide",
-			" JavaScript the way to properly use the ", el("a", { textContent: "Garbage collection", href: "https://developer.mozilla.org/en-US/docs/Glossary/Garbage_collection", title: "Garbage collection | MDN" }), "."
+			" JavaScript the way to properly use the ", el("a", { textContent: "Garbage collection", ...references.garbage_collection }), "."
 		),
 		el(code, { src: fileURL("./components/examples/scopes/intro.js"), page_id }),
 		el("p").append(
@@ -64,7 +75,7 @@ export function page({ pkg, info }){
 		),
 		el("p", { className: "notice" }).append(
 			"The library DOM API and signals works ideally when used declaratively.",
-			" It means, you split your app logic into three parts as it was itroduced in ", el("a", { textContent: "Signals", href: "http://localhost:40911/docs/p04-signals#h-introducing-signals" }), "."
+			" It means, you split your app logic into three parts as it was itroduced in ", el("a", { textContent: "Signals", ...references.signals }), "."
 		),
 		el(code, { src: fileURL("./components/examples/scopes/declarative.js"), page_id }),
 		el("p").append(

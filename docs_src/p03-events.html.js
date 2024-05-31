@@ -11,6 +11,35 @@ import { mnemonic } from "./components/mnemonic/events-init.js";
 import { code } from "./components/code.html.js";
 /** @param {string} url */
 const fileURL= url=> new URL(url, import.meta.url);
+const references= {
+	/** element.addEventListener() */
+	mdn_listen: {
+		title: "MDN documentation page for elemetn.addEventListener",
+		href: "https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener",
+	},
+	/** AbortSignal+element.addEventListener */
+	mdn_abortListener: {
+		title: "MDN documentation page for using AbortSignal with element.addEventListener",
+		href: "https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#signal",
+	},
+	/** comparison listening options by WebReflection */
+	web_events: {
+		href: "https://gist.github.com/WebReflection/b404c36f46371e3b1173bf5492acc944",
+	},
+	/** Custom Element lifecycle callbacks */
+	mdn_customElement: {
+		href: "https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#custom_element_lifecycle_callbacks" 
+	},
+	/** MutationObserver */
+	mdn_mutation: {
+		href: "https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver",
+	},
+	/** Readding the element to the DOM fix by Vue */
+	vue_fix: {
+		title: "Vue and Web Components, lifecycle implementation readding the element to the DOM",
+		href: "https://vuejs.org/guide/extras/web-components.html#lifecycle",
+	}
+};
 /** @param {import("./types.d.ts").PageAttrs} attrs */
 export function page({ pkg, info }){
 	const page_id= info.id;
@@ -28,9 +57,7 @@ export function page({ pkg, info }){
 		el(h3, "Events and listenners"),
 		el("p").append(
 			"In JavaScript you can listen to the native DOM events of the given element by using ",
-			el("a", { href: "https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener", title: "addEventListener on MDN" }).append(
-				el("code", "element.addEventListener(type, listener, options)")
-			), ".",
+			el("a", references.mdn_listen).append( el("code", "element.addEventListener(type, listener, options)") ), ".",
 			" ",
 			"The library provides an alternative (", el("code", "on"), ") accepting the differen order",
 			" of the arguments:"
@@ -43,7 +70,7 @@ export function page({ pkg, info }){
 		el("p", { className: "notice" }).append(
 			"The other difference is that there is ", el("strong", "no"), " ", el("code", "off"), " function.",
 			" ",
-			"You can remove listener declaratively using ", el("a", { textContent: "AbortSignal", href: "https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#signal", title: "part of addEventListener on MDN" }),
+			"You can remove listener declaratively using ", el("a", { textContent: "AbortSignal", ...references.mdn_abortListener }),
 			":"
 		),
 		el(example, { src: fileURL("./components/examples/events/abortSignal.js"), page_id }),
@@ -59,7 +86,7 @@ export function page({ pkg, info }){
 				" ",
 				el("em", "Side note: this can be useful in case of SSR."),
 				" ",
-				"To study difference, you can read a nice summary here: ", el("a", { href: "https://gist.github.com/WebReflection/b404c36f46371e3b1173bf5492acc944", textContent: "GIST @WebReflection/web_events.md" }), "."
+				"To study difference, you can read a nice summary here: ", el("a", { textContent: "GIST @WebReflection/web_events.md", ...references.web_events }), "."
 			)
 		),
 
@@ -93,10 +120,10 @@ export function page({ pkg, info }){
 		el("p").append(
 			"For Custom elements, we will later introduce a way to replace ", el("code", "*Callback"),
 			" syntax with ", el("code", "dde:*"), " events. The ", el("code", "on.*"), " functions then",
-			" listen to the appropriate Custom Elements events (see ", el("a", { textContent: "Custom element lifecycle callbacks | MDN", href: "https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#custom_element_lifecycle_callbacks" }), ")."
+			" listen to the appropriate Custom Elements events (see ", el("a", { textContent: "Custom element lifecycle callbacks | MDN", ...references.mdn_customElement }), ")."
 		),
 		el("p").append(
-			"But, in case of regular elemnets the ", el("a", { href: "https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver" }).append(el("code", "MutationObserver"), " | MDN"),
+			"But, in case of regular elemnets the ", el("a", references.mdn_mutation).append(el("code", "MutationObserver"), " | MDN"),
 			" is internaly used to track these events. Therefore, there are some drawbacks:",
 		),
 		el("ul").append(
@@ -116,7 +143,7 @@ export function page({ pkg, info }){
 			"To provide intuitive behaviour, similar also to how the life-cycle events works in other",
 			" frameworks/libraries, deka-dom-el library ensures that ", el("code", "on.connected"),
 			" and ", el("code", "on.disconnected"), " are called only once and only when the element",
-			" is (dis)connected to live DOM. The solution is inspired by ", el("a", { textContent: "Vue", href: "https://vuejs.org/guide/extras/web-components.html#lifecycle", title: "Vue and Web Components | Lifecycle" }), ".",
+			" is (dis)connected to live DOM. The solution is inspired by ", el("a", { textContent: "Vue", ...references.vue_fix }), ".",
 			" For using native behaviour re-(dis)connecting element, use:"
 		),
 		el("ul").append(

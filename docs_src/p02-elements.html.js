@@ -11,6 +11,38 @@ import { mnemonic } from "./components/mnemonic/elements-init.js";
 import { code } from "./components/code.html.js";
 /** @param {string} url */
 const fileURL= url=> new URL(url, import.meta.url);
+const references= {
+	/** document.createElement() */
+	mdn_create: {
+		title: "MDN documentation page for document.createElement()",
+		href: "https://developer.mozilla.org/en-US/docs/Web/API/Document/createElement",
+	},
+	/** Interface Description Language (`el.textContent`) */
+	mdn_idl: {
+		title: "MDN page about Interface Description Language",
+		href: "https://developer.mozilla.org/en-US/docs/Glossary/IDL",
+	},
+	/** HTMLElement */
+	mdn_el: {
+		title: "MDN documentation page for HTMLElement",
+		href: "https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement"
+	},
+	/** HTMLParagraphElement */
+	mdn_p: {
+		title: "MDN documentation page for HTMLParagraphElement (`p` tag)",
+		href: "https://developer.mozilla.org/en-US/docs/Web/API/HTMLParagraphElement"
+	},
+	/** `[a, b] = [1, 2]` */
+	mdn_destruct: {
+		title: "MDN page about destructuring assignment syntax (e.g. `[a, b] = [1, 2]`)",
+		href: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment",
+	},
+	/** document.createElementNS() */
+	mdn_ns: {
+		title: "MDN documentation page for document.createElementNS() (e.g. for SVG elements)",
+		href: "https://developer.mozilla.org/en-US/docs/Web/API/Document/createElementNS",
+	}
+};
 /** @param {import("./types.d.ts").PageAttrs} attrs */
 export function page({ pkg, info }){
 	const page_id= info.id;
@@ -22,16 +54,10 @@ export function page({ pkg, info }){
 		
 		el(h3, "Creating element(s) (with custom attributes)"),
 		el("p").append(
-			"You can create a native DOM element by using the ",
-			el("a", { href: "https://developer.mozilla.org/en-US/docs/Web/API/Document/createElement", title: "MDN documentation for document.createElement()" }).append(
-				el("code", "document.createElement()")
-			), ". ",
+			"You can create a native DOM element by using the ", el("a", references.mdn_create).append( el("code", "document.createElement()") ), ". ",
 			"It is also possible to provide a some attribute(s) declaratively using ", el("code", "Object.assign()"), ". ",
 			"More precisely, this way you can sets some ",
-			el("a", {
-				href: "https://developer.mozilla.org/en-US/docs/Glossary/IDL",
-				title: "MDN page about Interface Description Language"
-			}).append(
+			el("a", references.mdn_idl).append(
 				el("abbr", { textContent: "IDL", title: "Interface Description Language" })
 			), " also known as a JavaScript property."
 		),
@@ -48,8 +74,8 @@ export function page({ pkg, info }){
 		),
 		el("p").append(
 			"You can study all JavaScript elements interfaces to the corresponding HTML elements. ",
-			"All HTML elements inherits from ", el("a", { textContent: "HTMLElement", href: "https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement" }), ". ",
-			"To see all available IDLs for example for paragraphs, see ", el("a", { textContent: "HTMLParagraphElement", href: "https://developer.mozilla.org/en-US/docs/Web/API/HTMLParagraphElement" }), ". ",
+			"All HTML elements inherits from ", el("a", { textContent: "HTMLElement", ...references.mdn_el }), ". ",
+			"To see all available IDLs for example for paragraphs, see ", el("a", { textContent: "HTMLParagraphElement", ...references.mdn_p }), ". ",
 			"Moreover, the ", el("code", "assign"), " provides a way to sets declaratively some convenient properties:"
 		),
 		el("ul").append(
@@ -108,13 +134,13 @@ export function page({ pkg, info }){
 		),
 		el("p", { className: "notice" }).append(
 			"It is nice to use similar naming convention as native DOM API. ",
-			"This allows us to use ", el("a", { textContent: "the destructuring assignment syntax", href: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment", title: "Destructuring assignment | MDN" }),
+			"This allows us to use ", el("a", { textContent: "the destructuring assignment syntax", ...references.mdn_destruct }),
 			" and keep track of the native API (things are best remembered through regular use).",
 		),
 
 		el(h3, "Creating non-HTML elements"),
 		el("p").append(
-			"Similarly to the native DOM API (", el("a", { href: "https://developer.mozilla.org/en-US/docs/Web/API/Document/createElementNS", title: "MDN" }).append(el("code", "document.createElementNS")), ") for non-HTML elements",
+			"Similarly to the native DOM API (", el("a", references.mdn_ns).append(el("code", "document.createElementNS")), ") for non-HTML elements",
 			" we need to tell JavaScript which kind of the element to create.",
 			" We can use the ", el("code", "elNS"), " function:"
 		),

@@ -11,7 +11,33 @@ import { mnemonic } from "./components/mnemonic/signals-init.js";
 import { code } from "./components/code.html.js";
 /** @param {string} url */
 const fileURL= url=> new URL(url, import.meta.url);
-
+const references= {
+	/** Event-driven programming */
+	wiki_event_driven: {
+		title: "Wikipedia: Event-driven programming",
+		href: "https://en.wikipedia.org/wiki/Event-driven_programming",
+	},
+	/** Publish–subscribe pattern */
+	wiki_pubsub: {
+		title: "Wikipedia: Publish–subscribe pattern",
+		href: "https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern",
+	},
+	/** NPM package: fpubsub */
+	fpubsub: {
+		title: "NPM package: fpubsub",
+		href: "https://www.npmjs.com/package/fpubsub",
+	},
+	/** JS Primitives | MDN */
+	mdn_primitive: {
+		title: "Primitive | MDN",
+		href: "https://developer.mozilla.org/en-US/docs/Glossary/Primitive",
+	},
+	/** useReducer */
+	mdn_use_reducer: {
+		title: "useReducer hook | React docs",
+		href: "https://react.dev/reference/react/useReducer",
+	}
+};
 /** @param {import("./types.d.ts").PageAttrs} attrs */
 export function page({ pkg, info }){
 	const page_id= info.id;
@@ -36,10 +62,10 @@ export function page({ pkg, info }){
 		el(example, { src: fileURL("./components/examples/signals/signals.js"), page_id }),
 		el("p").append(
 			"All this is just an example of ",
-			el("a", { textContent: "Event-driven programming", href: "https://en.wikipedia.org/wiki/Event-driven_programming", title: "Wikipedia: Event-driven programming" }),
+			el("a", { textContent: "Event-driven programming", ...references.wiki_event_driven }),
 			" and ",
-			el("a", { textContent: "Publish–subscribe pattern", href: "https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern", title: "Wikipedia: Publish–subscribe pattern" }),
-			" (compare for example with ", el("a", { textContent: "fpubsub library", href: "https://www.npmjs.com/package/fpubsub", title: "NPM package: fpubsub" }), ").",
+			el("a", { textContent: "Publish–subscribe pattern", ...references.wiki_pubsub }),
+			" (compare for example with ", el("a", { textContent: "fpubsub library", ...references.fpubsub }), ").",
 			" All three parts can be in some manner independent and still connected",
 			" to the same reactive entity."
 		),
@@ -60,7 +86,7 @@ export function page({ pkg, info }){
 		el(h3, "Signals and actions"),
 		el("p").append(
 			el("code", "S(/* primitive */)"), " allows you to declare simple reactive variables, typically",
-			" around ", el("em", "immutable"), " ", el("a", { textContent: "primitive types", title: "Primitive | MDN", href: "https://developer.mozilla.org/en-US/docs/Glossary/Primitive" }), ".",
+			" around ", el("em", "immutable"), " ", el("a", { textContent: "primitive types", ...references.mdn_primitive }), ".",
 			" ",
 			"However, it may also be necessary to use reactive arrays, objects, or other complex reactive structures."
 		),
@@ -68,7 +94,7 @@ export function page({ pkg, info }){
 		el("p", "…but typical user-case is object/array (maps, sets and other mutable objects):"),
 		el(example, { src: fileURL("./components/examples/signals/actions-todos.js"), page_id }),
 		el("p").append(
-			"In some way, you can compare it with ", el("a", { textContent: "useReducer", href: "https://react.dev/reference/react/useReducer", title: "useReducer hook | React docs" }),
+			"In some way, you can compare it with ", el("a", { textContent: "useReducer", ...references.mdn_use_reducer }),
 			" hook from React. So, the ", el("code", "S(<data>, <actions>)"), " pattern creates",
 			" a store “machine”. We can then invoke (dispatch) registered action by calling",
 			" ", el("code", "S.action(<signal>, <name>, ...<args>)"), " after the action call",
