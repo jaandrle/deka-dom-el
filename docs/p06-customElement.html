@@ -11,7 +11,7 @@ S.observedAttributes;
 // “internal” utils
 import { lifecyclesToEvents } from "deka-dom-el";
 </code></div><h3 id="h-custom-elements-introduction"><!--<dde:mark type="component" name="h3" host="parentElement" ssr/>--><a href="#h-custom-elements-introduction" tabindex="-1">#</a> Custom Elements Introduction</h3><p><a title="MDN documentation page for Custom Elements" href="https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements">Using custom elements</a></p><div class="code" data-js="todo"><!--<dde:mark type="component" name="code" host="parentElement" ssr/>--><code class="language-js">class CustomHTMLElement extends HTMLElement{
-	static tagName = "custom-element"; // just suggestion, we can use `el(CustomHTMLElement.tagName)`
+	static tagName= "custom-element"; // just suggestion, we can use `el(CustomHTMLElement.tagName)`
 	static observedAttributes= [ "custom-attribute" ];
 	constructor(){
 		super();

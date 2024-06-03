@@ -1,5 +1,5 @@
 class CustomHTMLElement extends HTMLElement{
-	static tagName = "custom-element"; // just suggestion, we can use `el(CustomHTMLElement.tagName)`
+	static tagName= "custom-element"; // just suggestion, we can use `el(CustomHTMLElement.tagName)`
 	static observedAttributes= [ "custom-attribute" ];
 	constructor(){
 		super();
