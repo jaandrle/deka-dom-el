@@ -7,6 +7,10 @@ type OnListenerOptions= Pick<AddEventListenerOptions, "signal"> & { first_time?:
 interface signal{
 	_: Symbol
 	/**
+	 * Computations signal. This creates a signal which is computed from other signals.
+	 * */
+	<V extends ()=> any>(computation: V): Signal<ReturnType<V>, {}>
+	/**
 	 * Simple example:
 	 * ```js
 	 * const hello= S("Hello Signal");
@@ -31,10 +35,6 @@ interface signal{
 	 *		by `S.clear`.
 	 * */
 	<V, A extends Actions<V>>(value: V, actions?: A): Signal<V, A>;
-	/**
-	 * Computations signal. This creates a signal which is computed from other signals.
-	 * */
-	<V>(computation: ()=> V): Signal<V, {}>
 	action<S extends Signal<any, Actions<any>>, A extends (S extends Signal<any, infer A> ? A : never), N extends keyof A>(
 		signal: S,
 		name: N,
