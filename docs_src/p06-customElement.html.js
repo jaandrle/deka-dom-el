@@ -1,6 +1,7 @@
+import { T, t } from "./utils/index.js";
 export const info= {
-	title: "Custom elements",
-	description: "Using custom elements in combinantion with DDE",
+	title: t`Custom elements`,
+	description: t`Using custom elements in combinantion with DDE`,
 };
 
 import { el } from "deka-dom-el";
@@ -14,12 +15,12 @@ const fileURL= url=> new URL(url, import.meta.url);
 const references= {
 	/** Custom Elements on MDN */
 	custom_elements: {
-		title: "MDN documentation page for Custom Elements",
+		title: t`MDN documentation page for Custom Elements`,
 		href: "https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements",
 	},
 	/** Custom Elements tips from WebReflection */
 	custom_elements_tips: {
-		title: "Ideas and tips from WebReflection",
+		title: t`Ideas and tips from WebReflection`,
 		href: "https://gist.github.com/WebReflection/ec9f6687842aa385477c4afca625bbf4",
 	}
 };
@@ -27,20 +28,19 @@ const references= {
 export function page({ pkg, info }){
 	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
-		el("h2", "Using custom elements in combinantion with DDE"),
-		el("p").append(
-
-		),
+		el("h2", t`Using custom elements in combinantion with DDE`),
+		el("p").append(...T`
+		`),
 		el(code, { src: fileURL("./components/examples/customElement/intro.js"), page_id }),
 
-		el(h3, "Custom Elements Introduction"),
-		el("p").append(
-			el("a", { textContent: "Using custom elements", ...references.custom_elements })
-		),
+		el(h3, t`Custom Elements Introduction`),
+		el("p").append(...T`
+			${el("a", { textContent: t`Using custom elements`, ...references.custom_elements })}
+		`),
 		el(code, { src: fileURL("./components/examples/customElement/native-basic.js"), page_id }),
-		el("p").append(
-			el("a", { textContent: "Handy Custom Elements' Patterns", ...references.custom_elements_tips })
-		),
+		el("p").append(...T`
+			${el("a", { textContent: t`Handy Custom Elements' Patterns`, ...references.custom_elements_tips })}
+		`),
 
 		el(mnemonic)
 	);

@@ -52,6 +52,10 @@ export function page({ pkg, info }){
 		
 		el(h3, t`Introducing signals`),
 		el("p").append(...T`
+			Let’s re-introduce
+			${el("a", { textContent: t`3PS principle`, href: "./#h-event-driven-programming--parts-separation--ps" })}.
+		`),
+		el("p").append(...T`
 			Using signals, we split program logic into the three parts. Firstly (α), we create a variable (constant)
 			representing reactive value. Somewhere later, we can register (β) a logic reacting to the signal value
 			changes. Similarly, in a remaining part (γ), we can update the signal value.
