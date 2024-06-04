@@ -13,28 +13,23 @@ import { code } from "./components/code.html.js";
 /** @param {string} url */
 const fileURL= url=> new URL(url, import.meta.url);
 const references= {
-	/** Event-driven programming */
-	wiki_event_driven: {
+	wiki_event_driven: { /** Event-driven programming */
 		title: t`Wikipedia: Event-driven programming`,
 		href: "https://en.wikipedia.org/wiki/Event-driven_programming",
 	},
-	/** Publish–subscribe pattern */
-	wiki_pubsub: {
+	wiki_pubsub: { /** Publish–subscribe pattern */
 		title: t`Wikipedia: Publish–subscribe pattern`,
 		href: "https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern",
 	},
-	/** NPM package: fpubsub */
-	fpubsub: {
+	fpubsub: { /** NPM package: fpubsub */
 		title: t`NPM package: fpubsub`,
 		href: "https://www.npmjs.com/package/fpubsub",
 	},
-	/** JS Primitives | MDN */
-	mdn_primitive: {
+	mdn_primitive: { /** JS Primitives | MDN */
 		title: t`Primitive | MDN`,
 		href: "https://developer.mozilla.org/en-US/docs/Glossary/Primitive",
 	},
-	/** useReducer */
-	mdn_use_reducer: {
+	mdn_use_reducer: { /** useReducer */
 		title: t`useReducer hook | React docs`,
 		href: "https://react.dev/reference/react/useReducer",
 	}

@@ -27,6 +27,7 @@ export function page({ pkg, info }){
 	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
 		el("p", t`The library tries to provide pure JavaScript tool(s) to create reactive interfaces using …`),
+		
 		el(h3, t`Event-driven programming (3 parts separation ≡ 3PS)`),
 		el("p").append(t`
 			Let's introduce the basic principle on which the library is built. We'll use the JavaScript listener as
@@ -47,13 +48,15 @@ export function page({ pkg, info }){
 			to use introduced 3PS pattern in our applications. As you can see it in the example above.
 		`),
 		el("p").append(...T`
-			Also please notice that there is very similar 3PS pattern used for separate creation of UI and business logic.
+			Also please notice that there is very similar 3PS pattern used for separate creation of UI and
+			business logic.
 		`),
 		el("p").append(...T`
 			The 3PS is very simplified definition of the pattern. There are more deep/academic definitions more precisely
 			describe usage in specific situations, see for example ${el("a", { textContent: t`MVVM`, ...references.w_mvv })}
 			or ${el("a", { textContent: t`MVC`, ...references.w_mvc })}.
 		`),
+		
 		el(h3, t`Organization of the documentation`),
 	);
 }

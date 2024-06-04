@@ -13,13 +13,11 @@ import { code } from "./components/code.html.js";
 /** @param {string} url */
 const fileURL= url=> new URL(url, import.meta.url);
 const references= {
-	/** Garbage collection on MDN */
-	garbage_collection: {
+	garbage_collection: { /** Garbage collection on MDN */
 		title: t`MDN documentation page for Garbage collection`,
 		href: "https://developer.mozilla.org/en-US/docs/Glossary/Garbage_collection",
 	},
-	/** Signals */
-	signals: {
+	signals: { /** Signals */
 		title: t`Signals section on this library`,
 		href: "./p04-signals#h-introducing-signals",
 	}

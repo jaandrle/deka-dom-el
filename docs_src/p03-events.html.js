@@ -13,30 +13,24 @@ import { code } from "./components/code.html.js";
 /** @param {string} url */
 const fileURL= url=> new URL(url, import.meta.url);
 const references= {
-	/** element.addEventListener() */
-	mdn_listen: {
+	mdn_listen: { /** element.addEventListener() */
 		title: t`MDN documentation page for elemetn.addEventListener`,
 		href: "https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener",
 	},
-	/** AbortSignal+element.addEventListener */
-	mdn_abortListener: {
+	mdn_abortListener: { /** AbortSignal+element.addEventListener */
 		title: t`MDN documentation page for using AbortSignal with element.addEventListener`,
 		href: "https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#signal",
 	},
-	/** comparison listening options by WebReflection */
-	web_events: {
+	web_events: { /** comparison listening options by WebReflection */
 		href: "https://gist.github.com/WebReflection/b404c36f46371e3b1173bf5492acc944",
 	},
-	/** Custom Element lifecycle callbacks */
-	mdn_customElement: {
+	mdn_customElement: { /** Custom Element lifecycle callbacks */
 		href: "https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#custom_element_lifecycle_callbacks" 
 	},
-	/** MutationObserver */
-	mdn_mutation: {
+	mdn_mutation: { /** MutationObserver */
 		href: "https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver",
 	},
-	/** Readding the element to the DOM fix by Vue */
-	vue_fix: {
+	vue_fix: { /** Readding the element to the DOM fix by Vue */
 		title: t`Vue and Web Components, lifecycle implementation readding the element to the DOM`,
 		href: "https://vuejs.org/guide/extras/web-components.html#lifecycle",
 	}
