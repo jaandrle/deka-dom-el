@@ -13,19 +13,23 @@ import { code } from "./components/code.html.js";
 /** @param {string} url */
 const fileURL= url=> new URL(url, import.meta.url);
 const references= {
-	mdn_web_components: { /** Web Components on MDN */
+	/** Web Components on MDN */
+	mdn_web_components: {
 		title: t`MDN documentation page for Web Components`,
 		href: "https://developer.mozilla.org/en-US/docs/Web/API/Web_components",
 	},
-	mdn_observedAttributes: { /** observedAttributes on MDN */
+	/** observedAttributes on MDN */
+	mdn_observedAttributes: {
 		title: t`MDN documentation page for observedAttributes`,
 		href: "https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#responding_to_attribute_changes",
 	},
-	mdn_custom_elements: { /** Custom Elements on MDN */
+	/** Custom Elements on MDN */
+	mdn_custom_elements: {
 		title: t`MDN documentation page for Custom Elements`,
 		href: "https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements",
 	},
-	custom_elements_tips: { /** Custom Elements tips from WebReflection */
+	/** Custom Elements tips from WebReflection */
+	custom_elements_tips: {
 		title: t`Ideas and tips from WebReflection`,
 		href: "https://gist.github.com/WebReflection/ec9f6687842aa385477c4afca625bbf4",
 	}

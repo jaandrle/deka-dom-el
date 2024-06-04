@@ -13,27 +13,33 @@ import { code } from "./components/code.html.js";
 /** @param {string} url */
 const fileURL= url=> new URL(url, import.meta.url);
 const references= {
-	mdn_create: { /** document.createElement() */
+	/** document.createElement() */
+	mdn_create: {
 		title: t`MDN documentation page for document.createElement()`,
 		href: "https://developer.mozilla.org/en-US/docs/Web/API/Document/createElement",
 	},
-	mdn_idl: { /** Interface Description Language (`el.textContent`) */
+	/** Interface Description Language (`el.textContent`) */
+	mdn_idl: {
 		title: t`MDN page about Interface Description Language`,
 		href: "https://developer.mozilla.org/en-US/docs/Glossary/IDL",
 	},
-	mdn_el: { /** HTMLElement */
+	/** HTMLElement */
+	mdn_el: {
 		title: t`MDN documentation page for HTMLElement`,
 		href: "https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement"
 	},
-	mdn_p: { /** HTMLParagraphElement */
+	/** HTMLParagraphElement */
+	mdn_p: {
 		title: t`MDN documentation page for HTMLParagraphElement (\`p\` tag)`,
 		href: "https://developer.mozilla.org/en-US/docs/Web/API/HTMLParagraphElement"
 	},
-	mdn_destruct: { /** `[a, b] = [1, 2]` */
+	/** `[a, b] = [1, 2]` */
+	mdn_destruct: {
 		title: t`MDN page about destructuring assignment syntax (e.g. \`[a, b] = [1, 2]\`)`,
 		href: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment",
 	},
-	mdn_ns: { /** document.createElementNS() */
+	/** document.createElementNS() */
+	mdn_ns: {
 		title: t`MDN documentation page for document.createElementNS() (e.g. for SVG elements)`,
 		href: "https://developer.mozilla.org/en-US/docs/Web/API/Document/createElementNS",
 	}
