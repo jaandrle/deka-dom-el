@@ -46,7 +46,7 @@ export function assignAttribute<El extends SupportedElement, ATT extends keyof E
 type ExtendedHTMLElementTagNameMap= HTMLElementTagNameMap & CustomElementTagNameMap;
 type textContent= string | ddeSignal<string>;
 export function el<
-	TAG extends keyof ExtendedHTMLElementTagNameMap & string,
+	TAG extends keyof ExtendedHTMLElementTagNameMap,
 	EL extends (TAG extends keyof ExtendedHTMLElementTagNameMap ? ExtendedHTMLElementTagNameMap[TAG] : HTMLElement)
 >(
 	tag_name: TAG,
@@ -56,6 +56,11 @@ export function el<
 export function el(
 	tag_name?: "<>",
 ): ddeDocumentFragment
+export function el(
+	tag_name: string,
+	attrs?: ElementAttributes<HTMLElement>,
+	...addons: ddeElementAddon<HTMLElement>[]
+): ddeHTMLElement
 
 export function el<
 	C extends (attr: ddeComponentAttributes)=> SupportedElement | ddeDocumentFragment
@@ -124,7 +129,7 @@ interface On{
 		EE extends ddeElementAddon<SupportedElement>,
 		El extends ( EE extends ddeElementAddon<infer El> ? El : never )
 		>(
-			listener: (this: El, event: CustomEvent<void>) => any,
+			listener: (this: El, event: CustomEvent<El>) => any,
 			options?: AddEventListenerOptions
 		) : EE;
 	/** Listens to the element is disconnected from the live DOM. In case of custom elements uses [`disconnectedCallback`](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#custom_element_lifecycle_callbacks), or {@link MutationObserver} else where */
@@ -159,7 +164,7 @@ export const scope: {
 	 * It can be also used to register Addon(s) (functions to be called when component is initized)
 	 * — `scope.host(on.connected(console.log))`.
 	 * */
-	host: (...addons: ddeElementAddon<any>[])=> HTMLElement,
+	host: (...addons: ddeElementAddon<SupportedElement>[])=> HTMLElement,
 	
 	state: Scope[],
 	/** Adds new child scope. All attributes are inherited by default. */
@@ -176,11 +181,11 @@ export function customElementRender<
 >(
 	custom_element: EL,
 	target: ShadowRoot | EL,
-	render: (props: P)=> SupportedElement,
+	render: (props: P)=> SupportedElement | DocumentFragment,
 	props?: P | ((...args: any[])=> P)
 ): EL
-export function customElementWithDDE<EL extends HTMLElement>(custom_element: EL): EL
-export function lifecyclesToEvents<EL extends HTMLElement>(custom_element: EL): EL
+export function customElementWithDDE<EL extends (new ()=> HTMLElement)>(custom_element: EL): EL
+export function lifecyclesToEvents<EL extends (new ()=> HTMLElement)>(custom_element: EL): EL
 export function observedAttributes(custom_element: HTMLElement): Record<string, string>
 
 /* TypeScript MEH */
