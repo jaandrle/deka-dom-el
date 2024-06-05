@@ -1,5 +1,5 @@
-export class CustomHTMLElement extends HTMLElement{
-	static tagName= "custom-element"; // just suggestion, we can use `el(CustomHTMLElement.tagName)`
+export class HTMLCustomElement extends HTMLElement{
+	static tagName= "custom-element"; // just suggestion, we can use `el(HTMLCustomElement.tagName)`
 	static observedAttributes= [ "custom-attribute" ];
 	constructor(){
 		super();
@@ -18,4 +18,4 @@ export class CustomHTMLElement extends HTMLElement{
 	get customAttribute(){ return this.getAttribute("custom-attribute"); }
 	set customAttribute(value){ this.setAttribute("custom-attribute", value); }
 }
-customElements.define(CustomHTMLElement.tagName, CustomHTMLElement);
+customElements.define(HTMLCustomElement.tagName, HTMLCustomElement);

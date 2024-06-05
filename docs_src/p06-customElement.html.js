@@ -58,8 +58,18 @@ export function page({ pkg, info }){
 			For more advanced use of Custom Elements, the summary ${el("a", references.custom_elements_tips)
 			.append( el("strong", t`Handy Custom Elements' Patterns`) )} may be useful. Especially pay attention to
 			linking HTML attributes and defining setters/getters, this is very helpful to use in combination with
-			the library (${el("code", "el(CustomHTMLElement.tagName, { customAttribute: \"new-value\" });")}).
+			the library (${el("code", "el(HTMLCustomElement.tagName, { customAttribute: \"new-value\" });")}).
 		`),
+		el("p").append(...T`
+			Also see the Life Cycle Events sections, very similarly we would like to use
+			${el("a", { textContent: t`DDE events`, href: "./p03-events.html", title: t`See events part of the library documentation` })}.
+			To do it, the library provides function ${el("code", "customElementWithDDE")}…
+		`),
+		el(example, { src: fileURL("./components/examples/customElement/customElementWithDDE.js"), page_id }),
+
+		el("h3", t`Custom Elements with DDE`),
+		el(example, { src: fileURL("./components/examples/customElement/dde.js"), page_id }),
+
 
 		el(mnemonic)
 	);
