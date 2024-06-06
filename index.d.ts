@@ -1,4 +1,4 @@
-import { Signal } from "./signals";
+declare global{ /* ddeSignal */ }
 
 type CustomElementTagNameMap= { '#text': Text, '#comment': Comment }
 type SupportedElement=
@@ -15,20 +15,20 @@ type AttrsModified= {
 	/**
 	 * Use string like in HTML (internally uses `*.setAttribute("style", *)`), or object representation (like DOM API).
 	 */
-	style: string | Partial<CSSStyleDeclaration> | Signal<string, any> | Partial<{ [K in keyof CSSStyleDeclaration]: Signal<CSSStyleDeclaration[K], any> }>
+	style: string | Partial<CSSStyleDeclaration> | ddeSignal<string> | Partial<{ [K in keyof CSSStyleDeclaration]: ddeSignal<CSSStyleDeclaration[K]> }>
 	/**
 	 * Provide option to add/remove/toggle CSS clasess (index of object) using 1/0/-1. In fact `el.classList.toggle(class_name)` for `-1` and `el.classList.toggle(class_name, Boolean(...))` for others.
 	 */
-	classList: Record<string,-1|0|1|boolean|Signal<-1|0|1|boolean, any>>,
+	classList: Record<string,-1|0|1|boolean|ddeSignal<-1|0|1|boolean>>,
 	/**
 	 * By default simiral to `className`, but also supports `string[]`
 	 * */
-	className: string | (string|boolean|undefined|Signal<string|boolean|undefined, any>)[];
+	className: string | (string|boolean|undefined|ddeSignal<string|boolean|undefined>)[];
 	/**
 	 * Sets `aria-*` simiraly to `dataset`
 	 * */
-	ariaset: Record<string,string|Signal<string, any>>,
-} & Record<`=${string}` | `data${PascalCase}` | `aria${PascalCase}`, string|Signal<string, any>> & Record<`.${string}`, any>
+	ariaset: Record<string,string|ddeSignal<string>>,
+} & Record<`=${string}` | `data${PascalCase}` | `aria${PascalCase}`, string|ddeSignal<string>> & Record<`.${string}`, any>
 type _fromElsInterfaces<EL extends SupportedElement>= Omit<EL, keyof AttrsModified>;
 /**
  * Just element attributtes
@@ -38,15 +38,15 @@ type _fromElsInterfaces<EL extends SupportedElement>= Omit<EL, keyof AttrsModifi
  * There is added support for `data[A-Z].*`/`aria[A-Z].*` to be converted to the kebab-case alternatives.
  * @private
  */
-type ElementAttributes<T extends SupportedElement>= Partial<_fromElsInterfaces<T> & { [K in keyof _fromElsInterfaces<T>]: Signal<_fromElsInterfaces<T>[K], any> } & AttrsModified> & Record<string, any>;
+type ElementAttributes<T extends SupportedElement>= Partial<{ [K in keyof _fromElsInterfaces<T>]: _fromElsInterfaces<T>[K] | ddeSignal<_fromElsInterfaces<T>[K]> } & AttrsModified> & Record<string, any>;
 export function classListDeclarative<El extends SupportedElement>(element: El, classList: AttrsModified["classList"]): El
 export function assign<El extends SupportedElement>(element: El, ...attrs_array: ElementAttributes<El>[]): El
 export function assignAttribute<El extends SupportedElement, ATT extends keyof ElementAttributes<El>>(element: El, attr: ATT, value: ElementAttributes<El>[ATT]): ElementAttributes<El>[ATT]
 
 type ExtendedHTMLElementTagNameMap= HTMLElementTagNameMap & CustomElementTagNameMap;
-type textContent= string | ( (set?: string)=> string ); // TODO: for some reason `Signal<string, any>` leads to `attrs?: any`
+type textContent= string | ddeSignal<string>;
 export function el<
-	TAG extends keyof ExtendedHTMLElementTagNameMap & string,
+	TAG extends keyof ExtendedHTMLElementTagNameMap,
 	EL extends (TAG extends keyof ExtendedHTMLElementTagNameMap ? ExtendedHTMLElementTagNameMap[TAG] : HTMLElement)
 >(
 	tag_name: TAG,
@@ -56,6 +56,11 @@ export function el<
 export function el(
 	tag_name?: "<>",
 ): ddeDocumentFragment
+export function el(
+	tag_name: string,
+	attrs?: ElementAttributes<HTMLElement>,
+	...addons: ddeElementAddon<HTMLElement>[]
+): ddeHTMLElement
 
 export function el<
 	C extends (attr: ddeComponentAttributes)=> SupportedElement | ddeDocumentFragment
@@ -83,7 +88,7 @@ export function elNS(
 	EL extends ( TAG extends keyof MathMLElementTagNameMap ? MathMLElementTagNameMap[TAG] : MathMLElement ),
 >(
 	tag_name: TAG,
-	attrs?: string | textContent | Partial<{ [key in keyof EL]: EL[key] | Signal<EL[key], any> | string | number | boolean }>,
+	attrs?: string | textContent | Partial<{ [key in keyof EL]: EL[key] | ddeSignal<EL[key]> | string | number | boolean }>,
 	...addons: ddeElementAddon<EL>[]
 )=> ddeMathMLElement
 export function elNS(
@@ -124,7 +129,7 @@ interface On{
 		EE extends ddeElementAddon<SupportedElement>,
 		El extends ( EE extends ddeElementAddon<infer El> ? El : never )
 		>(
-			listener: (this: El, event: CustomEvent<void>) => any,
+			listener: (this: El, event: CustomEvent<El>) => any,
 			options?: AddEventListenerOptions
 		) : EE;
 	/** Listens to the element is disconnected from the live DOM. In case of custom elements uses [`disconnectedCallback`](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#custom_element_lifecycle_callbacks), or {@link MutationObserver} else where */
@@ -159,7 +164,7 @@ export const scope: {
 	 * It can be also used to register Addon(s) (functions to be called when component is initized)
 	 * — `scope.host(on.connected(console.log))`.
 	 * */
-	host: (...addons: ddeElementAddon<any>[])=> HTMLElement,
+	host: (...addons: ddeElementAddon<SupportedElement>[])=> HTMLElement,
 	
 	state: Scope[],
 	/** Adds new child scope. All attributes are inherited by default. */
@@ -176,11 +181,11 @@ export function customElementRender<
 >(
 	custom_element: EL,
 	target: ShadowRoot | EL,
-	render: (props: P)=> SupportedElement,
+	render: (props: P)=> SupportedElement | DocumentFragment,
 	props?: P | ((...args: any[])=> P)
 ): EL
-export function customElementWithDDE<EL extends HTMLElement>(custom_element: EL): EL
-export function lifecyclesToEvents<EL extends HTMLElement>(custom_element: EL): EL
+export function customElementWithDDE<EL extends (new ()=> HTMLElement)>(custom_element: EL): EL
+export function lifecyclesToEvents<EL extends (new ()=> HTMLElement)>(custom_element: EL): EL
 export function observedAttributes(custom_element: HTMLElement): Record<string, string>
 
 /* TypeScript MEH */
