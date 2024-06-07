@@ -68,7 +68,16 @@ export function page({ pkg, info }){
 		el(example, { src: fileURL("./components/examples/customElement/customElementWithDDE.js"), page_id }),
 
 		el("h3", t`Custom Elements with DDE`),
+		el("p").append(...T`
+			The ${el("code", "customElementWithDDE")} function is only (small) part of the inregration of the library.
+			More important for coexistence is render component function as a body of the Custom Element. For that, you
+			can use ${el("code", "customElementRender")} with arguments instance reference, target for connection,
+			render function and optional properties (will be passed to the render function) see later…
+		`),
 		el(example, { src: fileURL("./components/examples/customElement/dde.js"), page_id }),
+		el("p").append(...T`
+			…
+		`),
 
 
 		el(mnemonic)

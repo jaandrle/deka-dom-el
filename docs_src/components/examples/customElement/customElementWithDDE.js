@@ -11,7 +11,13 @@ customElementWithDDE(HTMLCustomElement);
 customElements.define(HTMLCustomElement.tagName, HTMLCustomElement);
 
 const instance= el(HTMLCustomElement.tagName);
-on.connected(e=> console.log("Element connected to the DOM:", e))(instance);
+on.connected( // preffered
+	e=> console.log("Element connected to the DOM (v1):", e)
+)(instance);
+instance.addEventListener(
+	"dde:connected",
+	e=> console.log("Element connected to the DOM (v2):", e)
+);
 document.body.append(
 	instance,
 );

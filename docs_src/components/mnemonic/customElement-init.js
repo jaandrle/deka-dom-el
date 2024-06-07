@@ -4,7 +4,7 @@ import { mnemonicUl } from "../mnemonicUl.html.js";
 export function mnemonic(){
 	return mnemonicUl().append(
 		el("li").append(
-			el("code", "customElementRender(<custom-element>, <render-function>[, <properties>])"), " — use function to render DOM structure for given <custom-element>",
+			el("code", "customElementRender(<custom-element>, <connect-target>, <render-function>[, <properties>])"), " — use function to render DOM structure for given <custom-element>",
 		),
 		el("li").append(
 			el("code", "customElementWithDDE(<custom-element>)"), " — register <custom-element> to DDE library, see also `lifecyclesToEvents`, can be also used as decorator",
