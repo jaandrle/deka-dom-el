@@ -1,69 +1,4 @@
-export type Signal<V, A>= (set?: V)=> V & A;
-type Action<V>= (this: { value: V, stopPropagation(): void }, ...a: any[])=> typeof signal._ | void;
-//type SymbolSignal= Symbol;
-type SymbolOnclear= symbol;
-type Actions<V>= Record<string | SymbolOnclear, Action<V>>;
-type OnListenerOptions= Pick<AddEventListenerOptions, "signal"> & { first_time?: boolean };
-interface signal{
-	_: Symbol
-	/**
-	 * Simple example:
-	 * ```js
-	 * const hello= S("Hello Signal");
-	 * ```
-	 * …simple todo signal:
-	 * ```js
-	 * const todos= S([], {
-	 * 	add(v){ this.value.push(S(v)); },
-	 * 	remove(i){ this.value.splice(i, 1); },
-	 * 	[S.symbols.onclear](){ S.clear(...this.value); },
-	 * });
-	 * ```
-	 * …computed signal:
-	 * ```js
-	 * const name= S("Jan");
-	 * const surname= S("Andrle");
-	 * const fullname= S(()=> name()+" "+surname());
-	 * ```
-	 * @param value Initial signal value. Or function computing value from other signals.
-	 * @param actions Use to define actions on the signal. Such as add item to the array.
-	 *		There is also a reserved function `S.symbol.onclear` which is called when the signal is cleared
-	 *		by `S.clear`.
-	 * */
-	<V, A extends Actions<V>>(value: V, actions?: A): Signal<V, A>;
-	/**
-	 * Computations signal. This creates a signal which is computed from other signals.
-	 * */
-	<V>(computation: ()=> V): Signal<V, {}>
-	action<S extends Signal<any, Actions<any>>, A extends (S extends Signal<any, infer A> ? A : never), N extends keyof A>(
-		signal: S,
-		name: N,
-		...params: A[N] extends (...args: infer P)=> any ? P : never
-	): void;
-	clear(...signals: Signal<any, any>[]): void;
-	on<T>(signal: Signal<T, any>, onchange: (a: T)=> void, options?: OnListenerOptions): void;
-	symbols: {
-		//signal: SymbolSignal;
-		onclear: SymbolOnclear;
-	}
-	/**
-	 * Reactive element, which is rendered based on the given signal.
-	 * ```js
-	 * S.el(signal, value=> value ? el("b", "True") : el("i", "False"));
-	 * S.el(listS, list=> list.map(li=> el("li", li)));
-	 * ```
-	 * */
-	el<S extends any>(signal: Signal<S, any>, el: (v: S)=> Element | Element[] | DocumentFragment): DocumentFragment;
-
-    observedAttributes(custom_element: HTMLElement): Record<string, Signal<any, any>>;
-}
-export const signal: signal;
-export const S: signal;
-declare global {
-	type ddeSignal<T, A= {}>= Signal<T, A>;
-	type ddeAction<V>= Action<V>
-	type ddeActions<V>= Actions<V>
-}
+declare global{ /* ddeSignal */ }
 type CustomElementTagNameMap= { '#text': Text, '#comment': Comment }
 type SupportedElement=
 	  HTMLElementTagNameMap[keyof HTMLElementTagNameMap]
@@ -80,20 +15,20 @@ type AttrsModified= {
 	/**
 	 * Use string like in HTML (internally uses `*.setAttribute("style", *)`), or object representation (like DOM API).
 	 */
-	style: string | Partial<CSSStyleDeclaration> | Signal<string, any> | Partial<{ [K in keyof CSSStyleDeclaration]: Signal<CSSStyleDeclaration[K], any> }>
+	style: string | Partial<CSSStyleDeclaration> | ddeSignal<string> | Partial<{ [K in keyof CSSStyleDeclaration]: ddeSignal<CSSStyleDeclaration[K]> }>
 	/**
 	 * Provide option to add/remove/toggle CSS clasess (index of object) using 1/0/-1. In fact `el.classList.toggle(class_name)` for `-1` and `el.classList.toggle(class_name, Boolean(...))` for others.
 	 */
-	classList: Record<string,-1|0|1|boolean|Signal<-1|0|1|boolean, any>>,
+	classList: Record<string,-1|0|1|boolean|ddeSignal<-1|0|1|boolean>>,
 	/**
 	 * By default simiral to `className`, but also supports `string[]`
 	 * */
-	className: string | (string|boolean|undefined|Signal<string|boolean|undefined, any>)[];
+	className: string | (string|boolean|undefined|ddeSignal<string|boolean|undefined>)[];
 	/**
 	 * Sets `aria-*` simiraly to `dataset`
 	 * */
-	ariaset: Record<string,string|Signal<string, any>>,
-} & Record<`=${string}` | `data${PascalCase}` | `aria${PascalCase}`, string|Signal<string, any>> & Record<`.${string}`, any>
+	ariaset: Record<string,string|ddeSignal<string>>,
+} & Record<`=${string}` | `data${PascalCase}` | `aria${PascalCase}`, string|ddeSignal<string>> & Record<`.${string}`, any>
 type _fromElsInterfaces<EL extends SupportedElement>= Omit<EL, keyof AttrsModified>;
 /**
  * Just element attributtes
@@ -103,15 +38,15 @@ type _fromElsInterfaces<EL extends SupportedElement>= Omit<EL, keyof AttrsModifi
  * There is added support for `data[A-Z].*`/`aria[A-Z].*` to be converted to the kebab-case alternatives.
  * @private
  */
-type ElementAttributes<T extends SupportedElement>= Partial<_fromElsInterfaces<T> & { [K in keyof _fromElsInterfaces<T>]: Signal<_fromElsInterfaces<T>[K], any> } & AttrsModified> & Record<string, any>;
+type ElementAttributes<T extends SupportedElement>= Partial<{ [K in keyof _fromElsInterfaces<T>]: _fromElsInterfaces<T>[K] | ddeSignal<_fromElsInterfaces<T>[K]> } & AttrsModified> & Record<string, any>;
 export function classListDeclarative<El extends SupportedElement>(element: El, classList: AttrsModified["classList"]): El
 export function assign<El extends SupportedElement>(element: El, ...attrs_array: ElementAttributes<El>[]): El
 export function assignAttribute<El extends SupportedElement, ATT extends keyof ElementAttributes<El>>(element: El, attr: ATT, value: ElementAttributes<El>[ATT]): ElementAttributes<El>[ATT]
 
 type ExtendedHTMLElementTagNameMap= HTMLElementTagNameMap & CustomElementTagNameMap;
-type textContent= string | ( (set?: string)=> string ); // TODO: for some reason `Signal<string, any>` leads to `attrs?: any`
+type textContent= string | ddeSignal<string>;
 export function el<
-	TAG extends keyof ExtendedHTMLElementTagNameMap & string,
+	TAG extends keyof ExtendedHTMLElementTagNameMap,
 	EL extends (TAG extends keyof ExtendedHTMLElementTagNameMap ? ExtendedHTMLElementTagNameMap[TAG] : HTMLElement)
 >(
 	tag_name: TAG,
@@ -121,6 +56,11 @@ export function el<
 export function el(
 	tag_name?: "<>",
 ): ddeDocumentFragment
+export function el(
+	tag_name: string,
+	attrs?: ElementAttributes<HTMLElement>,
+	...addons: ddeElementAddon<HTMLElement>[]
+): ddeHTMLElement
 
 export function el<
 	C extends (attr: ddeComponentAttributes)=> SupportedElement | ddeDocumentFragment
@@ -148,7 +88,7 @@ export function elNS(
 	EL extends ( TAG extends keyof MathMLElementTagNameMap ? MathMLElementTagNameMap[TAG] : MathMLElement ),
 >(
 	tag_name: TAG,
-	attrs?: string | textContent | Partial<{ [key in keyof EL]: EL[key] | Signal<EL[key], any> | string | number | boolean }>,
+	attrs?: string | textContent | Partial<{ [key in keyof EL]: EL[key] | ddeSignal<EL[key]> | string | number | boolean }>,
 	...addons: ddeElementAddon<EL>[]
 )=> ddeMathMLElement
 export function elNS(
@@ -189,7 +129,7 @@ interface On{
 		EE extends ddeElementAddon<SupportedElement>,
 		El extends ( EE extends ddeElementAddon<infer El> ? El : never )
 		>(
-			listener: (this: El, event: CustomEvent<void>) => any,
+			listener: (this: El, event: CustomEvent<El>) => any,
 			options?: AddEventListenerOptions
 		) : EE;
 	/** Listens to the element is disconnected from the live DOM. In case of custom elements uses [`disconnectedCallback`](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#custom_element_lifecycle_callbacks), or {@link MutationObserver} else where */
@@ -224,7 +164,7 @@ export const scope: {
 	 * It can be also used to register Addon(s) (functions to be called when component is initized)
 	 * — `scope.host(on.connected(console.log))`.
 	 * */
-	host: (...addons: ddeElementAddon<any>[])=> HTMLElement,
+	host: (...addons: ddeElementAddon<SupportedElement>[])=> HTMLElement,
 	
 	state: Scope[],
 	/** Adds new child scope. All attributes are inherited by default. */
@@ -241,11 +181,11 @@ export function customElementRender<
 >(
 	custom_element: EL,
 	target: ShadowRoot | EL,
-	render: (props: P)=> SupportedElement,
+	render: (props: P)=> SupportedElement | DocumentFragment,
 	props?: P | ((...args: any[])=> P)
 ): EL
-export function customElementWithDDE<EL extends HTMLElement>(custom_element: EL): EL
-export function lifecyclesToEvents<EL extends HTMLElement>(custom_element: EL): EL
+export function customElementWithDDE<EL extends (new ()=> HTMLElement)>(custom_element: EL): EL
+export function lifecyclesToEvents<EL extends (new ()=> HTMLElement)>(custom_element: EL): EL
 export function observedAttributes(custom_element: HTMLElement): Record<string, string>
 
 /* TypeScript MEH */
@@ -526,3 +466,69 @@ interface ddeSVGTitleElement extends SVGTitleElement{ append: ddeAppend<ddeSVGTi
 interface ddeSVGTSpanElement extends SVGTSpanElement{ append: ddeAppend<ddeSVGTSpanElement>; }
 interface ddeSVGUseElement extends SVGUseElement{ append: ddeAppend<ddeSVGUseElement>; }
 interface ddeSVGViewElement extends SVGViewElement{ append: ddeAppend<ddeSVGViewElement>; }
+export type Signal<V, A>= (set?: V)=> V & A;
+type Action<V>= (this: { value: V, stopPropagation(): void }, ...a: any[])=> typeof signal._ | void;
+//type SymbolSignal= Symbol;
+type SymbolOnclear= symbol;
+type Actions<V>= Record<string | SymbolOnclear, Action<V>>;
+type OnListenerOptions= Pick<AddEventListenerOptions, "signal"> & { first_time?: boolean };
+interface signal{
+	_: Symbol
+	/**
+	 * Computations signal. This creates a signal which is computed from other signals.
+	 * */
+	<V extends ()=> any>(computation: V): Signal<ReturnType<V>, {}>
+	/**
+	 * Simple example:
+	 * ```js
+	 * const hello= S("Hello Signal");
+	 * ```
+	 * …simple todo signal:
+	 * ```js
+	 * const todos= S([], {
+	 * 	add(v){ this.value.push(S(v)); },
+	 * 	remove(i){ this.value.splice(i, 1); },
+	 * 	[S.symbols.onclear](){ S.clear(...this.value); },
+	 * });
+	 * ```
+	 * …computed signal:
+	 * ```js
+	 * const name= S("Jan");
+	 * const surname= S("Andrle");
+	 * const fullname= S(()=> name()+" "+surname());
+	 * ```
+	 * @param value Initial signal value. Or function computing value from other signals.
+	 * @param actions Use to define actions on the signal. Such as add item to the array.
+	 *		There is also a reserved function `S.symbol.onclear` which is called when the signal is cleared
+	 *		by `S.clear`.
+	 * */
+	<V, A extends Actions<V>>(value: V, actions?: A): Signal<V, A>;
+	action<S extends Signal<any, Actions<any>>, A extends (S extends Signal<any, infer A> ? A : never), N extends keyof A>(
+		signal: S,
+		name: N,
+		...params: A[N] extends (...args: infer P)=> any ? P : never
+	): void;
+	clear(...signals: Signal<any, any>[]): void;
+	on<T>(signal: Signal<T, any>, onchange: (a: T)=> void, options?: OnListenerOptions): void;
+	symbols: {
+		//signal: SymbolSignal;
+		onclear: SymbolOnclear;
+	}
+	/**
+	 * Reactive element, which is rendered based on the given signal.
+	 * ```js
+	 * S.el(signal, value=> value ? el("b", "True") : el("i", "False"));
+	 * S.el(listS, list=> list.map(li=> el("li", li)));
+	 * ```
+	 * */
+	el<S extends any>(signal: Signal<S, any>, el: (v: S)=> Element | Element[] | DocumentFragment): DocumentFragment;
+
+    observedAttributes(custom_element: HTMLElement): Record<string, Signal<any, any>>;
+}
+export const signal: signal;
+export const S: signal;
+declare global {
+	type ddeSignal<T, A= {}>= Signal<T, A>;
+	type ddeAction<V>= Action<V>
+	type ddeActions<V>= Actions<V>
+}
