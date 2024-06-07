@@ -23,7 +23,7 @@ function ddeComponent({ attr }){
 	);
 	return el().append(
 		el("p", `Hello from Custom Element with attribute '${attr}'`)
-	)
+	);
 }
 customElementWithDDE(HTMLCustomElement);
 customElements.define(HTMLCustomElement.tagName, HTMLCustomElement);

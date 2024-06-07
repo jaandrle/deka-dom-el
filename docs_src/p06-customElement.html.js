@@ -76,7 +76,10 @@ export function page({ pkg, info }){
 		`),
 		el(example, { src: fileURL("./components/examples/customElement/dde.js"), page_id }),
 		el("p").append(...T`
-			…
+			…as you can see, you can use components created based on the documentation previously introduced. To unlock
+			full potential, use with combination ${el("code", "customElementWithDDE")} (allows to use livecycle events)
+			and ${el("code", "observedAttributes")} (converts attributes to render function arguments —
+			${el("em", "default")}) or ${el("code", "S.observedAttributes")} (converts attributes to signals).
 		`),
 
 
