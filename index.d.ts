@@ -177,12 +177,12 @@ export const scope: {
 
 export function customElementRender<
 	EL extends HTMLElement,
-	P extends any = Record<string, any>
+	P extends any = Record<string, string | ddeSignal<string>>
 >(
 	custom_element: EL,
 	target: ShadowRoot | EL,
 	render: (props: P)=> SupportedElement | DocumentFragment,
-	props?: P | ((...args: any[])=> P)
+	props?: P | ((el: EL)=> P)
 ): EL
 export function customElementWithDDE<EL extends (new ()=> HTMLElement)>(custom_element: EL): EL
 export function lifecyclesToEvents<EL extends (new ()=> HTMLElement)>(custom_element: EL): EL

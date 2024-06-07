@@ -81,6 +81,7 @@ export function page({ pkg, info }){
 			and ${el("code", "observedAttributes")} (converts attributes to render function arguments —
 			${el("em", "default")}) or ${el("code", "S.observedAttributes")} (converts attributes to signals).
 		`),
+		el(example, { src: fileURL("./components/examples/customElement/observedAttributes.js"), page_id }),
 
 
 		el(mnemonic)
