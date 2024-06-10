@@ -32,7 +32,17 @@ const references= {
 	custom_elements_tips: {
 		title: t`Ideas and tips from WebReflection`,
 		href: "https://gist.github.com/WebReflection/ec9f6687842aa385477c4afca625bbf4",
-	}
+	},
+	/** Shallow DOM on mdn */
+	mdn_shadow_dom_depth: {
+		title: t`MDN documentation page for Shadow DOM`,
+		href: "https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM",
+	},
+	/** Shallow DOM */
+	shadow_dom_depth: {
+		title: t`Everything you need to know about Shadow DOM (github repo praveenpuglia/shadow-dom-in-depth)`,
+		href: "https://github.com/praveenpuglia/shadow-dom-in-depth",
+	},
 };
 /** @param {import("./types.d.ts").PageAttrs} attrs */
 export function page({ pkg, info }){
@@ -82,6 +92,15 @@ export function page({ pkg, info }){
 			${el("em", "default")}) or ${el("code", "S.observedAttributes")} (converts attributes to signals).
 		`),
 		el(example, { src: fileURL("./components/examples/customElement/observedAttributes.js"), page_id }),
+
+
+		el(h3, t`Shadow DOM`),
+		el("p").append(...T`
+			Regarding to ${el("code", "this.attachShadow({ mode: 'open' })")} see quick overview
+			${el("a", { textContent: t`Using Shadow DOM`, ...references.mdn_shadow_dom_depth })}. An another source of
+			information can be ${el("a", { textContent: t`Shadow DOM in Depth`, ...references.shadow_dom_depth })}. To
+			sum up, there in basic three ways to render component body:
+		`),
 
 
 		el(mnemonic)
