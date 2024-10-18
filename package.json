@@ -62,14 +62,12 @@
 			"limit": "10.5 kB",
 			"gzip": false,
 			"brotli": false
-
 		},
 		{
 			"path": "./signals.js",
 			"limit": "12 kB",
 			"gzip": false,
 			"brotli": false
-
 		},
 		{
 			"path": "./index-with-signals.js",
@@ -95,12 +93,12 @@
 		"typescript"
 	],
 	"devDependencies": {
-		"@size-limit/preset-small-lib": "^11.0.1",
-		"dts-bundler": "^0.1.0",
-		"esbuild": "^0.19.9",
-		"jsdom": "^23.0.1",
-		"jshint": "^2.13.6",
-		"nodejsscript": "github:jaandrle/nodejsscript#dev-v1",
-		"size-limit-node-esbuild": "^0.3.0"
+		"@size-limit/preset-small-lib": "~11.0",
+		"dts-bundler": "~0.1",
+		"esbuild": "~0.24",
+		"jsdom": "~25.0",
+		"jshint": "~2.13",
+		"nodejsscript": "^1.0.2",
+		"size-limit-node-esbuild": "~0.3"
 	}
 }
