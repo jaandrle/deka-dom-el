@@ -101,7 +101,7 @@ export function page({ pkg, info }){
 			information can be ${el("a", { textContent: t`Shadow DOM in Depth`, ...references.shadow_dom_depth })}. To
 			sum up, there in basic three ways to render component body:
 		`),
-
+		el(example, { src: fileURL("./components/examples/customElement/shadowRoot.js"), page_id }),
 
 		el(mnemonic)
 	);
