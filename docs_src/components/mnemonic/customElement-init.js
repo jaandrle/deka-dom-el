@@ -17,6 +17,12 @@ export function mnemonic(){
 		),
 		el("li").append(
 			el("code", "lifecyclesToEvents(<class-declaration>)"), " — convert lifecycle methods to events, can be also used as decorator",
-		)
+		),
+		el("li").append(
+			el("code", "simulateSlots(<class-instance>, <body>[, <mapper>])"), " — simulate slots for Custom Elements without shadow DOM",
+		),
+		el("li").append(
+			el("code", "simulateSlots(<dde-component>[, <mapper>])"), " — simulate slots for “dde”/functional components",
+		),
 	);
 }

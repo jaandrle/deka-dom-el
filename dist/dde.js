@@ -1,47 +1,52 @@
 //deka-dom-el library is available via global namespace `dde`
 (()=> {
 // src/signals-common.js
-var C = {
-	isSignal(t) {
-		return !1;
+var signals_global = {
+	isSignal(attributes) {
+		return false;
 	},
-	processReactiveAttribute(t, e, n, r) {
-		return n;
+	processReactiveAttribute(obj, key, attr, set) {
+		return attr;
 	}
 };
-function V(t, e = !0) {
-	return e ? Object.assign(C, t) : (Object.setPrototypeOf(t, C), t);
+function registerReactivity(def, global = true) {
+	if (global) return Object.assign(signals_global, def);
+	Object.setPrototypeOf(def, signals_global);
+	return def;
 }
-function L(t) {
-	return C.isPrototypeOf(t) && t !== C ? t : C;
+function signals(_this) {
+	return signals_global.isPrototypeOf(_this) && _this !== signals_global ? _this : signals_global;
 }
 
 // src/helpers.js
-var q = (...t) => Object.prototype.hasOwnProperty.call(...t);
-function E(t) {
-	return typeof t > "u";
+var hasOwn = (...a) => Object.prototype.hasOwnProperty.call(...a);
+function isUndef(value) {
+	return typeof value === "undefined";
 }
-function N(t, e) {
-	if (!t || !(t instanceof AbortSignal))
-		return !0;
-	if (!t.aborted)
-		return t.addEventListener("abort", e), function() {
-			t.removeEventListener("abort", e);
-		};
+function onAbort(signal, listener) {
+	if (!signal || !(signal instanceof AbortSignal))
+		return true;
+	if (signal.aborted)
+		return;
+	signal.addEventListener("abort", listener);
+	return function cleanUp() {
+		signal.removeEventListener("abort", listener);
+	};
 }
-function F(t, e) {
-	let { observedAttributes: n = [] } = t.constructor;
-	return n.reduce(function(r, o) {
-		return r[J(o)] = e(t, o), r;
+function observedAttributes(instance, observedAttribute) {
+	const { observedAttributes: observedAttributes3 = [] } = instance.constructor;
+	return observedAttributes3.reduce(function(out, name) {
+		out[kebabToCamel(name)] = observedAttribute(instance, name);
+		return out;
 	}, {});
 }
-function J(t) {
-	return t.replace(/-./g, (e) => e[1].toUpperCase());
+function kebabToCamel(name) {
+	return name.replace(/-./g, (x) => x[1].toUpperCase());
 }
 
 // src/dom-common.js
-var a = {
-	setDeleteAttr: K,
+var enviroment = {
+	setDeleteAttr,
 	ssr: "",
 	D: globalThis.document,
 	F: globalThis.DocumentFragment,
@@ -49,425 +54,548 @@ var a = {
 	S: globalThis.SVGElement,
 	M: globalThis.MutationObserver
 };
-function K(t, e, n) {
-	if (Reflect.set(t, e, n), !!E(n)) {
-		if (Reflect.deleteProperty(t, e), t instanceof a.H && t.getAttribute(e) === "undefined")
-			return t.removeAttribute(e);
-		if (Reflect.get(t, e) === "undefined")
-			return Reflect.set(t, e, "");
-	}
+function setDeleteAttr(obj, prop, val) {
+	Reflect.set(obj, prop, val);
+	if (!isUndef(val)) return;
+	Reflect.deleteProperty(obj, prop);
+	if (obj instanceof enviroment.H && obj.getAttribute(prop) === "undefined")
+		return obj.removeAttribute(prop);
+	if (Reflect.get(obj, prop) === "undefined")
+		return Reflect.set(obj, prop, "");
 }
-var x = "__dde_lifecyclesToEvents", g = "dde:connected", y = "dde:disconnected", D = "dde:attributeChanged";
+var keyLTE = "__dde_lifecyclesToEvents";
+var evc = "dde:connected";
+var evd = "dde:disconnected";
+var eva = "dde:attributeChanged";
 
 // src/dom.js
-var v = [{
+var scopes = [{
 	get scope() {
-		return a.D.body;
+		return enviroment.D.body;
 	},
-	host: (t) => t ? t(a.D.body) : a.D.body,
-	prevent: !0
-}], S = {
+	host: (c) => c ? c(enviroment.D.body) : enviroment.D.body,
+	prevent: true
+}];
+var scope = {
 	get current() {
-		return v[v.length - 1];
+		return scopes[scopes.length - 1];
 	},
 	get host() {
 		return this.current.host;
 	},
 	preventDefault() {
-		let { current: t } = this;
-		return t.prevent = !0, t;
+		const { current } = this;
+		current.prevent = true;
+		return current;
 	},
 	get state() {
-		return [...v];
+		return [...scopes];
 	},
-	push(t = {}) {
-		return v.push(Object.assign({}, this.current, { prevent: !1 }, t));
+	push(s = {}) {
+		return scopes.push(Object.assign({}, this.current, { prevent: false }, s));
 	},
 	pushRoot() {
-		return v.push(v[0]);
+		return scopes.push(scopes[0]);
 	},
 	pop() {
-		if (v.length !== 1)
-			return v.pop();
+		if (scopes.length === 1) return;
+		return scopes.pop();
 	}
 };
-function $(...t) {
-	return this.appendOriginal(...t), this;
+function append(...els) {
+	this.appendOriginal(...els);
+	return this;
 }
-function Q(t) {
-	return t.append === $ || (t.appendOriginal = t.append, t.append = $), t;
+function chainableAppend(el) {
+	if (el.append === append) return el;
+	el.appendOriginal = el.append;
+	el.append = append;
+	return el;
 }
-var T;
-function k(t, e, ...n) {
-	let r = L(this), o = 0, c, f;
-	switch ((Object(e) !== e || r.isSignal(e)) && (e = { textContent: e }), !0) {
-		case typeof t == "function": {
-			o = 1, S.push({ scope: t, host: (...b) => b.length ? (o === 1 ? n.unshift(...b) : b.forEach((l) => l(f)), void 0) : f }), c = t(e || void 0);
-			let d = c instanceof a.F;
-			if (c.nodeName === "#comment")
-				break;
-			let p = k.mark({
+var namespace;
+function createElement(tag, attributes, ...addons) {
+	const s = signals(this);
+	let scoped = 0;
+	let el, el_host;
+	if (Object(attributes) !== attributes || s.isSignal(attributes))
+		attributes = { textContent: attributes };
+	switch (true) {
+		case typeof tag === "function": {
+			scoped = 1;
+			scope.push({ scope: tag, host: (...c) => c.length ? (scoped === 1 ? addons.unshift(...c) : c.forEach((c2) => c2(el_host)), void 0) : el_host });
+			el = tag(attributes || void 0);
+			const is_fragment = el instanceof enviroment.F;
+			if (el.nodeName === "#comment") break;
+			const el_mark = createElement.mark({
 				type: "component",
-				name: t.name,
-				host: d ? "this" : "parentElement"
+				name: tag.name,
+				host: is_fragment ? "this" : "parentElement"
 			});
-			c.prepend(p), d && (f = p);
+			el.prepend(el_mark);
+			if (is_fragment) el_host = el_mark;
 			break;
 		}
-		case t === "#text":
-			c = O.call(this, a.D.createTextNode(""), e);
+		case tag === "#text":
+			el = assign.call(this, enviroment.D.createTextNode(""), attributes);
 			break;
-		case (t === "<>" || !t):
-			c = O.call(this, a.D.createDocumentFragment(), e);
+		case (tag === "<>" || !tag):
+			el = assign.call(this, enviroment.D.createDocumentFragment(), attributes);
 			break;
-		case !!T:
-			c = O.call(this, a.D.createElementNS(T, t), e);
+		case Boolean(namespace):
+			el = assign.call(this, enviroment.D.createElementNS(namespace, tag), attributes);
 			break;
-		case !c:
-			c = O.call(this, a.D.createElement(t), e);
+		case !el:
+			el = assign.call(this, enviroment.D.createElement(tag), attributes);
 	}
-	return Q(c), f || (f = c), n.forEach((d) => d(f)), o && S.pop(), o = 2, c;
+	chainableAppend(el);
+	if (!el_host) el_host = el;
+	addons.forEach((c) => c(el_host));
+	if (scoped) scope.pop();
+	scoped = 2;
+	return el;
 }
-function bt(t, e = t, n = void 0) {
-	let r = Symbol.for("default"), o = Array.from(e.querySelectorAll("slot")).reduce((f, d) => Reflect.set(f, d.name || r, d) && f, {}), c = q(o, r);
-	if (t.append = new Proxy(t.append, {
-		apply(f, d, p) {
-			if (!p.length)
-				return t;
-			let b = a.D.createDocumentFragment();
-			for (let l of p) {
-				if (!l || !l.slot) {
-					c && b.appendChild(l);
+function simulateSlots(element, root, mapper) {
+	if (typeof root !== "object") {
+		mapper = root;
+		root = element;
+	}
+	const _default = Symbol.for("default");
+	const slots = Array.from(root.querySelectorAll("slot")).reduce((out, curr) => Reflect.set(out, curr.name || _default, curr) && out, {});
+	const has_d = hasOwn(slots, _default);
+	element.append = new Proxy(element.append, {
+		apply(orig, _, els) {
+			if (els[0] === root) return orig.apply(element, els);
+			if (!els.length) return element;
+			const d = enviroment.D.createDocumentFragment();
+			for (const el of els) {
+				if (!el || !el.slot) {
+					if (has_d) d.append(el);
 					continue;
 				}
-				let A = l.slot, _ = o[A];
-				tt(l, "remove", "slot"), _ && (X(_, l, n), Reflect.deleteProperty(o, A));
+				const name = el.slot;
+				const slot = slots[name];
+				elementAttribute(el, "remove", "slot");
+				if (!slot) continue;
+				simulateSlotReplace(slot, el, mapper);
+				Reflect.deleteProperty(slots, name);
 			}
-			return c && (o[r].replaceWith(b), Reflect.deleteProperty(o, r)), t.append = f, t;
+			if (has_d) {
+				slots[_default].replaceWith(d);
+				Reflect.deleteProperty(slots, _default);
+			}
+			element.append = orig;
+			return element;
 		}
-	}), t !== e) {
-		let f = Array.from(t.childNodes);
-		f.forEach((d) => d.remove()), t.append(...f);
+	});
+	if (element !== root) {
+		const els = Array.from(element.childNodes);
+		els.forEach((el) => el.remove());
+		element.append(...els);
 	}
-	return e;
+	return root;
 }
-function X(t, e, n) {
-	n && n(t, e);
+function simulateSlotReplace(slot, element, mapper) {
+	if (mapper) mapper(slot, element);
 	try {
-		t.replaceWith(O(e, { className: [e.className, t.className], dataset: { ...t.dataset } }));
-	} catch {
-		t.replaceWith(e);
+		slot.replaceWith(assign(element, { className: [element.className, slot.className], dataset: { ...slot.dataset } }));
+	} catch (_) {
+		slot.replaceWith(element);
 	}
 }
-k.mark = function(t, e = !1) {
-	t = Object.entries(t).map(([o, c]) => o + `="${c}"`).join(" ");
-	let n = e ? "" : "/", r = a.D.createComment(`<dde:mark ${t}${a.ssr}${n}>`);
-	return e && (r.end = a.D.createComment("</dde:mark>")), r;
+createElement.mark = function(attrs, is_open = false) {
+	attrs = Object.entries(attrs).map(([n, v]) => n + `="${v}"`).join(" ");
+	const end = is_open ? "" : "/";
+	const out = enviroment.D.createComment(`<dde:mark ${attrs}${enviroment.ssr}${end}>`);
+	if (is_open) out.end = enviroment.D.createComment("</dde:mark>");
+	return out;
 };
-function gt(t) {
-	let e = this;
-	return function(...r) {
-		T = t;
-		let o = k.call(e, ...r);
-		return T = void 0, o;
+function createElementNS(ns) {
+	const _this = this;
+	return function createElementNSCurried(...rest) {
+		namespace = ns;
+		const el = createElement.call(_this, ...rest);
+		namespace = void 0;
+		return el;
 	};
 }
-var P = /* @__PURE__ */ new WeakMap(), { setDeleteAttr: U } = a;
-function O(t, ...e) {
-	if (!e.length)
-		return t;
-	P.set(t, B(t, this));
-	for (let [n, r] of Object.entries(Object.assign({}, ...e)))
-		z.call(this, t, n, r);
-	return P.delete(t), t;
+var assign_context = /* @__PURE__ */ new WeakMap();
+var { setDeleteAttr: setDeleteAttr2 } = enviroment;
+function assign(element, ...attributes) {
+	if (!attributes.length) return element;
+	assign_context.set(element, assignContext(element, this));
+	for (const [key, value] of Object.entries(Object.assign({}, ...attributes)))
+		assignAttribute.call(this, element, key, value);
+	assign_context.delete(element);
+	return element;
 }
-function z(t, e, n) {
-	let { setRemoveAttr: r, s: o } = B(t, this), c = this;
-	n = o.processReactiveAttribute(
-		t,
-		e,
-		n,
-		(d, p) => z.call(c, t, d, p)
+function assignAttribute(element, key, value) {
+	const { setRemoveAttr, s } = assignContext(element, this);
+	const _this = this;
+	value = s.processReactiveAttribute(
+		element,
+		key,
+		value,
+		(key2, value2) => assignAttribute.call(_this, element, key2, value2)
 	);
-	let [f] = e;
-	if (f === "=")
-		return r(e.slice(1), n);
-	if (f === ".")
-		return H(t, e.slice(1), n);
-	if (/(aria|data)([A-Z])/.test(e))
-		return e = e.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase(), r(e, n);
-	switch (e === "className" && (e = "class"), e) {
-		case "xlink:href":
-			return r(e, n, "http://www.w3.org/1999/xlink");
-		case "textContent":
-			return U(t, e, n);
-		case "style":
-			if (typeof n != "object")
-				break;
-		case "dataset":
-			return M(o, n, H.bind(null, t[e]));
-		case "ariaset":
-			return M(o, n, (d, p) => r("aria-" + d, p));
-		case "classList":
-			return Y.call(c, t, n);
+	const [k] = key;
+	if ("=" === k) return setRemoveAttr(key.slice(1), value);
+	if ("." === k) return setDelete(element, key.slice(1), value);
+	if (/(aria|data)([A-Z])/.test(key)) {
+		key = key.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
+		return setRemoveAttr(key, value);
 	}
-	return et(t, e) ? U(t, e, n) : r(e, n);
+	if ("className" === key) key = "class";
+	switch (key) {
+		case "xlink:href":
+			return setRemoveAttr(key, value, "http://www.w3.org/1999/xlink");
+		case "textContent":
+			return setDeleteAttr2(element, key, value);
+		case "style":
+			if (typeof value !== "object") break;
+		/* falls through */
+		case "dataset":
+			return forEachEntries(s, value, setDelete.bind(null, element[key]));
+		case "ariaset":
+			return forEachEntries(s, value, (key2, val) => setRemoveAttr("aria-" + key2, val));
+		case "classList":
+			return classListDeclarative.call(_this, element, value);
+	}
+	return isPropSetter(element, key) ? setDeleteAttr2(element, key, value) : setRemoveAttr(key, value);
 }
-function B(t, e) {
-	if (P.has(t))
-		return P.get(t);
-	let r = (t instanceof a.S ? rt : nt).bind(null, t, "Attribute"), o = L(e);
-	return { setRemoveAttr: r, s: o };
+function assignContext(element, _this) {
+	if (assign_context.has(element)) return assign_context.get(element);
+	const is_svg = element instanceof enviroment.S;
+	const setRemoveAttr = (is_svg ? setRemoveNS : setRemove).bind(null, element, "Attribute");
+	const s = signals(_this);
+	return { setRemoveAttr, s };
 }
-function Y(t, e) {
-	let n = L(this);
-	return M(
-		n,
-		e,
-		(r, o) => t.classList.toggle(r, o === -1 ? void 0 : !!o)
-	), t;
+function classListDeclarative(element, toggle) {
+	const s = signals(this);
+	forEachEntries(
+		s,
+		toggle,
+		(class_name, val) => element.classList.toggle(class_name, val === -1 ? void 0 : Boolean(val))
+	);
+	return element;
 }
-function vt(t) {
-	return Array.from(t.children).forEach((e) => e.remove()), t;
+function empty(el) {
+	Array.from(el.children).forEach((el2) => el2.remove());
+	return el;
 }
-function tt(t, e, n, r) {
-	return t instanceof a.H ? t[e + "Attribute"](n, r) : t[e + "AttributeNS"](null, n, r);
+function elementAttribute(element, op, key, value) {
+	if (element instanceof enviroment.H)
+		return element[op + "Attribute"](key, value);
+	return element[op + "AttributeNS"](null, key, value);
 }
-function et(t, e) {
-	if (!(e in t))
-		return !1;
-	let n = I(t, e);
-	return !E(n.set);
+function isPropSetter(el, key) {
+	if (!(key in el)) return false;
+	const des = getPropDescriptor(el, key);
+	return !isUndef(des.set);
 }
-function I(t, e) {
-	if (t = Object.getPrototypeOf(t), !t)
-		return {};
-	let n = Object.getOwnPropertyDescriptor(t, e);
-	return n || I(t, e);
+function getPropDescriptor(p, key) {
+	p = Object.getPrototypeOf(p);
+	if (!p) return {};
+	const des = Object.getOwnPropertyDescriptor(p, key);
+	if (!des) return getPropDescriptor(p, key);
+	return des;
 }
-function M(t, e, n) {
-	if (!(typeof e != "object" || e === null))
-		return Object.entries(e).forEach(function([o, c]) {
-			o && (c = t.processReactiveAttribute(e, o, c, n), n(o, c));
-		});
+function forEachEntries(s, obj, cb) {
+	if (typeof obj !== "object" || obj === null) return;
+	return Object.entries(obj).forEach(function process([key, val]) {
+		if (!key) return;
+		val = s.processReactiveAttribute(obj, key, val, cb);
+		cb(key, val);
+	});
 }
-function Z(t) {
-	return Array.isArray(t) ? t.filter(Boolean).join(" ") : t;
+function attrArrToStr(attr) {
+	return Array.isArray(attr) ? attr.filter(Boolean).join(" ") : attr;
 }
-function nt(t, e, n, r) {
-	return t[(E(r) ? "remove" : "set") + e](n, Z(r));
+function setRemove(obj, prop, key, val) {
+	return obj[(isUndef(val) ? "remove" : "set") + prop](key, attrArrToStr(val));
 }
-function rt(t, e, n, r, o = null) {
-	return t[(E(r) ? "remove" : "set") + e + "NS"](o, n, Z(r));
+function setRemoveNS(obj, prop, key, val, ns = null) {
+	return obj[(isUndef(val) ? "remove" : "set") + prop + "NS"](ns, key, attrArrToStr(val));
 }
-function H(t, e, n) {
-	if (Reflect.set(t, e, n), !!E(n))
-		return Reflect.deleteProperty(t, e);
+function setDelete(obj, key, val) {
+	Reflect.set(obj, key, val);
+	if (!isUndef(val)) return;
+	return Reflect.deleteProperty(obj, key);
 }
 
 // src/events-observer.js
-var w = a.M ? ot() : new Proxy({}, {
+var c_ch_o = enviroment.M ? connectionsChangesObserverConstructor() : new Proxy({}, {
 	get() {
 		return () => {
 		};
 	}
 });
-function ot() {
-	let t = /* @__PURE__ */ new Map(), e = !1, n = (i) => function(u) {
-		for (let s of u)
-			if (s.type === "childList") {
-				if (l(s.addedNodes, !0)) {
-					i();
-					continue;
-				}
-				A(s.removedNodes, !0) && i();
+function connectionsChangesObserverConstructor() {
+	const store = /* @__PURE__ */ new Map();
+	let is_observing = false;
+	const observerListener = (stop2) => function(mutations) {
+		for (const mutation of mutations) {
+			if (mutation.type !== "childList") continue;
+			if (observerAdded(mutation.addedNodes, true)) {
+				stop2();
+				continue;
 			}
-	}, r = new a.M(n(d));
-	return {
-		observe(i) {
-			let u = new a.M(n(() => {
-			}));
-			return u.observe(i, { childList: !0, subtree: !0 }), () => u.disconnect();
-		},
-		onConnected(i, u) {
-			f();
-			let s = c(i);
-			s.connected.has(u) || (s.connected.add(u), s.length_c += 1);
-		},
-		offConnected(i, u) {
-			if (!t.has(i))
-				return;
-			let s = t.get(i);
-			s.connected.has(u) && (s.connected.delete(u), s.length_c -= 1, o(i, s));
-		},
-		onDisconnected(i, u) {
-			f();
-			let s = c(i);
-			s.disconnected.has(u) || (s.disconnected.add(u), s.length_d += 1);
-		},
-		offDisconnected(i, u) {
-			if (!t.has(i))
-				return;
-			let s = t.get(i);
-			s.disconnected.has(u) && (s.disconnected.delete(u), s.length_d -= 1, o(i, s));
+			if (observerRemoved(mutation.removedNodes, true))
+				stop2();
 		}
 	};
-	function o(i, u) {
-		u.length_c || u.length_d || (t.delete(i), d());
+	const observer = new enviroment.M(observerListener(stop));
+	return {
+		observe(element) {
+			const o = new enviroment.M(observerListener(() => {
+			}));
+			o.observe(element, { childList: true, subtree: true });
+			return () => o.disconnect();
+		},
+		onConnected(element, listener) {
+			start();
+			const listeners = getElementStore(element);
+			if (listeners.connected.has(listener)) return;
+			listeners.connected.add(listener);
+			listeners.length_c += 1;
+		},
+		offConnected(element, listener) {
+			if (!store.has(element)) return;
+			const ls = store.get(element);
+			if (!ls.connected.has(listener)) return;
+			ls.connected.delete(listener);
+			ls.length_c -= 1;
+			cleanWhenOff(element, ls);
+		},
+		onDisconnected(element, listener) {
+			start();
+			const listeners = getElementStore(element);
+			if (listeners.disconnected.has(listener)) return;
+			listeners.disconnected.add(listener);
+			listeners.length_d += 1;
+		},
+		offDisconnected(element, listener) {
+			if (!store.has(element)) return;
+			const ls = store.get(element);
+			if (!ls.disconnected.has(listener)) return;
+			ls.disconnected.delete(listener);
+			ls.length_d -= 1;
+			cleanWhenOff(element, ls);
+		}
+	};
+	function cleanWhenOff(element, ls) {
+		if (ls.length_c || ls.length_d)
+			return;
+		store.delete(element);
+		stop();
 	}
-	function c(i) {
-		if (t.has(i))
-			return t.get(i);
-		let u = {
+	function getElementStore(element) {
+		if (store.has(element)) return store.get(element);
+		const out = {
 			connected: /* @__PURE__ */ new WeakSet(),
 			length_c: 0,
 			disconnected: /* @__PURE__ */ new WeakSet(),
 			length_d: 0
 		};
-		return t.set(i, u), u;
+		store.set(element, out);
+		return out;
 	}
-	function f() {
-		e || (e = !0, r.observe(a.D.body, { childList: !0, subtree: !0 }));
+	function start() {
+		if (is_observing) return;
+		is_observing = true;
+		observer.observe(enviroment.D.body, { childList: true, subtree: true });
 	}
-	function d() {
-		!e || t.size || (e = !1, r.disconnect());
+	function stop() {
+		if (!is_observing || store.size) return;
+		is_observing = false;
+		observer.disconnect();
 	}
-	function p() {
-		return new Promise(function(i) {
-			(requestIdleCallback || requestAnimationFrame)(i);
+	function requestIdle() {
+		return new Promise(function(resolve) {
+			(requestIdleCallback || requestAnimationFrame)(resolve);
 		});
 	}
-	async function b(i) {
-		t.size > 30 && await p();
-		let u = [];
-		if (!(i instanceof Node))
-			return u;
-		for (let s of t.keys())
-			s === i || !(s instanceof Node) || i.contains(s) && u.push(s);
-		return u;
-	}
-	function l(i, u) {
-		let s = !1;
-		for (let h of i) {
-			if (u && b(h).then(l), !t.has(h))
-				continue;
-			let m = t.get(h);
-			m.length_c && (h.dispatchEvent(new Event(g)), m.connected = /* @__PURE__ */ new WeakSet(), m.length_c = 0, m.length_d || t.delete(h), s = !0);
+	async function collectChildren(element) {
+		if (store.size > 30)
+			await requestIdle();
+		const out = [];
+		if (!(element instanceof Node)) return out;
+		for (const el of store.keys()) {
+			if (el === element || !(el instanceof Node)) continue;
+			if (element.contains(el))
+				out.push(el);
 		}
-		return s;
+		return out;
 	}
-	function A(i, u) {
-		let s = !1;
-		for (let h of i)
-			u && b(h).then(A), !(!t.has(h) || !t.get(h).length_d) && ((globalThis.queueMicrotask || setTimeout)(_(h)), s = !0);
-		return s;
+	function observerAdded(addedNodes, is_root) {
+		let out = false;
+		for (const element of addedNodes) {
+			if (is_root) collectChildren(element).then(observerAdded);
+			if (!store.has(element)) continue;
+			const ls = store.get(element);
+			if (!ls.length_c) continue;
+			element.dispatchEvent(new Event(evc));
+			ls.connected = /* @__PURE__ */ new WeakSet();
+			ls.length_c = 0;
+			if (!ls.length_d) store.delete(element);
+			out = true;
+		}
+		return out;
 	}
-	function _(i) {
+	function observerRemoved(removedNodes, is_root) {
+		let out = false;
+		for (const element of removedNodes) {
+			if (is_root) collectChildren(element).then(observerRemoved);
+			if (!store.has(element)) continue;
+			const ls = store.get(element);
+			if (!ls.length_d) continue;
+			(globalThis.queueMicrotask || setTimeout)(dispatchRemove(element));
+			out = true;
+		}
+		return out;
+	}
+	function dispatchRemove(element) {
 		return () => {
-			i.isConnected || (i.dispatchEvent(new Event(y)), t.delete(i));
+			if (element.isConnected) return;
+			element.dispatchEvent(new Event(evd));
+			store.delete(element);
 		};
 	}
 }
 
 // src/customElement.js
-function Dt(t, e, n, r = it) {
-	S.push({
-		scope: t,
-		host: (...f) => f.length ? f.forEach((d) => d(t)) : t
-	}), typeof r == "function" && (r = r.call(t, t));
-	let o = t[x];
-	o || ct(t);
-	let c = n.call(t, r);
-	return o || t.dispatchEvent(new Event(g)), e.nodeType === 11 && typeof e.mode == "string" && t.addEventListener(y, w.observe(e), { once: !0 }), S.pop(), e.append(c);
+function customElementRender(custom_element, target, render, props = observedAttributes2) {
+	scope.push({
+		scope: custom_element,
+		host: (...c) => c.length ? c.forEach((c2) => c2(custom_element)) : custom_element
+	});
+	if (typeof props === "function") props = props.call(custom_element, custom_element);
+	const is_lte = custom_element[keyLTE];
+	if (!is_lte) lifecyclesToEvents(custom_element);
+	const out = render.call(custom_element, props);
+	if (!is_lte) custom_element.dispatchEvent(new Event(evc));
+	if (target.nodeType === 11 && typeof target.mode === "string")
+		custom_element.addEventListener(evd, c_ch_o.observe(target), { once: true });
+	scope.pop();
+	return target.append(out);
 }
-function ct(t) {
-	return W(t.prototype, "connectedCallback", function(e, n, r) {
-		e.apply(n, r), n.dispatchEvent(new Event(g));
-	}), W(t.prototype, "disconnectedCallback", function(e, n, r) {
-		e.apply(n, r), (globalThis.queueMicrotask || setTimeout)(
-			() => !n.isConnected && n.dispatchEvent(new Event(y))
+function lifecyclesToEvents(class_declaration) {
+	wrapMethod(class_declaration.prototype, "connectedCallback", function(target, thisArg, detail) {
+		target.apply(thisArg, detail);
+		thisArg.dispatchEvent(new Event(evc));
+	});
+	wrapMethod(class_declaration.prototype, "disconnectedCallback", function(target, thisArg, detail) {
+		target.apply(thisArg, detail);
+		(globalThis.queueMicrotask || setTimeout)(
+			() => !thisArg.isConnected && thisArg.dispatchEvent(new Event(evd))
 		);
-	}), W(t.prototype, "attributeChangedCallback", function(e, n, r) {
-		let [o, , c] = r;
-		n.dispatchEvent(new CustomEvent(D, {
-			detail: [o, c]
-		})), e.apply(n, r);
-	}), t.prototype[x] = !0, t;
+	});
+	wrapMethod(class_declaration.prototype, "attributeChangedCallback", function(target, thisArg, detail) {
+		const [attribute, , value] = detail;
+		thisArg.dispatchEvent(new CustomEvent(eva, {
+			detail: [attribute, value]
+		}));
+		target.apply(thisArg, detail);
+	});
+	class_declaration.prototype[keyLTE] = true;
+	return class_declaration;
 }
-function W(t, e, n) {
-	t[e] = new Proxy(t[e] || (() => {
-	}), { apply: n });
+function wrapMethod(obj, method, apply) {
+	obj[method] = new Proxy(obj[method] || (() => {
+	}), { apply });
 }
-function it(t) {
-	return F(t, (e, n) => e.getAttribute(n));
+function observedAttributes2(instance) {
+	return observedAttributes(instance, (i, n) => i.getAttribute(n));
 }
 
 // src/events.js
-function _t(t, e, n) {
-	return e || (e = {}), function(o, ...c) {
-		n && (c.unshift(o), o = typeof n == "function" ? n() : n);
-		let f = c.length ? new CustomEvent(t, Object.assign({ detail: c[0] }, e)) : new Event(t, e);
-		return o.dispatchEvent(f);
+function dispatchEvent(name, options, host) {
+	if (!options) options = {};
+	return function dispatch(element, ...d) {
+		if (host) {
+			d.unshift(element);
+			element = typeof host === "function" ? host() : host;
+		}
+		const event = d.length ? new CustomEvent(name, Object.assign({ detail: d[0] }, options)) : new Event(name, options);
+		return element.dispatchEvent(event);
 	};
 }
-function R(t, e, n) {
-	return function(o) {
-		return o.addEventListener(t, e, n), o;
+function on(event, listener, options) {
+	return function registerElement(element) {
+		element.addEventListener(event, listener, options);
+		return element;
 	};
 }
-var G = (t) => Object.assign({}, typeof t == "object" ? t : null, { once: !0 });
-R.connected = function(t, e) {
-	return e = G(e), function(r) {
-		return r.addEventListener(g, t, e), r[x] ? r : r.isConnected ? (r.dispatchEvent(new Event(g)), r) : (N(e.signal, () => w.offConnected(r, t)) && w.onConnected(r, t), r);
+var lifeOptions = (obj) => Object.assign({}, typeof obj === "object" ? obj : null, { once: true });
+on.connected = function(listener, options) {
+	options = lifeOptions(options);
+	return function registerElement(element) {
+		element.addEventListener(evc, listener, options);
+		if (element[keyLTE]) return element;
+		if (element.isConnected) return element.dispatchEvent(new Event(evc)), element;
+		const c = onAbort(options.signal, () => c_ch_o.offConnected(element, listener));
+		if (c) c_ch_o.onConnected(element, listener);
+		return element;
 	};
 };
-R.disconnected = function(t, e) {
-	return e = G(e), function(r) {
-		return r.addEventListener(y, t, e), r[x] || N(e.signal, () => w.offDisconnected(r, t)) && w.onDisconnected(r, t), r;
+on.disconnected = function(listener, options) {
+	options = lifeOptions(options);
+	return function registerElement(element) {
+		element.addEventListener(evd, listener, options);
+		if (element[keyLTE]) return element;
+		const c = onAbort(options.signal, () => c_ch_o.offDisconnected(element, listener));
+		if (c) c_ch_o.onDisconnected(element, listener);
+		return element;
 	};
 };
-var j = /* @__PURE__ */ new WeakMap();
-R.disconnectedAsAbort = function(t) {
-	if (j.has(t))
-		return j.get(t);
-	let e = new AbortController();
-	return j.set(t, e), t(R.disconnected(() => e.abort())), e;
+var store_abort = /* @__PURE__ */ new WeakMap();
+on.disconnectedAsAbort = function(host) {
+	if (store_abort.has(host)) return store_abort.get(host);
+	const a = new AbortController();
+	store_abort.set(host, a);
+	host(on.disconnected(() => a.abort()));
+	return a;
 };
-var st = /* @__PURE__ */ new WeakSet();
-R.attributeChanged = function(t, e) {
-	return typeof e != "object" && (e = {}), function(r) {
-		if (r.addEventListener(D, t, e), r[x] || st.has(r) || !a.M)
-			return r;
-		let o = new a.M(function(f) {
-			for (let { attributeName: d, target: p } of f)
-				p.dispatchEvent(
-					new CustomEvent(D, { detail: [d, p.getAttribute(d)] })
+var els_attribute_store = /* @__PURE__ */ new WeakSet();
+on.attributeChanged = function(listener, options) {
+	if (typeof options !== "object")
+		options = {};
+	return function registerElement(element) {
+		element.addEventListener(eva, listener, options);
+		if (element[keyLTE] || els_attribute_store.has(element))
+			return element;
+		if (!enviroment.M) return element;
+		const observer = new enviroment.M(function(mutations) {
+			for (const { attributeName, target } of mutations)
+				target.dispatchEvent(
+					new CustomEvent(eva, { detail: [attributeName, target.getAttribute(attributeName)] })
 				);
 		});
-		return N(e.signal, () => o.disconnect()) && o.observe(r, { attributes: !0 }), r;
+		const c = onAbort(options.signal, () => observer.disconnect());
+		if (c) observer.observe(element, { attributes: true });
+		return element;
 	};
 };
 
 globalThis.dde= {
-	assign: O,
-	assignAttribute: z,
-	chainableAppend: Q,
-	classListDeclarative: Y,
-	createElement: k,
-	createElementNS: gt,
-	customElementRender: Dt,
-	customElementWithDDE: ct,
-	dispatchEvent: _t,
-	el: k,
-	elNS: gt,
-	elementAttribute: tt,
-	empty: vt,
-	lifecyclesToEvents: ct,
-	observedAttributes: it,
-	on: R,
-	registerReactivity: V,
-	scope: S,
-	simulateSlots: bt
+	assign,
+	assignAttribute,
+	chainableAppend,
+	classListDeclarative,
+	createElement,
+	createElementNS,
+	customElementRender,
+	customElementWithDDE: lifecyclesToEvents,
+	dispatchEvent,
+	el: createElement,
+	elNS: createElementNS,
+	elementAttribute,
+	empty,
+	lifecyclesToEvents,
+	observedAttributes: observedAttributes2,
+	on,
+	registerReactivity,
+	scope,
+	simulateSlots
 };
 
 })();

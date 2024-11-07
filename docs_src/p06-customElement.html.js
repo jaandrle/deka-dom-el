@@ -38,6 +38,11 @@ const references= {
 		title: t`MDN documentation page for Shadow DOM`,
 		href: "https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM",
 	},
+	/** Shallow DOM on mdn */
+	mdn_shadow_dom_slot: {
+		title: t`MDN documentation page for <slot>`,
+		href: "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/slot",
+	},
 	/** Shallow DOM */
 	shadow_dom_depth: {
 		title: t`Everything you need to know about Shadow DOM (github repo praveenpuglia/shadow-dom-in-depth)`,
@@ -50,7 +55,7 @@ export function page({ pkg, info }){
 	return el(simplePage, { info, pkg }).append(
 		el("h2", t`Using web components in combinantion with DDE`),
 		el("p").append(...T`
-			The DDE library allows for use within ${el("a", references.mdn_web_components).append( el("strong", "Web Components") )}
+			The DDE library allows for use within ${el("a", references.mdn_web_components).append( el("strong", t`Web Components`) )}
 			for dom-tree generation. However, in order to be able to use signals (possibly mapping to registered
 			${el("a", references.mdn_observedAttributes).append( el("code", "observedAttributes") )}) and additional
 			functionality is (unfortunately) required to use helpers provided by the library.
@@ -59,16 +64,21 @@ export function page({ pkg, info }){
 
 		el(h3, t`Custom Elements Introduction`),
 		el("p").append(...T`
+			Web Components, specifically Custom Elements, are a set of web platform APIs that allow you to create
+			new HTML tags with custom functionality encapsulated within them. This allows for the creation of reusable
+			components that can be used across web applications.
+		`),
+		el("p").append(...T`
 			To start with, let’s see how to use native Custom Elements. As starting point please read
-			${el("a", references.mdn_custom_elements).append( el("strong", "Using Custom Elements"), " on MDN" )}.
+			${el("a", references.mdn_custom_elements).append( el("strong", t`Using Custom Elements`), t` on MDN` )}.
 			To sum up and for mnemonic see following code overview:
 		`),
 		el(code, { src: fileURL("./components/examples/customElement/native-basic.js"), page_id }),
 		el("p").append(...T`
 			For more advanced use of Custom Elements, the summary ${el("a", references.custom_elements_tips)
-			.append( el("strong", t`Handy Custom Elements' Patterns`) )} may be useful. Especially pay attention to
+			.append( el("strong", t`Handy Custom Elements Patterns`) )} may be useful. Especially pay attention to
 			linking HTML attributes and defining setters/getters, this is very helpful to use in combination with
-			the library (${el("code", "el(HTMLCustomElement.tagName, { customAttribute: \"new-value\" });")}).
+			the library (${el("code", `el(HTMLCustomElement.tagName, { customAttribute: "${t`new-value`}" });`)}).
 		`),
 		el("p").append(...T`
 			Also see the Life Cycle Events sections, very similarly we would like to use
@@ -96,12 +106,38 @@ export function page({ pkg, info }){
 
 		el(h3, t`Shadow DOM`),
 		el("p").append(...T`
-			Regarding to ${el("code", "this.attachShadow({ mode: 'open' })")} see quick overview
-			${el("a", { textContent: t`Using Shadow DOM`, ...references.mdn_shadow_dom_depth })}. An another source of
-			information can be ${el("a", { textContent: t`Shadow DOM in Depth`, ...references.shadow_dom_depth })}. To
-			sum up, there in basic three ways to render component body:
+			Shadow DOM is a web platform feature that allows for the encapsulation of a component’s internal DOM tree
+			from the rest of the document. This means that styles and scripts applied to the document will not affect
+			the component’s internal DOM, and vice versa.
 		`),
 		el(example, { src: fileURL("./components/examples/customElement/shadowRoot.js"), page_id }),
+		el("p").append(...T`
+			Regarding to ${el("code", "this.attachShadow({ mode: 'open' })")} see quick overview
+			${el("a", { textContent: t`Using Shadow DOM`, ...references.mdn_shadow_dom_depth })}. An another source of
+			information can be ${el("a", { textContent: t`Shadow DOM in Depth`, ...references.shadow_dom_depth })}.
+		`),
+		el("p").append(...T`
+			Besides the encapsulation, the Shadow DOM allows for using the ${el("a", references.mdn_shadow_dom_slot).append(
+			el("strong", t`<slot>`), t` element(s)`)}. You can simulate this feature using ${el("code", "simulateSlots")}:
+		`),
+		el(example, { src: fileURL("./components/examples/customElement/simulateSlots.js"), page_id }),
+		el("p").append(...T`
+			To sum up:
+		`),
+		el("ul").append(
+			el("li").append(...T`
+				The use of shadow DOM to encapsulate the internal structure of the custom element, which affects how
+				the custom element can be styled and modified using JavaScript and CSS.
+			`),
+			el("li").append(...T`
+				The ability to access and modify the internal structure of the custom element using JavaScript, which
+				is affected by the use of shadow DOM and the mode of the shadow DOM.
+			`),
+			el("li").append(...T`
+				The use of slots to allow for the insertion of content from the parent document into the custom
+				element, which is affected by the use of shadow DOM and the mode of the shadow DOM.
+			`),
+		),
 
 		el(mnemonic)
 	);

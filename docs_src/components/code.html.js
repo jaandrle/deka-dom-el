@@ -14,7 +14,8 @@ ${host}{
 	--shiki-token-punctuation: var(--code);
 	--shiki-token-link: #EE0000;
 	white-space: pre;
-	tab-size: 2;${""/* TODO: allow custom tab size?! */}
+	${""/* TODO: allow custom tab size?! */}
+	tab-size: 2;
 	overflow: scroll;
 }
 ${host}[data-js=todo]{

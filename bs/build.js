@@ -17,7 +17,7 @@ $.api("", true)
 			"npx esbuild '::file::'",
 			"--platform=neutral",
 			"--bundle",
-			minify==="full" ? "--minify" : "--minify-syntax --minify-identifiers",
+			//minify==="full" ? "--minify" : "--minify-syntax --minify-identifiers",
 			"--legal-comments=inline",
 			"--packages=external",
 			"--outfile='::out::'"

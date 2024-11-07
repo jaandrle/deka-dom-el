@@ -67,18 +67,23 @@ export function createElement(tag, attributes, ...addons){
 }
 import { hasOwn } from "./helpers.js";
 /** @param {HTMLElement} element @param {HTMLElement} [root] */
-export function simulateSlots(element, root= element, mapper= undefined){
+export function simulateSlots(element, root, mapper){
+	if(typeof root!=="object"){
+		mapper= root;
+		root= element;
+	}
 	const _default= Symbol.for("default");
 	const slots= Array.from(root.querySelectorAll("slot"))
 		.reduce((out, curr)=> Reflect.set(out, curr.name || _default, curr) && out, {});
 	const has_d= hasOwn(slots, _default);
 	element.append= new Proxy(element.append, {
 		apply(orig, _, els){
+			if(els[0]===root) return orig.apply(element, els);
 			if(!els.length) return element;
 
 			const d= env.D.createDocumentFragment();
 			for(const el of els){
-				if(!el || !el.slot){ if(has_d) d.appendChild(el); continue; }
+				if(!el || !el.slot){ if(has_d) d.append(el); continue; }
 				const name= el.slot;
 				const slot= slots[name];
 				elementAttribute(el, "remove", "slot");
