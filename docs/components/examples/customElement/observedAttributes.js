@@ -2,7 +2,7 @@ import {
 	customElementRender,
 	customElementWithDDE,
 	observedAttributes,
-	el, on, scope
+	el, on, scope,
 } from "deka-dom-el";
 import { S } from "deka-dom-el/signals";
 export class HTMLCustomElement extends HTMLElement{
@@ -24,7 +24,7 @@ export class HTMLCustomElement extends HTMLElement{
 /** @param {{ attr: ddeSignal<string, {}> }} props */
 function ddeComponent({ attr }){
 	scope.host(
-		on.connected(e=> console.log(e.target.outerHTML)),
+		on.connected(e=> console.log(( /** @type {HTMLParagraphElement} */ (e.target)).outerHTML)),
 	);
 	return el().append(
 		el("p", S(()=> `Hello from Custom Element with attribute '${attr()}'`))
