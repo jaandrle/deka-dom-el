@@ -145,16 +145,14 @@ main > *{
 	--shiki-token-punctuation: var(--code);
 	--shiki-token-link: #EE0000;
 	white-space: pre;
-	
-	tab-size: 2;
+	tab-size: 2; /* TODO: allow custom tab size?! */
 	overflow: scroll;
 }
 .code[data-js=todo]{
 	border: 1px solid var(--border);
 	border-radius: var(--standard-border-radius);
 	margin-bottom: 1rem;
-	
-	margin-top: 18.4px;
+	margin-top: 18.4px; /* to fix shift when → dataJS=done */
 	padding: 1rem 1.4rem;
 }
 .example{
