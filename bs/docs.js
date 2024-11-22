@@ -2,13 +2,13 @@
 /* jshint esversion: 11,-W097, -W040, module: true, node: true, expr: true, undef: true *//* global echo, $, pipe, s, fetch, cyclicLoop */
 echo("Building static documentation files…");
 echo("Preparing…");
-import { path_target, pages as pages_registered, styles, dispatchEvent, t } from "../docs_src/ssr.js";
+import { path_target, pages as pages_registered, styles, dispatchEvent, t } from "../docs/ssr.js";
 import { createHTMl } from "./docs/jsdom.js";
 import { register } from "../jsdom.js";
 const pkg= s.cat("package.json").xargs(JSON.parse);
 
 echo("Collecting list of pages…");
-const pages= s.ls($.xdg.main`../docs_src/*.html.js`).map(addPage);
+const pages= s.ls($.xdg.main`../docs/*.html.js`).map(addPage);
 for(const { id, info } of pages){
 	echo(`Generating ${id}.html…`);
 	const serverDOM= createHTMl("");
@@ -16,7 +16,7 @@ for(const { id, info } of pages){
 		"HTMLScriptElement"
 	);
 	const { el }= await register(serverDOM.dom);
-	const { page }= await import(`../docs_src/${id}.html.js`);
+	const { page }= await import(`../docs/${id}.html.js`);
 	serverDOM.document.body.append(
 		el(page, { pkg, info }),
 	);
