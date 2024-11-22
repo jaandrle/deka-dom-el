@@ -1,4 +1,9 @@
 import { style, el, S } from './exports.js';
+style.css`
+:root{
+	color-scheme: dark light;
+}
+`;
 document.head.append(style.element);
 import { fullNameComponent } from './components/fullNameComponent.js';
 import { todosComponent } from './components/todosComponent.js';

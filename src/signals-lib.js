@@ -21,7 +21,7 @@ export function signal(value, actions){
 	if(typeof value!=="function")
 		return create(false, value, actions);
 	if(isSignal(value)) return value;
-	
+
 	const out= create(true);
 	const contextReWatch= function(){
 		const [ origin, ...deps_old ]= deps.get(contextReWatch);
@@ -77,11 +77,11 @@ signal.clear= function(...signals){
 		o.listeners.forEach(l=> {
 			o.listeners.delete(l);
 			if(!deps.has(l)) return;
-			
+
 			const ls= deps.get(l);
 			ls.delete(s);
 			if(ls.size>1) return;
-			
+
 			s.clear(...ls);
 			deps.delete(l);
 		});

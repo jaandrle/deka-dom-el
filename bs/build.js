@@ -34,7 +34,7 @@ $.api("", true)
 		const file_dts_out= filesOut(file_dts);
 		echoVariant(file_dts_out);
 		s.echo(bundleDTS(file_dts)).to(file_dts_out);
-		
+
 		await toDDE(out, file_root);
 	}
 	$.exit(0);
@@ -43,10 +43,13 @@ $.api("", true)
 		const name= "dde";
 		const out= filesOut(file_root+".js", name);
 		echoVariant(`${out} (${file} → globalThis.${name})`)
-		
+
 		let content= s.cat(file).toString().split(/export ?{/);
 		content.splice(1, 0, `\nglobalThis.${name}= {`);
-		content[2]= content[2].replace(/,(?!\n)/g, ",\n").replace(/(?<!\n)}/, "\n}").replace(/^(\t*)(.*) as ([^,\n]*)(,?)$/mg, "$1$3: $2$4");
+		content[2]= content[2]
+			.replace(/,(?!\n)/g, ",\n")
+			.replace(/(?<!\n)}/, "\n}")
+			.replace(/^(\t*)(.*) as ([^,\n]*)(,?)$/mg, "$1$3: $2$4");
 		s.echo([
 			`//deka-dom-el library is available via global namespace \`${name}\``,
 			"(()=> {",

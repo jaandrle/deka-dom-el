@@ -27,7 +27,7 @@ export function page({ pkg, info }){
 	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
 		el("p", t`The library tries to provide pure JavaScript tool(s) to create reactive interfaces using …`),
-		
+
 		el(h3, t`Event-driven programming (3 parts separation ≡ 3PS)`),
 		el("p").append(t`
 			Let's introduce the basic principle on which the library is built. We'll use the JavaScript listener as
@@ -56,7 +56,7 @@ export function page({ pkg, info }){
 			describe usage in specific situations, see for example ${el("a", { textContent: t`MVVM`, ...references.w_mvv })}
 			or ${el("a", { textContent: t`MVC`, ...references.w_mvc })}.
 		`),
-		
+
 		el(h3, t`Organization of the documentation`),
 	);
 }

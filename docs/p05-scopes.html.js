@@ -36,7 +36,7 @@ export function page({ pkg, info }){
 		`),
 		el(code, { src: fileURL("./components/examples/scopes/intro.js"), page_id }),
 		el("p").append(...T`The library therefore use ${el("em", t`scopes`)} to provide these functionalities.`),
-		
+
 		el(h3, t`Scopes and hosts`),
 		el("p").append(...T`
 			The ${el("strong", "host")} is the name for the element representing the component. This is typically

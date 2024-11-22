@@ -29,7 +29,7 @@ const references= {
 	},
 	/** Custom Element lifecycle callbacks */
 	mdn_customElement: {
-		href: "https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#custom_element_lifecycle_callbacks" 
+		href: "https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#custom_element_lifecycle_callbacks" // editorconfig-checker-disable-line
 	},
 	/** MutationObserver */
 	mdn_mutation: {
@@ -50,9 +50,9 @@ export function page({ pkg, info }){
 			We quickly introduce helper to listening to the native DOM events. And library syntax/pattern so-called
 			${el("em", t`Addon`)} to incorporate not only this in UI templates declaratively.
 		`),
-		
+
 		el(code, { src: fileURL("./components/examples/events/intro.js"), page_id }),
-		
+
 		el(h3, t`Events and listenners`),
 		el("p").append(...T`
 			In JavaScript you can listen to the native DOM events of the given element by using
@@ -105,17 +105,20 @@ export function page({ pkg, info }){
 		`),
 		el("p").append(...T`
 			The library provide three additional live-cycle events corresponding to how they are named in a case of
-			custom elements: ${el("code", "on.connected")}, ${el("code", "on.disconnected")} and ${el("code", "on.attributeChanged")}.
+			custom elements: ${el("code", "on.connected")}, ${el("code", "on.disconnected")} and ${el("code",
+			"on.attributeChanged")}.
 		`),
 		el(example, { src: fileURL("./components/examples/events/live-cycle.js"), page_id }),
 		el("p").append(...T`
 			For Custom elements, we will later introduce a way to replace ${el("code", "*Callback")} syntax with
 			${el("code", "dde:*")} events. The ${el("code", "on.*")} functions then listen to the appropriate
-			Custom Elements events (see ${el("a", { textContent: t`Custom element lifecycle callbacks | MDN`, ...references.mdn_customElement })}).
+			Custom Elements events (see ${el("a", { textContent: t`Custom element lifecycle callbacks | MDN`,
+			...references.mdn_customElement })}).
 		`),
 		el("p").append(...T`
-			But, in case of regular elemnets the ${el("a", references.mdn_mutation).append(el("code", "MutationObserver"), " | MDN")}
-			is internaly used to track these events. Therefore, there are some drawbacks:
+			But, in case of regular elemnets the ${el("a", references.mdn_mutation).append(el("code",
+			"MutationObserver"), " | MDN")} is internaly used to track these events. Therefore, there are some
+			drawbacks:
 		`),
 		el("ul").append(
 			el("li").append(...T`
@@ -136,14 +139,15 @@ export function page({ pkg, info }){
 			native behaviour re-(dis)connecting element, use:
 		`),
 		el("ul").append(
-			el("li").append(...T`custom ${el("code", "MutationObserver")} or logic in (dis)${el("code", "connectedCallback")} or…`),
+			el("li").append(...T`custom ${el("code", "MutationObserver")} or logic in (dis)${el("code",
+			"connectedCallback")} or…`),
 			el("li").append(...T`re-add ${el("code", "on.connected")} or ${el("code", "on.disconnected")} listeners.`)
 		),
 
 		el(h3, t`Final notes`),
 		el("p", t`The library also provides a method to dispatch the events.`),
 		el(example, { src: fileURL("./components/examples/events/compareDispatch.js"), page_id }),
-		
+
 		el(mnemonic)
 	);
 }

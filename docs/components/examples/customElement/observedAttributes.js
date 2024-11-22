@@ -2,7 +2,7 @@ import {
 	customElementRender,
 	customElementWithDDE,
 	observedAttributes,
-	el, on, scope 
+	el, on, scope
 } from "deka-dom-el";
 import { S } from "deka-dom-el/signals";
 export class HTMLCustomElement extends HTMLElement{

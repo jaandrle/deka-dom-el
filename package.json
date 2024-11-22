@@ -83,9 +83,7 @@
 	"modifyEsbuildConfig": {
 		"platform": "browser"
 	},
-	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1"
-	},
+	"scripts": {},
 	"keywords": [
 		"dom",
 		"javascript",
@@ -95,6 +93,7 @@
 	"devDependencies": {
 		"@size-limit/preset-small-lib": "~11.0",
 		"dts-bundler": "~0.1",
+		"editorconfig-checker": "~6.0",
 		"esbuild": "~0.24",
 		"jsdom": "~25.0",
 		"jshint": "~2.13",

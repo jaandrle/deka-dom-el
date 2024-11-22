@@ -10,13 +10,13 @@ const scopes= [ {
 export const scope= {
 	get current(){ return scopes[scopes.length-1]; },
 	get host(){ return this.current.host; },
-	
+
 	preventDefault(){
 		const { current }= this;
 		current.prevent= true;
 		return current;
 	},
-	
+
 	get state(){ return [ ...scopes ]; },
 	push(s= {}){ return scopes.push(Object.assign({}, this.current, { prevent: false }, s)); },
 	pushRoot(){ return scopes.push(scopes[0]); },
@@ -25,9 +25,11 @@ export const scope= {
 		return scopes.pop();
 	},
 };
-// following chainableAppend implementation is OK as the ElementPrototype.append description already is { writable: true, enumerable: true, configurable: true }
+// following chainableAppend implementation is OK as the ElementPrototype.append description already is { writable: true, enumerable: true, configurable: true } // editorconfig-checker-disable-line
 function append(...els){ this.appendOriginal(...els); return this; }
-export function chainableAppend(el){ if(el.append===append) return el; el.appendOriginal= el.append; el.append= append; return el; }
+export function chainableAppend(el){
+	if(el.append===append) return el; el.appendOriginal= el.append; el.append= append; return el;
+}
 let namespace;
 export function createElement(tag, attributes, ...addons){
 	/* jshint maxcomplexity: 15 */
@@ -40,7 +42,9 @@ export function createElement(tag, attributes, ...addons){
 	switch(true){
 		case typeof tag==="function": {
 			scoped= 1;
-			scope.push({ scope: tag, host: (...c)=> c.length ? (scoped===1 ? addons.unshift(...c) : c.forEach(c=> c(el_host)), undefined) : el_host });
+			const host= (...c)=> !c.length ? el_host :
+				(scoped===1 ? addons.unshift(...c) : c.forEach(c=> c(el_host)), undefined);
+			scope.push({ scope: tag, host });
 			el= tag(attributes || undefined);
 			const is_fragment= el instanceof env.F;
 			if(el.nodeName==="#comment") break;
@@ -108,7 +112,9 @@ export function simulateSlots(element, root, mapper){
 }
 function simulateSlotReplace(slot, element, mapper){
 	if(mapper) mapper(slot, element);
-	try{ slot.replaceWith(assign(element, { className: [ element.className, slot.className ], dataset: { ...slot.dataset } })); }
+	try{ slot.replaceWith(assign(element, {
+		className: [ element.className, slot.className ],
+		dataset: { ...slot.dataset } })); }
 	catch(_){ slot.replaceWith(element); }
 }
 /**
@@ -141,7 +147,7 @@ const { setDeleteAttr }= env;
 export function assign(element, ...attributes){
 	if(!attributes.length) return element;
 	assign_context.set(element, assignContext(element, this));
-	
+
 	for(const [ key, value ] of Object.entries(Object.assign({}, ...attributes)))
 		assignAttribute.call(this, element, key, value);
 	assign_context.delete(element);
@@ -150,7 +156,7 @@ export function assign(element, ...attributes){
 export function assignAttribute(element, key, value){
 	const { setRemoveAttr, s }= assignContext(element, this);
 	const _this= this;
-	
+
 	value= s.processReactiveAttribute(element, key, value,
 		(key, value)=> assignAttribute.call(_this, element, key, value));
 	const [ k ]= key;
@@ -216,7 +222,9 @@ function getPropDescriptor(p, key){
 	return des;
 }
 
-/** @template {Record<any, any>} T @param {object} s @param {T} obj @param {(param: [ keyof T, T[keyof T] ])=> void} cb */
+/**
+ * @template {Record<any, any>} T @param {object} s @param {T} obj @param {(param: [ keyof T, T[keyof T] ])=> void} cb
+ * */
 function forEachEntries(s, obj, cb){
 	if(typeof obj !== "object" || obj===null) return;
 	return Object.entries(obj).forEach(function process([ key, val ]){
@@ -227,6 +235,9 @@ function forEachEntries(s, obj, cb){
 }
 
 function attrArrToStr(attr){ return Array.isArray(attr) ? attr.filter(Boolean).join(" ") : attr; }
-function setRemove(obj, prop, key, val){ return obj[ (isUndef(val) ? "remove" : "set") + prop ](key, attrArrToStr(val)); }
-function setRemoveNS(obj, prop, key, val, ns= null){ return obj[ (isUndef(val) ? "remove" : "set") + prop + "NS" ](ns, key, attrArrToStr(val)); }
-function setDelete(obj, key, val){ Reflect.set(obj, key, val); if(!isUndef(val)) return; return Reflect.deleteProperty(obj, key); }
+function setRemove(obj, prop, key, val){
+	return obj[ (isUndef(val) ? "remove" : "set") + prop ](key, attrArrToStr(val)); }
+function setRemoveNS(obj, prop, key, val, ns= null){
+	return obj[ (isUndef(val) ? "remove" : "set") + prop + "NS" ](ns, key, attrArrToStr(val)); }
+function setDelete(obj, key, val){
+	Reflect.set(obj, key, val); if(!isUndef(val)) return; return Reflect.deleteProperty(obj, key); }

@@ -23,7 +23,7 @@ function component(){
 	 *	const data= O("data");
 	 *	ul.append(el("li", data));
 	 * });
-	 * 
+	 *
 	 * // THE HOST IS PROBABLY DIFFERENT THAN
 	 * // YOU EXPECT AND OBSERVABLES MAY BE
 	 * // UNEXPECTEDLY REMOVED!!!

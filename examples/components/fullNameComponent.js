@@ -15,6 +15,7 @@ export function fullNameComponent(){
 		on.disconnected(()=> console.log(fullNameComponent))
 	);
 
+	const style= { height: "80px", display: "block", fill: "currentColor" };
 	const elSVG= elNS("http://www.w3.org/2000/svg");
 	return el("div", { className }).append(
 		el("h2", "Simple form:"),
@@ -29,7 +30,7 @@ export function fullNameComponent(){
 			": ",
 			el("#text", full_name)
 		),
-		elSVG("svg", { viewBox: "0 0 240 80", style: { height: "80px", display: "block" } }).append(
+		elSVG("svg", { viewBox: "0 0 240 80", style }).append(
 			//elSVG("style", {  })
 			elSVG("text", { x: 20, y: 35, textContent: "Text" }),
 		)
