@@ -7,6 +7,13 @@ import { createHTMl } from "./docs/jsdom.js";
 import { register } from "../jsdom.js";
 const pkg= s.cat("package.json").xargs(JSON.parse);
 
+if(s.test("-d", path_target.root)){
+	echo("Removing old files…");
+	s.rm("-rf", path_target.root+"*");
+} else {
+	echo("Creating directory…");
+	s.mkdir("-p", path_target.root);
+}
 echo("Collecting list of pages…");
 const pages= s.ls($.xdg.main`../docs/*.html.js`).map(addPage);
 for(const { id, info } of pages){
