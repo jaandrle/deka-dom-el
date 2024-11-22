@@ -1,3 +1,4 @@
+export { t } from "./utils/index.js";
 export const path_target= {
 	root: "docs/",
 	css: "docs/"

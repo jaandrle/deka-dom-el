@@ -47,7 +47,7 @@ type ExtendedHTMLElementTagNameMap= HTMLElementTagNameMap & CustomElementTagName
 type textContent= string | ddeSignal<string>;
 export function el<
 	TAG extends keyof ExtendedHTMLElementTagNameMap,
-	EL extends (TAG extends keyof ExtendedHTMLElementTagNameMap ? ExtendedHTMLElementTagNameMap[TAG] : HTMLElement)
+	EL extends ExtendedHTMLElementTagNameMap[TAG]
 >(
 	tag_name: TAG,
 	attrs?: ElementAttributes<EL> | textContent,
@@ -58,7 +58,7 @@ export function el(
 ): ddeDocumentFragment
 export function el(
 	tag_name: string,
-	attrs?: ElementAttributes<HTMLElement>,
+	attrs?: ElementAttributes<HTMLElement> | textContent,
 	...addons: ddeElementAddon<HTMLElement>[]
 ): ddeHTMLElement
 
@@ -101,7 +101,18 @@ export function elNS(
 export { elNS as createElementNS }
 
 export function chainableAppend<EL extends SupportedElement>(el: EL): EL;
-export function simulateSlots<EL extends SupportedElement | DocumentFragment>(el: EL): EL
+/**
+ * Mapper function (optional). Pass for coppying attributes, this is NOT implemented by {@link simulateSlots} itself!
+ * */
+type simulateSlotsMapper= (body: HTMLSlotElement, el: HTMLElement)=> void;
+/** Simulate slots for ddeComponents */
+export function simulateSlots<EL extends SupportedElement | DocumentFragment>(root: EL, mapper?: simulateSlotsMapper): EL
+/**
+ * Simulate slots in Custom Elements without using `shadowRoot`.
+ * @param el Custom Element root element
+ * @param body Body of the custom element
+ * */
+export function simulateSlots<EL extends SupportedElement | DocumentFragment>(el: HTMLElement, body: EL, mapper?: simulateSlotsMapper): EL
 
 export function dispatchEvent(name: keyof DocumentEventMap | string, options?: EventInit):
 	(element: SupportedElement, data?: any)=> void;
@@ -177,12 +188,12 @@ export const scope: {
 
 export function customElementRender<
 	EL extends HTMLElement,
-	P extends any = Record<string, any>
+	P extends any = Record<string, string | ddeSignal<string>>
 >(
 	custom_element: EL,
 	target: ShadowRoot | EL,
 	render: (props: P)=> SupportedElement | DocumentFragment,
-	props?: P | ((...args: any[])=> P)
+	props?: P | ((el: EL)=> P)
 ): EL
 export function customElementWithDDE<EL extends (new ()=> HTMLElement)>(custom_element: EL): EL
 export function lifecyclesToEvents<EL extends (new ()=> HTMLElement)>(custom_element: EL): EL
@@ -523,7 +534,7 @@ interface signal{
 	 * */
 	el<S extends any>(signal: Signal<S, any>, el: (v: S)=> Element | Element[] | DocumentFragment): DocumentFragment;
 
-    observedAttributes(custom_element: HTMLElement): Record<string, Signal<any, any>>;
+    observedAttributes(custom_element: HTMLElement): Record<string, Signal<string, {}>>;
 }
 export const signal: signal;
 export const S: signal;

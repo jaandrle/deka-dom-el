@@ -7,7 +7,7 @@ const css= echo.css`
 `;
 
 $.api("", true)
-.option("--minify", "Level of minification [ full, partial (default) ]")
+.option("--minify", "Level of minification [ no, full, partial (default) ]")
 .action(async function main({ minify= "partial" }){
 	for(const file_root of files){
 		const file= file_root+".js";
@@ -17,11 +17,11 @@ $.api("", true)
 			"npx esbuild '::file::'",
 			"--platform=neutral",
 			"--bundle",
-			minify==="full" ? "--minify" : "--minify-syntax --minify-identifiers",
+			minifyOption(minify),
 			"--legal-comments=inline",
 			"--packages=external",
 			"--outfile='::out::'"
-		].join(" "), { file, out });
+		].filter(Boolean).join(" "), { file, out });
 		if(esbuild_output.code)
 			return $.exit(esbuild_output.code, echo(esbuild_output.stderr));
 		echoVariant(esbuild_output.stderr.split("\n")[1].trim()+ " (esbuild)");
@@ -57,6 +57,12 @@ $.api("", true)
 })
 .parse();
 
+/** @param {"no"|"full"|"partial"} level */
+function minifyOption(level= "partial"){
+	if("no"===level) return undefined;
+	if("full"===level) return "--minify";
+	return "--minify-syntax --minify-identifiers";
+}
 function echoVariant(name){
 	return echo("%c✓ "+name, css.info+css);
 }
