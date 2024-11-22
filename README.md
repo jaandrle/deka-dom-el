@@ -1,4 +1,6 @@
-**WIP** (the experimentation phase) | [source code on GitHub](https://github.com/jaandrle/deka-dom-el) | [*mirrored* on Gitea](https://gitea.jaandrle.cz/jaandrle/deka-dom-el)
+**WIP** (the experimentation phase)
+| [source code on GitHub](https://github.com/jaandrle/deka-dom-el)
+| [*mirrored* on Gitea](https://gitea.jaandrle.cz/jaandrle/deka-dom-el)
 
 ***Vanilla for flavouring — a full-fledged feast for large projects***
 
@@ -10,11 +12,14 @@ document.body.append(
 	el("p", "See some syntax examples here:"),
 	el("ul").append(
 		el("li").append(
-			el("a", { textContent: "Link to the library repo", title: "Deka DOM El — GitHub", href: "https://github.com/jaandrle/deka-dom-el" })
+			el("a", { textContent: "Link to the library repo",
+				title: "Deka DOM El — GitHub",
+				href: "https://github.com/jaandrle/deka-dom-el" })
 		),
 		el("li").append(
 			"Use extended Vanilla JavaScript DOM/IDL API: ",
-			el("span", { textContent: "» this is a span with class=cN and data-a=A, data-b=B «", className: "cN", dataset: { a: "A", b: "B" } })
+			el("span", { textContent: "» this is a span with class=cN and data-a=A, data-b=B «",
+				className: "cN", dataset: { a: "A", b: "B" } })
 		),
 		el("li").append(
 			el(component, { textContent: "A component", className: "example" }, on("change", console.log))
@@ -35,18 +40,22 @@ function component({ textContent, className }){
 }
 ```
 # Deka DOM Elements
-Creating reactive elements, components and Web components using [IDL](https://developer.mozilla.org/en-US/docs/Glossary/IDL)/JavaScript DOM API and [**signals/observables**](#signals).
+Creating reactive elements, components and Web components using [IDL](https://developer.mozilla.org/en-US/docs/
+Glossary/IDL)/JavaScript DOM API and [**signals/observables**](#signals).
 
 ## Inspiration and suggested alternatives
-- my previous library (mostly used internaly): [jaandrle/dollar_dom_component: Functional DOM components without JSX and virtual DOM.](https://github.com/jaandrle/dollar_dom_component)
-- [vanjs-org/van: 🍦 VanJS: World's smallest reactive UI framework. Incredibly Powerful, Insanely Small - Everyone can build a useful UI app in an hour.](https://github.com/vanjs-org/van)
+- my previous library (mostly used internaly): [jaandrle/dollar_dom_component: Functional DOM components without
+JSX and virtual DOM.](https://github.com/jaandrle/dollar_dom_component)
+- [vanjs-org/van: 🍦 VanJS: World's smallest reactive UI framework. Incredibly Powerful, Insanely Small -
+Everyone can build a useful UI app in an hour.](https://github.com/vanjs-org/van)
 - [hyperhype/hyperscript: Create HyperText with JavaScript.](https://github.com/hyperhype/hyperscript)
-- [adamhaile/S: S.js - Simple, Clean, Fast Reactive Programming in Javascript](https://github.com/adamhaile/S) ([adamhaile/surplus: High performance JSX web views for S.js applications](https://github.com/adamhaile/surplus))
+- [adamhaile/S: S.js - Simple, Clean, Fast Reactive Programming in Javascript](https://github.com/adamhaile/S)
+([adamhaile/surplus: High performance JSX web views for S.js applications](https://github.com/adamhaile/surplus))
 - [potch/signals: a small reactive signals library](https://github.com/potch/signals)
 
 ## Why an another one?
-This library falls somewhere between van/hyperscript and [solid-js](https://github.com/solidjs/solid) in terms of size, complexity,
-and usability.
+This library falls somewhere between van/hyperscript and [solid-js](https://github.com/solidjs/solid) in terms of size,
+complexity, and usability.
 
 Another goal is to proceed in the best spirit of functional programming. This involves starting with
 pure JavaScript (DOM API) and gradually adding auxiliary functions, ranging from “minor” improvements
@@ -74,7 +83,10 @@ To balance these requirements, numerous compromises have been made. To summarize
 	- [dist/](dist/) (`https://cdn.jsdelivr.net/gh/jaandrle/deka-dom-el/dist/`…)
 
 ## Signals
-- [Signals — whats going on behind the scenes | by Ryan Hoffnan | ITNEXT](https://itnext.io/signals-whats-going-on-behind-the-scenes-ec858589ea63)
-- [The Evolution of Signals in JavaScript - DEV Community](https://dev.to/this-is-learning/the-evolution-of-signals-in-javascript-8ob)
-- there is also [tc39/proposal-signals: A proposal to add signals to JavaScript.](https://github.com/tc39/proposal-signals)
+- [Signals — whats going on behind the scenes | by Ryan Hoffnan | ITNEXT](https://itnext.io/
+signals-whats-going-on-behind-the-scenes-ec858589ea63)
+- [The Evolution of Signals in JavaScript - DEV Community](https://dev.to/this-is-learning/the-evolution-of-signals-in-
+javascript-8ob)
+- there is also [tc39/proposal-signals: A proposal to add signals to JavaScript.](https://github.com/tc39/proposal-
+signals)
 - [Observer pattern - Wikipedia](https://en.wikipedia.org/wiki/Observer_pattern)

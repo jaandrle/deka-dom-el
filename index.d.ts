@@ -2,10 +2,10 @@ declare global{ /* ddeSignal */ }
 
 type CustomElementTagNameMap= { '#text': Text, '#comment': Comment }
 type SupportedElement=
-	  HTMLElementTagNameMap[keyof HTMLElementTagNameMap]
-	| SVGElementTagNameMap[keyof SVGElementTagNameMap]
-	| MathMLElementTagNameMap[keyof MathMLElementTagNameMap]
-	| CustomElementTagNameMap[keyof CustomElementTagNameMap]
+		HTMLElementTagNameMap[keyof HTMLElementTagNameMap]
+	|	SVGElementTagNameMap[keyof SVGElementTagNameMap]
+	|	MathMLElementTagNameMap[keyof MathMLElementTagNameMap]
+	|	CustomElementTagNameMap[keyof CustomElementTagNameMap]
 declare global {
 	type ddeComponentAttributes= Record<any, any> | undefined;
 	type ddeElementAddon<El extends SupportedElement | DocumentFragment>= (element: El)=> El | void;
@@ -15,9 +15,12 @@ type AttrsModified= {
 	/**
 	 * Use string like in HTML (internally uses `*.setAttribute("style", *)`), or object representation (like DOM API).
 	 */
-	style: string | Partial<CSSStyleDeclaration> | ddeSignal<string> | Partial<{ [K in keyof CSSStyleDeclaration]: ddeSignal<CSSStyleDeclaration[K]> }>
+	style: string | Partial<CSSStyleDeclaration> | ddeSignal<string>
+		| Partial<{ [K in keyof CSSStyleDeclaration]: ddeSignal<CSSStyleDeclaration[K]> }>
 	/**
-	 * Provide option to add/remove/toggle CSS clasess (index of object) using 1/0/-1. In fact `el.classList.toggle(class_name)` for `-1` and `el.classList.toggle(class_name, Boolean(...))` for others.
+	 * Provide option to add/remove/toggle CSS clasess (index of object) using 1/0/-1.
+	 * In fact `el.classList.toggle(class_name)` for `-1` and `el.classList.toggle(class_name, Boolean(...))`
+	 * for others.
 	 */
 	classList: Record<string,-1|0|1|boolean|ddeSignal<-1|0|1|boolean>>,
 	/**
@@ -28,20 +31,32 @@ type AttrsModified= {
 	 * Sets `aria-*` simiraly to `dataset`
 	 * */
 	ariaset: Record<string,string|ddeSignal<string>>,
-} & Record<`=${string}` | `data${PascalCase}` | `aria${PascalCase}`, string|ddeSignal<string>> & Record<`.${string}`, any>
+}	& Record<`=${string}` | `data${PascalCase}` | `aria${PascalCase}`, string|ddeSignal<string>>
+	& Record<`.${string}`, any>
 type _fromElsInterfaces<EL extends SupportedElement>= Omit<EL, keyof AttrsModified>;
 /**
  * Just element attributtes
  *
- * In most cases, you can use native propertie such as [MDN WEB/API/Element](https://developer.mozilla.org/en-US/docs/Web/API/Element) and so on (e.g. [`Text`](https://developer.mozilla.org/en-US/docs/Web/API/Text)).
+ * In most cases, you can use native propertie such as
+ * [MDN WEB/API/Element](https://developer.mozilla.org/en-US/docs/Web/API/Element) and so on
+ * (e.g. [`Text`](https://developer.mozilla.org/en-US/docs/Web/API/Text)).
  *
  * There is added support for `data[A-Z].*`/`aria[A-Z].*` to be converted to the kebab-case alternatives.
  * @private
  */
-type ElementAttributes<T extends SupportedElement>= Partial<{ [K in keyof _fromElsInterfaces<T>]: _fromElsInterfaces<T>[K] | ddeSignal<_fromElsInterfaces<T>[K]> } & AttrsModified> & Record<string, any>;
-export function classListDeclarative<El extends SupportedElement>(element: El, classList: AttrsModified["classList"]): El
+type ElementAttributes<T extends SupportedElement>= Partial<{
+	[K in keyof _fromElsInterfaces<T>]: _fromElsInterfaces<T>[K] | ddeSignal<_fromElsInterfaces<T>[K]>
+} & AttrsModified> & Record<string, any>;
+export function classListDeclarative<El extends SupportedElement>(
+	element: El,
+	classList: AttrsModified["classList"]
+): El
 export function assign<El extends SupportedElement>(element: El, ...attrs_array: ElementAttributes<El>[]): El
-export function assignAttribute<El extends SupportedElement, ATT extends keyof ElementAttributes<El>>(element: El, attr: ATT, value: ElementAttributes<El>[ATT]): ElementAttributes<El>[ATT]
+export function assignAttribute<El extends SupportedElement, ATT extends keyof ElementAttributes<El>>(
+	element: El,
+	attr: ATT,
+	value: ElementAttributes<El>[ATT]
+): ElementAttributes<El>[ATT]
 
 type ExtendedHTMLElementTagNameMap= HTMLElementTagNameMap & CustomElementTagNameMap;
 type textContent= string | ddeSignal<string>;
@@ -68,7 +83,9 @@ export function el<
 	component: C,
 	attrs?: Parameters<C>[0] | textContent,
 	...addons: ddeElementAddon<ReturnType<C>>[]
-): ReturnType<C> extends ddeHTMLElementTagNameMap[keyof ddeHTMLElementTagNameMap] ? ReturnType<C> : ( ReturnType<C> extends ddeDocumentFragment ? ReturnType<C> : ddeHTMLElement )
+): ReturnType<C> extends ddeHTMLElementTagNameMap[keyof ddeHTMLElementTagNameMap]
+	? ReturnType<C>
+	: ( ReturnType<C> extends ddeDocumentFragment ? ReturnType<C> : ddeHTMLElement )
 export { el as createElement }
 
 export function elNS(
@@ -88,7 +105,9 @@ export function elNS(
 	EL extends ( TAG extends keyof MathMLElementTagNameMap ? MathMLElementTagNameMap[TAG] : MathMLElement ),
 >(
 	tag_name: TAG,
-	attrs?: string | textContent | Partial<{ [key in keyof EL]: EL[key] | ddeSignal<EL[key]> | string | number | boolean }>,
+	attrs?: string | textContent | Partial<{
+		[key in keyof EL]: EL[key] | ddeSignal<EL[key]> | string | number | boolean
+	}>,
 	...addons: ddeElementAddon<EL>[]
 )=> ddeMathMLElement
 export function elNS(
@@ -106,18 +125,27 @@ export function chainableAppend<EL extends SupportedElement>(el: EL): EL;
  * */
 type simulateSlotsMapper= (body: HTMLSlotElement, el: HTMLElement)=> void;
 /** Simulate slots for ddeComponents */
-export function simulateSlots<EL extends SupportedElement | DocumentFragment>(root: EL, mapper?: simulateSlotsMapper): EL
+export function simulateSlots<EL extends SupportedElement | DocumentFragment>(
+	root: EL,
+	mapper?: simulateSlotsMapper
+): EL
 /**
  * Simulate slots in Custom Elements without using `shadowRoot`.
  * @param el Custom Element root element
  * @param body Body of the custom element
  * */
-export function simulateSlots<EL extends SupportedElement | DocumentFragment>(el: HTMLElement, body: EL, mapper?: simulateSlotsMapper): EL
+export function simulateSlots<EL extends SupportedElement | DocumentFragment>(
+	el: HTMLElement,
+	body: EL, mapper?: simulateSlotsMapper
+): EL
 
 export function dispatchEvent(name: keyof DocumentEventMap | string, options?: EventInit):
 	(element: SupportedElement, data?: any)=> void;
-export function dispatchEvent(name: keyof DocumentEventMap | string, options: EventInit | null, element: SupportedElement | (()=> SupportedElement)):
-	(data?: any)=> void;
+export function dispatchEvent(
+	name: keyof DocumentEventMap | string,
+	options: EventInit | null,
+	element: SupportedElement | (()=> SupportedElement)
+): (data?: any)=> void;
 interface On{
 	/** Listens to the DOM event. See {@link Document.addEventListener} */
 	<
@@ -135,7 +163,7 @@ interface On{
 			listener: (this: El, ev: Event | CustomEvent ) => any,
 			options?: AddEventListenerOptions
 		) : EE;
-	/** Listens to the element is connected to the live DOM. In case of custom elements uses [`connectedCallback`](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#custom_element_lifecycle_callbacks), or {@link MutationObserver} else where */
+	/** Listens to the element is connected to the live DOM. In case of custom elements uses [`connectedCallback`](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#custom_element_lifecycle_callbacks), or {@link MutationObserver} else where */// editorconfig-checker-disable-line
 	connected<
 		EE extends ddeElementAddon<SupportedElement>,
 		El extends ( EE extends ddeElementAddon<infer El> ? El : never )
@@ -143,7 +171,7 @@ interface On{
 			listener: (this: El, event: CustomEvent<El>) => any,
 			options?: AddEventListenerOptions
 		) : EE;
-	/** Listens to the element is disconnected from the live DOM. In case of custom elements uses [`disconnectedCallback`](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#custom_element_lifecycle_callbacks), or {@link MutationObserver} else where */
+	/** Listens to the element is disconnected from the live DOM. In case of custom elements uses [`disconnectedCallback`](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#custom_element_lifecycle_callbacks), or {@link MutationObserver} else where */// editorconfig-checker-disable-line
 	disconnected<
 		EE extends ddeElementAddon<SupportedElement>,
 		El extends ( EE extends ddeElementAddon<infer El> ? El : never )
@@ -151,7 +179,7 @@ interface On{
 			listener: (this: El, event: CustomEvent<void>) => any,
 			options?: AddEventListenerOptions
 		) : EE;
-	/** Listens to the element attribute changes. In case of custom elements uses [`attributeChangedCallback`](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#custom_element_lifecycle_callbacks), or {@link MutationObserver} else where */
+	/** Listens to the element attribute changes. In case of custom elements uses [`attributeChangedCallback`](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#custom_element_lifecycle_callbacks), or {@link MutationObserver} else where */// editorconfig-checker-disable-line
 	attributeChanged<
 		EE extends ddeElementAddon<SupportedElement>,
 		El extends ( EE extends ddeElementAddon<infer El> ? El : never )
@@ -162,7 +190,12 @@ interface On{
 }
 export const on: On;
 
-type Scope= { scope: Node | Function | Object, host: ddeElementAddon<any>, custom_element: false | HTMLElement, prevent: boolean }
+type Scope= {
+	scope: Node | Function | Object,
+	host: ddeElementAddon<any>,
+	custom_element: false | HTMLElement,
+	prevent: boolean
+};
 /** Current scope created last time the `el(Function)` was invoke. (Or {@link scope.push}) */
 export const scope: {
 	current: Scope,
@@ -176,7 +209,7 @@ export const scope: {
 	 * — `scope.host(on.connected(console.log))`.
 	 * */
 	host: (...addons: ddeElementAddon<SupportedElement>[])=> HTMLElement,
-	
+
 	state: Scope[],
 	/** Adds new child scope. All attributes are inherited by default. */
 	push(scope: Partial<Scope>): ReturnType<Array<Scope>["push"]>,
@@ -202,12 +235,12 @@ export function observedAttributes(custom_element: HTMLElement): Record<string, 
 /* TypeScript MEH */
 declare global{
 	type ddeAppend<el>= (...nodes: (Node | string)[])=> el;
-	
+
 	interface ddeDocumentFragment extends DocumentFragment{ append: ddeAppend<ddeDocumentFragment>; }
 	interface ddeHTMLElement extends HTMLElement{ append: ddeAppend<ddeHTMLElement>; }
 	interface ddeSVGElement extends SVGElement{ append: ddeAppend<ddeSVGElement>; }
 	interface ddeMathMLElement extends MathMLElement{ append: ddeAppend<ddeMathMLElement>; }
-	
+
 	interface ddeHTMLElementTagNameMap {
 		"a": ddeHTMLAnchorElement;
 		"area": ddeHTMLAreaElement;
@@ -350,6 +383,7 @@ declare global{
 	}
 }
 
+// editorconfig-checker-disable
 interface ddeHTMLAnchorElement extends HTMLAnchorElement{ append: ddeAppend<ddeHTMLAnchorElement>; }
 interface ddeHTMLAreaElement extends HTMLAreaElement{ append: ddeAppend<ddeHTMLAreaElement>; }
 interface ddeHTMLAudioElement extends HTMLAudioElement{ append: ddeAppend<ddeHTMLAudioElement>; }
@@ -477,3 +511,4 @@ interface ddeSVGTitleElement extends SVGTitleElement{ append: ddeAppend<ddeSVGTi
 interface ddeSVGTSpanElement extends SVGTSpanElement{ append: ddeAppend<ddeSVGTSpanElement>; }
 interface ddeSVGUseElement extends SVGUseElement{ append: ddeAppend<ddeSVGUseElement>; }
 interface ddeSVGViewElement extends SVGViewElement{ append: ddeAppend<ddeSVGViewElement>; }
+// editorconfig-checker-enable

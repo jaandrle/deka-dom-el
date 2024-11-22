@@ -55,7 +55,7 @@ interface signal{
 	 * */
 	el<S extends any>(signal: Signal<S, any>, el: (v: S)=> Element | Element[] | DocumentFragment): DocumentFragment;
 
-    observedAttributes(custom_element: HTMLElement): Record<string, Signal<string, {}>>;
+	observedAttributes(custom_element: HTMLElement): Record<string, Signal<string, {}>>;
 }
 export const signal: signal;
 export const S: signal;
