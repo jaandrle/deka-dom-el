@@ -14,16 +14,14 @@ ${host}{
 	--shiki-token-punctuation: var(--code);
 	--shiki-token-link: #EE0000;
 	white-space: pre;
-	${""/* TODO: allow custom tab size?! */}
-	tab-size: 2;
+	tab-size: 2; /* TODO: allow custom tab size?! */
 	overflow: scroll;
 }
 ${host}[data-js=todo]{
 	border: 1px solid var(--border);
 	border-radius: var(--standard-border-radius);
 	margin-bottom: 1rem;
-	${/* to fix shift when → dataJS=done */""}
-	margin-top: 18.4px;
+	margin-top: 18.4px; /* to fix shift when → dataJS=done */
 	padding: 1rem 1.4rem;
 }
 `;
