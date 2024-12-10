@@ -21,7 +21,7 @@ const references= {
 	/** observedAttributes on MDN */
 	mdn_observedAttributes: {
 		title: t`MDN documentation page for observedAttributes`,
-		href: "https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#responding_to_attribute_changes",
+		href: "https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#responding_to_attribute_changes", // editorconfig-checker-disable-line
 	},
 	/** Custom Elements on MDN */
 	mdn_custom_elements: {
@@ -55,10 +55,10 @@ export function page({ pkg, info }){
 	return el(simplePage, { info, pkg }).append(
 		el("h2", t`Using web components in combinantion with DDE`),
 		el("p").append(...T`
-			The DDE library allows for use within ${el("a", references.mdn_web_components).append( el("strong", t`Web Components`) )}
-			for dom-tree generation. However, in order to be able to use signals (possibly mapping to registered
-			${el("a", references.mdn_observedAttributes).append( el("code", "observedAttributes") )}) and additional
-			functionality is (unfortunately) required to use helpers provided by the library.
+			The DDE library allows for use within ${el("a", references.mdn_web_components).append( el("strong",
+			t`Web Components`) )} for dom-tree generation. However, in order to be able to use signals (possibly
+			mapping to registered ${el("a", references.mdn_observedAttributes).append( el("code", "observedAttributes")
+			)}) and additional functionality is (unfortunately) required to use helpers provided by the library.
 		`),
 		el(code, { src: fileURL("./components/examples/customElement/intro.js"), page_id }),
 
@@ -82,8 +82,8 @@ export function page({ pkg, info }){
 		`),
 		el("p").append(...T`
 			Also see the Life Cycle Events sections, very similarly we would like to use
-			${el("a", { textContent: t`DDE events`, href: "./p03-events.html", title: t`See events part of the library documentation` })}.
-			To do it, the library provides function ${el("code", "customElementWithDDE")}…
+			${el("a", { textContent: t`DDE events`, href: "./p03-events.html", title: t`See events part of the library
+			documentation` })}. To do it, the library provides function ${el("code", "customElementWithDDE")}…
 		`),
 		el(example, { src: fileURL("./components/examples/customElement/customElementWithDDE.js"), page_id }),
 

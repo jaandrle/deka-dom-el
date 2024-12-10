@@ -38,7 +38,7 @@ export class CustomHTMLTestElement extends HTMLElement{
 		);
 	}
 	test= "A";
-	
+
 	get name(){ return this.getAttribute("name"); }
 	set name(value){ this.setAttribute("name", value); }
 	/** @attr pre-name */

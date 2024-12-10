@@ -103,10 +103,10 @@ function connectionsChangesObserverConstructor(){
 		for(const element of addedNodes){
 			if(is_root) collectChildren(element).then(observerAdded);
 			if(!store.has(element)) continue;
-			
+
 			const ls= store.get(element);
 			if(!ls.length_c) continue;
-			
+
 			element.dispatchEvent(new Event(evc));
 			ls.connected= new WeakSet();
 			ls.length_c= 0;
@@ -120,7 +120,7 @@ function connectionsChangesObserverConstructor(){
 		for(const element of removedNodes){
 			if(is_root) collectChildren(element).then(observerRemoved);
 			if(!store.has(element)) continue;
-			
+
 			const ls= store.get(element);
 			if(!ls.length_d) continue;
 			(globalThis.queueMicrotask || setTimeout)(dispatchRemove(element));

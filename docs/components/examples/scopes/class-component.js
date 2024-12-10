@@ -36,7 +36,7 @@ function elClass(_class, attributes, ...addons){
 	});
 	element.prepend(el_mark);
 	if(is_fragment) element_host= el_mark;
-	
+
 	chainableAppend(element);
 	addons.forEach(c=> c(element_host));
 	scope.pop();

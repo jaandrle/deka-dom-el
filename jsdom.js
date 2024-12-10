@@ -29,7 +29,7 @@ export function register(dom){
 export function unregister(){
 	if(!dom_last)
 		return false;
-	
+
 	Object.assign(env, env_bk);
 	env_bk= {};
 	dom_last= undefined;

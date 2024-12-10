@@ -17,22 +17,25 @@ const className= style.host(todosComponent).css`
 /** @param {{ todos: string[] }} */
 export function todosComponent({ todos= [ "Task A" ] }= {}){
 	let key= 0;
-	const todosO= S(new Map(), {
+	const todosO= S( /** @type {Map<number, ddeSignal<string>>} */ (new Map()), {
+		/** @param {string} v */
 		add(v){ this.value.set(key++, S(v)); },
+		/** @param {number} key */
 		remove(key){ S.clear(this.value.get(key)); this.value.delete(key); }
 	});
 	todos.forEach(text=> S.action(todosO, "add", text));
 
 	const name= "todoName";
 	const onsubmitAdd= on("submit", event=> {
-		const el= event.target.elements[name];
+		const el_form= /** @type {HTMLFormElement} */ (event.target);
+		const el= /** @type {HTMLInputElement} */ (el_form.elements[name]);
 		event.preventDefault();
 		S.action(todosO, "add", el.value);
 		el.value= "";
 	});
-	const onremove= on("remove", event=>
-		S.action(todosO, "remove", event.detail));
-	
+	const onremove= on("remove", /** @param {CustomEvent<number>} event */
+		event=> S.action(todosO, "remove", event.detail));
+
 	return el("div", { className }).append(
 		el("div").append(
 			el("h2", "Todos:"),
@@ -60,19 +63,24 @@ export function todosComponent({ todos= [ "Task A" ] }= {}){
 	)
 }
 /**
+ * @param {{ textContent: ddeSignal<string>, value: ddeSignal<number> }} attrs
  * @dispatchs {number} remove
  * */
 function todoComponent({ textContent, value }){
 	const { host }= scope;
+	const dispatchRemove= /** @type {(data: number) => void} */
+		(dispatchEvent("remove", null, host));
 	const onclick= on("click", event=> {
-		const value= Number(event.target.value);
+		const el= /** @type {HTMLButtonElement} */ (event.target);
+		const value= Number(el.value);
 		event.preventDefault();
 		event.stopPropagation();
-		dispatchEvent("remove")(host(), value);
+		dispatchRemove(value);
 	});
 	const is_editable= S(false);
 	const onedited= on("change", ev=> {
-		textContent(ev.target.value);
+		const el= /** @type {HTMLInputElement} */ (ev.target);
+		textContent(el.value);
 		is_editable(false);
 	});
 	return el("li").append(
