@@ -6,37 +6,37 @@
 
 *…use simple DOM API by default and library tools and logic when you need them*
 
-```js
+```javascript
 document.body.append(
-	el("h1", "Hello World 👋"),
-	el("p", "See some syntax examples here:"),
-	el("ul").append(
-		el("li").append(
-			el("a", { textContent: "Link to the library repo",
-				title: "Deka DOM El — GitHub",
-				href: "https://github.com/jaandrle/deka-dom-el" })
-		),
-		el("li").append(
-			"Use extended Vanilla JavaScript DOM/IDL API: ",
-			el("span", { textContent: "» this is a span with class=cN and data-a=A, data-b=B «",
-				className: "cN", dataset: { a: "A", b: "B" } })
-		),
-		el("li").append(
-			el(component, { textContent: "A component", className: "example" }, on("change", console.log))
-		)
-	)
-	
+	el(HelloWorldComponent)
 );
-function component({ textContent, className }){
-	const value= S("onchange");
-	
+function HelloWorldComponent(){
+	const clicks= S(0);
+	const emoji= S("🚀");
+	const isSelected= el=> (el.selected= el.value===emoji());
+
 	return el().append(
-		el("p", { textContent, className }),
-		el("p", { className: [ className, "second-line" ] }).append(
-			"…with reactivity: ", el("em", { style: { fontWeight: "bold" }, ariaset: { live: "polite" }, textContent: value }),
+		el("p", {
+			textContent: S(() => `Hello World ${emoji().repeat(clicks())}`),
+			className: "example",
+			ariaLive: "polite", //OR ariaset: { live: "polite" },
+			dataset: { example: "Example" }, //OR dataExample: "Example",
+		}),
+		el("button",
+			{ textContent: "Fire", type: "button" },
+			on("click", ()=> clicks(clicks() + 1)),
+			on("keyup", ()=> clicks(clicks() - 2)),
 		),
-		el("input", { type: "text", value: value() }, on("change", event=> value(event.target.value)))
+		el("select", {
+			onchange: event=> emoji(event.target.value),
+		}).append(
+			el(Option, "🎉", isSelected),
+			el(Option, "🚀", isSelected),
+		)
 	);
+}
+function Option({ textContent }){
+	return el("option", { value: textContent, textContent })
 }
 ```
 # Deka DOM Elements
