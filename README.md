@@ -30,12 +30,12 @@ function HelloWorldComponent(){
 		el("select", {
 			onchange: event=> emoji(event.target.value),
 		}).append(
-			el(Option, "🎉", isSelected),
-			el(Option, "🚀", isSelected),
+			el(OptionComponent, "🎉", isSelected),
+			el(OptionComponent, "🚀", isSelected),
 		)
 	);
 }
-function Option({ textContent }){
+function OptionComponent({ textContent }){
 	return el("option", { value: textContent, textContent })
 }
 ```
