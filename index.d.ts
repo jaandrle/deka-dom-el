@@ -8,7 +8,7 @@ type SupportedElement=
 	|	CustomElementTagNameMap[keyof CustomElementTagNameMap]
 declare global {
 	type ddeComponentAttributes= Record<any, any> | undefined;
-	type ddeElementAddon<El extends SupportedElement | DocumentFragment>= (element: El)=> El | void;
+	type ddeElementAddon<El extends SupportedElement | DocumentFragment | Node>= (element: El)=> any;
 }
 type PascalCase= `${Capitalize<string>}${string}`;
 type AttrsModified= {
@@ -27,6 +27,13 @@ type AttrsModified= {
 	 * By default simiral to `className`, but also supports `string[]`
 	 * */
 	className: string | (string|boolean|undefined|ddeSignal<string|boolean|undefined>)[];
+	/**
+	 * Used by the dataset HTML attribute to represent data for custom attributes added to elements.
+	 * Values are converted to string (see {@link DOMStringMap}).
+	 *
+	 * [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMStringMap)
+	 * */
+	dataset: Record<string,string|number|ddeSignal<string|number>>,
 	/**
 	 * Sets `aria-*` simiraly to `dataset`
 	 * */
@@ -62,11 +69,10 @@ type ExtendedHTMLElementTagNameMap= HTMLElementTagNameMap & CustomElementTagName
 type textContent= string | ddeSignal<string>;
 export function el<
 	TAG extends keyof ExtendedHTMLElementTagNameMap,
-	EL extends ExtendedHTMLElementTagNameMap[TAG]
 >(
 	tag_name: TAG,
-	attrs?: ElementAttributes<EL> | textContent,
-	...addons: ddeElementAddon<EL>[]
+	attrs?: ElementAttributes<ExtendedHTMLElementTagNameMap[NoInfer<TAG>]> | textContent,
+	...addons: ddeElementAddon<ExtendedHTMLElementTagNameMap[NoInfer<TAG>]>[], // TODO: for now addons must have the same element
 ): TAG extends keyof ddeHTMLElementTagNameMap ? ddeHTMLElementTagNameMap[TAG] : ddeHTMLElement
 export function el(
 	tag_name?: "<>",
@@ -95,8 +101,8 @@ export function elNS(
 	EL extends ( TAG extends keyof SVGElementTagNameMap ? SVGElementTagNameMap[TAG] : SVGElement ),
 >(
 	tag_name: TAG,
-	attrs?: ElementAttributes<EL> | textContent,
-	...addons: ddeElementAddon<EL>[]
+	attrs?: ElementAttributes<NoInfer<EL>> | textContent,
+	...addons: ddeElementAddon<NoInfer<EL>>[]
 )=>  TAG extends keyof ddeSVGElementTagNameMap ? ddeSVGElementTagNameMap[TAG] : ddeSVGElement
 export function elNS(
 	namespace: "http://www.w3.org/1998/Math/MathML"
@@ -108,7 +114,7 @@ export function elNS(
 	attrs?: string | textContent | Partial<{
 		[key in keyof EL]: EL[key] | ddeSignal<EL[key]> | string | number | boolean
 	}>,
-	...addons: ddeElementAddon<EL>[]
+	...addons: ddeElementAddon<NoInfer<EL>>[]
 )=> ddeMathMLElement
 export function elNS(
 	namespace: string
@@ -149,18 +155,18 @@ export function dispatchEvent(
 interface On{
 	/** Listens to the DOM event. See {@link Document.addEventListener} */
 	<
-		EE extends ddeElementAddon<SupportedElement>,
-		El extends ( EE extends ddeElementAddon<infer El> ? El : never ),
-		Event extends keyof DocumentEventMap>(
+		Event extends keyof DocumentEventMap,
+		EE extends ddeElementAddon<SupportedElement>= ddeElementAddon<HTMLElement>,
+		>(
 			type: Event,
-			listener: (this: El, ev: DocumentEventMap[Event]) => any,
+			listener: (this: EE extends ddeElementAddon<infer El> ? El : never, ev: DocumentEventMap[Event]) => any,
 			options?: AddEventListenerOptions
 		) : EE;
 	<
-		EE extends ddeElementAddon<SupportedElement>,
-		El extends ( EE extends ddeElementAddon<infer El> ? El : never )>(
+		EE extends ddeElementAddon<SupportedElement>= ddeElementAddon<HTMLElement>,
+		>(
 			type: string,
-			listener: (this: El, ev: Event | CustomEvent ) => any,
+			listener: (this: EE extends ddeElementAddon<infer El> ? El : never, ev: Event | CustomEvent ) => any,
 			options?: AddEventListenerOptions
 		) : EE;
 	/** Listens to the element is connected to the live DOM. In case of custom elements uses [`connectedCallback`](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#custom_element_lifecycle_callbacks), or {@link MutationObserver} else where */// editorconfig-checker-disable-line

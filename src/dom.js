@@ -69,6 +69,19 @@ export function createElement(tag, attributes, ...addons){
 	scoped= 2;
 	return el;
 }
+/**
+ * @param { { type: "component", name: string, host: "this" | "parentElement" } | { type: "reactive" | "later" } } attrs
+ * @param {boolean} [is_open=false]
+ * */
+createElement.mark= function(attrs, is_open= false){
+	attrs= Object.entries(attrs).map(([ n, v ])=> n+`="${v}"`).join(" ");
+	const end= is_open ? "" : "/";
+	const out= env.D.createComment(`<dde:mark ${attrs}${env.ssr}${end}>`);
+	if(is_open) out.end= env.D.createComment("</dde:mark>");
+	return out;
+};
+export { createElement as el };
+
 import { hasOwn } from "./helpers.js";
 /** @param {HTMLElement} element @param {HTMLElement} [root] */
 export function simulateSlots(element, root, mapper){
@@ -117,18 +130,6 @@ function simulateSlotReplace(slot, element, mapper){
 		dataset: { ...slot.dataset } })); }
 	catch(_){ slot.replaceWith(element); }
 }
-/**
- * @param { { type: "component", name: string, host: "this" | "parentElement" } | { type: "reactive" | "later" } } attrs
- * @param {boolean} [is_open=false]
- * */
-createElement.mark= function(attrs, is_open= false){
-	attrs= Object.entries(attrs).map(([ n, v ])=> n+`="${v}"`).join(" ");
-	const end= is_open ? "" : "/";
-	const out= env.D.createComment(`<dde:mark ${attrs}${env.ssr}${end}>`);
-	if(is_open) out.end= env.D.createComment("</dde:mark>");
-	return out;
-};
-export { createElement as el };
 
 //const namespaceHelper= ns=> ns==="svg" ? "http://www.w3.org/2000/svg" : ns;
 export function createElementNS(ns){
@@ -197,10 +198,6 @@ export function classListDeclarative(element, toggle){
 		(class_name, val)=>
 			element.classList.toggle(class_name, val===-1 ? undefined : Boolean(val)));
 	return element;
-}
-export function empty(el){
-	Array.from(el.children).forEach(el=> el.remove());
-	return el;
 }
 export function elementAttribute(element, op, key, value){
 	if(element instanceof env.H)
