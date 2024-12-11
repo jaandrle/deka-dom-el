@@ -8,6 +8,8 @@ type SupportedElement=
 declare global {
 	type ddeComponentAttributes= Record<any, any> | undefined;
 	type ddeElementAddon<El extends SupportedElement | DocumentFragment | Node>= (element: El)=> any;
+	type ddeString= string | ddeSignal<string>
+	type ddeStringable= ddeString | number | ddeSignal<number>
 }
 type PascalCase=
 `${Capitalize<string>}${string}`;
@@ -15,7 +17,7 @@ type AttrsModified= {
 	/**
 	 * Use string like in HTML (internally uses `*.setAttribute("style", *)`), or object representation (like DOM API).
 	 */
-	style: string | Partial<CSSStyleDeclaration> | ddeSignal<string>
+	style: Partial<CSSStyleDeclaration> | ddeString
 		| Partial<{ [K in keyof CSSStyleDeclaration]: ddeSignal<CSSStyleDeclaration[K]> }>
 	/**
 	 * Provide option to add/remove/toggle CSS clasess (index of object) using 1/0/-1.
@@ -24,23 +26,21 @@ type AttrsModified= {
 	 */
 	classList: Record<string,-1|0|1|boolean|ddeSignal<-1|0|1|boolean>>,
 	/**
-	 * By default simiral to `className`, but also supports `string[]`
-	 * */
-	className: string | (string|boolean|undefined|ddeSignal<string|boolean|undefined>)[];
-	/**
 	 * Used by the dataset HTML attribute to represent data for custom attributes added to elements.
 	 * Values are converted to string (see {@link DOMStringMap}).
 	 *
 	 * [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMStringMap)
 	 * */
-	dataset: Record<string,string|number|ddeSignal<string|number>>,
+	dataset: Record<string, ddeStringable>,
 	/**
 	 * Sets `aria-*` simiraly to `dataset`
 	 * */
-	ariaset: Record<string,string|ddeSignal<string>>,
-}	& Record<`=${string}` | `data${PascalCase}` | `aria${PascalCase}`, string|ddeSignal<string>>
+	ariaset: Record<string, ddeString>,
+}	& Record<`=${string}` | `data${PascalCase}` | `aria${PascalCase}`, ddeString>
 	& Record<`.${string}`, any>
 type _fromElsInterfaces<EL extends SupportedElement>= Omit<EL, keyof AttrsModified>;
+type IsReadonly<T, K extends keyof T> =
+  T extends { readonly [P in K]: T[K] } ? true : false;
 /**
  * Just element attributtes
  *
@@ -52,7 +52,9 @@ type _fromElsInterfaces<EL extends SupportedElement>= Omit<EL, keyof AttrsModifi
  * @private
  */
 type ElementAttributes<T extends SupportedElement>= Partial<{
-	[K in keyof _fromElsInterfaces<T>]: _fromElsInterfaces<T>[K] | ddeSignal<_fromElsInterfaces<T>[K]>
+	[K in keyof _fromElsInterfaces<T>]: IsReadonly<_fromElsInterfaces<T>, K> extends false
+		? _fromElsInterfaces<T>[K] | ddeSignal<_fromElsInterfaces<T>[K]>
+		: ddeStringable
 } & AttrsModified> & Record<string, any>;
 export function classListDeclarative<El extends SupportedElement>(
 	element: El,
@@ -66,20 +68,21 @@ export function assignAttribute<El extends SupportedElement, ATT extends keyof E
 ): ElementAttributes<El>[ATT]
 
 type ExtendedHTMLElementTagNameMap= HTMLElementTagNameMap & CustomElementTagNameMap;
-type textContent= string | ddeSignal<string>;
 export function el<
 	TAG extends keyof ExtendedHTMLElementTagNameMap,
 >(
 	tag_name: TAG,
-	attrs?: ElementAttributes<ExtendedHTMLElementTagNameMap[NoInfer<TAG>]> | textContent,
-	...addons: ddeElementAddon<ExtendedHTMLElementTagNameMap[NoInfer<TAG>]>[], // TODO: for now addons must have the same element
+	attrs?: ElementAttributes<ExtendedHTMLElementTagNameMap[NoInfer<TAG>]> | ddeString,
+	...addons: ddeElementAddon<
+		ExtendedHTMLElementTagNameMap[NoInfer<TAG>]
+	>[], // TODO: for now addons must have the same element
 ): TAG extends keyof ddeHTMLElementTagNameMap ? ddeHTMLElementTagNameMap[TAG] : ddeHTMLElement
 export function el(
 	tag_name?: "<>",
 ): ddeDocumentFragment
 export function el(
 	tag_name: string,
-	attrs?: ElementAttributes<HTMLElement> | textContent,
+	attrs?: ElementAttributes<HTMLElement> | ddeString,
 	...addons: ddeElementAddon<HTMLElement>[]
 ): ddeHTMLElement
 
@@ -87,7 +90,7 @@ export function el<
 	C extends (attr: ddeComponentAttributes)=> SupportedElement | ddeDocumentFragment
 >(
 	component: C,
-	attrs?: Parameters<C>[0] | textContent,
+	attrs?: Parameters<C>[0] | ddeString,
 	...addons: ddeElementAddon<ReturnType<C>>[]
 ): ReturnType<C> extends ddeHTMLElementTagNameMap[keyof ddeHTMLElementTagNameMap]
 	? ReturnType<C>
@@ -101,7 +104,7 @@ export function elNS(
 	EL extends ( TAG extends keyof SVGElementTagNameMap ? SVGElementTagNameMap[TAG] : SVGElement ),
 >(
 	tag_name: TAG,
-	attrs?: ElementAttributes<NoInfer<EL>> | textContent,
+	attrs?: ElementAttributes<NoInfer<EL>> | ddeString,
 	...addons: ddeElementAddon<NoInfer<EL>>[]
 )=>  TAG extends keyof ddeSVGElementTagNameMap ? ddeSVGElementTagNameMap[TAG] : ddeSVGElement
 export function elNS(
@@ -111,7 +114,7 @@ export function elNS(
 	EL extends ( TAG extends keyof MathMLElementTagNameMap ? MathMLElementTagNameMap[TAG] : MathMLElement ),
 >(
 	tag_name: TAG,
-	attrs?: string | textContent | Partial<{
+	attrs?: ddeString | Partial<{
 		[key in keyof EL]: EL[key] | ddeSignal<EL[key]> | string | number | boolean
 	}>,
 	...addons: ddeElementAddon<NoInfer<EL>>[]
@@ -120,7 +123,7 @@ export function elNS(
 	namespace: string
 ): (
 	tag_name: string,
-	attrs?: string | textContent | Record<string, any>,
+	attrs?: string | ddeString | Record<string, any>,
 	...addons: ddeElementAddon<SupportedElement>[]
 )=> SupportedElement
 export { elNS as createElementNS }

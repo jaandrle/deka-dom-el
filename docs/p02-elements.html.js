@@ -92,8 +92,7 @@ export function page({ pkg, info }){
 			el("li").append(...T`You can use string or object as a value for ${el("code", "style")} property.`),
 			el("li").append(...T`
 				${el("code", "className")} (IDL – preffered)/${el("code", "class")} are ways to add CSS classes
-				to the element. You can use string (similarly to ${el("code", "class=\"…\"")} syntax in  HTML) or
-				array of strings. This is handy to concat conditional classes.
+				to the element. You can use string (similarly to ${el("code", "class=\"…\"")} syntax in  HTML).
 			`),
 			el("li").append(...T`
 				Use ${el("code", "classList")} to toggle specific classes. This will be handy later when

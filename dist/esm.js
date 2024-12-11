@@ -7,7 +7,7 @@ var m = {
 		return n;
 	}
 };
-function V(t, e = !0) {
+function G(t, e = !0) {
 	return e ? Object.assign(m, t) : (Object.setPrototypeOf(t, m), t);
 }
 function L(t) {
@@ -30,16 +30,16 @@ function N(t, e) {
 function F(t, e) {
 	let { observedAttributes: n = [] } = t.constructor;
 	return n.reduce(function(r, o) {
-		return r[J(o)] = e(t, o), r;
+		return r[V(o)] = e(t, o), r;
 	}, {});
 }
-function J(t) {
+function V(t) {
 	return t.replace(/-./g, (e) => e[1].toUpperCase());
 }
 
 // src/dom-common.js
 var a = {
-	setDeleteAttr: K,
+	setDeleteAttr: J,
 	ssr: "",
 	D: globalThis.document,
 	F: globalThis.DocumentFragment,
@@ -47,7 +47,7 @@ var a = {
 	S: globalThis.SVGElement,
 	M: globalThis.MutationObserver
 };
-function K(t, e, n) {
+function J(t, e, n) {
 	if (Reflect.set(t, e, n), !!x(n)) {
 		if (Reflect.deleteProperty(t, e), t instanceof a.H && t.getAttribute(e) === "undefined")
 			return t.removeAttribute(e);
@@ -55,7 +55,7 @@ function K(t, e, n) {
 			return Reflect.set(t, e, "");
 	}
 }
-var y = "__dde_lifecyclesToEvents", g = "dde:connected", w = "dde:disconnected", D = "dde:attributeChanged";
+var w = "__dde_lifecyclesToEvents", g = "dde:connected", y = "dde:disconnected", D = "dde:attributeChanged";
 
 // src/dom.js
 var v = [{
@@ -92,7 +92,7 @@ var v = [{
 function $(...t) {
 	return this.appendOriginal(...t), this;
 }
-function Q(t) {
+function K(t) {
 	return t.append === $ || (t.appendOriginal = t.append, t.append = $), t;
 }
 var T;
@@ -125,7 +125,7 @@ function j(t, e, ...n) {
 		case !c:
 			c = O.call(this, a.D.createElement(t), e);
 	}
-	return Q(c), f || (f = c), n.forEach((d) => d(f)), o && S.pop(), o = 2, c;
+	return K(c), f || (f = c), n.forEach((d) => d(f)), o && S.pop(), o = 2, c;
 }
 j.mark = function(t, e = !1) {
 	t = Object.entries(t).map(([o, c]) => o + `="${c}"`).join(" ");
@@ -156,11 +156,14 @@ function bt(t, e, n) {
 	}
 	return e;
 }
+function Q(...t) {
+	return t.filter(Boolean).join(" ");
+}
 function X(t, e, n) {
 	n && n(t, e);
 	try {
 		t.replaceWith(O(e, {
-			className: [e.className, t.className],
+			className: Q(e.className, t.className),
 			dataset: { ...t.dataset }
 		}));
 	} catch {
@@ -245,14 +248,11 @@ function M(t, e, n) {
 			o && (c = t.processReactiveAttribute(e, o, c, n), n(o, c));
 		});
 }
-function Z(t) {
-	return Array.isArray(t) ? t.filter(Boolean).join(" ") : t;
-}
 function nt(t, e, n, r) {
-	return t[(x(r) ? "remove" : "set") + e](n, Z(r));
+	return t[(x(r) ? "remove" : "set") + e](n, r);
 }
 function rt(t, e, n, r, o = null) {
-	return t[(x(r) ? "remove" : "set") + e + "NS"](o, n, Z(r));
+	return t[(x(r) ? "remove" : "set") + e + "NS"](o, n, r);
 }
 function H(t, e, n) {
 	if (Reflect.set(t, e, n), !!x(n))
@@ -353,7 +353,7 @@ function ot() {
 	}
 	function _(i) {
 		return () => {
-			i.isConnected || (i.dispatchEvent(new Event(w)), t.delete(i));
+			i.isConnected || (i.dispatchEvent(new Event(y)), t.delete(i));
 		};
 	}
 }
@@ -364,24 +364,24 @@ function mt(t, e, n, r = it) {
 		scope: t,
 		host: (...f) => f.length ? f.forEach((d) => d(t)) : t
 	}), typeof r == "function" && (r = r.call(t, t));
-	let o = t[y];
+	let o = t[w];
 	o || ct(t);
 	let c = n.call(t, r);
-	return o || t.dispatchEvent(new Event(g)), e.nodeType === 11 && typeof e.mode == "string" && t.addEventListener(w, A.observe(e), { once: !0 }), S.pop(), e.append(c);
+	return o || t.dispatchEvent(new Event(g)), e.nodeType === 11 && typeof e.mode == "string" && t.addEventListener(y, A.observe(e), { once: !0 }), S.pop(), e.append(c);
 }
 function ct(t) {
 	return k(t.prototype, "connectedCallback", function(e, n, r) {
 		e.apply(n, r), n.dispatchEvent(new Event(g));
 	}), k(t.prototype, "disconnectedCallback", function(e, n, r) {
 		e.apply(n, r), (globalThis.queueMicrotask || setTimeout)(
-			() => !n.isConnected && n.dispatchEvent(new Event(w))
+			() => !n.isConnected && n.dispatchEvent(new Event(y))
 		);
 	}), k(t.prototype, "attributeChangedCallback", function(e, n, r) {
 		let [o, , c] = r;
 		n.dispatchEvent(new CustomEvent(D, {
 			detail: [o, c]
 		})), e.apply(n, r);
-	}), t.prototype[y] = !0, t;
+	}), t.prototype[w] = !0, t;
 }
 function k(t, e, n) {
 	t[e] = new Proxy(t[e] || (() => {
@@ -404,15 +404,15 @@ function R(t, e, n) {
 		return o.addEventListener(t, e, n), o;
 	};
 }
-var G = (t) => Object.assign({}, typeof t == "object" ? t : null, { once: !0 });
+var Z = (t) => Object.assign({}, typeof t == "object" ? t : null, { once: !0 });
 R.connected = function(t, e) {
-	return e = G(e), function(r) {
-		return r.addEventListener(g, t, e), r[y] ? r : r.isConnected ? (r.dispatchEvent(new Event(g)), r) : (N(e.signal, () => A.offConnected(r, t)) && A.onConnected(r, t), r);
+	return e = Z(e), function(r) {
+		return r.addEventListener(g, t, e), r[w] ? r : r.isConnected ? (r.dispatchEvent(new Event(g)), r) : (N(e.signal, () => A.offConnected(r, t)) && A.onConnected(r, t), r);
 	};
 };
 R.disconnected = function(t, e) {
-	return e = G(e), function(r) {
-		return r.addEventListener(w, t, e), r[y] || N(e.signal, () => A.offDisconnected(r, t)) && A.onDisconnected(r, t), r;
+	return e = Z(e), function(r) {
+		return r.addEventListener(y, t, e), r[w] || N(e.signal, () => A.offDisconnected(r, t)) && A.onDisconnected(r, t), r;
 	};
 };
 var W = /* @__PURE__ */ new WeakMap();
@@ -424,7 +424,7 @@ R.disconnectedAsAbort = function(t) {
 var st = /* @__PURE__ */ new WeakSet();
 R.attributeChanged = function(t, e) {
 	return typeof e != "object" && (e = {}), function(r) {
-		if (r.addEventListener(D, t, e), r[y] || st.has(r) || !a.M) return r;
+		if (r.addEventListener(D, t, e), r[w] || st.has(r) || !a.M) return r;
 		let o = new a.M(function(f) {
 			for (let { attributeName: d, target: p } of f)
 				p.dispatchEvent(
@@ -437,8 +437,9 @@ R.attributeChanged = function(t, e) {
 export {
 	O as assign,
 	z as assignAttribute,
-	Q as chainableAppend,
+	K as chainableAppend,
 	Y as classListDeclarative,
+	Q as cn,
 	j as createElement,
 	gt as createElementNS,
 	mt as customElementRender,
@@ -450,7 +451,7 @@ export {
 	ct as lifecyclesToEvents,
 	it as observedAttributes,
 	R as on,
-	V as registerReactivity,
+	G as registerReactivity,
 	S as scope,
 	bt as simulateSlots
 };

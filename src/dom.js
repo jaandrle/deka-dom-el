@@ -123,10 +123,11 @@ export function simulateSlots(element, root, mapper){
 	}
 	return root;
 }
+export function cn(...s){ return s.filter(Boolean).join(" "); }
 function simulateSlotReplace(slot, element, mapper){
 	if(mapper) mapper(slot, element);
 	try{ slot.replaceWith(assign(element, {
-		className: [ element.className, slot.className ],
+		className: cn(element.className, slot.className),
 		dataset: { ...slot.dataset } })); }
 	catch(_){ slot.replaceWith(element); }
 }
@@ -231,10 +232,9 @@ function forEachEntries(s, obj, cb){
 	});
 }
 
-function attrArrToStr(attr){ return Array.isArray(attr) ? attr.filter(Boolean).join(" ") : attr; }
 function setRemove(obj, prop, key, val){
-	return obj[ (isUndef(val) ? "remove" : "set") + prop ](key, attrArrToStr(val)); }
+	return obj[ (isUndef(val) ? "remove" : "set") + prop ](key, val); }
 function setRemoveNS(obj, prop, key, val, ns= null){
-	return obj[ (isUndef(val) ? "remove" : "set") + prop + "NS" ](ns, key, attrArrToStr(val)); }
+	return obj[ (isUndef(val) ? "remove" : "set") + prop + "NS" ](ns, key, val); }
 function setDelete(obj, key, val){
 	Reflect.set(obj, key, val); if(!isUndef(val)) return; return Reflect.deleteProperty(obj, key); }
