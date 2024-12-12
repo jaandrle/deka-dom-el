@@ -51,7 +51,9 @@ var d = {
 	F: globalThis.DocumentFragment,
 	H: globalThis.HTMLElement,
 	S: globalThis.SVGElement,
-	M: globalThis.MutationObserver
+	M: globalThis.MutationObserver,
+	qa: (t) => t,
+	qw: () => Promise.resolve()
 };
 function pt(t, e, n) {
 	if (Reflect.set(t, e, n), !!A(n)) {
@@ -64,6 +66,9 @@ function pt(t, e, n) {
 var O = "__dde_lifecyclesToEvents", _ = "dde:connected", S = "dde:disconnected", T = "dde:attributeChanged";
 
 // src/dom.js
+function Mt(t) {
+	return d.qa(t);
+}
 var y = [{
 	get scope() {
 		return d.D.body;
@@ -107,16 +112,16 @@ function M(t, e, ...n) {
 	switch ((Object(e) !== e || r.isSignal(e)) && (e = { textContent: e }), !0) {
 		case typeof t == "function": {
 			o = 1;
-			let a = (...h) => h.length ? (o === 1 ? n.unshift(...h) : h.forEach((m) => m(u)), void 0) : u;
+			let a = (...l) => l.length ? (o === 1 ? n.unshift(...l) : l.forEach((m) => m(u)), void 0) : u;
 			x.push({ scope: t, host: a }), c = t(e || void 0);
-			let l = c instanceof d.F;
+			let h = c instanceof d.F;
 			if (c.nodeName === "#comment") break;
 			let v = M.mark({
 				type: "component",
 				name: t.name,
-				host: l ? "this" : "parentElement"
+				host: h ? "this" : "parentElement"
 			});
-			c.prepend(v), l && (u = v);
+			c.prepend(v), h && (u = v);
 			break;
 		}
 		case t === "#text":
@@ -138,7 +143,7 @@ M.mark = function(t, e = !1) {
 	let n = e ? "" : "/", r = d.D.createComment(`<dde:mark ${t}${d.ssr}${n}>`);
 	return e && (r.end = d.D.createComment("</dde:mark>")), r;
 };
-function Mt(t) {
+function jt(t) {
 	let e = this;
 	return function(...r) {
 		$ = t;
@@ -146,22 +151,22 @@ function Mt(t) {
 		return $ = void 0, o;
 	};
 }
-function jt(t, e = t) {
+function Pt(t, e = t) {
 	let n = "\xB9\u2070", r = "\u2713", o = Object.fromEntries(
 		Array.from(e.querySelectorAll("slot")).filter((c) => !c.name.endsWith(n)).map((c) => [c.name += n, c])
 	);
 	if (t.append = new Proxy(t.append, {
 		apply(c, u, a) {
 			if (a[0] === e) return c.apply(t, a);
-			for (let l of a) {
-				let v = (l.slot || "") + n;
+			for (let h of a) {
+				let v = (h.slot || "") + n;
 				try {
-					bt(l, "remove", "slot");
+					bt(h, "remove", "slot");
 				} catch {
 				}
-				let h = o[v];
-				if (!h) return;
-				v.startsWith(r) || h.childNodes.forEach((m) => m.remove()), h.append(l), h.name = r + v;
+				let l = o[v];
+				if (!l) return;
+				l.name.startsWith(r) || (l.childNodes.forEach((m) => m.remove()), l.name = r + v), l.append(h);
 			}
 			return t.append = c, t;
 		}
@@ -185,7 +190,7 @@ function nt(t, e, n) {
 		t,
 		e,
 		n,
-		(a, l) => nt.call(c, t, a, l)
+		(a, h) => nt.call(c, t, a, h)
 	);
 	let [u] = e;
 	if (u === "=") return r(e.slice(1), n);
@@ -203,7 +208,7 @@ function nt(t, e, n) {
 		case "dataset":
 			return B(o, n, et.bind(null, t[e]));
 		case "ariaset":
-			return B(o, n, (a, l) => r("aria-" + a, l));
+			return B(o, n, (a, h) => r("aria-" + a, h));
 		case "classList":
 			return ht.call(c, t, n);
 	}
@@ -263,7 +268,7 @@ function mt() {
 	let t = /* @__PURE__ */ new Map(), e = !1, n = (i) => function(s) {
 		for (let f of s)
 			if (f.type === "childList") {
-				if (h(f.addedNodes, !0)) {
+				if (l(f.addedNodes, !0)) {
 					i();
 					continue;
 				}
@@ -316,23 +321,23 @@ function mt() {
 	function a() {
 		!e || t.size || (e = !1, r.disconnect());
 	}
-	function l() {
+	function h() {
 		return new Promise(function(i) {
 			(requestIdleCallback || requestAnimationFrame)(i);
 		});
 	}
 	async function v(i) {
-		t.size > 30 && await l();
+		t.size > 30 && await h();
 		let s = [];
 		if (!(i instanceof Node)) return s;
 		for (let f of t.keys())
 			f === i || !(f instanceof Node) || i.contains(f) && s.push(f);
 		return s;
 	}
-	function h(i, s) {
+	function l(i, s) {
 		let f = !1;
 		for (let b of i) {
-			if (s && v(b).then(h), !t.has(b)) continue;
+			if (s && v(b).then(l), !t.has(b)) continue;
 			let L = t.get(b);
 			L.length_c && (b.dispatchEvent(new Event(_)), L.connected = /* @__PURE__ */ new WeakSet(), L.length_c = 0, L.length_d || t.delete(b), f = !0);
 		}
@@ -352,7 +357,7 @@ function mt() {
 }
 
 // src/customElement.js
-function Ht(t, e, n, r = wt) {
+function It(t, e, n, r = wt) {
 	x.push({
 		scope: t,
 		host: (...u) => u.length ? u.forEach((a) => a(t)) : t
@@ -385,7 +390,7 @@ function wt(t) {
 }
 
 // src/events.js
-function Zt(t, e, n) {
+function Gt(t, e, n) {
 	return e || (e = {}), function(o, ...c) {
 		n && (c.unshift(o), o = typeof n == "function" ? n() : n);
 		let u = c.length ? new CustomEvent(t, Object.assign({ detail: c[0] }, e)) : new Event(t, e);
@@ -419,9 +424,9 @@ w.attributeChanged = function(t, e) {
 	return typeof e != "object" && (e = {}), function(r) {
 		if (r.addEventListener(T, t, e), r[O] || _t.has(r) || !d.M) return r;
 		let o = new d.M(function(u) {
-			for (let { attributeName: a, target: l } of u)
-				l.dispatchEvent(
-					new CustomEvent(T, { detail: [a, l.getAttribute(a)] })
+			for (let { attributeName: a, target: h } of u)
+				h.dispatchEvent(
+					new CustomEvent(T, { detail: [a, h.getAttribute(a)] })
 				);
 		});
 		return P(e.signal, () => o.disconnect()) && o.observe(r, { attributes: !0 }), r;
@@ -462,7 +467,7 @@ E.on = function t(e, n, r = {}) {
 	let { signal: o } = r;
 	if (!(o && o.aborted)) {
 		if (Array.isArray(e)) return e.forEach((c) => t(c, n, r));
-		Q(e, n), o && o.addEventListener("abort", () => R(e, n));
+		K(e, n), o && o.addEventListener("abort", () => R(e, n));
 	}
 };
 E.symbols = {
@@ -486,24 +491,24 @@ var D = "__dde_reactive";
 E.el = function(t, e) {
 	let n = M.mark({ type: "reactive" }, !0), r = n.end, o = d.D.createDocumentFragment();
 	o.append(n, r);
-	let { current: c } = x, u = {}, a = (l) => {
+	let { current: c } = x, u = {}, a = (h) => {
 		if (!n.parentNode || !r.parentNode)
 			return R(t, a);
 		let v = u;
 		u = {}, x.push(c);
-		let h = e(l, function(s, f) {
+		let l = e(h, function(s, f) {
 			let b;
 			return I(v, s) ? (b = v[s], delete v[s]) : b = f(), u[s] = b, b;
 		});
-		x.pop(), Array.isArray(h) || (h = [h]);
+		x.pop(), Array.isArray(l) || (l = [l]);
 		let m = document.createComment("");
-		h.push(m), n.after(...h);
+		l.push(m), n.after(...l);
 		let k;
 		for (; (k = m.nextSibling) && k !== r; )
 			k.remove();
 		m.remove(), n.isConnected && yt(c.host());
 	};
-	return Q(t, a), ut(t, a, n, e), a(t()), o;
+	return K(t, a), ut(t, a, n, e), a(t()), o;
 };
 function yt(t) {
 	!t || !t[D] || (requestIdleCallback || setTimeout)(function() {
@@ -517,7 +522,7 @@ var At = {
 };
 function Ot(t) {
 	return function(e, n) {
-		let r = (...c) => c.length ? e.setAttribute(n, ...c) : K(r), o = ft(r, e.getAttribute(n), At);
+		let r = (...c) => c.length ? e.setAttribute(n, ...c) : V(r), o = ft(r, e.getAttribute(n), At);
 		return t[n] = o, o;
 	};
 }
@@ -544,7 +549,7 @@ var st = {
 				return R(n, o);
 			r(e, c);
 		};
-		return Q(n, o), ut(n, o, t, e), n();
+		return K(n, o), ut(n, o, t, e), n();
 	}
 };
 function ut(t, e, ...n) {
@@ -562,14 +567,14 @@ function ut(t, e, ...n) {
 	});
 }
 function it(t, e, n) {
-	let r = t ? () => K(r) : (...o) => o.length ? at(r, ...o) : K(r);
+	let r = t ? () => V(r) : (...o) => o.length ? at(r, ...o) : V(r);
 	return ft(r, e, n, t);
 }
 var St = Object.assign(/* @__PURE__ */ Object.create(null), {
 	stopPropagation() {
 		this.skip = !0;
 	}
-}), V = class extends Error {
+}), Q = class extends Error {
 	constructor() {
 		super();
 		let [e, ...n] = this.stack.split(`
@@ -590,7 +595,7 @@ function ft(t, e, n, r = !1) {
 			onclear: o,
 			host: u,
 			listeners: /* @__PURE__ */ new Set(),
-			defined: new V().stack,
+			defined: new Q().stack,
 			readonly: r
 		},
 		enumerable: !1,
@@ -601,7 +606,7 @@ function ft(t, e, n, r = !1) {
 function Ct() {
 	return z[z.length - 1];
 }
-function K(t) {
+function V(t) {
 	if (!t[p]) return;
 	let { value: e, listeners: n } = t[p], r = Ct();
 	return r && n.add(r), g.has(r) && g.get(r).add(t), e;
@@ -612,7 +617,7 @@ function at(t, e, n) {
 	if (!(!n && r.value === e))
 		return r.value = e, r.listeners.forEach((o) => o(e)), e;
 }
-function Q(t, e) {
+function K(t, e) {
 	if (t[p])
 		return t[p].listeners.add(e);
 }
@@ -636,15 +641,16 @@ globalThis.dde= {
 	S: E,
 	assign: q,
 	assignAttribute: nt,
+	asyncQueueAdd: Mt,
 	chainableAppend: lt,
 	classListDeclarative: ht,
 	createElement: M,
-	createElementNS: Mt,
-	customElementRender: Ht,
+	createElementNS: jt,
+	customElementRender: It,
 	customElementWithDDE: xt,
-	dispatchEvent: Zt,
+	dispatchEvent: Gt,
 	el: M,
-	elNS: Mt,
+	elNS: jt,
 	elementAttribute: bt,
 	isSignal: U,
 	lifecyclesToEvents: xt,
@@ -653,7 +659,7 @@ globalThis.dde= {
 	registerReactivity: H,
 	scope: x,
 	signal: E,
-	simulateSlots: jt
+	simulateSlots: Pt
 };
 
 })();
