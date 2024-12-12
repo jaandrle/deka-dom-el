@@ -72,7 +72,7 @@ export function el<
 	TAG extends keyof ExtendedHTMLElementTagNameMap,
 >(
 	tag_name: TAG,
-	attrs?: ElementAttributes<ExtendedHTMLElementTagNameMap[NoInfer<TAG>]> | ddeString,
+	attrs?: ElementAttributes<ExtendedHTMLElementTagNameMap[NoInfer<TAG>]> | ddeStringable,
 	...addons: ddeElementAddon<
 		ExtendedHTMLElementTagNameMap[NoInfer<TAG>]
 	>[], // TODO: for now addons must have the same element
@@ -82,7 +82,7 @@ export function el(
 ): ddeDocumentFragment
 export function el(
 	tag_name: string,
-	attrs?: ElementAttributes<HTMLElement> | ddeString,
+	attrs?: ElementAttributes<HTMLElement> | ddeStringable,
 	...addons: ddeElementAddon<HTMLElement>[]
 ): ddeHTMLElement
 
@@ -90,7 +90,7 @@ export function el<
 	C extends (attr: ddeComponentAttributes)=> SupportedElement | ddeDocumentFragment
 >(
 	component: C,
-	attrs?: Parameters<C>[0] | ddeString,
+	attrs?: Parameters<C>[0] | ddeStringable,
 	...addons: ddeElementAddon<ReturnType<C>>[]
 ): ReturnType<C> extends ddeHTMLElementTagNameMap[keyof ddeHTMLElementTagNameMap]
 	? ReturnType<C>
@@ -104,7 +104,7 @@ export function elNS(
 	EL extends ( TAG extends keyof SVGElementTagNameMap ? SVGElementTagNameMap[TAG] : SVGElement ),
 >(
 	tag_name: TAG,
-	attrs?: ElementAttributes<NoInfer<EL>> | ddeString,
+	attrs?: ElementAttributes<NoInfer<EL>> | ddeStringable,
 	...addons: ddeElementAddon<NoInfer<EL>>[]
 )=>  TAG extends keyof ddeSVGElementTagNameMap ? ddeSVGElementTagNameMap[TAG] : ddeSVGElement
 export function elNS(
@@ -114,7 +114,7 @@ export function elNS(
 	EL extends ( TAG extends keyof MathMLElementTagNameMap ? MathMLElementTagNameMap[TAG] : MathMLElement ),
 >(
 	tag_name: TAG,
-	attrs?: ddeString | Partial<{
+	attrs?: ddeStringable | Partial<{
 		[key in keyof EL]: EL[key] | ddeSignal<EL[key]> | string | number | boolean
 	}>,
 	...addons: ddeElementAddon<NoInfer<EL>>[]
@@ -123,7 +123,7 @@ export function elNS(
 	namespace: string
 ): (
 	tag_name: string,
-	attrs?: string | ddeString | Record<string, any>,
+	attrs?: string | ddeStringable | Record<string, any>,
 	...addons: ddeElementAddon<SupportedElement>[]
 )=> SupportedElement
 export { elNS as createElementNS }

@@ -108,9 +108,11 @@ export function simulateSlots(element, root= element){
 				try{ elementAttribute(el, "remove", "slot"); } catch(_error){}
 				const slot= slots[name];
 				if(!slot) return;
-				if(!name.startsWith(mark_s)) slot.childNodes.forEach(c=> c.remove());
+				if(!slot.name.startsWith(mark_s)){
+					slot.childNodes.forEach(c=> c.remove());
+					slot.name= mark_s+name;
+				}
 				slot.append(el);
-				slot.name= mark_s+name;
 				//TODO?: el.dispatchEvent(new CustomEvent("dde:slotchange", { detail: slot }));
 			}
 			element.append= orig; //TODO?: better memory management, but non-native behavior!
@@ -119,7 +121,7 @@ export function simulateSlots(element, root= element){
 	});
 	if(element!==root){
 		const els= Array.from(element.childNodes);
-		//els.forEach(el=> el.remove());
+		//TODO?: els.forEach(el=> el.remove());
 		element.append(...els);
 	}
 	return root;

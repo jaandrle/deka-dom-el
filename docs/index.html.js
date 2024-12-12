@@ -36,7 +36,7 @@ export function page({ pkg, info }){
 		el(code, { src: fileURL("./components/examples/introducing/3ps.js"), page_id }),
 		el("p").append(...T`
 			As we can see, in the code at location “A” we define ${el("em", t`how to react`)} when the function
-			is called with any event as an argument. At that moment, we ${el("em", t`don't care who/why/how`)}
+			is called with any event as an argument. At that moment, we ${el("em", t`don’t care who/why/how`)}
 			the function was called. Similarly, at point “B”, we reference to a function to be called on the event
 			${el("em", t`without caring`)} what the function will do at that time. Finally, at point “C”, we tell
 			the application that a change has occurred, in the input, and we ${el("em", t`don't care if/how someone`)}

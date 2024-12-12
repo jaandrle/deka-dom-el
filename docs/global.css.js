@@ -103,7 +103,7 @@ main{
 	[main-start] min(var(--body-max-width), 90%) [main-end]
 	1fr [full-main-end];
 }
-main > *{
+main > *, main slot > *{
 	grid-column: main;
 }
 .icon {
