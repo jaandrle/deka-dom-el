@@ -1,6 +1,7 @@
 import { signals } from "./signals-common.js";
 import { enviroment as env } from './dom-common.js';
 
+export function asyncQueueAdd(promise){ return env.qa(promise); }
 /** @type {{ scope: object, prevent: boolean, host: function }[]} */
 const scopes= [ {
 	get scope(){ return  env.D.body; },

@@ -1,6 +1,12 @@
 //TODO: https://www.npmjs.com/package/html-element
 import { enviroment as env } from './src/dom-common.js';
 env.ssr= " ssr";
+
+const wa_store= new Set();
+env.qa= function(promise){ wa_store.add(promise); return promise; };
+env.qw= function(){ return Promise.allSettled(Array.from(wa_store)).then(()=> wa_store.clear()); };
+export const asyncQueue= env.ww;
+
 const { setDeleteAttr }= env;
 /** @param {HTMLElement} obj */
 env.setDeleteAttr= function(obj, prop, value){
