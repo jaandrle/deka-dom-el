@@ -34,7 +34,9 @@ export class CustomHTMLTestElement extends HTMLElement{
 			text(test),
 			text(name),
 			text(preName),
-			el("button", { type: "button", textContent: "pre-name", onclick: ()=> preName("Ahoj") })
+			el("button", { type: "button", textContent: "pre-name", onclick: ()=> preName("Ahoj") }),
+			" | ",
+			el("slot", { className: "test", name: "test" }),
 		);
 	}
 	test= "A";

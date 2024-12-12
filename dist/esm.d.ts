@@ -40,7 +40,7 @@ type AttrsModified= {
 	& Record<`.${string}`, any>
 type _fromElsInterfaces<EL extends SupportedElement>= Omit<EL, keyof AttrsModified>;
 type IsReadonly<T, K extends keyof T> =
-  T extends { readonly [P in K]: T[K] } ? true : false;
+	T extends { readonly [P in K]: T[K] } ? true : false;
 /**
  * Just element attributtes
  *
@@ -129,14 +129,9 @@ export function elNS(
 export { elNS as createElementNS }
 
 export function chainableAppend<EL extends SupportedElement>(el: EL): EL;
-/**
- * Mapper function (optional). Pass for coppying attributes, this is NOT implemented by {@link simulateSlots} itself!
- * */
-type simulateSlotsMapper= (body: HTMLSlotElement, el: HTMLElement)=> void;
 /** Simulate slots for ddeComponents */
 export function simulateSlots<EL extends SupportedElement | DocumentFragment>(
 	root: EL,
-	mapper?: simulateSlotsMapper
 ): EL
 /**
  * Simulate slots in Custom Elements without using `shadowRoot`.
@@ -145,7 +140,7 @@ export function simulateSlots<EL extends SupportedElement | DocumentFragment>(
  * */
 export function simulateSlots<EL extends SupportedElement | DocumentFragment>(
 	el: HTMLElement,
-	body: EL, mapper?: simulateSlotsMapper
+	body: EL,
 ): EL
 
 export function dispatchEvent(name: keyof DocumentEventMap | string, options?: EventInit):

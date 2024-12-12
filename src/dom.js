@@ -25,7 +25,7 @@ export const scope= {
 		return scopes.pop();
 	},
 };
-// following chainableAppend implementation is OK as the ElementPrototype.append description already is { writable: true, enumerable: true, configurable: true } // editorconfig-checker-disable-line
+//NOTE: following chainableAppend implementation is OK as the ElementPrototype.append description already is { writable: true, enumerable: true, configurable: true } // editorconfig-checker-disable-line
 function append(...els){ this.appendOriginal(...els); return this; }
 export function chainableAppend(el){
 	if(el.append===append) return el; el.appendOriginal= el.append; el.append= append; return el;
@@ -36,7 +36,6 @@ export function createElement(tag, attributes, ...addons){
 	const s= signals(this);
 	let scoped= 0;
 	let el, el_host;
-	//TODO Array.isArray(tag) ⇒ set key (cache els)
 	if(Object(attributes)!==attributes || s.isSignal(attributes))
 		attributes= { textContent: attributes };
 	switch(true){
@@ -81,58 +80,7 @@ createElement.mark= function(attrs, is_open= false){
 	return out;
 };
 export { createElement as el };
-
-import { hasOwn } from "./helpers.js";
-/** @param {HTMLElement} element @param {HTMLElement} [root] */
-export function simulateSlots(element, root, mapper){
-	if(typeof root!=="object"){
-		mapper= root;
-		root= element;
-	}
-	const _default= Symbol.for("default");
-	const slots= Array.from(root.querySelectorAll("slot"))
-		.reduce((out, curr)=> Reflect.set(out, curr.name || _default, curr) && out, {});
-	const has_d= hasOwn(slots, _default);
-	element.append= new Proxy(element.append, {
-		apply(orig, _, els){
-			if(els[0]===root) return orig.apply(element, els);
-			if(!els.length) return element;
-
-			const d= env.D.createDocumentFragment();
-			for(const el of els){
-				if(!el || !el.slot){ if(has_d) d.append(el); continue; }
-				const name= el.slot;
-				const slot= slots[name];
-				elementAttribute(el, "remove", "slot");
-				if(!slot) continue;
-				simulateSlotReplace(slot, el, mapper);
-				Reflect.deleteProperty(slots, name);
-			}
-			if(has_d){
-				slots[_default].replaceWith(d);
-				Reflect.deleteProperty(slots, _default);
-			}
-			element.append= orig; //TODO: better memory management, but non-native behavior!
-			return element;
-		}
-	});
-	if(element!==root){
-		const els= Array.from(element.childNodes);
-		els.forEach(el=> el.remove());
-		element.append(...els);
-	}
-	return root;
-}
-export function cn(...s){ return s.filter(Boolean).join(" "); }
-function simulateSlotReplace(slot, element, mapper){
-	if(mapper) mapper(slot, element);
-	try{ slot.replaceWith(assign(element, {
-		className: cn(element.className, slot.className),
-		dataset: { ...slot.dataset } })); }
-	catch(_){ slot.replaceWith(element); }
-}
-
-//const namespaceHelper= ns=> ns==="svg" ? "http://www.w3.org/2000/svg" : ns;
+//TODO?: const namespaceHelper= ns=> ns==="svg" ? "http://www.w3.org/2000/svg" : ns;
 export function createElementNS(ns){
 	const _this= this;
 	return function createElementNSCurried(...rest){
@@ -143,6 +91,38 @@ export function createElementNS(ns){
 	};
 }
 export { createElementNS as elNS };
+
+/** @param {HTMLElement} element @param {HTMLElement} [root] */
+export function simulateSlots(element, root= element){
+	const mark_e= "¹⁰", mark_s= "✓"; //NOTE: Markers to identify slots processed by this function. Also “prevents” native behavior as it is unlikely to use these in names. // editorconfig-checker-disable-line
+	const slots= Object.fromEntries(
+		Array.from(root.querySelectorAll("slot"))
+			.filter(s => !s.name.endsWith(mark_e))
+			.map(s => [(s.name += mark_e), s]));
+	element.append= new Proxy(element.append, {
+		apply(orig, _, els){
+			if(els[0]===root) return orig.apply(element, els);
+			for(const el of els){
+				const name= (el.slot||"")+mark_e;
+				try{ elementAttribute(el, "remove", "slot"); } catch(_error){}
+				const slot= slots[name];
+				if(!slot) return;
+				if(!name.startsWith(mark_s)) slot.childNodes.forEach(c=> c.remove());
+				slot.append(el);
+				slot.name= mark_s+name;
+				//TODO?: el.dispatchEvent(new CustomEvent("dde:slotchange", { detail: slot }));
+			}
+			element.append= orig; //TODO?: better memory management, but non-native behavior!
+			return element;
+		}
+	});
+	if(element!==root){
+		const els= Array.from(element.childNodes);
+		//els.forEach(el=> el.remove());
+		element.append(...els);
+	}
+	return root;
+}
 
 const assign_context= new WeakMap();
 const { setDeleteAttr }= env;
@@ -168,11 +148,11 @@ export function assignAttribute(element, key, value){
 		key= key.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
 		return setRemoveAttr(key, value);
 	}
-	if("className"===key) key= "class";//just optimalization, `isPropSetter` returns false immediately
+	if("className"===key) key= "class";//NOTE: just optimalization, this makes `isPropSetter` returns false immediately // editorconfig-checker-disable-line
 	switch(key){
 		case "xlink:href":
 			return setRemoveAttr(key, value, "http://www.w3.org/1999/xlink");
-		case "textContent": //just optimalization, its part of Node ⇒ deep for `isPropSetter`
+		case "textContent": //NOTE: just optimalization, this makes `isPropSetter` returns false immediately (as its part of Node ⇒ deep for `isPropSetter`) // editorconfig-checker-disable-line
 			return setDeleteAttr(element, key, value);
 		case "style":
 			if(typeof value!=="object") break;
@@ -206,7 +186,7 @@ export function elementAttribute(element, op, key, value){
 	return element[op+"AttributeNS"](null, key, value);
 }
 import { isUndef } from "./helpers.js";
-//TODO add cache? `(Map/Set)<el.tagName+key,isUndef>`
+//TODO: add cache? `(Map/Set)<el.tagName+key,isUndef>`
 function isPropSetter(el, key){
 	if(!(key in el)) return false;
 	const des= getPropDescriptor(el, key);

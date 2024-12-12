@@ -15,7 +15,10 @@ document.body.append(
 	el("h1", "Experiments:"),
 	el(fullNameComponent),
 	el(todosComponent),
-	el(CustomHTMLTestElement.tagName, { name: "attr" }),
+	el(CustomHTMLTestElement.tagName, { name: "attr" }).append(
+		el("span", { textContent: "test", slot: "test" }),
+		el("span", { textContent: "test", slot: "test" }),
+	),
 	el(thirdParty),
 	el(CustomSlottingHTMLElement.tagName, { onclick: ()=> toggle(!toggle()) }).append(
 		el("strong", { slot: "name", textContent: "Honzo" }),

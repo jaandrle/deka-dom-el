@@ -58,7 +58,7 @@ signal.on= function on(s, listener, options= {}){
 	if(Array.isArray(s)) return s.forEach(s=> on(s, listener, options));
 	addSignalListener(s, listener);
 	if(as) as.addEventListener("abort", ()=> removeSignalListener(s, listener));
-	//TODO cleanup when signal removed
+	//TODO: cleanup when signal removed
 };
 signal.symbols= {
 	//signal: mark,

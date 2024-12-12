@@ -82,12 +82,12 @@ function connectionsChangesObserverConstructor(){
 		is_observing= false;
 		observer.disconnect();
 	}
-	//TODO remount support?
+	//TODO: remount support?
 	function requestIdle(){ return new Promise(function(resolve){
 		(requestIdleCallback || requestAnimationFrame)(resolve);
 	}); }
 	async function collectChildren(element){
-		if(store.size > 30)//TODO limit?
+		if(store.size > 30)//TODO?: limit
 			await requestIdle();
 		const out= [];
 		if(!(element instanceof Node)) return out;
