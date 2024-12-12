@@ -38,17 +38,16 @@ function G(t) {
 
 // src/dom-common.js
 var f = {
-	setDeleteAttr: Q,
+	setDeleteAttr: V,
 	ssr: "",
 	D: globalThis.document,
 	F: globalThis.DocumentFragment,
 	H: globalThis.HTMLElement,
 	S: globalThis.SVGElement,
 	M: globalThis.MutationObserver,
-	qa: (t) => t,
-	qw: () => Promise.resolve()
+	q: (t) => t || Promise.resolve()
 };
-function Q(t, e, n) {
+function V(t, e, n) {
 	if (Reflect.set(t, e, n), !!x(n)) {
 		if (Reflect.deleteProperty(t, e), t instanceof f.H && t.getAttribute(e) === "undefined")
 			return t.removeAttribute(e);
@@ -60,7 +59,7 @@ var w = "__dde_lifecyclesToEvents", v = "dde:connected", m = "dde:disconnected",
 
 // src/dom.js
 function dt(t) {
-	return f.qa(t);
+	return f.q(t);
 }
 var g = [{
 	get scope() {
@@ -96,7 +95,7 @@ var g = [{
 function q(...t) {
 	return this.appendOriginal(...t), this;
 }
-function V(t) {
+function J(t) {
 	return t.append === q || (t.appendOriginal = t.append, t.append = q), t;
 }
 var T;
@@ -129,7 +128,7 @@ function P(t, e, ...n) {
 		case !c:
 			c = R.call(this, f.D.createElement(t), e);
 	}
-	return V(c), a || (a = c), n.forEach((d) => d(a)), o && D.pop(), o = 2, c;
+	return J(c), a || (a = c), n.forEach((d) => d(a)), o && D.pop(), o = 2, c;
 }
 P.mark = function(t, e = !1) {
 	t = Object.entries(t).map(([o, c]) => o + `="${c}"`).join(" ");
@@ -154,7 +153,7 @@ function ht(t, e = t) {
 			for (let p of d) {
 				let b = (p.slot || "") + n;
 				try {
-					K(p, "remove", "slot");
+					Q(p, "remove", "slot");
 				} catch {
 				}
 				let h = o[b];
@@ -203,7 +202,7 @@ function U(t, e, n) {
 		case "ariaset":
 			return M(o, n, (d, p) => r("aria-" + d, p));
 		case "classList":
-			return J.call(c, t, n);
+			return K.call(c, t, n);
 	}
 	return X(t, e) ? $(t, e, n) : r(e, n);
 }
@@ -212,7 +211,7 @@ function H(t, e) {
 	let r = (t instanceof f.S ? tt : Y).bind(null, t, "Attribute"), o = S(e);
 	return { setRemoveAttr: r, s: o };
 }
-function J(t, e) {
+function K(t, e) {
 	let n = S(this);
 	return M(
 		n,
@@ -220,7 +219,7 @@ function J(t, e) {
 		(r, o) => t.classList.toggle(r, o === -1 ? void 0 : !!o)
 	), t;
 }
-function K(t, e, n, r) {
+function Q(t, e, n, r) {
 	return t instanceof f.H ? t[e + "Attribute"](n, r) : t[e + "AttributeNS"](null, n, r);
 }
 function X(t, e) {
@@ -428,9 +427,8 @@ _.attributeChanged = function(t, e) {
 export {
 	R as assign,
 	U as assignAttribute,
-	dt as asyncQueueAdd,
-	V as chainableAppend,
-	J as classListDeclarative,
+	J as chainableAppend,
+	K as classListDeclarative,
 	P as createElement,
 	pt as createElementNS,
 	mt as customElementRender,
@@ -438,10 +436,11 @@ export {
 	Ot as dispatchEvent,
 	P as el,
 	pt as elNS,
-	K as elementAttribute,
+	Q as elementAttribute,
 	nt as lifecyclesToEvents,
 	rt as observedAttributes,
 	_ as on,
+	dt as queue,
 	Z as registerReactivity,
 	D as scope,
 	ht as simulateSlots

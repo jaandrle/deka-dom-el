@@ -6,8 +6,7 @@ export const enviroment= {
 	H: globalThis.HTMLElement,
 	S: globalThis.SVGElement,
 	M: globalThis.MutationObserver,
-	qa: (p)=> p,
-	qw: ()=> Promise.resolve(),
+	q: p=> p || Promise.resolve(),
 };
 import { isUndef } from './helpers.js';
 function setDeleteAttr(obj, prop, val){

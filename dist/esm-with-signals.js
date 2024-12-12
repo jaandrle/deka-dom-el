@@ -50,8 +50,7 @@ var d = {
 	H: globalThis.HTMLElement,
 	S: globalThis.SVGElement,
 	M: globalThis.MutationObserver,
-	qa: (t) => t,
-	qw: () => Promise.resolve()
+	q: (t) => t || Promise.resolve()
 };
 function pt(t, e, n) {
 	if (Reflect.set(t, e, n), !!A(n)) {
@@ -65,7 +64,7 @@ var O = "__dde_lifecyclesToEvents", _ = "dde:connected", S = "dde:disconnected",
 
 // src/dom.js
 function Mt(t) {
-	return d.qa(t);
+	return d.q(t);
 }
 var y = [{
 	get scope() {
@@ -465,7 +464,7 @@ E.on = function t(e, n, r = {}) {
 	let { signal: o } = r;
 	if (!(o && o.aborted)) {
 		if (Array.isArray(e)) return e.forEach((c) => t(c, n, r));
-		K(e, n), o && o.addEventListener("abort", () => R(e, n));
+		Q(e, n), o && o.addEventListener("abort", () => R(e, n));
 	}
 };
 E.symbols = {
@@ -506,7 +505,7 @@ E.el = function(t, e) {
 			k.remove();
 		m.remove(), n.isConnected && yt(c.host());
 	};
-	return K(t, a), ut(t, a, n, e), a(t()), o;
+	return Q(t, a), ut(t, a, n, e), a(t()), o;
 };
 function yt(t) {
 	!t || !t[D] || (requestIdleCallback || setTimeout)(function() {
@@ -520,7 +519,7 @@ var At = {
 };
 function Ot(t) {
 	return function(e, n) {
-		let r = (...c) => c.length ? e.setAttribute(n, ...c) : V(r), o = ft(r, e.getAttribute(n), At);
+		let r = (...c) => c.length ? e.setAttribute(n, ...c) : K(r), o = ft(r, e.getAttribute(n), At);
 		return t[n] = o, o;
 	};
 }
@@ -547,7 +546,7 @@ var st = {
 				return R(n, o);
 			r(e, c);
 		};
-		return K(n, o), ut(n, o, t, e), n();
+		return Q(n, o), ut(n, o, t, e), n();
 	}
 };
 function ut(t, e, ...n) {
@@ -565,14 +564,14 @@ function ut(t, e, ...n) {
 	});
 }
 function it(t, e, n) {
-	let r = t ? () => V(r) : (...o) => o.length ? at(r, ...o) : V(r);
+	let r = t ? () => K(r) : (...o) => o.length ? at(r, ...o) : K(r);
 	return ft(r, e, n, t);
 }
 var St = Object.assign(/* @__PURE__ */ Object.create(null), {
 	stopPropagation() {
 		this.skip = !0;
 	}
-}), Q = class extends Error {
+}), V = class extends Error {
 	constructor() {
 		super();
 		let [e, ...n] = this.stack.split(`
@@ -593,7 +592,7 @@ function ft(t, e, n, r = !1) {
 			onclear: o,
 			host: u,
 			listeners: /* @__PURE__ */ new Set(),
-			defined: new Q().stack,
+			defined: new V().stack,
 			readonly: r
 		},
 		enumerable: !1,
@@ -604,7 +603,7 @@ function ft(t, e, n, r = !1) {
 function Ct() {
 	return z[z.length - 1];
 }
-function V(t) {
+function K(t) {
 	if (!t[p]) return;
 	let { value: e, listeners: n } = t[p], r = Ct();
 	return r && n.add(r), g.has(r) && g.get(r).add(t), e;
@@ -615,7 +614,7 @@ function at(t, e, n) {
 	if (!(!n && r.value === e))
 		return r.value = e, r.listeners.forEach((o) => o(e)), e;
 }
-function K(t, e) {
+function Q(t, e) {
 	if (t[p])
 		return t[p].listeners.add(e);
 }
@@ -638,7 +637,6 @@ export {
 	E as S,
 	q as assign,
 	nt as assignAttribute,
-	Mt as asyncQueueAdd,
 	lt as chainableAppend,
 	ht as classListDeclarative,
 	M as createElement,
@@ -653,6 +651,7 @@ export {
 	xt as lifecyclesToEvents,
 	wt as observedAttributes,
 	w as on,
+	Mt as queue,
 	H as registerReactivity,
 	x as scope,
 	E as signal,

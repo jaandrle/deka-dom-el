@@ -2,10 +2,12 @@
 import { enviroment as env } from './src/dom-common.js';
 env.ssr= " ssr";
 
-const wa_store= new Set();
-env.qa= function(promise){ wa_store.add(promise); return promise; };
-env.qw= function(){ return Promise.allSettled(Array.from(wa_store)).then(()=> wa_store.clear()); };
-export const asyncQueue= env.ww;
+const q_store= new Set();
+env.q= function(promise){
+	if(promise) return ( q_store.add(promise), promise );
+	return Promise.allSettled(Array.from(q_store)).then(()=> q_store.clear());
+};
+export const queue= env.q;
 
 const { setDeleteAttr }= env;
 /** @param {HTMLElement} obj */
