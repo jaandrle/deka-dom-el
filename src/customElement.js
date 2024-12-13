@@ -1,7 +1,8 @@
 import { keyLTE, evc, evd, eva } from "./dom-common.js";
 import { scope } from "./dom.js";
 import { c_ch_o } from "./events-observer.js";
-export function customElementRender(custom_element, target, render, props= observedAttributes){
+export function customElementRender(target, render, props= observedAttributes){
+	const custom_element= target.host || target;
 	scope.push({
 		scope: custom_element,
 		host: (...c)=> c.length ? c.forEach(c=> c(custom_element)) : custom_element
