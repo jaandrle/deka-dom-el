@@ -8,7 +8,7 @@ export class HTMLCustomElement extends HTMLElement{
 	static tagName= "custom-slotting";
 	connectedCallback(){
 		const c= ()=> simulateSlots(this, ddeComponent());
-		customElementRender(this, this, c);
+		customElementRender(this, c);
 	}
 }
 customElementWithDDE(HTMLCustomElement);

@@ -7,7 +7,6 @@ export class HTMLCustomElement extends HTMLElement{
 	static observedAttributes= [ "attr" ];
 	connectedCallback(){
 		customElementRender(
-			this,
 			this.attachShadow({ mode: "open" }),
 			ddeComponent
 		);

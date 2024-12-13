@@ -17,11 +17,7 @@ function ddeComponent(){
 export class A extends HTMLElement{
 	static tagName= "custom-element-without";
 	connectedCallback(){
-		customElementRender(
-			this,
-			this,
-			ddeComponent
-		);
+		customElementRender(this, ddeComponent);
 	}
 }
 customElementWithDDE(A);
@@ -30,7 +26,6 @@ export class B extends HTMLElement{
 	static tagName= "custom-element-open";
 	connectedCallback(){
 		customElementRender(
-			this,
 			this.attachShadow({ mode: "open" }),
 			ddeComponent
 		);
@@ -42,7 +37,6 @@ export class C extends HTMLElement{
 	static tagName= "custom-element-closed";
 	connectedCallback(){
 		customElementRender(
-			this,
 			this.attachShadow({ mode: "closed" }),
 			ddeComponent
 		);

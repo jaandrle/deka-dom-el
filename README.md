@@ -8,12 +8,17 @@
 
 ```javascript
 document.body.append(
-	el(HelloWorldComponent)
+	el(HelloWorldComponent, { initial: "🚀" })
 );
-function HelloWorldComponent(){
+/** @typedef {"🎉" | "🚀"} Emoji */
+/** @param {{ initial: Emoji }} attrs */
+function HelloWorldComponent({ initial }){
 	const clicks= S(0);
-	const emoji= S("🚀");
-	const isSelected= el=> (el.selected= el.value===emoji());
+	const emoji= S(initial);
+	/** @param {HTMLOptionElement} el */
+	const isSelected= el=> (el.selected= el.value===initial);
+	// @ts-expect-error 2339: The <select> has only two options with {@link Emoji}
+	const onChange= on("change", event=> emoji(event.target.value));
 
 	return el().append(
 		el("p", {
@@ -27,11 +32,9 @@ function HelloWorldComponent(){
 			on("click", ()=> clicks(clicks() + 1)),
 			on("keyup", ()=> clicks(clicks() - 2)),
 		),
-		el("select", {
-			onchange: event=> emoji(event.target.value),
-		}).append(
-			el(OptionComponent, "🎉", isSelected),
-			el(OptionComponent, "🚀", isSelected),
+		el("select", null, onChange).append(
+			el(OptionComponent, "🎉", isSelected),//OR { textContent: "🎉" }
+			el(OptionComponent, "🚀", isSelected),//OR { textContent: "🚀" }
 		)
 	);
 }

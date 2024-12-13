@@ -11,7 +11,6 @@ export class HTMLCustomElement extends HTMLElement{
 	connectedCallback(){
 		console.log(observedAttributes(this));
 		customElementRender(
-			this,
 			this.attachShadow({ mode: "open" }),
 			ddeComponent,
 			S.observedAttributes

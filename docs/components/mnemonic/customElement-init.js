@@ -4,8 +4,8 @@ import { mnemonicUl } from "../mnemonicUl.html.js";
 export function mnemonic(){
 	return mnemonicUl().append(
 		el("li").append(
-			el("code", "customElementRender(<custom-element>, <connect-target>, <render-function>[, <properties>])"),
-			" — use function to render DOM structure for given <custom-element>",
+			el("code", "customElementRender(<connect-target>, <render-function>[, <properties>])"),
+			" — use function to render DOM structure for given custom element (or its Shadow DOM)",
 		),
 		el("li").append(
 			el("code", "customElementWithDDE(<custom-element>)"),
@@ -24,7 +24,7 @@ export function mnemonic(){
 			" — convert lifecycle methods to events, can be also used as decorator",
 		),
 		el("li").append(
-			el("code", "simulateSlots(<class-instance>, <body>[, <mapper>])"),
+			el("code", "simulateSlots(<class-instance>, <body>)"),
 			" — simulate slots for Custom Elements without shadow DOM",
 		),
 		el("li").append(

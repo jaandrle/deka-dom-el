@@ -1,6 +1,7 @@
 import { signals } from "./signals-common.js";
 import { enviroment as env } from './dom-common.js';
 
+//TODO: add type, docs ≡ make it public
 export function queue(promise){ return env.q(promise); }
 /** @type {{ scope: object, prevent: boolean, host: function }[]} */
 const scopes= [ {

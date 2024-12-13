@@ -227,7 +227,6 @@ export function customElementRender<
 	EL extends HTMLElement,
 	P extends any = Record<string, string | ddeSignal<string>>
 >(
-	custom_element: EL,
 	target: ShadowRoot | EL,
 	render: (props: P)=> SupportedElement | DocumentFragment,
 	props?: P | ((el: EL)=> P)

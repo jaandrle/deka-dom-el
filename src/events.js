@@ -8,6 +8,7 @@ export function dispatchEvent(name, options, host){
 			d.unshift(element);
 			element= typeof host==="function"? host() : host;
 		}
+		//TODO: what about re-emmitting?
 		const event= d.length ? new CustomEvent(name, Object.assign({ detail: d[0] }, options)) : new Event(name, options);
 		return element.dispatchEvent(event);
 	};
