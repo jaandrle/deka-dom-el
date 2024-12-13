@@ -51,9 +51,9 @@ let is_registered= {};
 /** @param {string} page_id */
 function registerClientPart(page_id){
 	if(is_registered[page_id]) return;
-	
+
 	document.head.append(
-		 el("script", { src: "https://cdn.jsdelivr.net/npm/shiki@0.9", defer: true }),
+		el("script", { src: "https://cdn.jsdelivr.net/npm/shiki@0.9", defer: true }),
 	);
 	registerClientFile(
 		new URL("./code.js.js", import.meta.url),

@@ -10,7 +10,7 @@ export function createHTMl(html, options= {}){
 	if(dom) cleanHTML();
 	// set a default url if we don't get one - otherwise things explode when we copy localstorage keys
 	if (!('url' in options)) { Object.assign(options, { url: 'http://localhost:3000' }) }
-	
+
 	dom= new JSDOM(html, options);
 	const window= dom.window;
 	return {

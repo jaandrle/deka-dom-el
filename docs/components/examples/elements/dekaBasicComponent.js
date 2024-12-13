@@ -11,7 +11,7 @@ document.body.append(
 );
 
 function component({ className, textContent }){
-	return el("div", { className: [ "class1", className ] }).append(
+	return el("div", { className: [ "class1", className ].join(" ") }).append(
 		el("p", textContent)
 	);
 }

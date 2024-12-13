@@ -27,7 +27,7 @@ export function page({ pkg, info }){
 	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
 		el("p", t`The library tries to provide pure JavaScript tool(s) to create reactive interfaces using …`),
-		
+
 		el(h3, t`Event-driven programming (3 parts separation ≡ 3PS)`),
 		el("p").append(t`
 			Let's introduce the basic principle on which the library is built. We'll use the JavaScript listener as
@@ -36,7 +36,7 @@ export function page({ pkg, info }){
 		el(code, { src: fileURL("./components/examples/introducing/3ps.js"), page_id }),
 		el("p").append(...T`
 			As we can see, in the code at location “A” we define ${el("em", t`how to react`)} when the function
-			is called with any event as an argument. At that moment, we ${el("em", t`don't care who/why/how`)}
+			is called with any event as an argument. At that moment, we ${el("em", t`don’t care who/why/how`)}
 			the function was called. Similarly, at point “B”, we reference to a function to be called on the event
 			${el("em", t`without caring`)} what the function will do at that time. Finally, at point “C”, we tell
 			the application that a change has occurred, in the input, and we ${el("em", t`don't care if/how someone`)}
@@ -56,7 +56,7 @@ export function page({ pkg, info }){
 			describe usage in specific situations, see for example ${el("a", { textContent: t`MVVM`, ...references.w_mvv })}
 			or ${el("a", { textContent: t`MVC`, ...references.w_mvc })}.
 		`),
-		
+
 		el(h3, t`Organization of the documentation`),
 	);
 }

@@ -49,7 +49,7 @@ export function page({ pkg, info }){
 			programming. If we desire to solve the issue in a declarative manner, signals may be a viable approach.
 		`),
 		el(code, { src: fileURL("./components/examples/signals/intro.js"), page_id }),
-		
+
 		el(h3, t`Introducing signals`),
 		el("p").append(...T`
 			Let’s re-introduce
@@ -62,7 +62,7 @@ export function page({ pkg, info }){
 		`),
 		el(example, { src: fileURL("./components/examples/signals/signals.js"), page_id }),
 		el("p").append(...T`
-			All this is just an example of 
+			All this is just an example of
 			${el("a", { textContent: t`Event-driven programming`, ...references.wiki_event_driven })} and
 			${el("a", { textContent: t`Publish–subscribe pattern`, ...references.wiki_pubsub })} (compare for example
 			with ${el("a", { textContent: t`fpubsub library`, ...references.fpubsub })}). All three parts can be in
@@ -109,8 +109,8 @@ export function page({ pkg, info }){
 		el("p").append(...T`
 			To derived attribute based on value of signal variable just use the signal as a value of the attribute
 			(${el("code", "assign(element, { attribute: S('value') })")}). ${el("code", "assign")}/${el("code", "el")}
-			 provides ways to glue reactive attributes/classes more granularly into the DOM. Just use dedicated build-in
-			 attributes ${el("code", "dataset")}, ${el("code", "ariaset")} and ${el("code", "classList")}.
+			provides ways to glue reactive attributes/classes more granularly into the DOM. Just use dedicated build-in
+			attributes ${el("code", "dataset")}, ${el("code", "ariaset")} and ${el("code", "classList")}.
 		`),
 		el("p").append(...T`
 			For computation, you can use the “derived signal” (see above) like

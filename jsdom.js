@@ -1,6 +1,14 @@
 //TODO: https://www.npmjs.com/package/html-element
 import { enviroment as env } from './src/dom-common.js';
 env.ssr= " ssr";
+
+const q_store= new Set();
+env.q= function(promise){
+	if(promise) return ( q_store.add(promise), promise );
+	return Promise.allSettled(Array.from(q_store)).then(()=> q_store.clear());
+};
+export const queue= env.q;
+
 const { setDeleteAttr }= env;
 /** @param {HTMLElement} obj */
 env.setDeleteAttr= function(obj, prop, value){
@@ -29,7 +37,7 @@ export function register(dom){
 export function unregister(){
 	if(!dom_last)
 		return false;
-	
+
 	Object.assign(env, env_bk);
 	env_bk= {};
 	dom_last= undefined;

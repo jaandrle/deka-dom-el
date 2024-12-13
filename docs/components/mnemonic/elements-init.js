@@ -4,22 +4,28 @@ import { mnemonicUl } from "../mnemonicUl.html.js";
 export function mnemonic(){
 	return mnemonicUl().append(
 		el("li").append(
-			el("code", "assign(<element>, ...<idl-objects>): <element>"), " — assign properties to the element",
+			el("code", "assign(<element>, ...<objects>): <element>"),
+			" — assign properties (prefered, or attributes) to the element",
 		),
 		el("li").append(
-			el("code", "el(<tag-name>, <primitive>)[.append(...)]: <element-from-tag-name>"), " — simple element containing only text",
+			el("code", "el(<tag-name>, <primitive>)[.append(...)]: <element-from-tag-name>"),
+			" — simple element containing only text",
 		),
 		el("li").append(
-			el("code", "el(<tag-name>, <idl-object>)[.append(...)]: <element-from-tag-name>"), " — element with more properties",
+			el("code", "el(<tag-name>, <object>)[.append(...)]: <element-from-tag-name>"),
+			" — element with more properties (prefered, or attributes)",
 		),
 		el("li").append(
-			el("code", "el(<function>, <function-argument(s)>)[.append(...)]: <element-returned-by-function>"), " — using component represented by function",
+			el("code", "el(<function>, <function-argument(s)>)[.append(...)]: <element-returned-by-function>"),
+			" — using component represented by function (must accept object like for <tag-name>)",
 		),
 		el("li").append(
-			el("code", "el(<...>, <...>, ...<addons>)"), " — see following page"
+			el("code", "el(<...>, <...>, ...<addons>)"),
+			" — see following section of documentation",
 		),
 		el("li").append(
-			el("code", "elNS(<namespace>)(<as-el-see-above>)[.append(...)]: <element-based-on-arguments>"), " — typically SVG elements",
+			el("code", "elNS(<namespace>)(<as-el-see-above>)[.append(...)]: <element-based-on-arguments>"),
+			" — typically SVG elements",
 		)
 	);
 }

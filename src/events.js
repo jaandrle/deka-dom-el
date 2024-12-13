@@ -8,6 +8,7 @@ export function dispatchEvent(name, options, host){
 			d.unshift(element);
 			element= typeof host==="function"? host() : host;
 		}
+		//TODO: what about re-emmitting?
 		const event= d.length ? new CustomEvent(name, Object.assign({ detail: d[0] }, options)) : new Event(name, options);
 		return element.dispatchEvent(event);
 	};
@@ -64,9 +65,9 @@ on.attributeChanged= function(listener, options){
 		element.addEventListener(eva, listener, options);
 		if(element[keyLTE] || els_attribute_store.has(element))
 			return element;
-		
+
 		if(!env.M) return element;
-		
+
 		const observer= new env.M(function(mutations){
 			for(const { attributeName, target } of mutations)
 				target.dispatchEvent(
@@ -77,4 +78,4 @@ on.attributeChanged= function(listener, options){
 		//TODO: clean up when element disconnected
 		return element;
 	};
-};	
+};

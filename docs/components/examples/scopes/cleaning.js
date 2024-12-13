@@ -1,4 +1,6 @@
-import { el, empty, on } from "deka-dom-el";
+import { el, on } from "deka-dom-el";
+/** @param {HTMLElement} el */
+const empty= el=> Array.from(el.children).forEach(c=> c.remove());
 document.body.append(
 	el(component),
 	el("button", {

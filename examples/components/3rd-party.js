@@ -21,7 +21,8 @@ export function thirdParty(){
 	});
 	// Array.from((new URL(location)).searchParams.entries())
 	// 	.forEach(([ key, value ])=> S.action(store, "set", key, value));
-	// S.on(store, data=> history.replaceState("", "", "?"+(new URLSearchParams(JSON.parse(JSON.stringify(data)))).toString()));
+	// S.on(store, data=> history.replaceState("", "",
+	// "?"+(new URLSearchParams(JSON.parse(JSON.stringify(data)))).toString()));
 	useStore(store_adapter, {
 		onread(data){
 			Array.from(data.entries())

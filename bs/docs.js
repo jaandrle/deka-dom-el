@@ -1,5 +1,5 @@
 #!/usr/bin/env -S npx nodejsscript
-/* jshint esversion: 11,-W097, -W040, module: true, node: true, expr: true, undef: true *//* global echo, $, pipe, s, fetch, cyclicLoop */
+/* jshint esversion: 11,-W097, -W040, module: true, node: true, expr: true, undef: true *//* global echo, $, pipe, s, fetch, cyclicLoop */// editorconfig-checker-disable-line
 echo("Building static documentation files…");
 echo("Preparing…");
 import { path_target, pages as pages_registered, styles, dispatchEvent, t } from "../docs/ssr.js";

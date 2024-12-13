@@ -47,7 +47,7 @@ let is_registered= {};
 /** @param {string} page_id */
 function registerClientPart(page_id){
 	if(is_registered[page_id]) return;
-	
+
 	document.head.append(
 		el("script", { src: "https://flems.io/flems.html", type: "text/javascript", charset: "utf-8" }),
 	);
@@ -64,5 +64,5 @@ function generateCodeId(src){
 		.replace(/000+/g, "");
 	const count= 1 + ( store_prev.get(candidate) || 0 );
 	store_prev.set(candidate, count);
-	return count.toString()+"-"+candidate; 
+	return count.toString()+"-"+candidate;
 }

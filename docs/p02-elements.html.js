@@ -54,7 +54,7 @@ export function page({ pkg, info }){
 		`),
 
 		el(code, { src: fileURL("./components/examples/elements/intro.js"), page_id }),
-		
+
 		el(h3, t`Creating element(s) (with custom attributes)`),
 		el("p").append(...T`
 			You can create a native DOM element by using the ${el("a", references.mdn_create).append(
@@ -77,8 +77,9 @@ export function page({ pkg, info }){
 		el("p").append(...T`
 			You can study all JavaScript elements interfaces to the corresponding HTML elements. All HTML elements
 			inherits from ${el("a", { textContent: "HTMLElement", ...references.mdn_el })}. To see
-			all available IDLs for example for paragraphs, see ${el("a", { textContent: "HTMLParagraphElement", ...references.mdn_p })}.
-			Moreover, the ${el("code", "assign")} provides a way to sets declaratively some convenient properties:
+			all available IDLs for example for paragraphs, see ${el("a", { textContent: "HTMLParagraphElement",
+			...references.mdn_p })}. Moreover, the ${el("code", "assign")} provides a way to sets declaratively
+			some convenient properties:
 		`),
 		el("ul").append(
 			el("li").append(...T`
@@ -91,8 +92,7 @@ export function page({ pkg, info }){
 			el("li").append(...T`You can use string or object as a value for ${el("code", "style")} property.`),
 			el("li").append(...T`
 				${el("code", "className")} (IDL – preffered)/${el("code", "class")} are ways to add CSS classes
-				to the element. You can use string (similarly to ${el("code", "class=\"…\"")} syntax in  HTML) or
-				array of strings. This is handy to concat conditional classes.
+				to the element. You can use string (similarly to ${el("code", "class=\"…\"")} syntax in  HTML).
 			`),
 			el("li").append(...T`
 				Use ${el("code", "classList")} to toggle specific classes. This will be handy later when
@@ -114,7 +114,7 @@ export function page({ pkg, info }){
 			${el("code", "classListDeclarative")}.
 		`),
 		el(example, { src: fileURL("./components/examples/elements/dekaAssign.js"), page_id }),
-		
+
 		el(h3, t`Native JavaScript templating`),
 		el("p", t`By default, the native JS has no good way to define HTML template using DOM API:`),
 		el(example, { src: fileURL("./components/examples/elements/nativeAppend.js"), page_id }),
@@ -123,8 +123,8 @@ export function page({ pkg, info }){
 			parent element.
 		`),
 		el(example, { src: fileURL("./components/examples/elements/dekaAppend.js"), page_id }),
-		
-		
+
+
 		el(h3, t`Basic (state-less) components`),
 		el("p").append(...T`
 			You can use functions for encapsulation (repeating) logic. The ${el("code", "el")} accepts function
@@ -149,7 +149,7 @@ export function page({ pkg, info }){
 			the ${el("code", "elNS")} function:
 		`),
 		el(example, { src: fileURL("./components/examples/elements/dekaElNS.js"), page_id }),
-		
+
 		el(mnemonic)
 	);
 }

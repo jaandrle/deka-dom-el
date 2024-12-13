@@ -4,7 +4,7 @@ const count= S(0);
 import { el } from "deka-dom-el";
 document.body.append(
 	el("p", S(()=> "Currently: "+count())),
-	el("p", { classList: { red: S(()=> count()%2) }, dataset: { count }, textContent: "Attributes example" })
+	el("p", { classList: { red: S(()=> count()%2 === 0) }, dataset: { count }, textContent: "Attributes example" }),
 );
 document.head.append(
 	el("style", ".red { color: red; }")
