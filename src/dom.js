@@ -162,9 +162,9 @@ export function assignAttribute(element, key, value){
 			if(typeof value!=="object") break;
 			/* falls through */
 		case "dataset":
-			return forEachEntries(s, value, setDelete.bind(null, element[key]));
+			return forEachEntries(s, key, element, value, setDelete.bind(null, element[key]));
 		case "ariaset":
-			return forEachEntries(s, value, (key, val)=> setRemoveAttr("aria-"+key, val));
+			return forEachEntries(s, key, element, value, (key, val)=> setRemoveAttr("aria-"+key, val));
 		case "classList":
 			return classListDeclarative.call(_this, element, value);
 	}
@@ -179,9 +179,9 @@ function assignContext(element, _this){
 }
 export function classListDeclarative(element, toggle){
 	const s= signals(this);
-	forEachEntries(s, toggle,
+	forEachEntries(s, "classList", element, toggle,
 		(class_name, val)=>
-			element.classList.toggle(class_name, val===-1 ? undefined : Boolean(val)));
+			element.classList.toggle(class_name, val===-1 ? undefined : Boolean(val)) );
 	return element;
 }
 export function elementAttribute(element, op, key, value){
@@ -205,13 +205,21 @@ function getPropDescriptor(p, key){
 }
 
 /**
- * @template {Record<any, any>} T @param {object} s @param {T} obj @param {(param: [ keyof T, T[keyof T] ])=> void} cb
+ * @template {Record<any, any>} T
+ * @param {object} s
+ * @param {string} target
+ * @param {Element} element
+ * @param {T} obj
+ * @param {(param: [ keyof T, T[keyof T] ])=> void} cb
  * */
-function forEachEntries(s, obj, cb){
+function forEachEntries(s, target, element, obj, cb){
+	const S = String;
 	if(typeof obj !== "object" || obj===null) return;
 	return Object.entries(obj).forEach(function process([ key, val ]){
 		if(!key) return;
-		val= s.processReactiveAttribute(obj, key, val, cb);
+		key = new S(key);
+		key.target = target;
+		val= s.processReactiveAttribute(element, key, val, cb);
 		cb(key, val);
 	});
 }

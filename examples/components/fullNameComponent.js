@@ -15,10 +15,14 @@ export function fullNameComponent(){
 		on.disconnected(()=> console.log(fullNameComponent))
 	);
 
+	const count= S(0);
+	setInterval(()=> count(count()+1), 5000);
 	const style= { height: "80px", display: "block", fill: "currentColor" };
 	const elSVG= elNS("http://www.w3.org/2000/svg");
 	return el("div", { className }).append(
 		el("h2", "Simple form:"),
+		el("p", { textContent: S(()=> "Count: "+count()),
+			dataset: { count }, classList: { count: S(() => count()%2 === 0) } }),
 		el("form", { onsubmit: ev=> ev.preventDefault() }).append(
 			...name.map((v, i)=>
 				el("label", labels[i]).append(
