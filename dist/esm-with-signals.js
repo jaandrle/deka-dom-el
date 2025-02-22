@@ -555,16 +555,18 @@ var st = {
 };
 function ut(t, e, ...r) {
 	let { current: n } = x;
-	n.prevent || n.host(function(o) {
-		o[D] || (o[D] = [], _.disconnected(
+	n.host(function(o) {
+		if (o[D])
+			return o[D].push([[t, e], ...r]);
+		o[D] = [], !n.prevent && _.disconnected(
 			() => (
 				/*!
-				* Clears all Signals listeners added in the current scope/host (`S.el`, `assign`, …?).
-				* You can investigate the `__dde_reactive` key of the element.
-				* */
+					* Clears all Signals listeners added in the current scope/host (`S.el`, `assign`, …?).
+					* You can investigate the `__dde_reactive` key of the element.
+					* */
 				o[D].forEach(([[c, u]]) => R(c, u, c[l] && c[l].host && c[l].host() === o))
 			)
-		)(o)), o[D].push([[t, e], ...r]);
+		)(o);
 	});
 }
 function it(t, e, r) {

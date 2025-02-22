@@ -92,6 +92,8 @@ import { enviroment as env } from "./dom-common.js";
 import { el } from "./dom.js";
 import { scope } from "./dom.js";
 // TODO: third argument for handle `cache_tmp` in re-render
+// TODO: clear cache on disconnect
+// TODO: extract cache to separate (exportable) function
 signal.el= function(s, map){
 	const mark_start= el.mark({ type: "reactive" }, true);
 	const mark_end= mark_start.end;
@@ -191,20 +193,19 @@ export const signals_config= {
 };
 function removeSignalsFromElements(s, listener, ...notes){
 	const { current }= scope;
-	if(current.prevent) return;
 	current.host(function(element){
-		if(!element[key_reactive]){
-			element[key_reactive]= [];
-			on.disconnected(()=>
-				/*!
-				 * Clears all Signals listeners added in the current scope/host (`S.el`, `assign`, …?).
-				 * You can investigate the `__dde_reactive` key of the element.
-				 * */
-				element[key_reactive].forEach(([ [ s, listener ] ])=>
-					removeSignalListener(s, listener, s[mark] && s[mark].host && s[mark].host() === element))
-			)(element);
-		}
-		element[key_reactive].push([ [ s, listener ], ...notes ]);
+		if(element[key_reactive])
+			return element[key_reactive].push([ [ s, listener ], ...notes ]);
+		element[key_reactive]= [];
+		if(current.prevent) return; // typically document.body, doenst need auto-remove as it should happen on page leave
+		on.disconnected(()=>
+			/*!
+				* Clears all Signals listeners added in the current scope/host (`S.el`, `assign`, …?).
+				* You can investigate the `__dde_reactive` key of the element.
+				* */
+			element[key_reactive].forEach(([ [ s, listener ] ])=>
+				removeSignalListener(s, listener, s[mark] && s[mark].host && s[mark].host() === element))
+		)(element);
 	});
 }
 
