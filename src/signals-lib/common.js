@@ -1,3 +1,4 @@
+import { isProtoFrom } from "../helpers.js";
 /**
  * Global signals object with default implementation
  * @type {Object}
@@ -39,5 +40,5 @@ export function registerReactivity(def, global= true){
  * @returns {typeof signals_global} Signals implementation
  */
 export function signals(_this){
-	return signals_global.isPrototypeOf(_this) && _this!==signals_global ? _this : signals_global;
+	return isProtoFrom(_this, signals_global) && _this!==signals_global ? _this : signals_global;
 }

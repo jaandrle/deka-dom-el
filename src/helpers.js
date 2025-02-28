@@ -24,6 +24,11 @@ export function typeOf(v){
 	return Object.prototype.toString.call(v);
 }
 
+export function isInstance(obj, cls){ return obj instanceof cls; }
+/** @type {typeof Object.prototype.isPrototypeOf.call} */
+export function isProtoFrom(obj, cls){ return Object.prototype.isPrototypeOf.call(cls, obj); }
+export function oCreate(proto= null){ return Object.create(proto); }
+
 /**
  * Handles AbortSignal registration and cleanup
  * @param {AbortSignal} signal - The AbortSignal to listen to
@@ -31,7 +36,7 @@ export function typeOf(v){
  * @returns {Function|undefined|boolean} Cleanup function or undefined if already aborted
  */
 export function onAbort(signal, listener){
-	if(!signal || !(signal instanceof AbortSignal))
+	if(!signal || !isInstance(signal, AbortSignal))
 		return true;
 	if(signal.aborted)
 		return;

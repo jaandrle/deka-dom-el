@@ -20,7 +20,7 @@ export const enviroment= {
 	M: globalThis.MutationObserver,
 	q: p=> p || Promise.resolve(),
 };
-import { isUndef } from './helpers.js';
+import { isInstance, isUndef } from './helpers.js';
 
 /**
  * Handles attribute setting with special undefined handling
@@ -43,7 +43,7 @@ function setDeleteAttr(obj, prop, val){
 	Reflect.set(obj, prop, val);
 	if(!isUndef(val)) return;
 	Reflect.deleteProperty(obj, prop);
-	if(obj instanceof enviroment.H && obj.getAttribute(prop)==="undefined")
+	if(isInstance(obj, enviroment.H) && obj.getAttribute(prop)==="undefined")
 		return obj.removeAttribute(prop);
 	if(Reflect.get(obj, prop)==="undefined")
 		return Reflect.set(obj, prop, "");

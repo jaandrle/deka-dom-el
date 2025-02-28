@@ -1,4 +1,5 @@
 import { enviroment as env, evc, evd } from './dom-common.js';
+import { isInstance } from "./helpers.js";
 
 /**
  * Connection changes observer for tracking element connection/disconnection
@@ -167,9 +168,9 @@ function connectionsChangesObserverConstructor(){
 		if(store.size > 30)//TODO?: limit
 			await requestIdle();
 		const out= [];
-		if(!(element instanceof Node)) return out;
+		if(!isInstance(element, Node)) return out;
 		for(const el of store.keys()){
-			if(el===element || !(el instanceof Node)) continue;
+			if(el===element || !isInstance(el, Node)) continue;
 			if(element.contains(el))
 				out.push(el);
 		}

@@ -90,6 +90,7 @@ export function chainableAppend(el){
 /** Current namespace for element creation */
 let namespace;
 
+import { isInstance, isUndef } from "./helpers.js";
 /**
  * Creates a DOM element with specified tag, attributes and addons
  *
@@ -112,7 +113,7 @@ export function createElement(tag, attributes, ...addons){
 				(scoped===1 ? addons.unshift(...c) : c.forEach(c=> c(el_host)), undefined);
 			scope.push({ scope: tag, host });
 			el= tag(attributes || undefined);
-			const is_fragment= el instanceof env.F;
+			const is_fragment= isInstance(el, env.F);
 			if(el.nodeName==="#comment") break;
 			const el_mark= createElement.mark({
 				type: "component",
@@ -283,7 +284,7 @@ export function assignAttribute(element, key, value){
  */
 function assignContext(element, _this){
 	if(assign_context.has(element)) return assign_context.get(element);
-	const is_svg= element instanceof env.S;
+	const is_svg= isInstance(element, env.S);
 	const setRemoveAttr= (is_svg ? setRemoveNS : setRemove).bind(null, element, "Attribute");
 	const s= signals(_this);
 	return { setRemoveAttr, s };
@@ -313,11 +314,10 @@ export function classListDeclarative(element, toggle){
  * @returns {void}
  */
 export function elementAttribute(element, op, key, value){
-	if(element instanceof env.H)
+	if(isInstance(element, env.H))
 		return element[op+"Attribute"](key, value);
 	return element[op+"AttributeNS"](null, key, value);
 }
-import { isUndef } from "./helpers.js";
 
 //TODO: add cache? `(Map/Set)<el.tagName+key,isUndef>`
 /**

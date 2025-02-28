@@ -1,6 +1,6 @@
 import { queueSignalWrite, mark } from "./helpers.js";
 export { mark };
-import { hasOwn, Defined } from "../helpers.js";
+import { hasOwn, Defined, oCreate, isProtoFrom } from "../helpers.js";
 
 /**
  * Checks if a value is a signal
@@ -155,22 +155,8 @@ import { el } from "../dom.js";
 import { scope } from "../dom.js";
 import { on } from "../events.js";
 
-/** Store for memoized values */
-const storeMemo= new WeakMap();
-
-/**
- * Memoizes a function result
- *
- * @param {string|unknown} key - Cache key (non-strings will be stringified)
- * @param {Function} fun - Function to compute value
- * @param {keyof storeMemo} [host= fun]
- * @returns {unknown} Cached or computed result
- */
-export function memo(key, fun, host= fun){
-	if(typeof key!=="string") key= JSON.stringify(key);
-	if (!storeMemo.has(host)) storeMemo.set(host, {});
-	const cache= storeMemo.get(host);
-	return hasOwn(cache, key) ? cache[key] : (cache[key]= fun());
+export function cache(store= oCreate()){
+	return (key, fun)=> hasOwn(store, key) ? store[key] : (store[key]= fun());
 }
 /**
  * Creates a reactive DOM element that re-renders when signal changes
@@ -186,15 +172,16 @@ signal.el= function(s, map){
 	const out= env.D.createDocumentFragment();
 	out.append(mark_start, mark_end);
 	const { current }= scope;
+	let cache_shared= oCreate();
 	const reRenderReactiveElement= v=> {
 		if(!mark_start.parentNode || !mark_end.parentNode) // === `isConnected` or wasn’t yet rendered
 			return removeSignalListener(s, reRenderReactiveElement);
-		const cache= {}; // remove unused els from cache
+		const memo= cache(cache_shared);
+		cache_shared= oCreate();
 		scope.push(current);
 		let els= map(v, function useCache(key, fun){
-			return (cache[key]= memo(key, fun, reRenderReactiveElement));
+			return (cache_shared[key]= memo(key, fun));
 		});
-		storeMemo.set(reRenderReactiveElement, cache);
 		scope.pop();
 		if(!Array.isArray(els))
 			els= [ els ];
@@ -211,6 +198,10 @@ signal.el= function(s, map){
 	addSignalListener(s, reRenderReactiveElement);
 	removeSignalsFromElements(s, reRenderReactiveElement, mark_start, map);
 	reRenderReactiveElement(s());
+	current.host(on.disconnected(()=>
+		/*! Clears cached elements for reactive element `S.el` */
+		cache_shared= {}
+	));
 	return out;
 };
 /**
@@ -363,7 +354,7 @@ function create(is_readonly, value, actions){
  * Prototype for signal internal objects
  * @private
  */
-const protoSigal= Object.assign(Object.create(null), {
+const protoSigal= Object.assign(oCreate(), {
 	/**
 	 * Prevents signal propagation
 	 */
