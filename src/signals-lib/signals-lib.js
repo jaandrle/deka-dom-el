@@ -1,9 +1,8 @@
 export const mark= "__dde_signal";
-import { hasOwn } from "./helpers.js";
+import { hasOwn } from "../helpers.js";
 
 export function isSignal(candidate){
-	try{ return hasOwn(candidate, mark); }
-	catch(e){ return false; }
+	return typeof candidate === "function" && hasOwn(candidate, mark);
 }
 /** @type {function[]} */
 const stack_watch= [];
@@ -23,8 +22,9 @@ export function signal(value, actions){
 	if(isSignal(value)) return value;
 
 	const out= create(true);
-	const contextReWatch= function(){
-		const [ origin, ...deps_old ]= deps.get(contextReWatch);
+	function contextReWatch(){
+		const deps_old= deps.get(contextReWatch);
+		const origin= deps_old.shift();
 		deps.set(contextReWatch, new Set([ origin ]));
 
 		stack_watch.push(contextReWatch);
@@ -47,7 +47,7 @@ export { signal as S };
 signal.action= function(s, name, ...a){
 	const M= s[mark], { actions }= M;
 	if(!actions || !(name in actions))
-		throw new Error(`'${s}' has no action with name '${name}'!`);
+		throw new Error(`Action "${name}" not defined. See ${mark}.actions.`);
 	actions[name].apply(M, a);
 	if(M.skip) return (delete M.skip);
 	M.listeners.forEach(l=> l(M.value));
@@ -58,7 +58,6 @@ signal.on= function on(s, listener, options= {}){
 	if(Array.isArray(s)) return s.forEach(s=> on(s, listener, options));
 	addSignalListener(s, listener);
 	if(as) as.addEventListener("abort", ()=> removeSignalListener(s, listener));
-	//TODO: cleanup when signal removed
 };
 signal.symbols= {
 	//signal: mark,
@@ -88,9 +87,25 @@ signal.clear= function(...signals){
 	}
 };
 const key_reactive= "__dde_reactive";
-import { enviroment as env } from "./dom-common.js";
-import { el } from "./dom.js";
-import { scope } from "./dom.js";
+import { enviroment as env } from "../dom-common.js";
+import { el } from "../dom.js";
+import { scope } from "../dom.js";
+import { on } from "../events.js";
+
+const storeMemo= new WeakMap();
+export function memo(key, fun, cache){
+	if(typeof key!=="string") key= JSON.stringify(key);
+	if(!cache) {
+		const keyStore= scope.host();
+		if(storeMemo.has(keyStore))
+			cache= storeMemo.get(keyStore);
+		else {
+			cache= {};
+			storeMemo.set(keyStore, cache);
+		}
+	}
+	return hasOwn(cache, key) ? cache[key] : (cache[key]= fun());
+}
 // TODO: third argument for handle `cache_tmp` in re-render
 signal.el= function(s, map){
 	const mark_start= el.mark({ type: "reactive" }, true);
@@ -102,19 +117,13 @@ signal.el= function(s, map){
 	const reRenderReactiveElement= v=> {
 		if(!mark_start.parentNode || !mark_end.parentNode) // === `isConnected` or wasn’t yet rendered
 			return removeSignalListener(s, reRenderReactiveElement);
-		const cache_tmp= cache; // will be reused in the useCache or removed in the while loop on the end
+		let cache_tmp= cache; // will be reused in the useCache or removed in the while loop on the end
 		cache= {};
 		scope.push(current);
 		let els= map(v, function useCache(key, fun){
-			let value;
-			if(hasOwn(cache_tmp, key)){
-				value= cache_tmp[key];
-				delete cache_tmp[key];
-			} else
-				value= fun();
-			cache[key]= value;
-			return value;
+			return cache[key]= memo(key, fun, cache_tmp);
 		});
+		cache_tmp= {};
 		scope.pop();
 		if(!Array.isArray(els))
 			els= [ els ];
@@ -131,6 +140,9 @@ signal.el= function(s, map){
 	addSignalListener(s, reRenderReactiveElement);
 	removeSignalsFromElements(s, reRenderReactiveElement, mark_start, map);
 	reRenderReactiveElement(s());
+	current.host(on.disconnected(()=>
+		/*! This clears memoized elements in S.el when the host is disconnected */
+		cache= {}));
 	return out;
 };
 function requestCleanUpReactives(host){
@@ -140,8 +152,7 @@ function requestCleanUpReactives(host){
 			.filter(([ s, el ])=> el.isConnected ? true : (removeSignalListener(...s), false));
 	});
 }
-import { on } from "./events.js";
-import { observedAttributes } from "./helpers.js";
+import { observedAttributes } from "../helpers.js";
 const observedAttributeActions= {
 	_set(value){ this.value= value; },
 };
@@ -161,20 +172,20 @@ signal.observedAttributes= function(element){
 	const attrs= observedAttributes(element, observedAttribute(store));
 	on.attributeChanged(function attributeChangeToSignal({ detail }){
 		/*! This maps attributes to signals (`S.observedAttributes`).
-			* Investigate `__dde_attributes` key of the element.*/
+			Investigate `__dde_attributes` key of the element. */
 		const [ name, value ]= detail;
 		const curr= this[key_attributes][name];
 		if(curr) return signal.action(curr, "_set", value);
 	})(element);
 	on.disconnected(function(){
 		/*! This removes all signals mapped to attributes (`S.observedAttributes`).
-			* Investigate `__dde_attributes` key of the element.*/
+			Investigate `__dde_attributes` key of the element. */
 		signal.clear(...Object.values(this[key_attributes]));
 	})(element);
 	return attrs;
 };
 
-import { typeOf } from './helpers.js';
+import { typeOf } from '../helpers.js';
 export const signals_config= {
 	isSignal,
 	processReactiveAttribute(element, key, attrs, set){
@@ -191,28 +202,30 @@ export const signals_config= {
 };
 function removeSignalsFromElements(s, listener, ...notes){
 	const { current }= scope;
-	if(current.prevent) return;
 	current.host(function(element){
-		if(!element[key_reactive]){
-			element[key_reactive]= [];
-			on.disconnected(()=>
-				/*!
-				 * Clears all Signals listeners added in the current scope/host (`S.el`, `assign`, …?).
-				 * You can investigate the `__dde_reactive` key of the element.
-				 * */
-				element[key_reactive].forEach(([ [ s, listener ] ])=>
-					removeSignalListener(s, listener, s[mark] && s[mark].host && s[mark].host() === element))
-			)(element);
-		}
-		element[key_reactive].push([ [ s, listener ], ...notes ]);
+		if(element[key_reactive])
+			return element[key_reactive].push([ [ s, listener ], ...notes ]);
+		element[key_reactive]= [];
+		if(current.prevent) return; // typically document.body, doenst need auto-remove as it should happen on page leave
+		on.disconnected(()=>
+			/*! Clears all Signals listeners added in the current scope/host (`S.el`, `assign`, …?).
+				You can investigate the `__dde_reactive` key of the element. */
+			element[key_reactive].forEach(([ [ s, listener ] ])=>
+				removeSignalListener(s, listener, s[mark] && s[mark].host && s[mark].host() === element))
+		)(element);
 	});
 }
 
+const cleanUpRegistry = new FinalizationRegistry(function(s){
+	signal.clear({ [mark]: s });
+});
 function create(is_readonly, value, actions){
 	const varS= is_readonly
 		? ()=> read(varS)
 		: (...value)=> value.length ? write(varS, ...value) : read(varS);
-	return toSignal(varS, value, actions, is_readonly);
+	const SI= toSignal(varS, value, actions, is_readonly);
+	cleanUpRegistry.register(SI, SI[mark]);
+	return SI;
 }
 const protoSigal= Object.assign(Object.create(null), {
 	stopPropagation(){
@@ -264,12 +277,31 @@ function read(s){
 	if(deps.has(context)) deps.get(context).add(s);
 	return value;
 }
+const queueSignalWrite= (()=> {
+	let pendingSignals= new Set();
+	let scheduled= false;
+
+	function flushSignals() {
+		scheduled = false;
+		for(const signal of pendingSignals){
+			const M = signal[mark];
+			if(M) M.listeners.forEach(l => l(M.value));
+		}
+		pendingSignals.clear();
+	}
+	return function(s){
+		pendingSignals.add(s);
+		if(scheduled) return;
+		scheduled = true;
+		queueMicrotask(flushSignals);
+	}
+})();
 function write(s, value, force){
-	if(!s[mark]) return;
 	const M= s[mark];
-	if(!force && M.value===value) return;
+	if(!M || (!force && M.value===value)) return;
+	
 	M.value= value;
-	M.listeners.forEach(l=> l(value));
+	queueSignalWrite(s);
 	return value;
 }
 
@@ -280,13 +312,18 @@ function addSignalListener(s, listener){
 function removeSignalListener(s, listener, clear_when_empty){
 	const M= s[mark];
 	if(!M) return;
-	const out= M.listeners.delete(listener);
-	if(clear_when_empty && !M.listeners.size){
-		signal.clear(s);
-		if(!deps.has(M)) return out;
-		const c= deps.get(M);
-		if(!deps.has(c)) return out;
-		deps.get(c).forEach(sig=> removeSignalListener(sig, c, true));
-	}
+	
+	const { listeners: L }= M;
+	const out= L.delete(listener);
+	if(!out || !clear_when_empty || L.size) return out;
+
+	signal.clear(s);
+	const depList= deps.get(M);
+	if(!depList) return out;
+	
+	const depSource= deps.get(depList);
+	if(!depSource) return out;
+	
+	for(const sig of depSource) removeSignalListener(sig, depList, true);
 	return out;
 }

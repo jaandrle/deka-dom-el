@@ -29,8 +29,8 @@
 			"types": "./jsdom.d.ts"
 		},
 		"./src/signals-lib": {
-			"import": "./src/signals-lib.js",
-			"types": "./src/signals-lib.d.ts"
+			"import": "./src/signals-lib/signals-lib.js",
+			"types": "./src/signals-lib/signals-lib.d.ts"
 		}
 	},
 	"files": [
