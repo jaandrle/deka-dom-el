@@ -1,6 +1,6 @@
 //deka-dom-el library is available via global namespace `dde`
 (()=> {
-// src/signals-lib/signals-common.js
+// src/signals-lib/common.js
 var signals_global = {
 	isSignal(attributes) {
 		return false;
@@ -570,8 +570,36 @@ on.attributeChanged = function(listener, options) {
 	};
 };
 
-// src/signals-lib/signals-lib.js
+// src/signals-lib/helpers.js
 var mark = "__dde_signal";
+var SignalDefined = class extends Error {
+	constructor() {
+		super();
+		const [curr, ...rest] = this.stack.split("\n");
+		const curr_file = curr.slice(curr.indexOf("@"), curr.indexOf(".js:") + 4);
+		this.stack = rest.find((l) => !l.includes(curr_file));
+	}
+};
+var queueSignalWrite = /* @__PURE__ */ (() => {
+	let pendingSignals = /* @__PURE__ */ new Set();
+	let scheduled = false;
+	function flushSignals() {
+		scheduled = false;
+		for (const signal2 of pendingSignals) {
+			const M = signal2[mark];
+			if (M) M.listeners.forEach((l) => l(M.value));
+		}
+		pendingSignals.clear();
+	}
+	return function(s) {
+		pendingSignals.add(s);
+		if (scheduled) return;
+		scheduled = true;
+		queueMicrotask(flushSignals);
+	};
+})();
+
+// src/signals-lib/signals-lib.js
 function isSignal(candidate) {
 	return typeof candidate === "function" && hasOwn(candidate, mark);
 }
@@ -602,12 +630,14 @@ function signal(value, actions) {
 	return out;
 }
 signal.action = function(s, name, ...a) {
-	const M = s[mark], { actions } = M;
-	if (!actions || !(name in actions))
+	const M = s[mark];
+	if (!M) return;
+	const { actions } = M;
+	if (!actions || !hasOwn(actions, name))
 		throw new Error(`Action "${name}" not defined. See ${mark}.actions.`);
 	actions[name].apply(M, a);
 	if (M.skip) return delete M.skip;
-	M.listeners.forEach((l) => l(M.value));
+	queueSignalWrite(s);
 };
 signal.on = function on2(s, listener, options = {}) {
 	const { signal: as } = options;
@@ -621,7 +651,6 @@ signal.symbols = {
 	onclear: Symbol.for("Signal.onclear")
 };
 signal.clear = function(...signals2) {
-	console.log("clenaup", signals2);
 	for (const s of signals2) {
 		const M = s[mark];
 		if (!M) continue;
@@ -647,17 +676,15 @@ var storeMemo = /* @__PURE__ */ new WeakMap();
 function memo(key, fun, cache) {
 	if (typeof key !== "string") key = JSON.stringify(key);
 	if (!cache) {
-		const key2 = scope.host();
-		if (storeMemo.has(key2))
-			cache = storeMemo.get(key2);
+		const keyStore = scope.host();
+		if (storeMemo.has(keyStore))
+			cache = storeMemo.get(keyStore);
 		else {
 			cache = {};
-			storeMemo.set(key2, cache);
+			storeMemo.set(keyStore, cache);
 		}
 	}
-	if (!hasOwn(cache, key))
-		cache[key] = fun();
-	return cache[key];
+	return hasOwn(cache, key) ? cache[key] : cache[key] = fun();
 }
 signal.el = function(s, map) {
 	const mark_start = createElement.mark({ type: "reactive" }, true);
@@ -766,7 +793,6 @@ function removeSignalsFromElements(s, listener, ...notes) {
 	});
 }
 var cleanUpRegistry = new FinalizationRegistry(function(s) {
-	console.log("UNREG");
 	signal.clear({ [mark]: s });
 });
 function create(is_readonly, value, actions) {
@@ -780,14 +806,6 @@ var protoSigal = Object.assign(/* @__PURE__ */ Object.create(null), {
 		this.skip = true;
 	}
 });
-var SignalDefined = class extends Error {
-	constructor() {
-		super();
-		const [curr, ...rest] = this.stack.split("\n");
-		const curr_file = curr.slice(curr.indexOf("@"), curr.indexOf(".js:") + 4);
-		this.stack = rest.find((l) => !l.includes(curr_file));
-	}
-};
 function toSignal(s, value, actions, readonly = false) {
 	const onclear = [];
 	if (typeOf(actions) !== "[object Object]")
@@ -828,28 +846,9 @@ function read(s) {
 	if (deps.has(context)) deps.get(context).add(s);
 	return value;
 }
-var queueSignalWrite = /* @__PURE__ */ (() => {
-	let pendingSignals = /* @__PURE__ */ new Set();
-	let scheduled = false;
-	function flushSignals() {
-		scheduled = false;
-		for (const signal2 of pendingSignals) {
-			const M = signal2[mark];
-			if (M) M.listeners.forEach((l) => l(M.value));
-		}
-		pendingSignals.clear();
-	}
-	return function(s) {
-		pendingSignals.add(s);
-		if (scheduled) return;
-		scheduled = true;
-		queueMicrotask(flushSignals);
-	};
-})();
 function write(s, value, force) {
-	if (!s[mark]) return;
 	const M = s[mark];
-	if (!force && M.value === value) return;
+	if (!M || !force && M.value === value) return;
 	M.value = value;
 	queueSignalWrite(s);
 	return value;
@@ -863,13 +862,13 @@ function removeSignalListener(s, listener, clear_when_empty) {
 	if (!M) return;
 	const { listeners: L } = M;
 	const out = L.delete(listener);
-	if (clear_when_empty && !L.size) {
-		signal.clear(s);
-		if (!deps.has(M)) return out;
-		const c = deps.get(M);
-		if (!deps.has(c)) return out;
-		deps.get(c).forEach((sig) => removeSignalListener(sig, c, true));
-	}
+	if (!out || !clear_when_empty || L.size) return out;
+	signal.clear(s);
+	const depList = deps.get(M);
+	if (!depList) return out;
+	const depSource = deps.get(depList);
+	if (!depSource) return out;
+	for (const sig of depSource) removeSignalListener(sig, depList, true);
 	return out;
 }
 

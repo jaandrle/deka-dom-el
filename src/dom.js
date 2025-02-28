@@ -1,4 +1,4 @@
-import { signals } from "./signals-lib/signals-common.js";
+import { signals } from "./signals-lib/common.js";
 import { enviroment as env } from './dom-common.js';
 
 //TODO: add type, docs ≡ make it public

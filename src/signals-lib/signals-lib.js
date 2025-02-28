@@ -1,4 +1,5 @@
-export const mark= "__dde_signal";
+import { SignalDefined, queueSignalWrite, mark } from "./helpers.js";
+export { mark };
 import { hasOwn } from "../helpers.js";
 
 export function isSignal(candidate){
@@ -23,8 +24,7 @@ export function signal(value, actions){
 
 	const out= create(true);
 	function contextReWatch(){
-		const deps_old= deps.get(contextReWatch);
-		const origin= deps_old.shift();
+		const [ origin, ...deps_old ]= deps.get(contextReWatch);
 		deps.set(contextReWatch, new Set([ origin ]));
 
 		stack_watch.push(contextReWatch);
@@ -45,12 +45,14 @@ export function signal(value, actions){
 }
 export { signal as S };
 signal.action= function(s, name, ...a){
-	const M= s[mark], { actions }= M;
-	if(!actions || !(name in actions))
+	const M= s[mark];
+	if(!M) return;
+	const { actions }= M;
+	if(!actions || !hasOwn(actions, name))
 		throw new Error(`Action "${name}" not defined. See ${mark}.actions.`);
 	actions[name].apply(M, a);
 	if(M.skip) return (delete M.skip);
-	M.listeners.forEach(l=> l(M.value));
+	queueSignalWrite(s);
 };
 signal.on= function on(s, listener, options= {}){
 	const { signal: as }= options;
@@ -232,14 +234,6 @@ const protoSigal= Object.assign(Object.create(null), {
 		this.skip= true;
 	}
 });
-class SignalDefined extends Error{
-	constructor(){
-		super();
-		const [ curr, ...rest ]= this.stack.split("\n");
-		const curr_file= curr.slice(curr.indexOf("@"), curr.indexOf(".js:")+4);
-		this.stack= rest.find(l=> !l.includes(curr_file));
-	}
-}
 function toSignal(s, value, actions, readonly= false){
 	const onclear= [];
 	if(typeOf(actions)!=="[object Object]")
@@ -277,29 +271,10 @@ function read(s){
 	if(deps.has(context)) deps.get(context).add(s);
 	return value;
 }
-const queueSignalWrite= (()=> {
-	let pendingSignals= new Set();
-	let scheduled= false;
-
-	function flushSignals() {
-		scheduled = false;
-		for(const signal of pendingSignals){
-			const M = signal[mark];
-			if(M) M.listeners.forEach(l => l(M.value));
-		}
-		pendingSignals.clear();
-	}
-	return function(s){
-		pendingSignals.add(s);
-		if(scheduled) return;
-		scheduled = true;
-		queueMicrotask(flushSignals);
-	}
-})();
 function write(s, value, force){
 	const M= s[mark];
 	if(!M || (!force && M.value===value)) return;
-	
+
 	M.value= value;
 	queueSignalWrite(s);
 	return value;
@@ -312,7 +287,7 @@ function addSignalListener(s, listener){
 function removeSignalListener(s, listener, clear_when_empty){
 	const M= s[mark];
 	if(!M) return;
-	
+
 	const { listeners: L }= M;
 	const out= L.delete(listener);
 	if(!out || !clear_when_empty || L.size) return out;
@@ -320,10 +295,10 @@ function removeSignalListener(s, listener, clear_when_empty){
 	signal.clear(s);
 	const depList= deps.get(M);
 	if(!depList) return out;
-	
+
 	const depSource= deps.get(depList);
 	if(!depSource) return out;
-	
+
 	for(const sig of depSource) removeSignalListener(sig, depList, true);
 	return out;
 }

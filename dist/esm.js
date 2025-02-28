@@ -1,4 +1,4 @@
-// src/signals-lib/signals-common.js
+// src/signals-lib/common.js
 var signals_global = {
 	isSignal(attributes) {
 		return false;

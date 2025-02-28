@@ -1,4 +1,4 @@
-export { registerReactivity } from './signals-lib/signals-common.js';
+export { registerReactivity } from './signals-lib/common.js';
 import { enviroment as env, keyLTE, evc, evd, eva } from './dom-common.js';
 
 export function dispatchEvent(name, options, host){
