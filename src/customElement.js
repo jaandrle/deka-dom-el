@@ -1,6 +1,15 @@
 import { keyLTE, evc, evd, eva } from "./dom-common.js";
 import { scope } from "./dom.js";
 import { c_ch_o } from "./events-observer.js";
+
+/**
+ * Renders content into a custom element or shadow root
+ *
+ * @param {Element|ShadowRoot} target - The custom element or shadow root to render into
+ * @param {Function} render - The render function that returns content
+ * @param {Function|Object} [props=observedAttributes] - Props to pass to the render function
+ * @returns {Node} The rendered content
+ */
 export function customElementRender(target, render, props= observedAttributes){
 	const custom_element= target.host || target;
 	scope.push({
@@ -17,6 +26,13 @@ export function customElementRender(target, render, props= observedAttributes){
 	scope.pop();
 	return target.append(out);
 }
+
+/**
+ * Transforms custom element lifecycle callbacks into events
+ *
+ * @param {Function|Object} class_declaration - Custom element class or instance
+ * @returns {Function|Object} The modified class or instance
+ */
 export function lifecyclesToEvents(class_declaration){
 	wrapMethod(class_declaration.prototype, "connectedCallback", function(target, thisArg, detail){
 		target.apply(thisArg, detail);
@@ -38,12 +54,30 @@ export function lifecyclesToEvents(class_declaration){
 	class_declaration.prototype[keyLTE]= true;
 	return class_declaration;
 }
+
+/** Public API */
 export { lifecyclesToEvents as customElementWithDDE };
+
+/**
+ * Wraps a method with a proxy to intercept calls
+ *
+ * @param {Object} obj - Object containing the method
+ * @param {string} method - Method name to wrap
+ * @param {Function} apply - Function to execute when method is called
+ * @private
+ */
 function wrapMethod(obj, method, apply){
 	obj[method]= new Proxy(obj[method] || (()=> {}), { apply });
 }
 
 import { observedAttributes as oA } from "./helpers.js";
+
+/**
+ * Gets observed attributes for a custom element
+ *
+ * @param {Element} instance - Custom element instance
+ * @returns {Object} Object mapping camelCase attribute names to their values
+ */
 export function observedAttributes(instance){
 	return oA(instance, (i, n)=> i.getAttribute(n));
 }

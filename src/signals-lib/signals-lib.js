@@ -2,12 +2,25 @@ import { SignalDefined, queueSignalWrite, mark } from "./helpers.js";
 export { mark };
 import { hasOwn } from "../helpers.js";
 
+/**
+ * Checks if a value is a signal
+ *
+ * @param {any} candidate - Value to check
+ * @returns {boolean} True if the value is a signal
+ */
 export function isSignal(candidate){
 	return typeof candidate === "function" && hasOwn(candidate, mark);
 }
-/** @type {function[]} */
-const stack_watch= [];
+
 /**
+ * Stack for tracking nested signal computations
+ * @type {function[]}
+ */
+const stack_watch= [];
+
+/**
+ * Dependencies tracking map for signals
+ *
  * ### `WeakMap<function, Set<ddeSignal<any, any>>>`
  * The `Set` is in the form of `[ source, ...depended signals (DSs) ]`.
  * When the DS is cleaned (`S.clear`) it is removed from DSs,
@@ -15,14 +28,26 @@ const stack_watch= [];
  * ### `WeakMap<object, function>`
  * This is used for revesed deps, the `function` is also key for `deps`.
  * @type {WeakMap<function|object,Set<ddeSignal<any, any>>|function>}
- * */
+ */
 const deps= new WeakMap();
+/**
+ * Creates a new signal or converts a function into a derived signal
+ *
+ * @param {any|function} value - Initial value or function that computes the value
+ * @param {Object} [actions] - Custom actions for the signal
+ * @returns {function} Signal function
+ */
 export function signal(value, actions){
 	if(typeof value!=="function")
 		return create(false, value, actions);
 	if(isSignal(value)) return value;
 
 	const out= create(true);
+
+	/**
+	 * Updates the derived signal when dependencies change
+	 * @private
+	 */
 	function contextReWatch(){
 		const [ origin, ...deps_old ]= deps.get(contextReWatch);
 		deps.set(contextReWatch, new Set([ origin ]));
@@ -43,7 +68,16 @@ export function signal(value, actions){
 	contextReWatch();
 	return out;
 }
+
+/** Alias for signal */
 export { signal as S };
+/**
+ * Calls a custom action on a signal
+ *
+ * @param {function} s - Signal to call action on
+ * @param {string} name - Action name
+ * @param {...any} a - Arguments to pass to the action
+ */
 signal.action= function(s, name, ...a){
 	const M= s[mark];
 	if(!M) return;
@@ -54,6 +88,15 @@ signal.action= function(s, name, ...a){
 	if(M.skip) return (delete M.skip);
 	queueSignalWrite(s);
 };
+
+/**
+ * Subscribes a listener to signal changes
+ *
+ * @param {function|function[]} s - Signal or array of signals to subscribe to
+ * @param {function} listener - Callback function receiving signal value
+ * @param {Object} [options={}] - Subscription options
+ * @param {AbortSignal} [options.signal] - Signal to abort subscription
+ */
 signal.on= function on(s, listener, options= {}){
 	const { signal: as }= options;
 	if(as && as.aborted) return;
@@ -61,10 +104,20 @@ signal.on= function on(s, listener, options= {}){
 	addSignalListener(s, listener);
 	if(as) as.addEventListener("abort", ()=> removeSignalListener(s, listener));
 };
+
+/**
+ * Symbol constants for signal internals
+ */
 signal.symbols= {
 	//signal: mark,
 	onclear: Symbol.for("Signal.onclear")
 };
+
+/**
+ * Cleans up signals and their dependencies
+ *
+ * @param {...function} signals - Signals to clean up
+ */
 signal.clear= function(...signals){
 	for(const s of signals){
 		const M= s[mark];
@@ -74,6 +127,13 @@ signal.clear= function(...signals){
 		clearListDeps(s, M);
 		delete s[mark];
 	}
+
+	/**
+	 * Cleans up signal dependencies
+	 * @param {function} s - Signal being cleared
+	 * @param {Object} o - Signal metadata
+	 * @private
+	 */
 	function clearListDeps(s, o){
 		o.listeners.forEach(l=> {
 			o.listeners.delete(l);
@@ -88,13 +148,24 @@ signal.clear= function(...signals){
 		});
 	}
 };
+/** Property key for tracking reactive elements */
 const key_reactive= "__dde_reactive";
 import { enviroment as env } from "../dom-common.js";
 import { el } from "../dom.js";
 import { scope } from "../dom.js";
 import { on } from "../events.js";
 
+/** Store for memoized values */
 const storeMemo= new WeakMap();
+
+/**
+ * Memoizes a function result by key
+ *
+ * @param {string|any} key - Cache key (non-strings will be stringified)
+ * @param {Function} fun - Function to compute value
+ * @param {Object} [cache] - Optional explicit cache object
+ * @returns {any} Cached or computed result
+ */
 export function memo(key, fun, cache){
 	if(typeof key!=="string") key= JSON.stringify(key);
 	if(!cache) {
@@ -109,6 +180,13 @@ export function memo(key, fun, cache){
 	return hasOwn(cache, key) ? cache[key] : (cache[key]= fun());
 }
 // TODO: third argument for handle `cache_tmp` in re-render
+/**
+ * Creates a reactive DOM element that re-renders when signal changes
+ *
+ * @param {function} s - Signal to watch
+ * @param {Function} map - Function mapping signal value to DOM elements
+ * @returns {DocumentFragment} Fragment containing reactive elements
+ */
 signal.el= function(s, map){
 	const mark_start= el.mark({ type: "reactive" }, true);
 	const mark_end= mark_start.end;
@@ -147,6 +225,12 @@ signal.el= function(s, map){
 		cache= {}));
 	return out;
 };
+/**
+ * Cleans up reactive elements that are no longer connected
+ *
+ * @param {Element} host - Host element containing reactive elements
+ * @private
+ */
 function requestCleanUpReactives(host){
 	if(!host || !host[key_reactive]) return;
 	(requestIdleCallback || setTimeout)(function(){
@@ -155,9 +239,22 @@ function requestCleanUpReactives(host){
 	});
 }
 import { observedAttributes } from "../helpers.js";
+
+/**
+ * Actions for observed attribute signals
+ * @private
+ */
 const observedAttributeActions= {
 	_set(value){ this.value= value; },
 };
+
+/**
+ * Creates a function that returns signals for element attributes
+ *
+ * @param {Object} store - Storage object for attribute signals
+ * @returns {Function} Function creating attribute signals
+ * @private
+ */
 function observedAttribute(store){
 	return function(instance, name){
 		const varS= (...args)=> !args.length
@@ -168,7 +265,15 @@ function observedAttribute(store){
 		return out;
 	};
 }
+/** Property key for storing attribute signals */
 const key_attributes= "__dde_attributes";
+
+/**
+ * Creates signals for observed attributes in custom elements
+ *
+ * @param {Element} element - Custom element instance
+ * @returns {Object} Object with attribute signals
+ */
 signal.observedAttributes= function(element){
 	const store= element[key_attributes]= {};
 	const attrs= observedAttributes(element, observedAttribute(store));
@@ -188,8 +293,23 @@ signal.observedAttributes= function(element){
 };
 
 import { typeOf } from '../helpers.js';
+
+/**
+ * Signal configuration for the library
+ * Implements processReactiveAttribute to handle signal-based attributes
+ */
 export const signals_config= {
 	isSignal,
+
+	/**
+	 * Processes attributes that might be signals
+	 *
+	 * @param {Element} element - Element with the attribute
+	 * @param {string} key - Attribute name
+	 * @param {any} attrs - Attribute value (possibly a signal)
+	 * @param {Function} set - Function to set attribute value
+	 * @returns {any} Processed attribute value
+	 */
 	processReactiveAttribute(element, key, attrs, set){
 		if(!isSignal(attrs)) return attrs;
 		const l= attr=> {
@@ -202,6 +322,14 @@ export const signals_config= {
 		return attrs();
 	}
 };
+/**
+ * Registers signal listener for cleanup when element is removed
+ *
+ * @param {function} s - Signal to track
+ * @param {Function} listener - Signal listener
+ * @param {...any} notes - Additional context information
+ * @private
+ */
 function removeSignalsFromElements(s, listener, ...notes){
 	const { current }= scope;
 	current.host(function(element){
@@ -218,9 +346,22 @@ function removeSignalsFromElements(s, listener, ...notes){
 	});
 }
 
+/**
+ * Registry for cleaning up signals when they are garbage collected
+ * @type {FinalizationRegistry}
+ */
 const cleanUpRegistry = new FinalizationRegistry(function(s){
 	signal.clear({ [mark]: s });
 });
+/**
+ * Creates a new signal function
+ *
+ * @param {boolean} is_readonly - Whether the signal is readonly
+ * @param {any} value - Initial signal value
+ * @param {Object} actions - Custom actions for the signal
+ * @returns {function} Signal function
+ * @private
+ */
 function create(is_readonly, value, actions){
 	const varS= is_readonly
 		? ()=> read(varS)
@@ -229,11 +370,29 @@ function create(is_readonly, value, actions){
 	cleanUpRegistry.register(SI, SI[mark]);
 	return SI;
 }
+
+/**
+ * Prototype for signal internal objects
+ * @private
+ */
 const protoSigal= Object.assign(Object.create(null), {
+	/**
+	 * Prevents signal propagation
+	 */
 	stopPropagation(){
 		this.skip= true;
 	}
 });
+/**
+ * Transforms a function into a signal
+ *
+ * @param {function} s - Function to transform
+ * @param {any} value - Initial value
+ * @param {Object} actions - Custom actions
+ * @param {boolean} [readonly=false] - Whether the signal is readonly
+ * @returns {function} Signal function
+ * @private
+ */
 function toSignal(s, value, actions, readonly= false){
 	const onclear= [];
 	if(typeOf(actions)!=="[object Object]")
@@ -260,9 +419,22 @@ function toSignal(s, value, actions, readonly= false){
 	Object.setPrototypeOf(s[mark], protoSigal);
 	return s;
 }
+/**
+ * Gets the current computation context
+ * @returns {function|undefined} Current context function
+ * @private
+ */
 function currentContext(){
 	return stack_watch[stack_watch.length - 1];
 }
+
+/**
+ * Reads a signal's value and tracks dependencies
+ *
+ * @param {function} s - Signal to read
+ * @returns {any} Signal value
+ * @private
+ */
 function read(s){
 	if(!s[mark]) return;
 	const { value, listeners }= s[mark];
@@ -271,6 +443,16 @@ function read(s){
 	if(deps.has(context)) deps.get(context).add(s);
 	return value;
 }
+
+/**
+ * Writes a new value to a signal
+ *
+ * @param {function} s - Signal to update
+ * @param {any} value - New value
+ * @param {boolean} [force=false] - Force update even if value is unchanged
+ * @returns {any} The new value
+ * @private
+ */
 function write(s, value, force){
 	const M= s[mark];
 	if(!M || (!force && M.value===value)) return;
@@ -280,10 +462,28 @@ function write(s, value, force){
 	return value;
 }
 
+/**
+ * Adds a listener to a signal
+ *
+ * @param {function} s - Signal to listen to
+ * @param {Function} listener - Callback function
+ * @returns {Set} Listener set
+ * @private
+ */
 function addSignalListener(s, listener){
 	if(!s[mark]) return;
 	return s[mark].listeners.add(listener);
 }
+
+/**
+ * Removes a listener from a signal
+ *
+ * @param {function} s - Signal to modify
+ * @param {Function} listener - Listener to remove
+ * @param {boolean} [clear_when_empty] - Whether to clear the signal when no listeners remain
+ * @returns {boolean} Whether the listener was found and removed
+ * @private
+ */
 function removeSignalListener(s, listener, clear_when_empty){
 	const M= s[mark];
 	if(!M) return;

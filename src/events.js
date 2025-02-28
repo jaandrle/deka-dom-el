@@ -1,6 +1,14 @@
 export { registerReactivity } from './signals-lib/common.js';
 import { enviroment as env, keyLTE, evc, evd, eva } from './dom-common.js';
 
+/**
+ * Creates a function to dispatch events on elements
+ *
+ * @param {string} name - Event name
+ * @param {Object} [options] - Event options
+ * @param {Element|Function} [host] - Host element or function returning host element
+ * @returns {Function} Function that dispatches the event
+ */
 export function dispatchEvent(name, options, host){
 	if(!options) options= {};
 	return function dispatch(element, ...d){
@@ -13,6 +21,15 @@ export function dispatchEvent(name, options, host){
 		return element.dispatchEvent(event);
 	};
 }
+
+/**
+ * Creates a function to register event listeners on elements
+ *
+ * @param {string} event - Event name
+ * @param {Function} listener - Event handler
+ * @param {Object} [options] - Event listener options
+ * @returns {Function} Function that registers the listener
+ */
 export function on(event, listener, options){
 	return function registerElement(element){
 		element.addEventListener(event, listener, options);
@@ -22,9 +39,23 @@ export function on(event, listener, options){
 
 import { c_ch_o } from "./events-observer.js";
 import { onAbort } from './helpers.js';
+
+/**
+ * Prepares lifecycle event options with once:true default
+ * @private
+ */
 const lifeOptions= obj=> Object.assign({}, typeof obj==="object" ? obj : null, { once: true });
+
 //TODO: cleanUp when event before abort?
 //TODO: docs (e.g.) https://nolanlawson.com/2024/01/13/web-component-gotcha-constructor-vs-connectedcallback/
+
+/**
+ * Creates a function to register connected lifecycle event listeners
+ *
+ * @param {Function} listener - Event handler
+ * @param {Object} [options] - Event listener options
+ * @returns {Function} Function that registers the connected listener
+ */
 on.connected= function(listener, options){
 	options= lifeOptions(options);
 	return function registerElement(element){
@@ -37,6 +68,14 @@ on.connected= function(listener, options){
 		return element;
 	};
 };
+
+/**
+ * Creates a function to register disconnected lifecycle event listeners
+ *
+ * @param {Function} listener - Event handler
+ * @param {Object} [options] - Event listener options
+ * @returns {Function} Function that registers the disconnected listener
+ */
 on.disconnected= function(listener, options){
 	options= lifeOptions(options);
 	return function registerElement(element){
@@ -48,7 +87,16 @@ on.disconnected= function(listener, options){
 		return element;
 	};
 };
+
+/** Store for disconnect abort controllers */
 const store_abort= new WeakMap();
+
+/**
+ * Creates an AbortController that triggers when the element disconnects
+ *
+ * @param {Element|Function} host - Host element or function taking an element
+ * @returns {AbortController} AbortController that aborts on disconnect
+ */
 on.disconnectedAsAbort= function(host){
 	if(store_abort.has(host)) return store_abort.get(host);
 
@@ -57,7 +105,17 @@ on.disconnectedAsAbort= function(host){
 	host(on.disconnected(()=> a.abort()));
 	return a;
 };
+
+/** Store for elements with attribute observers */
 const els_attribute_store= new WeakSet();
+
+/**
+ * Creates a function to register attribute change event listeners
+ *
+ * @param {Function} listener - Event handler
+ * @param {Object} [options] - Event listener options
+ * @returns {Function} Function that registers the attribute change listener
+ */
 on.attributeChanged= function(listener, options){
 	if(typeof options !== "object")
 		options= {};
