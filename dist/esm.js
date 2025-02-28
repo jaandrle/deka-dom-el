@@ -1,8 +1,21 @@
 // src/signals-lib/common.js
 var signals_global = {
+	/**
+	* Checks if a value is a signal
+	* @param {any} attributes - Value to check
+	* @returns {boolean} Whether the value is a signal
+	*/
 	isSignal(attributes) {
 		return false;
 	},
+	/**
+	* Processes an attribute that might be reactive
+	* @param {Element} obj - Element that owns the attribute
+	* @param {string} key - Attribute name
+	* @param {any} attr - Attribute value
+	* @param {Function} set - Function to set the attribute
+	* @returns {any} Processed attribute value
+	*/
 	processReactiveAttribute(obj, key, attr, set) {
 		return attr;
 	}
@@ -78,26 +91,55 @@ var scopes = [{
 	prevent: true
 }];
 var scope = {
+	/**
+	* Gets the current scope
+	* @returns {Object} Current scope context
+	*/
 	get current() {
 		return scopes[scopes.length - 1];
 	},
+	/**
+	* Gets the host element of the current scope
+	* @returns {Function} Host accessor function
+	*/
 	get host() {
 		return this.current.host;
 	},
+	/**
+	* Prevents default behavior in the current scope
+	* @returns {Object} Current scope context
+	*/
 	preventDefault() {
 		const { current } = this;
 		current.prevent = true;
 		return current;
 	},
+	/**
+	* Gets a copy of the current scope stack
+	* @returns {Array} Copy of scope stack
+	*/
 	get state() {
 		return [...scopes];
 	},
+	/**
+	* Pushes a new scope to the stack
+	* @param {Object} [s={}] - Scope object to push
+	* @returns {number} New length of the scope stack
+	*/
 	push(s = {}) {
 		return scopes.push(Object.assign({}, this.current, { prevent: false }, s));
 	},
+	/**
+	* Pushes the root scope to the stack
+	* @returns {number} New length of the scope stack
+	*/
 	pushRoot() {
 		return scopes.push(scopes[0]);
 	},
+	/**
+	* Pops the current scope from the stack
+	* @returns {Object|undefined} Popped scope or undefined if only one scope remains
+	*/
 	pop() {
 		if (scopes.length === 1) return;
 		return scopes.pop();
@@ -329,12 +371,22 @@ function connectionsChangesObserverConstructor() {
 	};
 	const observer = new enviroment.M(observerListener(stop));
 	return {
+		/**
+		* Creates an observer for a specific element
+		* @param {Element} element - Element to observe
+		* @returns {Function} Cleanup function
+		*/
 		observe(element) {
 			const o = new enviroment.M(observerListener(() => {
 			}));
 			o.observe(element, { childList: true, subtree: true });
 			return () => o.disconnect();
 		},
+		/**
+		* Register a connection listener for an element
+		* @param {Element} element - Element to watch
+		* @param {Function} listener - Callback for connection event
+		*/
 		onConnected(element, listener) {
 			start();
 			const listeners = getElementStore(element);
@@ -342,6 +394,11 @@ function connectionsChangesObserverConstructor() {
 			listeners.connected.add(listener);
 			listeners.length_c += 1;
 		},
+		/**
+		* Unregister a connection listener
+		* @param {Element} element - Element being watched
+		* @param {Function} listener - Callback to remove
+		*/
 		offConnected(element, listener) {
 			if (!store.has(element)) return;
 			const ls = store.get(element);
@@ -350,6 +407,11 @@ function connectionsChangesObserverConstructor() {
 			ls.length_c -= 1;
 			cleanWhenOff(element, ls);
 		},
+		/**
+		* Register a disconnection listener for an element
+		* @param {Element} element - Element to watch
+		* @param {Function} listener - Callback for disconnection event
+		*/
 		onDisconnected(element, listener) {
 			start();
 			const listeners = getElementStore(element);
@@ -357,6 +419,11 @@ function connectionsChangesObserverConstructor() {
 			listeners.disconnected.add(listener);
 			listeners.length_d += 1;
 		},
+		/**
+		* Unregister a disconnection listener
+		* @param {Element} element - Element being watched
+		* @param {Function} listener - Callback to remove
+		*/
 		offDisconnected(element, listener) {
 			if (!store.has(element)) return;
 			const ls = store.get(element);

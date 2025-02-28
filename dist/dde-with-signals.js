@@ -2,9 +2,22 @@
 (()=> {
 // src/signals-lib/common.js
 var signals_global = {
+	/**
+	* Checks if a value is a signal
+	* @param {any} attributes - Value to check
+	* @returns {boolean} Whether the value is a signal
+	*/
 	isSignal(attributes) {
 		return false;
 	},
+	/**
+	* Processes an attribute that might be reactive
+	* @param {Element} obj - Element that owns the attribute
+	* @param {string} key - Attribute name
+	* @param {any} attr - Attribute value
+	* @param {Function} set - Function to set the attribute
+	* @returns {any} Processed attribute value
+	*/
 	processReactiveAttribute(obj, key, attr, set) {
 		return attr;
 	}
@@ -49,6 +62,19 @@ function observedAttributes(instance, observedAttribute2) {
 function kebabToCamel(name) {
 	return name.replace(/-./g, (x) => x[1].toUpperCase());
 }
+var Defined = class extends Error {
+	constructor() {
+		super();
+		const [curr, ...rest] = this.stack.split("\n");
+		const curr_file = curr.slice(curr.indexOf("@"), curr.indexOf(".js:") + 4);
+		const curr_lib = curr_file.includes("src/dom-common.js") ? "src/" : curr_file;
+		this.stack = rest.find((l) => !l.includes(curr_lib)) || curr;
+	}
+	get compact() {
+		const { stack } = this;
+		return stack.slice(0, stack.indexOf("@") + 1) + "\u2026" + stack.slice(stack.lastIndexOf("/"));
+	}
+};
 
 // src/dom-common.js
 var enviroment = {
@@ -87,26 +113,55 @@ var scopes = [{
 	prevent: true
 }];
 var scope = {
+	/**
+	* Gets the current scope
+	* @returns {Object} Current scope context
+	*/
 	get current() {
 		return scopes[scopes.length - 1];
 	},
+	/**
+	* Gets the host element of the current scope
+	* @returns {Function} Host accessor function
+	*/
 	get host() {
 		return this.current.host;
 	},
+	/**
+	* Prevents default behavior in the current scope
+	* @returns {Object} Current scope context
+	*/
 	preventDefault() {
 		const { current } = this;
 		current.prevent = true;
 		return current;
 	},
+	/**
+	* Gets a copy of the current scope stack
+	* @returns {Array} Copy of scope stack
+	*/
 	get state() {
 		return [...scopes];
 	},
+	/**
+	* Pushes a new scope to the stack
+	* @param {Object} [s={}] - Scope object to push
+	* @returns {number} New length of the scope stack
+	*/
 	push(s = {}) {
 		return scopes.push(Object.assign({}, this.current, { prevent: false }, s));
 	},
+	/**
+	* Pushes the root scope to the stack
+	* @returns {number} New length of the scope stack
+	*/
 	pushRoot() {
 		return scopes.push(scopes[0]);
 	},
+	/**
+	* Pops the current scope from the stack
+	* @returns {Object|undefined} Popped scope or undefined if only one scope remains
+	*/
 	pop() {
 		if (scopes.length === 1) return;
 		return scopes.pop();
@@ -338,12 +393,22 @@ function connectionsChangesObserverConstructor() {
 	};
 	const observer = new enviroment.M(observerListener(stop));
 	return {
+		/**
+		* Creates an observer for a specific element
+		* @param {Element} element - Element to observe
+		* @returns {Function} Cleanup function
+		*/
 		observe(element) {
 			const o = new enviroment.M(observerListener(() => {
 			}));
 			o.observe(element, { childList: true, subtree: true });
 			return () => o.disconnect();
 		},
+		/**
+		* Register a connection listener for an element
+		* @param {Element} element - Element to watch
+		* @param {Function} listener - Callback for connection event
+		*/
 		onConnected(element, listener) {
 			start();
 			const listeners = getElementStore(element);
@@ -351,6 +416,11 @@ function connectionsChangesObserverConstructor() {
 			listeners.connected.add(listener);
 			listeners.length_c += 1;
 		},
+		/**
+		* Unregister a connection listener
+		* @param {Element} element - Element being watched
+		* @param {Function} listener - Callback to remove
+		*/
 		offConnected(element, listener) {
 			if (!store.has(element)) return;
 			const ls = store.get(element);
@@ -359,6 +429,11 @@ function connectionsChangesObserverConstructor() {
 			ls.length_c -= 1;
 			cleanWhenOff(element, ls);
 		},
+		/**
+		* Register a disconnection listener for an element
+		* @param {Element} element - Element to watch
+		* @param {Function} listener - Callback for disconnection event
+		*/
 		onDisconnected(element, listener) {
 			start();
 			const listeners = getElementStore(element);
@@ -366,6 +441,11 @@ function connectionsChangesObserverConstructor() {
 			listeners.disconnected.add(listener);
 			listeners.length_d += 1;
 		},
+		/**
+		* Unregister a disconnection listener
+		* @param {Element} element - Element being watched
+		* @param {Function} listener - Callback to remove
+		*/
 		offDisconnected(element, listener) {
 			if (!store.has(element)) return;
 			const ls = store.get(element);
@@ -572,20 +652,13 @@ on.attributeChanged = function(listener, options) {
 
 // src/signals-lib/helpers.js
 var mark = "__dde_signal";
-var SignalDefined = class extends Error {
-	constructor() {
-		super();
-		const [curr, ...rest] = this.stack.split("\n");
-		const curr_file = curr.slice(curr.indexOf("@"), curr.indexOf(".js:") + 4);
-		this.stack = rest.find((l) => !l.includes(curr_file));
-	}
-};
 var queueSignalWrite = /* @__PURE__ */ (() => {
 	let pendingSignals = /* @__PURE__ */ new Set();
 	let scheduled = false;
 	function flushSignals() {
 		scheduled = false;
 		for (const signal2 of pendingSignals) {
+			pendingSignals.delete(signal2);
 			const M = signal2[mark];
 			if (M) M.listeners.forEach((l) => l(M.value));
 		}
@@ -623,7 +696,6 @@ function signal(value, actions) {
 			removeSignalListener(dep_signal, contextReWatch);
 		}
 	}
-	;
 	deps.set(out[mark], contextReWatch);
 	deps.set(contextReWatch, /* @__PURE__ */ new Set([out]));
 	contextReWatch();
@@ -673,36 +745,27 @@ signal.clear = function(...signals2) {
 };
 var key_reactive = "__dde_reactive";
 var storeMemo = /* @__PURE__ */ new WeakMap();
-function memo(key, fun, cache) {
+function memo(key, fun, host = fun) {
 	if (typeof key !== "string") key = JSON.stringify(key);
-	if (!cache) {
-		const keyStore = scope.host();
-		if (storeMemo.has(keyStore))
-			cache = storeMemo.get(keyStore);
-		else {
-			cache = {};
-			storeMemo.set(keyStore, cache);
-		}
-	}
+	if (!storeMemo.has(host)) storeMemo.set(host, {});
+	const cache = storeMemo.get(host);
 	return hasOwn(cache, key) ? cache[key] : cache[key] = fun();
 }
 signal.el = function(s, map) {
-	const mark_start = createElement.mark({ type: "reactive" }, true);
+	const mark_start = createElement.mark({ type: "reactive", source: new Defined().compact }, true);
 	const mark_end = mark_start.end;
 	const out = enviroment.D.createDocumentFragment();
 	out.append(mark_start, mark_end);
 	const { current } = scope;
-	let cache = {};
 	const reRenderReactiveElement = (v) => {
 		if (!mark_start.parentNode || !mark_end.parentNode)
 			return removeSignalListener(s, reRenderReactiveElement);
-		let cache_tmp = cache;
-		cache = {};
+		const cache = {};
 		scope.push(current);
 		let els = map(v, function useCache(key, fun) {
-			return cache[key] = memo(key, fun, cache_tmp);
+			return cache[key] = memo(key, fun, reRenderReactiveElement);
 		});
-		cache_tmp = {};
+		storeMemo.set(reRenderReactiveElement, cache);
 		scope.pop();
 		if (!Array.isArray(els))
 			els = [els];
@@ -719,10 +782,6 @@ signal.el = function(s, map) {
 	addSignalListener(s, reRenderReactiveElement);
 	removeSignalsFromElements(s, reRenderReactiveElement, mark_start, map);
 	reRenderReactiveElement(s());
-	current.host(on.disconnected(() => (
-		/*! This clears memoized elements in S.el when the host is disconnected */
-		cache = {}
-	)));
 	return out;
 };
 function requestCleanUpReactives(host) {
@@ -764,6 +823,15 @@ signal.observedAttributes = function(element) {
 };
 var signals_config = {
 	isSignal,
+	/**
+	* Processes attributes that might be signals
+	*
+	* @param {Element} element - Element with the attribute
+	* @param {string} key - Attribute name
+	* @param {any} attrs - Attribute value (possibly a signal)
+	* @param {Function} set - Function to set attribute value
+	* @returns {any} Processed attribute value
+	*/
 	processReactiveAttribute(element, key, attrs, set) {
 		if (!isSignal(attrs)) return attrs;
 		const l = (attr) => {
@@ -802,6 +870,9 @@ function create(is_readonly, value, actions) {
 	return SI;
 }
 var protoSigal = Object.assign(/* @__PURE__ */ Object.create(null), {
+	/**
+	* Prevents signal propagation
+	*/
 	stopPropagation() {
 		this.skip = true;
 	}
@@ -823,7 +894,7 @@ function toSignal(s, value, actions, readonly = false) {
 			onclear,
 			host,
 			listeners: /* @__PURE__ */ new Set(),
-			defined: new SignalDefined().stack,
+			defined: new Defined().stack,
 			readonly
 		},
 		enumerable: false,

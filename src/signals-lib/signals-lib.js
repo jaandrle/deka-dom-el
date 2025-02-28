@@ -1,6 +1,6 @@
-import { SignalDefined, queueSignalWrite, mark } from "./helpers.js";
+import { queueSignalWrite, mark } from "./helpers.js";
 export { mark };
-import { hasOwn } from "../helpers.js";
+import { hasOwn, Defined } from "../helpers.js";
 
 /**
  * Checks if a value is a signal
@@ -62,7 +62,7 @@ export function signal(value, actions){
 			if(deps_curr.has(dep_signal)) continue;
 			removeSignalListener(dep_signal, contextReWatch);
 		}
-	};
+	}
 	deps.set(out[mark], contextReWatch);
 	deps.set(contextReWatch, new Set([ out ]));
 	contextReWatch();
@@ -159,51 +159,42 @@ import { on } from "../events.js";
 const storeMemo= new WeakMap();
 
 /**
- * Memoizes a function result by key
+ * Memoizes a function result
  *
- * @param {string|any} key - Cache key (non-strings will be stringified)
+ * @param {string|unknown} key - Cache key (non-strings will be stringified)
  * @param {Function} fun - Function to compute value
- * @param {Object} [cache] - Optional explicit cache object
- * @returns {any} Cached or computed result
+ * @param {keyof storeMemo} [host= fun]
+ * @returns {unknown} Cached or computed result
  */
-export function memo(key, fun, cache){
+export function memo(key, fun, host= fun){
 	if(typeof key!=="string") key= JSON.stringify(key);
-	if(!cache) {
-		const keyStore= scope.host();
-		if(storeMemo.has(keyStore))
-			cache= storeMemo.get(keyStore);
-		else {
-			cache= {};
-			storeMemo.set(keyStore, cache);
-		}
-	}
+	if (!storeMemo.has(host)) storeMemo.set(host, {});
+	const cache= storeMemo.get(host);
 	return hasOwn(cache, key) ? cache[key] : (cache[key]= fun());
 }
-// TODO: third argument for handle `cache_tmp` in re-render
 /**
  * Creates a reactive DOM element that re-renders when signal changes
  *
+ * @TODO Third argument for handle `cache_tmp` in re-render
  * @param {function} s - Signal to watch
  * @param {Function} map - Function mapping signal value to DOM elements
  * @returns {DocumentFragment} Fragment containing reactive elements
  */
 signal.el= function(s, map){
-	const mark_start= el.mark({ type: "reactive" }, true);
+	const mark_start= el.mark({ type: "reactive", source: new Defined().compact }, true);
 	const mark_end= mark_start.end;
 	const out= env.D.createDocumentFragment();
 	out.append(mark_start, mark_end);
 	const { current }= scope;
-	let cache= {};
 	const reRenderReactiveElement= v=> {
 		if(!mark_start.parentNode || !mark_end.parentNode) // === `isConnected` or wasn’t yet rendered
 			return removeSignalListener(s, reRenderReactiveElement);
-		let cache_tmp= cache; // will be reused in the useCache or removed in the while loop on the end
-		cache= {};
+		const cache= {}; // remove unused els from cache
 		scope.push(current);
 		let els= map(v, function useCache(key, fun){
-			return cache[key]= memo(key, fun, cache_tmp);
+			return (cache[key]= memo(key, fun, reRenderReactiveElement));
 		});
-		cache_tmp= {};
+		storeMemo.set(reRenderReactiveElement, cache);
 		scope.pop();
 		if(!Array.isArray(els))
 			els= [ els ];
@@ -220,9 +211,6 @@ signal.el= function(s, map){
 	addSignalListener(s, reRenderReactiveElement);
 	removeSignalsFromElements(s, reRenderReactiveElement, mark_start, map);
 	reRenderReactiveElement(s());
-	current.host(on.disconnected(()=>
-		/*! This clears memoized elements in S.el when the host is disconnected */
-		cache= {}));
 	return out;
 };
 /**
@@ -407,7 +395,7 @@ function toSignal(s, value, actions, readonly= false){
 		value: {
 			value, actions, onclear, host,
 			listeners: new Set(),
-			defined: (new SignalDefined()).stack,
+			defined: new Defined().stack,
 			readonly
 		},
 		enumerable: false,

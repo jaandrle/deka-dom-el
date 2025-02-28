@@ -53,7 +53,8 @@
 		"globals": {
 			"requestIdleCallback": false,
 			"AbortController": false,
-			"AbortSignal": false
+			"AbortSignal": false,
+			"FinalizationRegistry": false
 		}
 	},
 	"size-limit": [
@@ -65,7 +66,7 @@
 		},
 		{
 			"path": "./signals.js",
-			"limit": "12 kB",
+			"limit": "12.5 kB",
 			"gzip": false,
 			"brotli": false
 		},
