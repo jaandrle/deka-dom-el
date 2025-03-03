@@ -52,9 +52,12 @@ type IsReadonly<T, K extends keyof T> =
  * @private
  */
 type ElementAttributes<T extends SupportedElement>= Partial<{
-	[K in keyof _fromElsInterfaces<T>]: IsReadonly<_fromElsInterfaces<T>, K> extends false
-		? _fromElsInterfaces<T>[K] | ddeSignal<_fromElsInterfaces<T>[K]>
-		: ddeStringable
+	[K in keyof _fromElsInterfaces<T>]:
+		_fromElsInterfaces<T>[K] extends ((...p: any[])=> any)
+			? _fromElsInterfaces<T>[K] | ((...p: Parameters<_fromElsInterfaces<T>[K]>)=> ddeSignal<ReturnType<_fromElsInterfaces<T>[K]>>)
+			: (IsReadonly<_fromElsInterfaces<T>, K> extends false
+				? _fromElsInterfaces<T>[K] | ddeSignal<_fromElsInterfaces<T>[K]>
+				: ddeStringable)
 } & AttrsModified> & Record<string, any>;
 export function classListDeclarative<El extends SupportedElement>(
 	element: El,

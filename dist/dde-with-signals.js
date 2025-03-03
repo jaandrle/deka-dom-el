@@ -718,7 +718,7 @@ function signal(value, actions) {
 		const [origin, ...deps_old] = deps.get(contextReWatch);
 		deps.set(contextReWatch, /* @__PURE__ */ new Set([origin]));
 		stack_watch.push(contextReWatch);
-		write(out, value.get());
+		write(out, value());
 		stack_watch.pop();
 		if (!deps_old.length) return;
 		const deps_curr = deps.get(contextReWatch);
