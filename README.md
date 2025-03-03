@@ -86,10 +86,7 @@ To balance these requirements, numerous compromises have been made. To summarize
 	- [dist/](dist/) (`https://cdn.jsdelivr.net/gh/jaandrle/deka-dom-el/dist/`…)
 
 ## Signals
-- [Signals — whats going on behind the scenes \| by Ryan Hoffnan \| ITNEXT](https://itnext.io/
-signals-whats-going-on-behind-the-scenes-ec858589ea63)
-- [The Evolution of Signals in JavaScript - DEV Community](https://dev.to/this-is-learning/the-evolution-of-signals-in-
-javascript-8ob)
-- there is also [tc39/proposal-signals: A proposal to add signals to JavaScript.](https://github.com/tc39/proposal-
-signals)
+- [Signals — whats going on behind the scenes \| by Ryan Hoffnan \| ITNEXT](https://itnext.io/signals-whats-going-on-behind-the-scenes-ec858589ea63)
+- [The Evolution of Signals in JavaScript - DEV Community](https://dev.to/this-is-learning/the-evolution-of-signals-in-javascript-8ob)
+- there is also [tc39/proposal-signals: A proposal to add signals to JavaScript.](https://github.com/tc39/proposal-signals)
 - [Observer pattern - Wikipedia](https://en.wikipedia.org/wiki/Observer_pattern)
