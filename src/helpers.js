@@ -27,7 +27,8 @@ export function typeOf(v){
 export function isInstance(obj, cls){ return obj instanceof cls; }
 /** @type {typeof Object.prototype.isPrototypeOf.call} */
 export function isProtoFrom(obj, cls){ return Object.prototype.isPrototypeOf.call(cls, obj); }
-export function oCreate(proto= null){ return Object.create(proto); }
+export function oCreate(proto= null, p= {}){ return Object.create(proto, p); }
+export function oAssign(...o){ return Object.assign(...o); }
 
 /**
  * Handles AbortSignal registration and cleanup

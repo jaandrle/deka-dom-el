@@ -58,7 +58,7 @@ export function todosComponent({ todos= [ "Task A" ] }= {}){
 		),
 		el("div").append(
 			el("h3", "Output (JSON):"),
-			el("output", S(()=> JSON.stringify(Array.from(todosO()), null, "\t")))
+			el("output", S(()=> JSON.stringify(Array.from(todosO.get()), null, "\t")))
 		)
 	)
 }
@@ -80,13 +80,13 @@ function todoComponent({ textContent, value }){
 	const is_editable= S(false);
 	const onedited= on("change", ev=> {
 		const el= /** @type {HTMLInputElement} */ (ev.target);
-		textContent(el.value);
-		is_editable(false);
+		textContent.set(el.value);
+		is_editable.set(false);
 	});
 	return el("li").append(
 		S.el(is_editable, is=> is
-			? el("input", { value: textContent(), type: "text" }, onedited)
-			: el("span", { textContent, onclick: is_editable.bind(null, true) })
+			? el("input", { value: textContent.get(), type: "text" }, onedited)
+			: el("span", { textContent, onclick: ()=> is_editable.set(true) })
 		),
 		el("button", { type: "button", value, textContent: "-" }, onclick)
 	);

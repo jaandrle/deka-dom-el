@@ -4,11 +4,11 @@ const threePS= ({ emoji= "🚀" })=> {
 	const clicks= S(0); // A
 	return el().append(
 		el("p", S(()=>
-			"Hello World "+emoji.repeat(clicks()) // B
+			"Hello World "+emoji.repeat(clicks.get()) // B
 		)),
 		el("button", {
 			type: "button",
-			onclick: ()=> clicks(clicks()+1), // C
+			onclick: ()=> clicks.set(clicks.get()+1), // C
 			textContent: "Fire",
 		})
 	);

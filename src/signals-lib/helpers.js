@@ -18,12 +18,12 @@ export const queueSignalWrite= (()=> {
 	 */
 	function flushSignals() {
 		scheduled = false;
-		for(const signal of pendingSignals){
-			pendingSignals.delete(signal);
+		const todo= pendingSignals;
+		pendingSignals= new Set();
+		for(const signal of todo){
 			const M = signal[mark];
 			if(M) M.listeners.forEach(l => l(M.value));
 		}
-		pendingSignals.clear();
 	}
 
 	/**

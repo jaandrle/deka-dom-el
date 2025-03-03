@@ -15,7 +15,7 @@ export function thirdParty(){
 	}, {
 		set(key, value){
 			const p=  this.value[key] || S();
-			p(value);
+			p.set(value);
 			this.value[key]= p;
 		}
 	});
@@ -32,7 +32,7 @@ export function thirdParty(){
 	})();
 	return el("input", {
 		className,
-		value: store().value(),
+		value: store.get().value.get(),
 		type: "text",
 		onchange: ev=> S.action(store, "set", "value", ev.target.value)
 	});

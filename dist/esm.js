@@ -1,3 +1,37 @@
+// src/helpers.js
+function isUndef(value) {
+	return typeof value === "undefined";
+}
+function isInstance(obj, cls) {
+	return obj instanceof cls;
+}
+function isProtoFrom(obj, cls) {
+	return Object.prototype.isPrototypeOf.call(cls, obj);
+}
+function oAssign(...o) {
+	return Object.assign(...o);
+}
+function onAbort(signal, listener) {
+	if (!signal || !isInstance(signal, AbortSignal))
+		return true;
+	if (signal.aborted)
+		return;
+	signal.addEventListener("abort", listener);
+	return function cleanUp() {
+		signal.removeEventListener("abort", listener);
+	};
+}
+function observedAttributes(instance, observedAttribute) {
+	const { observedAttributes: observedAttributes3 = [] } = instance.constructor;
+	return observedAttributes3.reduce(function(out, name) {
+		out[kebabToCamel(name)] = observedAttribute(instance, name);
+		return out;
+	}, {});
+}
+function kebabToCamel(name) {
+	return name.replace(/-./g, (x) => x[1].toUpperCase());
+}
+
 // src/signals-lib/common.js
 var signals_global = {
 	/**
@@ -21,37 +55,12 @@ var signals_global = {
 	}
 };
 function registerReactivity(def, global = true) {
-	if (global) return Object.assign(signals_global, def);
+	if (global) return oAssign(signals_global, def);
 	Object.setPrototypeOf(def, signals_global);
 	return def;
 }
 function signals(_this) {
-	return signals_global.isPrototypeOf(_this) && _this !== signals_global ? _this : signals_global;
-}
-
-// src/helpers.js
-function isUndef(value) {
-	return typeof value === "undefined";
-}
-function onAbort(signal, listener) {
-	if (!signal || !(signal instanceof AbortSignal))
-		return true;
-	if (signal.aborted)
-		return;
-	signal.addEventListener("abort", listener);
-	return function cleanUp() {
-		signal.removeEventListener("abort", listener);
-	};
-}
-function observedAttributes(instance, observedAttribute) {
-	const { observedAttributes: observedAttributes3 = [] } = instance.constructor;
-	return observedAttributes3.reduce(function(out, name) {
-		out[kebabToCamel(name)] = observedAttribute(instance, name);
-		return out;
-	}, {});
-}
-function kebabToCamel(name) {
-	return name.replace(/-./g, (x) => x[1].toUpperCase());
+	return isProtoFrom(_this, signals_global) && _this !== signals_global ? _this : signals_global;
 }
 
 // src/dom-common.js
@@ -69,7 +78,7 @@ function setDeleteAttr(obj, prop, val) {
 	Reflect.set(obj, prop, val);
 	if (!isUndef(val)) return;
 	Reflect.deleteProperty(obj, prop);
-	if (obj instanceof enviroment.H && obj.getAttribute(prop) === "undefined")
+	if (isInstance(obj, enviroment.H) && obj.getAttribute(prop) === "undefined")
 		return obj.removeAttribute(prop);
 	if (Reflect.get(obj, prop) === "undefined")
 		return Reflect.set(obj, prop, "");
@@ -127,7 +136,7 @@ var scope = {
 	* @returns {number} New length of the scope stack
 	*/
 	push(s = {}) {
-		return scopes.push(Object.assign({}, this.current, { prevent: false }, s));
+		return scopes.push(oAssign({}, this.current, { prevent: false }, s));
 	},
 	/**
 	* Pushes the root scope to the stack
@@ -168,7 +177,7 @@ function createElement(tag, attributes, ...addons) {
 			const host = (...c) => !c.length ? el_host : (scoped === 1 ? addons.unshift(...c) : c.forEach((c2) => c2(el_host)), void 0);
 			scope.push({ scope: tag, host });
 			el = tag(attributes || void 0);
-			const is_fragment = el instanceof enviroment.F;
+			const is_fragment = isInstance(el, enviroment.F);
 			if (el.nodeName === "#comment") break;
 			const el_mark = createElement.mark({
 				type: "component",
@@ -251,7 +260,7 @@ var { setDeleteAttr: setDeleteAttr2 } = enviroment;
 function assign(element, ...attributes) {
 	if (!attributes.length) return element;
 	assign_context.set(element, assignContext(element, this));
-	for (const [key, value] of Object.entries(Object.assign({}, ...attributes)))
+	for (const [key, value] of Object.entries(oAssign({}, ...attributes)))
 		assignAttribute.call(this, element, key, value);
 	assign_context.delete(element);
 	return element;
@@ -292,7 +301,7 @@ function assignAttribute(element, key, value) {
 }
 function assignContext(element, _this) {
 	if (assign_context.has(element)) return assign_context.get(element);
-	const is_svg = element instanceof enviroment.S;
+	const is_svg = isInstance(element, enviroment.S);
 	const setRemoveAttr = (is_svg ? setRemoveNS : setRemove).bind(null, element, "Attribute");
 	const s = signals(_this);
 	return { setRemoveAttr, s };
@@ -309,7 +318,7 @@ function classListDeclarative(element, toggle) {
 	return element;
 }
 function elementAttribute(element, op, key, value) {
-	if (element instanceof enviroment.H)
+	if (isInstance(element, enviroment.H))
 		return element[op + "Attribute"](key, value);
 	return element[op + "AttributeNS"](null, key, value);
 }
@@ -469,9 +478,9 @@ function connectionsChangesObserverConstructor() {
 		if (store.size > 30)
 			await requestIdle();
 		const out = [];
-		if (!(element instanceof Node)) return out;
+		if (!isInstance(element, Node)) return out;
 		for (const el of store.keys()) {
-			if (el === element || !(el instanceof Node)) continue;
+			if (el === element || !isInstance(el, Node)) continue;
 			if (element.contains(el))
 				out.push(el);
 		}
@@ -567,7 +576,7 @@ function dispatchEvent(name, options, host) {
 			d.unshift(element);
 			element = typeof host === "function" ? host() : host;
 		}
-		const event = d.length ? new CustomEvent(name, Object.assign({ detail: d[0] }, options)) : new Event(name, options);
+		const event = d.length ? new CustomEvent(name, oAssign({ detail: d[0] }, options)) : new Event(name, options);
 		return element.dispatchEvent(event);
 	};
 }
@@ -577,7 +586,7 @@ function on(event, listener, options) {
 		return element;
 	};
 }
-var lifeOptions = (obj) => Object.assign({}, typeof obj === "object" ? obj : null, { once: true });
+var lifeOptions = (obj) => oAssign({}, typeof obj === "object" ? obj : null, { once: true });
 on.connected = function(listener, options) {
 	options = lifeOptions(options);
 	return function registerElement(element) {

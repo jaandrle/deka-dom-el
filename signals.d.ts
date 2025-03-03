@@ -1,4 +1,12 @@
-export type Signal<V, A>= (set?: V)=> V & A;
+export interface Signal<V, A> {
+	/** The current value of the signal */
+	get(): V;
+	/** Set new value of the signal */
+	set(value: V): V;
+	toJSON(): V;
+	valueOf(): V;
+}
+
 type Action<V>= (this: { value: V, stopPropagation(): void }, ...a: any[])=> typeof signal._ | void;
 //type SymbolSignal= Symbol;
 type SymbolOnclear= symbol;
@@ -27,7 +35,7 @@ interface signal{
 	 * ```js
 	 * const name= S("Jan");
 	 * const surname= S("Andrle");
-	 * const fullname= S(()=> name()+" "+surname());
+	 * const fullname= S(()=> name.get()+" "+surname.get());
 	 * ```
 	 * @param value Initial signal value. Or function computing value from other signals.
 	 * @param actions Use to define actions on the signal. Such as add item to the array.

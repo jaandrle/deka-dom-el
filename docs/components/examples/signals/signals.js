@@ -4,7 +4,7 @@ const signal= S(0);
 // β — just reacts on signal changes
 S.on(signal, console.log);
 // γ — just updates the value
-const update= ()=> signal(signal()+1);
+const update= ()=> signal.set(signal.get()+1);
 
 update();
 const interval= 5*1000;

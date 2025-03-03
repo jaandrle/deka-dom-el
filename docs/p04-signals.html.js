@@ -69,9 +69,9 @@ export function page({ pkg, info }){
 			some manner independent and still connected to the same reactive entity.
 		`),
 		el("p").append(...T`
-			Signals are implemented in the library as functions. To see current value of signal, just call it without
-			any arguments ${el("code", "console.log(signal())")}. To update the signal value, pass any argument
-			${el("code", `signal('${t`a new value`}')`)}. For listenning the signal value changes, use
+			Signals are implemented in the library as objects with methods. To see current value of signal,
+			call the get method ${el("code", "console.log(signal.get())")}. To update the signal value, use the set method
+			${el("code", `signal.set('${t`a new value`}')`)}. For listenning the signal value changes, use
 			${el("code", "S.on(signal, console.log)")}.
 		`),
 		el("p").append(...T`
@@ -114,7 +114,7 @@ export function page({ pkg, info }){
 		`),
 		el("p").append(...T`
 			For computation, you can use the “derived signal” (see above) like
-			${el("code", "assign(element, { textContent: S(()=> 'Hello '+WorldSignal()) })")}. This is read-only signal
+			${el("code", "assign(element, { textContent: S(()=> 'Hello '+WorldSignal.get()) })")}. This is read-only signal
 			its value is computed based on given function and updated when any signal used in the function changes.
 		`),
 		el("p").append(...T`

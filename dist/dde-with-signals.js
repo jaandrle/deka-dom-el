@@ -1,36 +1,5 @@
 //deka-dom-el library is available via global namespace `dde`
 (()=> {
-// src/signals-lib/common.js
-var signals_global = {
-	/**
-	* Checks if a value is a signal
-	* @param {any} attributes - Value to check
-	* @returns {boolean} Whether the value is a signal
-	*/
-	isSignal(attributes) {
-		return false;
-	},
-	/**
-	* Processes an attribute that might be reactive
-	* @param {Element} obj - Element that owns the attribute
-	* @param {string} key - Attribute name
-	* @param {any} attr - Attribute value
-	* @param {Function} set - Function to set the attribute
-	* @returns {any} Processed attribute value
-	*/
-	processReactiveAttribute(obj, key, attr, set) {
-		return attr;
-	}
-};
-function registerReactivity(def, global = true) {
-	if (global) return Object.assign(signals_global, def);
-	Object.setPrototypeOf(def, signals_global);
-	return def;
-}
-function signals(_this) {
-	return signals_global.isPrototypeOf(_this) && _this !== signals_global ? _this : signals_global;
-}
-
 // src/helpers.js
 var hasOwn = (...a) => Object.prototype.hasOwnProperty.call(...a);
 function isUndef(value) {
@@ -42,8 +11,20 @@ function typeOf(v) {
 	if (v === null) return "null";
 	return Object.prototype.toString.call(v);
 }
+function isInstance(obj, cls) {
+	return obj instanceof cls;
+}
+function isProtoFrom(obj, cls) {
+	return Object.prototype.isPrototypeOf.call(cls, obj);
+}
+function oCreate(proto = null, p = {}) {
+	return Object.create(proto, p);
+}
+function oAssign(...o) {
+	return Object.assign(...o);
+}
 function onAbort(signal2, listener) {
-	if (!signal2 || !(signal2 instanceof AbortSignal))
+	if (!signal2 || !isInstance(signal2, AbortSignal))
 		return true;
 	if (signal2.aborted)
 		return;
@@ -67,7 +48,7 @@ var Defined = class extends Error {
 		super();
 		const [curr, ...rest] = this.stack.split("\n");
 		const curr_file = curr.slice(curr.indexOf("@"), curr.indexOf(".js:") + 4);
-		const curr_lib = curr_file.includes("src/dom-common.js") ? "src/" : curr_file;
+		const curr_lib = curr_file.includes("src/helpers.js") ? "src/" : curr_file;
 		this.stack = rest.find((l) => !l.includes(curr_lib)) || curr;
 	}
 	get compact() {
@@ -75,6 +56,37 @@ var Defined = class extends Error {
 		return stack.slice(0, stack.indexOf("@") + 1) + "\u2026" + stack.slice(stack.lastIndexOf("/"));
 	}
 };
+
+// src/signals-lib/common.js
+var signals_global = {
+	/**
+	* Checks if a value is a signal
+	* @param {any} attributes - Value to check
+	* @returns {boolean} Whether the value is a signal
+	*/
+	isSignal(attributes) {
+		return false;
+	},
+	/**
+	* Processes an attribute that might be reactive
+	* @param {Element} obj - Element that owns the attribute
+	* @param {string} key - Attribute name
+	* @param {any} attr - Attribute value
+	* @param {Function} set - Function to set the attribute
+	* @returns {any} Processed attribute value
+	*/
+	processReactiveAttribute(obj, key, attr, set) {
+		return attr;
+	}
+};
+function registerReactivity(def, global = true) {
+	if (global) return oAssign(signals_global, def);
+	Object.setPrototypeOf(def, signals_global);
+	return def;
+}
+function signals(_this) {
+	return isProtoFrom(_this, signals_global) && _this !== signals_global ? _this : signals_global;
+}
 
 // src/dom-common.js
 var enviroment = {
@@ -91,7 +103,7 @@ function setDeleteAttr(obj, prop, val) {
 	Reflect.set(obj, prop, val);
 	if (!isUndef(val)) return;
 	Reflect.deleteProperty(obj, prop);
-	if (obj instanceof enviroment.H && obj.getAttribute(prop) === "undefined")
+	if (isInstance(obj, enviroment.H) && obj.getAttribute(prop) === "undefined")
 		return obj.removeAttribute(prop);
 	if (Reflect.get(obj, prop) === "undefined")
 		return Reflect.set(obj, prop, "");
@@ -149,7 +161,7 @@ var scope = {
 	* @returns {number} New length of the scope stack
 	*/
 	push(s = {}) {
-		return scopes.push(Object.assign({}, this.current, { prevent: false }, s));
+		return scopes.push(oAssign({}, this.current, { prevent: false }, s));
 	},
 	/**
 	* Pushes the root scope to the stack
@@ -190,7 +202,7 @@ function createElement(tag, attributes, ...addons) {
 			const host = (...c) => !c.length ? el_host : (scoped === 1 ? addons.unshift(...c) : c.forEach((c2) => c2(el_host)), void 0);
 			scope.push({ scope: tag, host });
 			el = tag(attributes || void 0);
-			const is_fragment = el instanceof enviroment.F;
+			const is_fragment = isInstance(el, enviroment.F);
 			if (el.nodeName === "#comment") break;
 			const el_mark = createElement.mark({
 				type: "component",
@@ -273,7 +285,7 @@ var { setDeleteAttr: setDeleteAttr2 } = enviroment;
 function assign(element, ...attributes) {
 	if (!attributes.length) return element;
 	assign_context.set(element, assignContext(element, this));
-	for (const [key, value] of Object.entries(Object.assign({}, ...attributes)))
+	for (const [key, value] of Object.entries(oAssign({}, ...attributes)))
 		assignAttribute.call(this, element, key, value);
 	assign_context.delete(element);
 	return element;
@@ -314,7 +326,7 @@ function assignAttribute(element, key, value) {
 }
 function assignContext(element, _this) {
 	if (assign_context.has(element)) return assign_context.get(element);
-	const is_svg = element instanceof enviroment.S;
+	const is_svg = isInstance(element, enviroment.S);
 	const setRemoveAttr = (is_svg ? setRemoveNS : setRemove).bind(null, element, "Attribute");
 	const s = signals(_this);
 	return { setRemoveAttr, s };
@@ -331,7 +343,7 @@ function classListDeclarative(element, toggle) {
 	return element;
 }
 function elementAttribute(element, op, key, value) {
-	if (element instanceof enviroment.H)
+	if (isInstance(element, enviroment.H))
 		return element[op + "Attribute"](key, value);
 	return element[op + "AttributeNS"](null, key, value);
 }
@@ -491,9 +503,9 @@ function connectionsChangesObserverConstructor() {
 		if (store.size > 30)
 			await requestIdle();
 		const out = [];
-		if (!(element instanceof Node)) return out;
+		if (!isInstance(element, Node)) return out;
 		for (const el of store.keys()) {
-			if (el === element || !(el instanceof Node)) continue;
+			if (el === element || !isInstance(el, Node)) continue;
 			if (element.contains(el))
 				out.push(el);
 		}
@@ -589,7 +601,7 @@ function dispatchEvent(name, options, host) {
 			d.unshift(element);
 			element = typeof host === "function" ? host() : host;
 		}
-		const event = d.length ? new CustomEvent(name, Object.assign({ detail: d[0] }, options)) : new Event(name, options);
+		const event = d.length ? new CustomEvent(name, oAssign({ detail: d[0] }, options)) : new Event(name, options);
 		return element.dispatchEvent(event);
 	};
 }
@@ -599,7 +611,7 @@ function on(event, listener, options) {
 		return element;
 	};
 }
-var lifeOptions = (obj) => Object.assign({}, typeof obj === "object" ? obj : null, { once: true });
+var lifeOptions = (obj) => oAssign({}, typeof obj === "object" ? obj : null, { once: true });
 on.connected = function(listener, options) {
 	options = lifeOptions(options);
 	return function registerElement(element) {
@@ -657,12 +669,12 @@ var queueSignalWrite = /* @__PURE__ */ (() => {
 	let scheduled = false;
 	function flushSignals() {
 		scheduled = false;
-		for (const signal2 of pendingSignals) {
-			pendingSignals.delete(signal2);
+		const todo = pendingSignals;
+		pendingSignals = /* @__PURE__ */ new Set();
+		for (const signal2 of todo) {
 			const M = signal2[mark];
 			if (M) M.listeners.forEach((l) => l(M.value));
 		}
-		pendingSignals.clear();
 	}
 	return function(s) {
 		pendingSignals.add(s);
@@ -673,8 +685,27 @@ var queueSignalWrite = /* @__PURE__ */ (() => {
 })();
 
 // src/signals-lib/signals-lib.js
+var Signal = oCreate(null, {
+	get: { value() {
+		return read(this);
+	} },
+	set: { value(...v) {
+		return write(this, ...v);
+	} },
+	toJSON: { value() {
+		return read(this);
+	} },
+	valueOf: { value() {
+		return this[mark] && this[mark].value;
+	} }
+});
+var SignalReadOnly = oCreate(Signal, {
+	set: { value() {
+		return;
+	} }
+});
 function isSignal(candidate) {
-	return typeof candidate === "function" && hasOwn(candidate, mark);
+	return isProtoFrom(candidate, Signal);
 }
 var stack_watch = [];
 var deps = /* @__PURE__ */ new WeakMap();
@@ -687,7 +718,7 @@ function signal(value, actions) {
 		const [origin, ...deps_old] = deps.get(contextReWatch);
 		deps.set(contextReWatch, /* @__PURE__ */ new Set([origin]));
 		stack_watch.push(contextReWatch);
-		write(out, value());
+		write(out, value.get());
 		stack_watch.pop();
 		if (!deps_old.length) return;
 		const deps_curr = deps.get(contextReWatch);
@@ -744,12 +775,8 @@ signal.clear = function(...signals2) {
 	}
 };
 var key_reactive = "__dde_reactive";
-var storeMemo = /* @__PURE__ */ new WeakMap();
-function memo(key, fun, host = fun) {
-	if (typeof key !== "string") key = JSON.stringify(key);
-	if (!storeMemo.has(host)) storeMemo.set(host, {});
-	const cache = storeMemo.get(host);
-	return hasOwn(cache, key) ? cache[key] : cache[key] = fun();
+function cache(store = oCreate()) {
+	return (key, fun) => hasOwn(store, key) ? store[key] : store[key] = fun();
 }
 signal.el = function(s, map) {
 	const mark_start = createElement.mark({ type: "reactive", source: new Defined().compact }, true);
@@ -757,15 +784,16 @@ signal.el = function(s, map) {
 	const out = enviroment.D.createDocumentFragment();
 	out.append(mark_start, mark_end);
 	const { current } = scope;
+	let cache_shared = oCreate();
 	const reRenderReactiveElement = (v) => {
 		if (!mark_start.parentNode || !mark_end.parentNode)
 			return removeSignalListener(s, reRenderReactiveElement);
-		const cache = {};
+		const memo = cache(cache_shared);
+		cache_shared = oCreate();
 		scope.push(current);
 		let els = map(v, function useCache(key, fun) {
-			return cache[key] = memo(key, fun, reRenderReactiveElement);
+			return cache_shared[key] = memo(key, fun);
 		});
-		storeMemo.set(reRenderReactiveElement, cache);
 		scope.pop();
 		if (!Array.isArray(els))
 			els = [els];
@@ -781,7 +809,13 @@ signal.el = function(s, map) {
 	};
 	addSignalListener(s, reRenderReactiveElement);
 	removeSignalsFromElements(s, reRenderReactiveElement, mark_start, map);
-	reRenderReactiveElement(s());
+	reRenderReactiveElement(s.get());
+	current.host(on.disconnected(
+		() => (
+			/*! Clears cached elements for reactive element `S.el` */
+			cache_shared = {}
+		)
+	));
 	return out;
 };
 function requestCleanUpReactives(host) {
@@ -797,7 +831,11 @@ var observedAttributeActions = {
 };
 function observedAttribute(store) {
 	return function(instance, name) {
-		const varS = (...args) => !args.length ? read(varS) : instance.setAttribute(name, ...args);
+		const varS = oCreate(Signal, {
+			set: { value(...v) {
+				return instance.setAttribute(name, ...v);
+			} }
+		});
 		const out = toSignal(varS, instance.getAttribute(name), observedAttributeActions);
 		store[name] = out;
 		return out;
@@ -841,7 +879,7 @@ var signals_config = {
 		};
 		addSignalListener(attrs, l);
 		removeSignalsFromElements(attrs, l, element, key);
-		return attrs();
+		return attrs.get();
 	}
 };
 function removeSignalsFromElements(s, listener, ...notes) {
@@ -864,12 +902,12 @@ var cleanUpRegistry = new FinalizationRegistry(function(s) {
 	signal.clear({ [mark]: s });
 });
 function create(is_readonly, value, actions) {
-	const varS = is_readonly ? () => read(varS) : (...value2) => value2.length ? write(varS, ...value2) : read(varS);
+	const varS = oCreate(is_readonly ? SignalReadOnly : Signal);
 	const SI = toSignal(varS, value, actions, is_readonly);
 	cleanUpRegistry.register(SI, SI[mark]);
 	return SI;
 }
-var protoSigal = Object.assign(/* @__PURE__ */ Object.create(null), {
+var protoSigal = oAssign(oCreate(), {
 	/**
 	* Prevents signal propagation
 	*/
@@ -888,7 +926,7 @@ function toSignal(s, value, actions, readonly = false) {
 	}
 	const { host } = scope;
 	Reflect.defineProperty(s, mark, {
-		value: {
+		value: oAssign(oCreate(protoSigal), {
 			value,
 			actions,
 			onclear,
@@ -896,14 +934,11 @@ function toSignal(s, value, actions, readonly = false) {
 			listeners: /* @__PURE__ */ new Set(),
 			defined: new Defined().stack,
 			readonly
-		},
+		}),
 		enumerable: false,
 		writable: false,
 		configurable: true
 	});
-	s.toJSON = () => s();
-	s.valueOf = () => s[mark] && s[mark].value;
-	Object.setPrototypeOf(s[mark], protoSigal);
 	return s;
 }
 function currentContext() {

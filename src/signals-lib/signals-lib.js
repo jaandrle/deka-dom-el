@@ -1,7 +1,16 @@
 import { queueSignalWrite, mark } from "./helpers.js";
 export { mark };
-import { hasOwn, Defined, oCreate, isProtoFrom } from "../helpers.js";
+import { hasOwn, Defined, oCreate, isProtoFrom, oAssign } from "../helpers.js";
 
+const Signal = oCreate(null, {
+	get: { value(){ return read(this); } },
+	set: { value(...v){ return write(this, ...v); } },
+	toJSON: { value(){ return read(this); } },
+	valueOf: { value(){ return this[mark] && this[mark].value; } }
+});
+const SignalReadOnly= oCreate(Signal, {
+	set: { value(){ return; } },
+});
 /**
  * Checks if a value is a signal
  *
@@ -9,7 +18,7 @@ import { hasOwn, Defined, oCreate, isProtoFrom } from "../helpers.js";
  * @returns {boolean} True if the value is a signal
  */
 export function isSignal(candidate){
-	return typeof candidate === "function" && hasOwn(candidate, mark);
+	return isProtoFrom(candidate, Signal);
 }
 
 /**
@@ -35,7 +44,7 @@ const deps= new WeakMap();
  *
  * @param {any|function} value - Initial value or function that computes the value
  * @param {Object} [actions] - Custom actions for the signal
- * @returns {function} Signal function
+ * @returns {Object} Signal object with get() and set() methods
  */
 export function signal(value, actions){
 	if(typeof value!=="function")
@@ -53,7 +62,7 @@ export function signal(value, actions){
 		deps.set(contextReWatch, new Set([ origin ]));
 
 		stack_watch.push(contextReWatch);
-		write(out, value());
+		write(out, value.get());
 		stack_watch.pop();
 
 		if(!deps_old.length) return;
@@ -74,7 +83,7 @@ export { signal as S };
 /**
  * Calls a custom action on a signal
  *
- * @param {function} s - Signal to call action on
+ * @param {Object} s - Signal object to call action on
  * @param {string} name - Action name
  * @param {...any} a - Arguments to pass to the action
  */
@@ -92,7 +101,7 @@ signal.action= function(s, name, ...a){
 /**
  * Subscribes a listener to signal changes
  *
- * @param {function|function[]} s - Signal or array of signals to subscribe to
+ * @param {Object|Object[]} s - Signal object or array of signal objects to subscribe to
  * @param {function} listener - Callback function receiving signal value
  * @param {Object} [options={}] - Subscription options
  * @param {AbortSignal} [options.signal] - Signal to abort subscription
@@ -116,7 +125,7 @@ signal.symbols= {
 /**
  * Cleans up signals and their dependencies
  *
- * @param {...function} signals - Signals to clean up
+ * @param {...Object} signals - Signal objects to clean up
  */
 signal.clear= function(...signals){
 	for(const s of signals){
@@ -162,7 +171,7 @@ export function cache(store= oCreate()){
  * Creates a reactive DOM element that re-renders when signal changes
  *
  * @TODO Third argument for handle `cache_tmp` in re-render
- * @param {function} s - Signal to watch
+ * @param {Object} s - Signal object to watch
  * @param {Function} map - Function mapping signal value to DOM elements
  * @returns {DocumentFragment} Fragment containing reactive elements
  */
@@ -197,7 +206,7 @@ signal.el= function(s, map){
 	};
 	addSignalListener(s, reRenderReactiveElement);
 	removeSignalsFromElements(s, reRenderReactiveElement, mark_start, map);
-	reRenderReactiveElement(s());
+	reRenderReactiveElement(s.get());
 	current.host(on.disconnected(()=>
 		/*! Clears cached elements for reactive element `S.el` */
 		cache_shared= {}
@@ -236,9 +245,9 @@ const observedAttributeActions= {
  */
 function observedAttribute(store){
 	return function(instance, name){
-		const varS= (...args)=> !args.length
-			? read(varS)
-			: instance.setAttribute(name, ...args);
+		const varS= oCreate(Signal, {
+			set: { value(...v){ return instance.setAttribute(name, ...v); } }
+		});
 		const out= toSignal(varS, instance.getAttribute(name), observedAttributeActions);
 		store[name]= out;
 		return out;
@@ -298,13 +307,13 @@ export const signals_config= {
 		};
 		addSignalListener(attrs, l);
 		removeSignalsFromElements(attrs, l, element, key);
-		return attrs();
+		return attrs.get();
 	}
 };
 /**
  * Registers signal listener for cleanup when element is removed
  *
- * @param {function} s - Signal to track
+ * @param {Object} s - Signal object to track
  * @param {Function} listener - Signal listener
  * @param {...any} notes - Additional context information
  * @private
@@ -333,18 +342,16 @@ const cleanUpRegistry = new FinalizationRegistry(function(s){
 	signal.clear({ [mark]: s });
 });
 /**
- * Creates a new signal function
+ * Creates a new signal object
  *
  * @param {boolean} is_readonly - Whether the signal is readonly
  * @param {any} value - Initial signal value
  * @param {Object} actions - Custom actions for the signal
- * @returns {function} Signal function
+ * @returns {Object} Signal object with get() and set() methods
  * @private
  */
 function create(is_readonly, value, actions){
-	const varS= is_readonly
-		? ()=> read(varS)
-		: (...value)=> value.length ? write(varS, ...value) : read(varS);
+	const varS = oCreate(is_readonly ? SignalReadOnly : Signal);
 	const SI= toSignal(varS, value, actions, is_readonly);
 	cleanUpRegistry.register(SI, SI[mark]);
 	return SI;
@@ -354,7 +361,7 @@ function create(is_readonly, value, actions){
  * Prototype for signal internal objects
  * @private
  */
-const protoSigal= Object.assign(oCreate(), {
+const protoSigal= oAssign(oCreate(), {
 	/**
 	 * Prevents signal propagation
 	 */
@@ -363,13 +370,13 @@ const protoSigal= Object.assign(oCreate(), {
 	}
 });
 /**
- * Transforms a function into a signal
+ * Transforms an object into a signal
  *
- * @param {function} s - Function to transform
+ * @param {Object} s - Object to transform
  * @param {any} value - Initial value
  * @param {Object} actions - Custom actions
  * @param {boolean} [readonly=false] - Whether the signal is readonly
- * @returns {function} Signal function
+ * @returns {Object} Signal object with get() and set() methods
  * @private
  */
 function toSignal(s, value, actions, readonly= false){
@@ -383,19 +390,16 @@ function toSignal(s, value, actions, readonly= false){
 	}
 	const { host }= scope;
 	Reflect.defineProperty(s, mark, {
-		value: {
+		value: oAssign(oCreate(protoSigal), {
 			value, actions, onclear, host,
 			listeners: new Set(),
 			defined: new Defined().stack,
 			readonly
-		},
+		}),
 		enumerable: false,
 		writable: false,
 		configurable: true
 	});
-	s.toJSON= ()=> s();
-	s.valueOf= ()=> s[mark] && s[mark].value;
-	Object.setPrototypeOf(s[mark], protoSigal);
 	return s;
 }
 /**
@@ -410,7 +414,7 @@ function currentContext(){
 /**
  * Reads a signal's value and tracks dependencies
  *
- * @param {function} s - Signal to read
+ * @param {Object} s - Signal object to read
  * @returns {any} Signal value
  * @private
  */
@@ -426,7 +430,7 @@ function read(s){
 /**
  * Writes a new value to a signal
  *
- * @param {function} s - Signal to update
+ * @param {Object} s - Signal object to update
  * @param {any} value - New value
  * @param {boolean} [force=false] - Force update even if value is unchanged
  * @returns {any} The new value
@@ -444,7 +448,7 @@ function write(s, value, force){
 /**
  * Adds a listener to a signal
  *
- * @param {function} s - Signal to listen to
+ * @param {Object} s - Signal object to listen to
  * @param {Function} listener - Callback function
  * @returns {Set} Listener set
  * @private
@@ -457,7 +461,7 @@ function addSignalListener(s, listener){
 /**
  * Removes a listener from a signal
  *
- * @param {function} s - Signal to modify
+ * @param {Object} s - Signal object to modify
  * @param {Function} listener - Listener to remove
  * @param {boolean} [clear_when_empty] - Whether to clear the signal when no listeners remain
  * @returns {boolean} Whether the listener was found and removed

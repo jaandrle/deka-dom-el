@@ -78,7 +78,7 @@
 		},
 		{
 			"path": "./index-with-signals.js",
-			"limit": "5.25 kB"
+			"limit": "5.5 kB"
 		}
 	],
 	"modifyEsbuildConfig": {

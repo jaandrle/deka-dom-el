@@ -26,7 +26,7 @@ function ddeComponent({ attr }){
 		on.connected(e=> console.log(( /** @type {HTMLParagraphElement} */ (e.target)).outerHTML)),
 	);
 	return el().append(
-		el("p", S(()=> `Hello from Custom Element with attribute '${attr()}'`))
+		el("p", S(()=> `Hello from Custom Element with attribute '${attr.get()}'`))
 	);
 }
 customElementWithDDE(HTMLCustomElement);

@@ -18,19 +18,19 @@ function HelloWorldComponent({ initial }){
 	/** @param {HTMLOptionElement} el */
 	const isSelected= el=> (el.selected= el.value===initial);
 	// @ts-expect-error 2339: The <select> has only two options with {@link Emoji}
-	const onChange= on("change", event=> emoji(event.target.value));
+	const onChange= on("change", event=> emoji.set(event.target.value));
 
 	return el().append(
 		el("p", {
-			textContent: S(() => `Hello World ${emoji().repeat(clicks())}`),
+			textContent: S(() => `Hello World ${emoji.get().repeat(clicks.get())}`),
 			className: "example",
 			ariaLive: "polite", //OR ariaset: { live: "polite" },
 			dataset: { example: "Example" }, //OR dataExample: "Example",
 		}),
 		el("button",
 			{ textContent: "Fire", type: "button" },
-			on("click", ()=> clicks(clicks() + 1)),
-			on("keyup", ()=> clicks(clicks() - 2)),
+			on("click", ()=> clicks.set(clicks.get() + 1)),
+			on("keyup", ()=> clicks.set(clicks.get() - 2)),
 		),
 		el("select", null, onChange).append(
 			el(OptionComponent, "🎉", isSelected),//OR { textContent: "🎉" }

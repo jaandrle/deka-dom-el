@@ -1,5 +1,6 @@
 export { registerReactivity } from './signals-lib/common.js';
 import { enviroment as env, keyLTE, evc, evd, eva } from './dom-common.js';
+import { oAssign, onAbort } from './helpers.js';
 
 /**
  * Creates a function to dispatch events on elements
@@ -17,7 +18,7 @@ export function dispatchEvent(name, options, host){
 			element= typeof host==="function"? host() : host;
 		}
 		//TODO: what about re-emmitting?
-		const event= d.length ? new CustomEvent(name, Object.assign({ detail: d[0] }, options)) : new Event(name, options);
+		const event= d.length ? new CustomEvent(name, oAssign({ detail: d[0] }, options)) : new Event(name, options);
 		return element.dispatchEvent(event);
 	};
 }
@@ -38,13 +39,12 @@ export function on(event, listener, options){
 }
 
 import { c_ch_o } from "./events-observer.js";
-import { onAbort } from './helpers.js';
 
 /**
  * Prepares lifecycle event options with once:true default
  * @private
  */
-const lifeOptions= obj=> Object.assign({}, typeof obj==="object" ? obj : null, { once: true });
+const lifeOptions= obj=> oAssign({}, typeof obj==="object" ? obj : null, { once: true });
 
 //TODO: cleanUp when event before abort?
 //TODO: docs (e.g.) https://nolanlawson.com/2024/01/13/web-component-gotcha-constructor-vs-connectedcallback/

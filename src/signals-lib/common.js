@@ -1,4 +1,4 @@
-import { isProtoFrom } from "../helpers.js";
+import { isProtoFrom, oAssign } from "../helpers.js";
 /**
  * Global signals object with default implementation
  * @type {Object}
@@ -29,7 +29,7 @@ export const signals_global= {
  * @returns {Object} The registered reactivity implementation
  */
 export function registerReactivity(def, global= true){
-	if(global) return Object.assign(signals_global, def);
+	if(global) return oAssign(signals_global, def);
 	Object.setPrototypeOf(def, signals_global);
 	return def;
 }

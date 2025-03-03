@@ -1,5 +1,6 @@
 import { signals } from "./signals-lib/common.js";
 import { enviroment as env } from './dom-common.js';
+import { isInstance, isUndef, oAssign } from "./helpers.js";
 
 /**
  * Queues a promise, this is helpful for crossplatform components (on server side we can wait for all registered
@@ -55,7 +56,7 @@ export const scope= {
 	 * @param {Object} [s={}] - Scope object to push
 	 * @returns {number} New length of the scope stack
 	 */
-	push(s= {}){ return scopes.push(Object.assign({}, this.current, { prevent: false }, s)); },
+	push(s= {}){ return scopes.push(oAssign({}, this.current, { prevent: false }, s)); },
 
 	/**
 	 * Pushes the root scope to the stack
@@ -90,7 +91,6 @@ export function chainableAppend(el){
 /** Current namespace for element creation */
 let namespace;
 
-import { isInstance, isUndef } from "./helpers.js";
 /**
  * Creates a DOM element with specified tag, attributes and addons
  *
@@ -230,7 +230,7 @@ export function assign(element, ...attributes){
 	if(!attributes.length) return element;
 	assign_context.set(element, assignContext(element, this));
 
-	for(const [ key, value ] of Object.entries(Object.assign({}, ...attributes)))
+	for(const [ key, value ] of Object.entries(oAssign({}, ...attributes)))
 		assignAttribute.call(this, element, key, value);
 	assign_context.delete(element);
 	return element;

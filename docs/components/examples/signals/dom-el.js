@@ -2,7 +2,7 @@ import { S } from "deka-dom-el/signals";
 const count= S(0, {
 	add(){ this.value= this.value + Math.round(Math.random()*10); }
 });
-const numbers= S([ count() ], {
+const numbers= S([ count.get() ], {
 	push(next){ this.value.push(next); }
 });
 
@@ -22,5 +22,5 @@ document.body.append(
 const interval= 5*1000;
 setTimeout(clearInterval, 10*interval, setInterval(function(){
 	S.action(count, "add");
-	S.action(numbers, "push", count());
+	S.action(numbers, "push", count.get());
 }, interval));

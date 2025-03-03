@@ -22,9 +22,9 @@ const onsubmit= on("submit", function(event){
 			S.action(todos, "push", data.get("todo"));
 			break;
 		case "E"/*dit*/: {
-			const last= todos().at(-1);
+			const last= todos.get().at(-1);
 			if(!last) break;
-			last(data.get("todo"));
+			last.set(data.get("todo"));
 			break;
 		}
 		case "R"/*emove*/:
