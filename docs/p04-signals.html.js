@@ -1,7 +1,7 @@
 import { T, t } from "./utils/index.js";
 export const info= {
 	title: t`Signals and reactivity`,
-	description: t`Handling reactivity in UI via signals.`,
+	description: t`Managing reactive UI state with signals.`,
 };
 
 import { el } from "deka-dom-el";
@@ -100,10 +100,10 @@ export function page({ pkg, info }){
 		`),
 
 		el(h3, t`Reactive DOM attributes and elements`),
-		el("p", t`There are on basic level two distinc situation to mirror dynamic value into the DOM/UI`),
+		el("p", t`There are two fundamental ways to make your DOM reactive with signals:`),
 		el("ol").append(
-			el("li", t`to change some attribute(s) of existing element(s)`),
-			el("li", t`to generate elements itself dynamically – this covers conditions and loops`)
+			el("li", t`Reactive attributes: Update properties, attributes, and styles of existing elements`),
+			el("li", t`Reactive elements: Dynamically create or update DOM elements based on data changes (for conditions and loops)`)
 		),
 		el(example, { src: fileURL("./components/examples/signals/dom-attrs.js"), page_id }),
 		el("p").append(...T`

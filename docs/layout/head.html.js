@@ -1,38 +1,245 @@
 import { el, elNS } from "deka-dom-el";
-import { pages } from "../ssr.js";
+import { pages, styles } from "../ssr.js";
+const host= "."+header.name;
+const host_nav= "."+nav.name;
+styles.css`
+/* Header */
+${host} {
+	grid-area: header;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0.75rem 1.5rem;
+	background-color: var(--primary);
+	color: white;
+	box-shadow: var(--shadow);
+	min-height: var(--header-height);
+}
+
+${host} .header-title {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+}
+
+${host} h1 {
+	font-size: 1.25rem;
+	margin: 0;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	color: white;
+}
+
+${host} .version-badge {
+	font-size: 0.75rem;
+	background-color: rgba(150, 150, 150, 0.2);
+	padding: 0.25rem 0.5rem;
+	border-radius: var(--border-radius);
+}
+
+${host} p {
+	display: none;
+	margin: 0;
+}
+
+${host} .github-link {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	color: white;
+	font-size: 0.875rem;
+	padding: 0.375rem 0.75rem;
+	border-radius: var(--border-radius);
+	background-color: rgba(0, 0, 0, 0.2);
+	margin-left: 1rem;
+	text-decoration: none;
+	transition: background-color 0.2s;
+}
+
+${host} .github-link:hover {
+	background-color: rgba(0, 0, 0, 0.3);
+	text-decoration: none;
+}
+
+@media (min-width: 768px) {
+	${host} p {
+		display: block;
+		font-size: 0.875rem;
+		opacity: 0.9;
+	}
+}
+
+/* Navigation */
+${host_nav} {
+	grid-area: sidebar;
+	background-color: var(--bg-sidebar);
+	border-right: 1px solid var(--border);
+	padding: 1.5rem 1rem;
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+${host_nav} a {
+	display: flex;
+	align-items: center;
+	padding: 0.625rem 0.75rem;
+	border-radius: var(--border-radius);
+	color: var(--text);
+	text-decoration: none;
+	transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+	line-height: 1.2;
+}
+
+${host_nav} a:hover {
+	background-color: rgba(var(--primary-rgb), 0.08); /* Using CSS variables for better theming */
+	text-decoration: none;
+	transform: translateY(-1px);
+	color: var(--primary);
+}
+
+${host_nav} a.current,
+${host_nav} a[aria-current=page] {
+	background-color: var(--nav-current-bg, var(--primary-dark));
+	color: var(--nav-current-text, white);
+	font-weight: 600;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+}
+
+${host_nav} a.current:hover,
+${host_nav} a[aria-current=page]:hover {
+	background-color: var(--primary);
+	color: white;
+	transform: translateY(-1px);
+}
+
+${host_nav} a .nav-number {
+	display: inline-block;
+	width: 1.5rem;
+	text-align: right;
+	margin-right: 0.5rem;
+	opacity: 0.7;
+}
+
+${host_nav} a:first-child {
+	display: flex;
+	align-items: center;
+	font-weight: 600;
+	margin-bottom: 0.5rem;
+}
+
+/* Mobile navigation */
+@media (max-width: 767px) {
+	${host_nav} {
+		padding: 0.75rem;
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		border-bottom: 1px solid var(--border);
+		border-right: none;
+		justify-content: center;
+	}
+
+	${host_nav} a {
+		font-size: 0.875rem;
+		padding: 0.375rem 0.75rem;
+		white-space: nowrap;
+	}
+
+	${host_nav} a .nav-number {
+		width: auto;
+		margin-right: 0.25rem;
+	}
+
+	${host_nav} a:first-child {
+		margin-bottom: 0;
+		margin-right: 0.5rem;
+		min-width: 100%;
+		justify-content: center;
+	}
+}
+`;
 /**
  * @param {object} def
  * @param {import("../types.d.ts").Info} def.info
  * @param {import("../types.d.ts").Pkg} def.pkg Package information.
  * */
 export function header({ info: { href, title, description }, pkg }){
-	title= `\`${pkg.name}\` — ${title}`;
+	const pageTitle = `${pkg.name} — ${title}`;
+
+	// Add meta elements to the head
 	document.head.append(
-		head({ title, description, pkg })
+		head({ title: pageTitle, description, pkg })
 	);
+
+	// Add theme color meta tag
+	document.head.append(
+		el("meta", { name: "theme-color", content: "#3f51b5" })
+	);
+
 	return el().append(
-		el("header").append(
-			el("h1", title),
-			el("p", description)
-		),
-		el("nav").append(
-			el("a", { href: pkg.homepage }).append(
+		// Header section with accessibility support
+		el("header", { role: "banner", className: header.name }).append(
+			el("div", { className: "header-title" }).append(
+				el("h1", pkg.name),
+				el("span", {
+					className: "version-badge",
+					"aria-label": "Version",
+					textContent: pkg.version || ""
+				})
+			),
+			el("p", description),
+			el("a", {
+				href: pkg.homepage,
+				className: "github-link",
+				"aria-label": "View on GitHub",
+				target: "_blank",
+				rel: "noopener noreferrer"
+			}).append(
 				el(iconGitHub),
 				"GitHub"
-			),
-			...pages.map((p, i)=> el("a", {
-				href: p.href==="index" ? "./" : p.href,
-				textContent: (i+1) + ". " + p.title,
-				title: p.description,
-				classList: { current: p.href===href }
-			}))
-		)
+			)
+		),
+
+		// Navigation between pages
+		nav({ href })
+	);
+}
+function nav({ href }){
+	return el("nav", {
+		role: "navigation",
+		"aria-label": "Main navigation",
+		className: nav.name
+	}).append(
+		...pages.map((p, i) => {
+			const isIndex = p.href === "index";
+			const isCurrent = p.href === href;
+
+			return el("a", {
+				href: isIndex ? "./" : p.href,
+				title: p.description || `Go to ${p.title}`,
+				"aria-current": isCurrent ? "page" : null,
+				classList: { current: isCurrent }
+			}).append(
+				el("span", {
+					className: "nav-number",
+					"aria-hidden": "true",
+					textContent: `${i+1}.`
+				}),
+				p.title
+			);
+		})
 	);
 }
 function head({ title, description, pkg }){
 	return el().append(
 		el("meta", { name: "viewport", content: "width=device-width, initial-scale=1" }),
 		el("meta", { name: "description", content: description }),
+		el("meta", { name: "theme-color", content: "#b71c1c" }),
 		el("title", title),
 		el(metaAuthor),
 		el(metaTwitter, pkg),
