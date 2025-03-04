@@ -96,7 +96,6 @@ function connectionsChangesObserverConstructor(){
 		offDisconnected(element, listener){
 			if(!store.has(element)) return;
 			const ls= store.get(element);
-			if(!ls.disconnected.has(listener)) return;
 			ls.disconnected.delete(listener);
 			ls.length_d-= 1;
 			cleanWhenOff(element, ls);

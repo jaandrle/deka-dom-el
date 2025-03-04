@@ -31,9 +31,11 @@ ${host} {
 	overflow: auto;
 	border-radius: var(--border-radius);
 	font-family: var(--font-mono);
-	font-size: 0.9rem;
+	font-size: 0.8rem;
 	line-height: 1.5;
 	position: relative;
+	margin-block: 1rem;
+	width: 100%;
 }
 
 /* Light mode overrides to match GitHub-like theme */
@@ -113,8 +115,6 @@ html[data-theme="dark"] ${host} {
 ${host}[data-js=todo] {
 	border: 1px solid var(--border);
 	border-radius: var(--border-radius);
-	margin-bottom: 1.5rem;
-	margin-top: 1rem;
 	padding: 1rem;
 	background-color: var(--code-bg);
 	position: relative;
@@ -137,8 +137,13 @@ ${host}[data-js=todo]::before {
 /* All code blocks should have consistent font and sizing */
 ${host} code {
 	font-family: var(--font-mono);
-	font-size: 0.9rem;
+	font-size: inherit;
 	line-height: 1.5;
+	padding: 0;
+}
+${host} pre {
+	margin-block: 0;
+	font-size: inherit;
 }
 
 /* Ensure line numbers (if added) are styled appropriately */

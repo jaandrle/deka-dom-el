@@ -9,12 +9,13 @@ ${host} {
 	padding-top: 1.5rem;
 	border-top: 1px solid var(--border);
 	gap: 1rem;
+	width: 100%;
 }
 
 ${host} a {
 	display: flex;
 	align-items: center;
-	padding: 0.75rem 1.25rem;
+	padding: 0.5rem 0.75rem;
 	border-radius: var(--border-radius);
 	background-color: var(--primary-dark); /* Darker background for better contrast */
 	color: white;
@@ -59,7 +60,6 @@ ${host} a:only-child {
 
 @media (max-width: 640px) {
 	${host} a {
-		padding: 0.5rem 0.75rem;
 		font-size: 0.9rem;
 	}
 }
@@ -72,7 +72,7 @@ import { el } from "../../index.js";
  * */
 export function h3({ textContent, id }){
 		if(!id) id= "h-"+textContent.toLowerCase().replaceAll(/\s/g, "-").replaceAll(/[^a-z-]/g, "");
-		return el("h3", { id, className: "section-heading" }).append(
+		return el("h3", { id }).append(
 				el("a", {
 						className: "heading-anchor",
 						href: "#"+id,

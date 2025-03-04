@@ -1,41 +1,35 @@
 import { styles } from "./ssr.js";
 styles.css`
-/* Modern custom styling with reddish color scheme and high contrast */
 :root {
-	/* Color variables - reddish theme with increased contrast */
-	--primary: #b71c1c;       /* Darker red for better contrast on white */
-	--primary-light: #f05545; /* Lighter but still contrasting red */
-	--primary-dark: #7f0000;  /* Very dark red for maximum contrast */
-	--primary-rgb: 183, 28, 28; /* RGB values for rgba operations */
-	--secondary: #700037;     /* Darker purple for better contrast */
-	--secondary-light: #ae1357; /* More saturated magenta for visibility */
-	--secondary-dark: #4a0027;  /* Very dark purple */
-	--secondary-rgb: 112, 0, 55; /* RGB values for rgba operations */
+	--primary: #b71c1c;
+	--primary-light: #f05545;
+	--primary-dark: #7f0000;
+	--primary-rgb: 183, 28, 28;
+	--secondary: #700037;
+	--secondary-light: #ae1357;
+	--secondary-dark: #4a0027;
+	--secondary-rgb: 112, 0, 55;
 
-	/* Typography */
 	--font-main: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 	--font-mono: 'Fira Code', 'JetBrains Mono', 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
 
-	/* Layout */
-	--body-max-width: 50rem;
-	--sidebar-width: 16rem;
+	--body-max-width: 40rem;
+	--sidebar-width: 20rem;
 	--header-height: 4rem;
 	--border-radius: 0.375rem;
 
-	/* Colors light mode - enhanced contrast */
 	--bg: #ffffff;
 	--bg-sidebar: #fff5f5;
-	--text: #1a1313;          /* Near-black text for high contrast */
-	--text-light: #555050;    /* Darker gray text that meets contrast requirements */
+	--text: #1a1313;
+	--text-light: #555050;
 	--code-bg: #f9f2f2;
-	--code-text: #9a0000;     /* Darker red for code text */
+	--code-text: #9a0000;
 	--border: #d8c0c0;
 	--selection: rgba(183, 28, 28, 0.15);
 	--marked: #b71c1c;
 	--accent: var(--secondary);
 	--shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 
-	/* Contrast improvements for components */
 	--link-color: #9a0000;
 	--link-hover: #7f0000;
 	--button-text: #ffffff;
@@ -43,32 +37,29 @@ styles.css`
 
 @media (prefers-color-scheme: dark) {
 	:root {
-		--bg: #121212;           /* Pure dark background */
-		--bg-sidebar: #1a1212;   /* Slightly lighter sidebar */
-		--text: #ffffff;         /* Pure white text for highest contrast */
-		--text-light: #cccccc;   /* Light gray that still meets contrast requirements */
+		--bg: #121212;
+		--bg-sidebar: #1a1212;
+		--text: #ffffff;
+		--text-light: #cccccc;
 		--code-bg: #2c2020;
-		--code-text: #ff9e80;    /* Slightly more orange for better visibility */
+		--code-text: #ff9e80;
 		--border: #4d3939;
 		--selection: rgba(255, 99, 71, 0.25);
-		--primary: #b74141;      /* Brighter red for better visibility on dark */
-		--primary-light: #ff867f; /* Even brighter highlight red */
-		--primary-dark: #c62828; /* Darker red that still has good contrast */
-		--secondary: #f02b47;    /* Brighter magenta for better visibility */
-		--secondary-light: #ff6090; /* Bright pink with good contrast */
-		--secondary-dark: #b0003a; /* Darker but still visible pink */
+		--primary: #b74141;
+		--primary-light: #ff867f;
+		--primary-dark: #c62828;
+		--secondary: #f02b47;
+		--secondary-light: #ff6090;
+		--secondary-dark: #b0003a;
 		--accent: var(--secondary);
 
-		/* Contrast improvements for dark mode components */
 		--link-color: #ff5252;
 		--link-hover: #ff867f;
 		--button-text: #ffffff;
 
-		/* Navigation current page - darker for better contrast */
 		--nav-current-bg: #aa2222;
 		--nav-current-text: #ffffff;
 
-		/* RGB values for rgba operations in dark mode */
 		--primary-rgb: 255, 82, 82;
 		--secondary-rgb: 233, 30, 99;
 	}
@@ -131,15 +122,6 @@ html {
 	transform: translateX(0);
 }
 
-@media (prefers-reduced-motion: reduce) {
-	*, *::before, *::after {
-		animation-duration: 0.01ms !important;
-		animation-iteration-count: 1 !important;
-		transition-duration: 0.01ms !important;
-		scroll-behavior: auto !important;
-	}
-}
-
 body {
 	font-family: var(--font-main);
 	background-color: var(--bg);
@@ -163,27 +145,31 @@ body {
 h1, h2, h3, h4, h5, h6 {
 	margin-bottom: 1rem;
 	margin-top: 2rem;
-	font-weight: 700; /* Bolder for better contrast */
+	font-weight: 700;
 	line-height: 1.25;
 	color: var(--text);
 }
 
 h1 {
-	font-size: 2.25rem; /* Slightly larger for better hierarchy */
+	font-size: 2.25rem;
 	margin-top: 0;
-	color: var(--primary-dark); /* Distinctive color for main headings */
+	color: var(--primary-dark);
+}
+h1 > a {
+	font-weight: unset;
+	color: unset;
 }
 
 h2 {
 	font-size: 1.5rem;
-	border-bottom: 2px solid var(--border); /* Thicker border for better visibility */
+	border-bottom: 2px solid var(--border);
 	padding-bottom: 0.5rem;
-	color: var(--primary); /* Color for better hierarchy */
+	color: var(--primary);
 }
 
 h3 {
 	font-size: 1.25rem;
-	color: var(--secondary); /* Different color for tertiary headings */
+	color: var(--secondary);
 }
 
 p {
@@ -192,21 +178,16 @@ p {
 
 a {
 	color: var(--link-color, var(--primary));
-	text-decoration: none;
 	transition: color 0.2s ease;
-	font-weight: 500; /* Slightly bolder for better contrast */
-	text-decoration: underline;
+	font-weight: 500;
 	text-underline-offset: 3px;
 	transition: color 0.2s ease, text-underline-offset 0.2s ease;
 }
-
-/* Ensure visited links maintain high contrast */
 a:visited {
-	color: var(--secondary, #700037);
+	--link-color: var(--secondary, #700037);
 }
-
 a:hover {
-	color: var(--link-hover, var(--primary-light));
+	--link-color: var(--link-hover, var(--primary-light));
 	text-underline-offset: 5px;
 }
 
@@ -252,12 +233,18 @@ body > main {
 	padding: 2rem;
 	max-width: 100%;
 	overflow-x: hidden;
+	display: grid;
+	grid-template-columns:
+	[full-main-start] 1fr
+	[main-start] min(var(--body-max-width), 90%) [main-end]
+	1fr [full-main-end];
 }
 
 body > main > *, body > main slot > * {
-	max-width: calc(var(--body-max-width) - var(--sidebar-width));
-	margin-left: auto;
-	margin-right: auto;
+	width: 100%;
+	max-width: 100%;
+	margin-inline: auto;
+	grid-column: main;
 }
 
 /* Page title with ID anchor for skip link */
@@ -278,24 +265,23 @@ body > main h2, body > main h3 {
 
 body > main h3 {
 	border-left: 3px solid var(--primary);
-	padding-left: 0.75rem;
-	margin-left: -0.75rem;
+	position: relative;
+	left: -1.5rem;
+	padding-inline-start: 1em;
 }
 
 /* Make clickable heading links for better navigation */
-body > main h2 .heading-anchor,
-body > main h3 .heading-anchor {
+.heading-anchor {
 	position: absolute;
 	color: var(--text-light);
-	left: -1rem;
+	left: -2rem;
 	text-decoration: none;
 	font-weight: normal;
 	opacity: 0;
 	transition: opacity 0.2s;
 }
-
-body > main h2:hover .heading-anchor,
-body > main h3:hover .heading-anchor {
+h2:hover .heading-anchor,
+h3:hover .heading-anchor {
 	opacity: 0.8;
 }
 
@@ -303,9 +289,12 @@ body > main h3:hover .heading-anchor {
 	body > main {
 		padding: 1.5rem 1rem;
 	}
-
-	body > main > *, body > main slot > * {
-		max-width: 100%;
+	body > main h2, body > main h3 {
+		left: 1rem;
+		width: calc(100% - 1rem);
+	}
+	.heading-anchor {
+		opacity: 0.4;
 	}
 }
 
@@ -342,7 +331,6 @@ body > main h3:hover .heading-anchor {
 	display: inline-block;
 	width: 1em;
 	height: 1em;
-	margin-right: 0.5rem;
 	vertical-align: -0.125em;
 	stroke-width: 0;
 	stroke: currentColor;

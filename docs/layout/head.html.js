@@ -40,7 +40,9 @@ ${host} .version-badge {
 }
 
 ${host} p {
-	display: none;
+	display: block;
+	font-size: 0.875rem;
+	opacity: 0.9;
 	margin: 0;
 }
 
@@ -53,7 +55,6 @@ ${host} .github-link {
 	padding: 0.375rem 0.75rem;
 	border-radius: var(--border-radius);
 	background-color: rgba(0, 0, 0, 0.2);
-	margin-left: 1rem;
 	text-decoration: none;
 	transition: background-color 0.2s;
 }
@@ -61,14 +62,6 @@ ${host} .github-link {
 ${host} .github-link:hover {
 	background-color: rgba(0, 0, 0, 0.3);
 	text-decoration: none;
-}
-
-@media (min-width: 768px) {
-	${host} p {
-		display: block;
-		font-size: 0.875rem;
-		opacity: 0.9;
-	}
 }
 
 /* Navigation */
@@ -185,7 +178,18 @@ export function header({ info: { href, title, description }, pkg }){
 		// Header section with accessibility support
 		el("header", { role: "banner", className: header.name }).append(
 			el("div", { className: "header-title" }).append(
-				el("h1", pkg.name),
+				el("a", {
+					href: pkg.homepage,
+					className: "github-link",
+					"aria-label": "View on GitHub",
+					target: "_blank",
+					rel: "noopener noreferrer"
+				}).append(
+					el(iconGitHub),
+				),
+				el("h1").append(
+					el("a", { href: pages[0].href, textContent: pkg.name, title: "Go to documentation homepage" }),
+				),
 				el("span", {
 					className: "version-badge",
 					"aria-label": "Version",
@@ -193,16 +197,6 @@ export function header({ info: { href, title, description }, pkg }){
 				})
 			),
 			el("p", description),
-			el("a", {
-				href: pkg.homepage,
-				className: "github-link",
-				"aria-label": "View on GitHub",
-				target: "_blank",
-				rel: "noopener noreferrer"
-			}).append(
-				el(iconGitHub),
-				"GitHub"
-			)
 		),
 
 		// Navigation between pages

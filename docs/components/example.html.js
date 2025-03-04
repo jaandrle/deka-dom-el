@@ -19,7 +19,7 @@ ${host} .runtime {
 .CodeMirror {
 	height: 100% !important;
 	font-family: var(--font-mono) !important;
-	font-size: 0.95rem !important;
+	font-size: 0.8rem !important;
 	line-height: 1.5 !important;
 }
 
