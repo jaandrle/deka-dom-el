@@ -1,4 +1,4 @@
-     import { T, t } from "./utils/index.js";
+import { T, t } from "./utils/index.js";
 export const info= {
 	title: t`Server-Side Rendering (SSR)`,
 	description: t`Using deka-dom-el for server-side rendering with jsdom to generate static HTML.`,

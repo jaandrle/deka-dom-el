@@ -103,7 +103,8 @@ export function page({ pkg, info }){
 		el("p", t`There are two fundamental ways to make your DOM reactive with signals:`),
 		el("ol").append(
 			el("li", t`Reactive attributes: Update properties, attributes, and styles of existing elements`),
-			el("li", t`Reactive elements: Dynamically create or update DOM elements based on data changes (for conditions and loops)`)
+			el("li").append(...T`Reactive elements: Dynamically create or update DOM elements based on data changes
+				(for conditions and loops)`)
 		),
 		el(example, { src: fileURL("./components/examples/signals/dom-attrs.js"), page_id }),
 		el("p").append(...T`

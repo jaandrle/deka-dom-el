@@ -3,8 +3,8 @@ import { S } from "deka-dom-el/signals";
 // Debugging a derived signal
 const name = S('Alice');
 const greeting = S(() => {
-  console.log('Computing greeting...');
-  return 'Hello, ' + name.get();
+	console.log('Computing greeting...');
+	return 'Hello, ' + name.get();
 });
 
 // Monitor the derived signal

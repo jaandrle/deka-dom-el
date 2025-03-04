@@ -36,7 +36,10 @@ export function page({ pkg, info }){
 		el("p").append(...T`
 			You can also monitor signal changes by adding a listener:
 		`),
-		el(code, { content: "// Log every time the signal changes\nS.on(signal, value => console.log('Signal changed:', value));", page_id }),
+		el(code, {
+			content:
+			"// Log every time the signal changes\nS.on(signal, value => console.log('Signal changed:', value));",
+			page_id }),
 
 		el("h4", t`Debugging derived signals`),
 		el("p").append(...T`
@@ -103,7 +106,7 @@ export function page({ pkg, info }){
 			that are automatically updated when signal values change. These elements are wrapped in special
 			comment nodes for debugging (to be true they are also used internaly, so please do not edit them by hand):
 		`),
-		el(code, { content: "// Example of reactive element marker\n<!--<dde:mark type=\"reactive\" source=\"...\">-->\n<!-- content that updates when signal changes -->\n<!--</dde:mark>-->", page_id }),
+		el(code, { src: fileURL("./components/examples/debugging/dom-reactive-mark.js"), page_id }),
 		el("p").append(...T`
 			This is particularly useful when debugging why a reactive section isn't updating as expected.
 			You can inspect the elements between the comment nodes to see their current state and the

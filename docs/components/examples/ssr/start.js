@@ -10,10 +10,10 @@ const { el } = await register(dom);
 
 // Use deka-dom-el normally
 dom.window.document.body.append(
-  el("div", { className: "container" }).append(
-    el("h1", "Hello, SSR World!"),
-    el("p", "This content was rendered on the server.")
-  )
+	el("div", { className: "container" }).append(
+		el("h1", "Hello, SSR World!"),
+		el("p", "This content was rendered on the server.")
+	)
 );
 
 // Wait for any async operations to complete

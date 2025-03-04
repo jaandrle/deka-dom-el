@@ -10,8 +10,10 @@ styles.css`
 	--secondary-dark: #4a0027;
 	--secondary-rgb: 112, 0, 55;
 
-	--font-main: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-	--font-mono: 'Fira Code', 'JetBrains Mono', 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+	--font-main: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+		Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+	--font-mono: 'Fira Code', 'JetBrains Mono', 'SF Mono',
+		SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
 
 	--body-max-width: 40rem;
 	--sidebar-width: 20rem;
