@@ -14,7 +14,10 @@ ${host} {
 	background-color: var(--primary);
 	color: white;
 	box-shadow: var(--shadow);
-	min-height: var(--header-height);
+	min-height: calc(var(--header-height) - 1em);
+	--_m: .75em;
+	margin: var(--_m) var(--_m) 0 var(--_m);
+	border-radius: var(--border-radius);
 }
 
 ${host} .header-title {

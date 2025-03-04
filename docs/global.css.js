@@ -133,6 +133,7 @@ body {
 		"sidebar"
 		"content";
 	min-height: 100vh;
+	margin: 0;
 }
 
 ::selection {
