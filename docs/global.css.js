@@ -68,8 +68,6 @@ styles.css`
 /* Base styling */
 * {
 	box-sizing: border-box;
-	margin: 0;
-	padding: 0;
 }
 
 html {
@@ -158,13 +156,6 @@ h1 {
 h1 > a {
 	font-weight: unset;
 	color: unset;
-}
-
-h2 {
-	font-size: 1.5rem;
-	border-bottom: 2px solid var(--border);
-	padding-bottom: 0.5rem;
-	color: var(--primary);
 }
 
 h3 {
