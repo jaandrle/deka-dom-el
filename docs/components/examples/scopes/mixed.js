@@ -13,16 +13,20 @@ function Counter() {
 		count.set(count.get() + 1);
 		// NEVER EVER
 		// count = S(count.get() + 1);
+		// THE HOST IS PROBABLY DIFFERENT THAN
+		// YOU EXPECT AND SIGNAL MAY BE
+		// UNEXPECTEDLY REMOVED!!!
 		host().querySelector("button").disabled = count.get() >= 10;
 	};
-	// NEVER EVER
-	// setTimeout(()=> {
-	//	const wrong= S(0);
-	//  // THE HOST IS PROBABLY DIFFERENT THAN
-	//  // YOU EXPECT AND OBSERVABLES MAY BE
-	//  // UNEXPECTEDLY REMOVED!!!
-	//	counterText.textContent= "Count: " + wrong.get();
-	// }, 1000);
+	setTimeout(()=> {
+		// ok, BUT consider extract to separate function
+		// see section below for more info
+		scope.push();
+		const ok= S(0);
+		scope.pop();
+		S.on(ok, console.log);
+		setInterval(()=> ok.set(ok.get() + 1), 100);
+	}, 100);
 
 	return el("div").append(
 		counterText,
