@@ -1,7 +1,7 @@
 import { T, t } from "./utils/index.js";
 export const info= {
 	title: t`Elements`,
-	description: t`Basic concepts of elements modifications and creations.`,
+	description: t`Building user interfaces with declarative DOM element creation.`,
 };
 
 import { el } from "deka-dom-el";
@@ -48,107 +48,214 @@ const references= {
 export function page({ pkg, info }){
 	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
-		el("h2", t`Native JavaScript DOM elements creations`),
-		el("p", t`
-			Let’s go through all patterns we would like to use and what needs to be improved for better experience.
+		el("h2", t`Declarative DOM Element Creation`),
+		el("p").append(...T`
+			Building user interfaces in JavaScript often involves creating and manipulating DOM elements.
+			DDE provides a simple yet powerful approach to element creation that is declarative, chainable,
+			and maintains a clean syntax close to HTML structure.
 		`),
+		el("div", { class: "callout" }).append(
+			el("h4", t`DDE Elements: Key Benefits`),
+			el("ul").append(
+				el("li", t`Declarative element creation with intuitive property assignment`),
+				el("li", t`Chainable methods for natural DOM tree construction`),
+				el("li", t`Simplified component patterns for code reuse`),
+				el("li", t`Normalized property/attribute handling across browsers`),
+				el("li", t`Smart element return values for cleaner code flow`)
+			)
+		),
 
 		el(code, { src: fileURL("./components/examples/elements/intro.js"), page_id }),
 
-		el(h3, t`Creating element(s) (with custom attributes)`),
+		el(h3, t`Creating Elements: Native vs DDE`),
 		el("p").append(...T`
-			You can create a native DOM element by using the ${el("a", references.mdn_create).append(
-			el("code", "document.createElement()") )}. It is also possible to provide a some attribute(s) declaratively
-			using ${el("code", "Object.assign()")}. More precisely, this way you can sets some
-			${el("a", references.mdn_idl).append( el("abbr", { textContent: "IDL", title: "Interface Description Language" }))}
-			also known as a JavaScript property.
+			In standard JavaScript, you create DOM elements using the
+			${el("a", references.mdn_create).append(el("code", "document.createElement()"))} method
+			and then set properties individually or with Object.assign():
 		`),
-		el(example, { src: fileURL("./components/examples/elements/nativeCreateElement.js"), page_id }),
-		el("p").append(...T`
-			To make this easier, you can use the ${el("code", "el")} function. Internally in basic examples,
-			it is wrapper around ${el("code", "assign(document.createElement(…), { … })")}.
-		`),
+		el("div", { class: "illustration" }).append(
+			el("div", { class: "comparison" }).append(
+				el("div").append(
+					el("h5", t`Native DOM API`),
+					el(code, { content: `// Create element with properties
+const button = document.createElement('button');
+button.textContent = "Click me";
+button.className = "primary";
+button.disabled = true;
+
+// Or using Object.assign()
+const button = Object.assign(
+  document.createElement('button'),
+  {
+    textContent: "Click me",
+    className: "primary",
+    disabled: true
+  }
+);`, page_id })
+				),
+				el("div").append(
+					el("h5", t`DDE Approach`),
+					el(code, { content: `// Create element with properties
+const button = el("button", {
+  textContent: "Click me",
+  className: "primary",
+  disabled: true
+});
+
+// Shorter and more expressive
+// than the native approach`, page_id })
+				)
+			)
+		),
 		el(example, { src: fileURL("./components/examples/elements/dekaCreateElement.js"), page_id }),
 		el("p").append(...T`
-			The ${el("code", "assign")} function provides improved behaviour of ${el("code", "Object.assign()")}.
-			You can declaratively sets any IDL and attribute of the given element. Function prefers IDL and fallback
-			to the ${el("code", "element.setAttribute")} if there is no writable property in the element prototype.
+			The ${el("code", "el")} function provides a simple wrapper around ${el("code", "document.createElement")}
+			with enhanced property assignment.
 		`),
+
+		el(h3, t`Advanced Property Assignment`),
 		el("p").append(...T`
-			You can study all JavaScript elements interfaces to the corresponding HTML elements. All HTML elements
-			inherits from ${el("a", { textContent: "HTMLElement", ...references.mdn_el })}. To see
-			all available IDLs for example for paragraphs, see ${el("a", { textContent: "HTMLParagraphElement",
-			...references.mdn_p })}. Moreover, the ${el("code", "assign")} provides a way to sets declaratively
-			some convenient properties:
+			The ${el("code", "assign")} function is the heart of DDE's element property handling. It provides
+			intelligent assignment of both properties (IDL) and attributes:
 		`),
-		el("ul").append(
-			el("li").append(...T`
-				It is possible to sets ${el("code", "data-*")}/${el("code", "aria-*")} attributes using object notation.
-			`),
-			el("li").append(...T`
-				In opposite, it is also possible to sets ${el("code", "data-*")}/${el("code", "aria-*")} attribute
-				using camelCase notation.
-			`),
-			el("li").append(...T`You can use string or object as a value for ${el("code", "style")} property.`),
-			el("li").append(...T`
-				${el("code", "className")} (IDL – preffered)/${el("code", "class")} are ways to add CSS classes
-				to the element. You can use string (similarly to ${el("code", "class=\"…\"")} syntax in  HTML).
-			`),
-			el("li").append(...T`
-				Use ${el("code", "classList")} to toggle specific classes. This will be handy later when
-				the reactivity via signals is beeing introduced.
-			`),
-			el("li").append(...T`
-				The ${el("code", "assign")} also accepts the ${el("code", "undefined")} as a value for any property
-				to remove it from the element declaratively. Also for some IDL the corresponding attribute is removed
-				as it can be confusing. ${el("em").append(...T`For example, natievly the element’s ${el("code", "id")}
-				is removed by setting the IDL to an empty string.`)}
-			`),
-			el("li").append(...T`
-				You can use ${el("code", "=")} or ${el("code", ".")} to force processing given key as attribute/property
-				of the element.
-			`)
+		el("div", { class: "function-table" }).append(
+			el("dl").append(
+				el("dt", t`Property vs Attribute Priority`),
+				el("dd", t`Prefers IDL properties, falls back to setAttribute() when no writable property exists`),
+
+				el("dt", t`Data and ARIA Attributes`),
+				el("dd", t`Both dataset.* and data-* syntaxes supported (same for ARIA)`),
+
+				el("dt", t`Style Handling`),
+				el("dd", t`Accepts string or object notation for style property`),
+
+				el("dt", t`Class Management`),
+				el("dd", t`Works with className, class, or classList object for toggling classes`),
+
+				el("dt", t`Force Modes`),
+				el("dd", t`Use = prefix to force attribute mode, . prefix to force property mode`),
+
+				el("dt", t`Attribute Removal`),
+				el("dd", t`Pass undefined to remove a property or attribute`)
+			)
 		),
-		el("p").append(...T`
-			For processing, the ${el("code", "assign")} internally uses ${el("code", "assignAttribute")} and
-			${el("code", "classListDeclarative")}.
-		`),
 		el(example, { src: fileURL("./components/examples/elements/dekaAssign.js"), page_id }),
 
-		el(h3, t`Native JavaScript templating`),
-		el("p", t`By default, the native JS has no good way to define HTML template using DOM API:`),
-		el(example, { src: fileURL("./components/examples/elements/nativeAppend.js"), page_id }),
+		el("div", { class: "note" }).append(
+			el("p").append(...T`
+				You can explore standard HTML element properties in the MDN documentation for
+				${el("a", { textContent: "HTMLElement", ...references.mdn_el })} (base class)
+				and specific element interfaces like ${el("a", { textContent: "HTMLParagraphElement", ...references.mdn_p })}.
+			`)
+		),
+
+		el(h3, t`Building DOM Trees with Chainable Methods`),
 		el("p").append(...T`
-			This library therefore overwrites the ${el("code", "append")} method of created elements to always return
-			parent element.
+			One of the most powerful features of DDE is its approach to building element trees.
+			Unlike the native DOM API which doesn't return the parent after appendChild(), DDE's
+			append() always returns the parent element:
 		`),
+		el("div", { class: "illustration" }).append(
+			el("div", { class: "comparison" }).append(
+				el("div", { class: "bad-practice" }).append(
+					el("h5", t`❌ Native DOM API`),
+					el(code, { content: `// Verbose, needs temp variables
+const div = document.createElement('div');
+const h1 = document.createElement('h1');
+h1.textContent = 'Title';
+div.appendChild(h1);
+
+const p = document.createElement('p');
+p.textContent = 'Paragraph';
+div.appendChild(p);
+
+// appendChild doesn't return parent
+// so chaining is not possible`, page_id })
+				),
+				el("div", { class: "good-practice" }).append(
+					el("h5", t`✅ DDE Approach`),
+					el(code, { content: `// Chainable, natural nesting
+const div = el("div").append(
+  el("h1", "Title"),
+  el("p", "Paragraph")
+);
+
+// append() returns parent element
+// making chains easy and intuitive`, page_id })
+				)
+			)
+		),
 		el(example, { src: fileURL("./components/examples/elements/dekaAppend.js"), page_id }),
-
-
-		el(h3, t`Basic (state-less) components`),
 		el("p").append(...T`
-			You can use functions for encapsulation (repeating) logic. The ${el("code", "el")} accepts function
-			as first argument. In that case, the function should return dom elements and the second argument for
-			${el("code", "el")} is argument for given element.
+			This chainable approach results in code that more closely mirrors the structure of your HTML,
+			making it easier to understand and maintain.
+		`),
+
+		el(h3, t`Building Reusable Components`),
+		el("p").append(...T`
+			DDE makes it simple to create reusable element components through regular JavaScript functions.
+			The ${el("code", "el()")} function accepts a component function as its first argument:
 		`),
 		el(example, { src: fileURL("./components/examples/elements/dekaBasicComponent.js"), page_id }),
 		el("p").append(...T`
-			As you can see, in case of state-less/basic components there is no difference between calling component
-			function directly or using ${el("code", "el")} function.
+			Component functions receive props as their argument and return element(s). This pattern
+			encourages code reuse and better organization of your UI code.
 		`),
-		el("p", { className: "notice" }).append(...T`
-			It is nice to use similar naming convention as native DOM API. This allows us to use
-			${el("a", { textContent: t`the destructuring assignment syntax`, ...references.mdn_destruct })} and keep
-			track of the native API (things are best remembered through regular use).
-		`),
+		el("div", { class: "tip" }).append(
+			el("p").append(...T`
+				It's helpful to use naming conventions similar to native DOM elements for your components.
+				This allows you to use ${el("a", { textContent: "destructuring assignment", ...references.mdn_destruct })}
+				and keeps your code consistent with the DOM API.
+			`)
+		),
 
-		el(h3, t`Creating non-HTML elements`),
+		el(h3, t`Working with SVG and Other Namespaces`),
 		el("p").append(...T`
-			Similarly to the native DOM API (${el("a", references.mdn_ns).append(el("code", "document.createElementNS"))})
-			for non-HTML elements we need to tell JavaScript which kind of the element to create. We can use
-			the ${el("code", "elNS")} function:
+			For non-HTML elements like SVG, MathML, or custom namespaces, DDE provides the ${el("code", "elNS")} function
+			which corresponds to the native ${el("a", references.mdn_ns).append(el("code", "document.createElementNS"))}:
 		`),
 		el(example, { src: fileURL("./components/examples/elements/dekaElNS.js"), page_id }),
+		el("p").append(...T`
+			This function returns a namespace-specific element creator, allowing you to work with any element type
+			using the same consistent interface.
+		`),
+
+		el(h3, t`Best Practices`),
+		el("ol").append(
+			el("li").append(...T`
+				${el("strong", "Prefer composition over complexity")}: Create small component functions that can be
+				combined rather than large, complex templates
+			`),
+			el("li").append(...T`
+				${el("strong", "Use meaningful component names")}: Name your component functions after the elements or
+				patterns they create
+			`),
+			el("li").append(...T`
+				${el("strong", "Destructure for better readability")}: Use ${el("code", "const { div, p, button } = el")}
+				to create element-specific functions
+			`),
+			el("li").append(...T`
+				${el("strong", "Be consistent with property usage")}: Prefer using the same pattern (property vs attribute)
+				throughout your code
+			`)
+		),
+
+		el("div", { class: "troubleshooting" }).append(
+			el("h4", t`Common Element Creation Pitfalls`),
+			el("dl").append(
+				el("dt", t`Elements not showing up in DOM`),
+				el("dd", t`Remember to append elements to the document or a parent that's already in the document`),
+
+				el("dt", t`Properties not being applied correctly`),
+				el("dd", t`Check if you're mixing up property (IDL) names with attribute names (e.g., className vs class)`),
+
+				el("dt", t`Event listeners not working`),
+				el("dd", t`Ensure you're using the correct event binding approach (see Events section)`),
+
+				el("dt", t`SVG elements not rendering correctly`),
+				el("dd", t`Make sure you're using elNS with the correct SVG namespace for SVG elements`)
+			)
+		),
 
 		el(mnemonic)
 	);
