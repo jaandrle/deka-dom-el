@@ -2,6 +2,10 @@
 | [source code on GitHub](https://github.com/jaandrle/deka-dom-el)
 | [*mirrored* on Gitea](https://gitea.jaandrle.cz/jaandrle/deka-dom-el)
 
+<p align="center">
+  <img src="docs/assets/logo.svg" alt="Deka DOM Elements Logo" width="180" height="180">
+</p>
+
 # Deka DOM Elements
 
 ***Vanilla for flavouring — a full-fledged feast for large projects***

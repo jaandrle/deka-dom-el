@@ -49,22 +49,11 @@ ${host} p {
 	margin: 0;
 }
 
-${host} .github-link {
+${host_nav} .github-link {
 	display: flex;
 	align-items: center;
 	gap: 0.5rem;
-	color: white;
-	font-size: 0.875rem;
-	padding: 0.375rem 0.75rem;
-	border-radius: var(--border-radius);
-	background-color: hsla(0, 0%, 0%, 0.2);
-	text-decoration: none;
-	transition: background-color 0.2s;
-}
-
-${host} .github-link:hover {
-	background-color: hsla(0, 0%, 0%, 0.3);
-	text-decoration: none;
+	font-size: 0.9rem;
 }
 
 /* Navigation */
@@ -105,13 +94,6 @@ ${host_nav} a:hover {
 
 ${host_nav} a .nav-number {
 	color: rgb(from currentColor r g b / .75);
-}
-
-${host_nav} a:first-child {
-	display: flex;
-	align-items: center;
-	font-weight: 600;
-	margin-bottom: 0.5rem;
 }
 
 /* Mobile navigation */
@@ -163,15 +145,13 @@ export function header({ info: { href, title, description }, pkg }){
 		// Header section with accessibility support
 		el("header", { role: "banner", className: header.name }).append(
 			el("div", { className: "header-title" }).append(
-				el("a", {
-					href: pkg.homepage,
-					className: "github-link",
-					"aria-label": "View on GitHub",
-					target: "_blank",
-					rel: "noopener noreferrer"
-				}).append(
-					el(iconGitHub),
-				),
+				el("img", {
+					src: "assets/logo.svg",
+					alt: "DDE Logo",
+					width: "32",
+					height: "32",
+					style: "margin-right: 0.5rem;"
+				}),
 				el("h1").append(
 					el("a", { href: pages[0].href, textContent: pkg.name, title: "Go to documentation homepage" }),
 				),
@@ -185,15 +165,25 @@ export function header({ info: { href, title, description }, pkg }){
 		),
 
 		// Navigation between pages
-		nav({ href })
+		nav({ href, pkg })
 	);
 }
-function nav({ href }){
+function nav({ href, pkg }){
 	return el("nav", {
 		role: "navigation",
 		"aria-label": "Main navigation",
 		className: nav.name
 	}).append(
+		el("a", {
+			href: pkg.homepage,
+			className: "github-link",
+			"aria-label": "View on GitHub",
+			target: "_blank",
+			rel: "noopener noreferrer",
+		}).append(
+			el(iconGitHub),
+			"GitHub"
+		),
 		...pages.map((p, i) => {
 			const isIndex = p.href === "index";
 			const isCurrent = p.href === href;
@@ -211,7 +201,7 @@ function nav({ href }){
 				}),
 				p.title
 			);
-		})
+		}),
 	);
 }
 function head({ title, description, pkg }){
@@ -219,6 +209,7 @@ function head({ title, description, pkg }){
 		el("meta", { name: "viewport", content: "width=device-width, initial-scale=1" }),
 		el("meta", { name: "description", content: description }),
 		el("meta", { name: "theme-color", content: "#b71c1c" }),
+		el("link", { rel: "icon", href: "assets/favicon.svg", type: "image/svg+xml" }),
 		el("title", title),
 		el(metaAuthor),
 		el(metaTwitter, pkg),
@@ -239,7 +230,7 @@ function metaTwitter({ name, description, homepage }){
 		el("meta", { name: "twitter:url", content: homepage }),
 		el("meta", { name: "twitter:title", content: name }),
 		el("meta", { name: "twitter:description", content: description }),
-		//el("meta", { name: "twitter:image", content: "" }),
+		el("meta", { name: "twitter:image", content: homepage + "/assets/logo.svg" }),
 		el("meta", { name: "twitter:creator", content: "@jaandrle" }),
 	);
 }
@@ -248,7 +239,7 @@ function metaFacebook({ name, description, homepage }){
 		el("meta", { name: "og:url", content: homepage }),
 		el("meta", { name: "og:title", content: name }),
 		el("meta", { name: "og:description", content: description }),
-		//el("meta", { name: "og:image", content: "" }),
+		el("meta", { name: "og:image", content: homepage + "/assets/logo.svg" }),
 		el("meta", { name: "og:creator", content: "@jaandrle" }),
 	);
 }

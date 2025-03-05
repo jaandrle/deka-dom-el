@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+  <!-- Gradients and effects -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#333333" />
+      <stop offset="100%" stop-color="#222222" />
+    </linearGradient>
+    <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e32c2c" />
+      <stop offset="100%" stop-color="#ff5252" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000" flood-opacity="0.3"/>
+    </filter>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  
+  <!-- Square background with rounded corners -->
+  <rect x="18" y="18" width="220" height="220" rx="20" ry="20" fill="url(#bgGradient)" />
+  
+  <!-- Subtle code brackets as background element -->
+  <g opacity="0.15" fill="#fff" filter="url(#glow)">
+    <path d="M80,60 L50,128 L80,196" stroke="#fff" stroke-width="8" fill="none"/>
+    <path d="M176,60 L206,128 L176,196" stroke="#fff" stroke-width="8" fill="none"/>
+  </g>
+  
+  <!-- lowercase dde letters with shadow effect -->
+  <text x="128" y="154" text-anchor="middle" font-family="'Fira Code', 'JetBrains Mono', 'Source Code Pro', 'SF Mono', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace" font-size="100" font-weight="bold" fill="url(#textGradient)" filter="url(#shadow)">dde</text>
+</svg>

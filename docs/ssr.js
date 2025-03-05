@@ -1,7 +1,8 @@
 export { t } from "./utils/index.js";
 export const path_target= {
 	root: "dist/docs/",
-	css: "dist/docs/"
+	css: "dist/docs/",
+	assets: "dist/docs/assets/"
 };
 /**
  * This variable will be filled with the list of pages during the build process (see `bs/docs.js`).

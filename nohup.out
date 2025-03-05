@@ -1,0 +1,26 @@
+  Markserv   boot: starting Markserv...
+(node:170089) [DEP0128] DeprecationWarning: Invalid 'main' field in '/home/jaandrle/.npm/_npx/13a70f167aa91a98/node_modules/implant/package.json' of 'implant'. Please either fix that or report it to the module author
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:170089) [DEP0128] DeprecationWarning: Invalid 'main' field in '/home/jaandrle/.npm/_npx/13a70f167aa91a98/node_modules/balanced-pairs/package.json' of 'balanced-pairs'. Please either fix that or report it to the module author
+(node:170089) [DEP0128] DeprecationWarning: Invalid 'main' field in '/home/jaandrle/.npm/_npx/13a70f167aa91a98/node_modules/super-split/package.json' of 'super-split'. Please either fix that or report it to the module author
+  Markserv   address: http://localhost:8642
+  Markserv   path: /home/jaandrle/Vzdálené/GitHub/deka-dom-el
+  Markserv   livereload: communicating on port: 35729
+  Markserv   process: your pid is: 170089
+  Markserv   stop: press [Ctrl + C] or type "sudo kill -9 170089"
+    GitHub   Contribute on Github - github.com/markserv
+  Markserv   upgrade: checking for upgrade...
+  Markserv   upgrade: no upgrade available
+  Markserv   dir: /home/jaandrle/Vzdálené/GitHub/deka-dom-el/
+  Markserv   markdown: /home/jaandrle/Vzdálené/GitHub/deka-dom-el/README.md
+  Markserv   file: /home/jaandrle/Vzdálené/GitHub/deka-dom-el/docs/assets/logo.svg
+  Markserv   markdown: /home/jaandrle/Vzdálené/GitHub/deka-dom-el/README.md
+  Markserv   file: /home/jaandrle/Vzdálené/GitHub/deka-dom-el/docs/assets/logo.svg
+  Markserv   markdown: /home/jaandrle/Vzdálené/GitHub/deka-dom-el/README.md
+  Markserv   file: /home/jaandrle/Vzdálené/GitHub/deka-dom-el/docs/assets/logo.svg
+  Markserv   markdown: /home/jaandrle/Vzdálené/GitHub/deka-dom-el/README.md
+  Markserv   file: /home/jaandrle/Vzdálené/GitHub/deka-dom-el/docs/assets/logo.svg
+  Markserv   markdown: /home/jaandrle/Vzdálené/GitHub/deka-dom-el/README.md
+  Markserv   file: /home/jaandrle/Vzdálené/GitHub/deka-dom-el/docs/assets/logo.svg
+  Markserv   markdown: /home/jaandrle/Vzdálené/GitHub/deka-dom-el/README.md
+  Markserv   file: /home/jaandrle/Vzdálené/GitHub/deka-dom-el/docs/assets/logo.svg
