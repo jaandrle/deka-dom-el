@@ -2,94 +2,110 @@
 | [source code on GitHub](https://github.com/jaandrle/deka-dom-el)
 | [*mirrored* on Gitea](https://gitea.jaandrle.cz/jaandrle/deka-dom-el)
 
+# Deka DOM Elements
+
 ***Vanilla for flavouring — a full-fledged feast for large projects***
 
 *…use simple DOM API by default and library tools and logic when you need them*
 
 ```javascript
+// 🌟 Reactive component with clear separation of concerns
 document.body.append(
-	el(HelloWorldComponent, { initial: "🚀" })
+  el(EmojiCounter, { initial: "🚀" })
 );
-/** @typedef {"🎉" | "🚀"} Emoji */
-/** @param {{ initial: Emoji }} attrs */
-function HelloWorldComponent({ initial }){
-	const clicks= S(0);
-	const emoji= S(initial);
-	/** @param {HTMLOptionElement} el */
-	const isSelected= el=> (el.selected= el.value===initial);
-	// @ts-expect-error 2339: The <select> has only two options with {@link Emoji}
-	const onChange= on("change", event=> emoji.set(event.target.value));
 
-	return el().append(
-		el("p", {
-			textContent: S(() => `Hello World ${emoji.get().repeat(clicks.get())}`),
-			className: "example",
-			ariaLive: "polite", //OR ariaset: { live: "polite" },
-			dataset: { example: "Example" }, //OR dataExample: "Example",
-		}),
-		el("button",
-			{ textContent: "Fire", type: "button" },
-			on("click", ()=> clicks.set(clicks.get() + 1)),
-			on("keyup", ()=> clicks.set(clicks.get() - 2)),
-		),
-		el("select", null, onChange).append(
-			el(OptionComponent, "🎉", isSelected),//OR { textContent: "🎉" }
-			el(OptionComponent, "🚀", isSelected),//OR { textContent: "🚀" }
-		)
-	);
+function EmojiCounter({ initial }) {
+  // ✨ State - Define reactive data
+  const count = S(0);
+  const emoji = S(initial);
+
+  /** @param {HTMLOptionElement} el */
+  const isSelected= el=> (el.selected= el.value===initial);
+  
+  // 🔄 View - UI updates automatically when signals change
+  return el().append(
+    el("p", {
+      className: "output",
+      textContent: S(() =>
+        `Hello World ${emoji.get().repeat(clicks.get())}`),
+    }),
+    
+    // 🎮 Controls - Update state on events
+    el("button", { textContent: "Add Emoji" },
+      on("click", () => count.set(count.get() + 1))
+    ),
+    
+    el("select", null, on("change", e => emoji.set(e.target.value)))
+	.append(
+      el(Option, "🎉", isSelected),
+      el(Option, "🚀", isSelected),
+      el(Option, "💖", isSelected),
+    )
+  );
 }
-function OptionComponent({ textContent }){
-	return el("option", { value: textContent, textContent })
+function Option({ textContent }){
+  return Ol("option", { value: textContent, textContent });
 }
 ```
-# Deka DOM Elements
-Creating reactive elements, components and Web components using [IDL](https://developer.mozilla.org/en-US/docs/
-Glossary/IDL)/JavaScript DOM API and [**signals/observables**](#signals).
 
-## Inspiration and suggested alternatives
-- my previous library (mostly used internaly): [jaandrle/dollar_dom_component: Functional DOM components without
-JSX and virtual DOM.](https://github.com/jaandrle/dollar_dom_component)
-- [vanjs-org/van: 🍦 VanJS: World's smallest reactive UI framework. Incredibly Powerful, Insanely Small -
-Everyone can build a useful UI app in an hour.](https://github.com/vanjs-org/van)
-- [hyperhype/hyperscript: Create HyperText with JavaScript.](https://github.com/hyperhype/hyperscript)
-- [adamhaile/S: S.js - Simple, Clean, Fast Reactive Programming in Javascript](https://github.com/adamhaile/S)
-([adamhaile/surplus: High performance JSX web views for S.js applications](https://github.com/adamhaile/surplus))
-- [potch/signals: a small reactive signals library](https://github.com/potch/signals)
+Creating reactive elements, components, and Web Components using the native
+[IDL](https://developer.mozilla.org/en-US/docs/Glossary/IDL)/JavaScript DOM API enhanced with
+[**signals/observables**](#understanding-signals).
 
-## Why an another one?
-This library falls somewhere between van/hyperscript and [solid-js](https://github.com/solidjs/solid) in terms of size,
-complexity, and usability.
+## Features at a Glance
 
-Another goal is to proceed in the best spirit of functional programming. This involves starting with
-pure JavaScript (DOM API) and gradually adding auxiliary functions, ranging from “minor” improvements
-to the capability of writing complete declarative reactive UI templates.
+- ✅ **No build step required** — use directly in browsers or Node.js
+- ☑️ **Lightweight** — ~10-15kB minified (original goal 10kB) with zero/minimal dependencies
+- ✅ **Declarative & functional approach** for clean, maintainable code
+- ✅ **Optional signals** with support for custom reactive implementations
+- ✅ **Server-side rendering** support via [jsdom](https://github.com/jsdom/jsdom)
+- 🔄 **TypeScript support** (work in progress)
+- 🔄 **Enhanced Web Components** support (work in progress)
 
-As a result, any “internal” function (`assign`, `classListDeclarative`, `on`, `dispatchEvent`, …, `S`, …)
-can be used independently, although they are primarily designed for use in combination.  This can also,
-hopefully, help in integrating the library into existing projects.
+## Why Another Library?
 
-To balance these requirements, numerous compromises have been made. To summarize:
-- [ ] Library size: 10–15kB minified (the original goal was a maximum of 10kB)
-- [x] Optional use of *signals* with the ability to register *your own signals/observables implementation*
-- [x] *No build step required*
-- [x] Preference for a *declarative/functional* approach
-- [x] Focus on zero/minimal dependencies
-- [ ] Support for/enhancement of custom elements (web components)
-- [x] Support for SSR ([jsdom](https://github.com/jsdom/jsdom))
-- [ ] WIP providing types
+This library bridges the gap between minimal solutions like van/hyperscript and more comprehensive frameworks like [solid-js](https://github.com/solidjs/solid), offering a balanced trade-off between size, complexity, and usability.
 
-## First steps
-- [**Guide**](https://jaandrle.github.io/deka-dom-el)
-- Documentation
-- Installation
-	- npm
-	- [dist/](dist/) (`https://cdn.jsdelivr.net/gh/jaandrle/deka-dom-el/dist/`…)
+Following functional programming principles, Deka DOM Elements starts with pure JavaScript (DOM API) and gradually adds auxiliary functions. These range from minor improvements to advanced features for building complete declarative reactive UI templates.
 
-## Signals
-- [Signals — whats going on behind the scenes \| by Ryan Hoffnan \|
-	ITNEXT](https://itnext.io/signals-whats-going-on-behind-the-scenes-ec858589ea63)
-- [The Evolution of Signals in JavaScript - DEV
-	Community](https://dev.to/this-is-learning/the-evolution-of-signals-in-javascript-8ob)
-- there is also [tc39/proposal-signals:
-	A proposal to add signals to JavaScript.](https://github.com/tc39/proposal-signals)
-- [Observer pattern - Wikipedia](https://en.wikipedia.org/wiki/Observer_pattern)
+A key advantage: any internal function (`assign`, `classListDeclarative`, `on`, `dispatchEvent`, `S`, etc.) can be used independently while also working seamlessly together. This modular approach makes it easier to integrate the library into existing projects.
+
+## Getting Started
+
+### Installation
+
+#### npm
+```bash
+# TBD
+# npm install deka-dom-el
+```
+
+#### Direct Script
+```html
+<script src="https://cdn.jsdelivr.net/gh/jaandrle/deka-dom-el/dist/dde-with-signals.min.js"></script>
+<script type="module">
+  const { el, S } = dde;
+</script>
+```
+
+### Documentation
+
+- [**Interactive Guide**](https://jaandrle.github.io/deka-dom-el): WIP
+- [Examples](./examples/): TBD/WIP
+
+## Understanding Signals
+
+Signals are the reactive backbone of Deka DOM Elements:
+
+- [Signals — what's going on behind the scenes](https://itnext.io/signals-whats-going-on-behind-the-scenes-ec858589ea63)
+- [The Evolution of Signals in JavaScript](https://dev.to/this-is-learning/the-evolution-of-signals-in-javascript-8ob)
+- [TC39 Signals Proposal](https://github.com/tc39/proposal-signals) (future standard)
+- [Observer pattern](https://en.wikipedia.org/wiki/Observer_pattern) (underlying concept)
+
+## Inspiration and Alternatives
+
+- [vanjs-org/van](https://github.com/vanjs-org/van) - World's smallest reactive UI framework
+- [adamhaile/S](https://github.com/adamhaile/S) - Simple, clean, fast reactive programming
+- [hyperhype/hyperscript](https://github.com/hyperhype/hyperscript) - Create HyperText with JavaScript
+- [potch/signals](https://github.com/potch/signals) - A small reactive signals library
+- [jaandrle/dollar_dom_component](https://github.com/jaandrle/dollar_dom_component) - Functional DOM components without JSX/virtual DOM

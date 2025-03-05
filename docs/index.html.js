@@ -2,7 +2,7 @@ import { t, T } from "./utils/index.js";
 export const info= {
 	href: "./",
 	title: t`Introduction`,
-	description: t`Introducing a library.`,
+	description: t`A lightweight, reactive DOM library for creating dynamic UIs with a declarative syntax`,
 };
 
 import { el } from "deka-dom-el";
@@ -26,37 +26,86 @@ const references= {
 export function page({ pkg, info }){
 	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
-		el("p", t`The library tries to provide pure JavaScript tool(s) to create reactive interfaces using …`),
-
-		el(h3, t`Event-driven programming (3 parts separation ≡ 3PS)`),
-		el("p").append(t`
-			Let's introduce the basic principle on which the library is built. We'll use the JavaScript listener as
-			a starting point.
-		`),
-		el(code, { src: fileURL("./components/examples/introducing/3ps.js"), page_id }),
+		el("h2", t`Vanilla for flavouring — a full-fledged feast for large projects`),
 		el("p").append(...T`
-			As we can see, in the code at location “A” we define ${el("em", t`how to react`)} when the function
-			is called with any event as an argument. At that moment, we ${el("em", t`don’t care who/why/how`)}
-			the function was called. Similarly, at point “B”, we reference to a function to be called on the event
-			${el("em", t`without caring`)} what the function will do at that time. Finally, at point “C”, we tell
-			the application that a change has occurred, in the input, and we ${el("em", t`don't care if/how someone`)}
-			is listening for the event.
+			Welcome to Deka DOM Elements (DDE) — a lightweight library for building dynamic UIs with a
+			declarative syntax that stays close to the native DOM API. DDE gives you powerful reactive
+			tools without the complexity and overhead of larger frameworks.
 		`),
+		el("div", { className: "callout" }).append(
+			el("h4", t`What Makes DDE Special`),
+			el("ul").append(
+				el("li", t`No build step required — use directly in the browser`),
+				el("li", t`Lightweight core (~10-15kB minified) with zero dependencies`),
+				el("li", t`Natural DOM API — work with real DOM nodes, not abstractions`),
+				el("li", t`Built-in reactivity with powerful signals system`),
+				el("li", t`Clean code organization with the 3PS pattern`)
+			)
+		),
 		el(example, { src: fileURL("./components/examples/introducing/helloWorld.js"), page_id }),
+
+		el(h3, t`The 3PS Pattern: A Better Way to Build UIs`),
 		el("p").append(...T`
-			The library introduces a new “type” of variable/constant called ${el("em", t`signal`)} allowing us to
-			to use introduced 3PS pattern in our applications. As you can see it in the example above.
+			At the heart of DDE is the 3PS (3-Part Separation) pattern. This simple yet powerful approach helps you
+			organize your UI code into three distinct areas, making your applications more maintainable and easier to reason about.
 		`),
+		el("div", { className: "illustration" }).append(
+			el("div", { className: "tabs" }).append(
+				el("div", { className: "tab" }).append(
+					el("h5", t`Traditional DOM Manipulation`),
+					el(code, { src: fileURL("./components/examples/introducing/3ps-before.js"), page_id }),
+				),
+				el("div", { className: "tab" }).append(
+					el("h5", t`DDE's 3PS Pattern`),
+					el(code, { src: fileURL("./components/examples/introducing/3ps.js"), page_id }),
+				)
+			)
+		),
 		el("p").append(...T`
-			Also please notice that there is very similar 3PS pattern used for separate creation of UI and
-			business logic.
+			The 3PS pattern separates your code into three clear parts:
 		`),
+		el("ol").append(
+			el("li").append(...T`
+				${el("strong", "Create State")}: Define your application's reactive data using signals
+			`),
+			el("li").append(...T`
+				${el("strong", "Bind to Elements")}: Define how UI elements react to state changes
+			`),
+			el("li").append(...T`
+				${el("strong", "Update State")}: Modify state in response to user events or other triggers
+			`)
+		),
+
 		el("p").append(...T`
-			The 3PS is very simplified definition of the pattern. There are more deep/academic definitions more precisely
-			describe usage in specific situations, see for example ${el("a", { textContent: t`MVVM`, ...references.w_mvv })}
-			or ${el("a", { textContent: t`MVC`, ...references.w_mvc })}.
+			By separating these concerns, your code becomes more modular, testable, and easier to maintain. This approach
+			shares principles with more formal patterns like ${el("a", { textContent: "MVVM", ...references.w_mvv })} and
+			${el("a", { textContent: "MVC", ...references.w_mvc })}, but with less overhead and complexity.
 		`),
 
-		el(h3, t`Organization of the documentation`),
+		el("div", { className: "note" }).append(
+			el("p").append(...T`
+				The 3PS pattern becomes especially powerful when combined with components, allowing you to create
+				reusable pieces of UI with encapsulated state and behavior. You'll learn more about this in the
+				following sections.
+			`)
+		),
+
+		el(h3, t`How to Use This Documentation`),
+		el("p").append(...T`
+			This guide will take you through DDE's features step by step:
+		`),
+		el("ol").append(
+			el("li").append(...T`${el("strong", "Elements")} — Creating and manipulating DOM elements`),
+			el("li").append(...T`${el("strong", "Events")} — Handling user interactions and lifecycle events`),
+			el("li").append(...T`${el("strong", "Signals")} — Adding reactivity to your UI`),
+			el("li").append(...T`${el("strong", "Scopes")} — Managing component lifecycles`),
+			el("li").append(...T`${el("strong", "Custom Elements")} — Building web components`),
+			el("li").append(...T`${el("strong", "Debugging")} — Tools to help you build and fix your apps`),
+			el("li").append(...T`${el("strong", "SSR")} — Server-side rendering with DDE`)
+		),
+		el("p").append(...T`
+			Each section builds on the previous ones, so we recommend following them in order.
+			Let's get started with the basics of creating elements!
+		`),
 	);
 }
