@@ -184,13 +184,13 @@ export function page({ pkg, info }){
 
 		el("div", { className: "callout" }).append(
 			el("h4", t`How S.observedAttributes Works`),
-			el("p").append(...T`
-				1. Takes each attribute listed in static observedAttributes
-				2. Creates a DDE signal for each one
-				3. Automatically updates these signals when attributes change
-				4. Passes the signals to your component function
-				5. Your component reacts to changes through signal subscriptions
-			`)
+			el("ol").append(
+				el("li", t`Takes each attribute listed in static observedAttributes`),
+				el("li", t`Creates a DDE signal for each one`),
+				el("li", t`Automatically updates these signals when attributes change`),
+				el("li", t`Passes the signals to your component function`),
+				el("li", t`Your component reacts to changes through signal subscriptions`)
+			)
 		),
 
 		el(h3, t`Working with Shadow DOM`),

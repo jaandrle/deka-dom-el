@@ -229,7 +229,7 @@ pre code {
 /* Main content */
 body > main {
 	grid-area: content;
-	padding: 2rem;
+	padding-block: 2rem;
 	max-width: 100%;
 	overflow-x: hidden;
 	display: grid;
@@ -259,45 +259,44 @@ body > main .page-title {
 /* Section headings with better visual hierarchy */
 body > main h2, body > main h3 {
 	scroll-margin-top: calc(var(--header-height) + 1rem);
-	position: relative;
-}
-
-body > main h3 {
-	border-left: 3px solid var(--primary);
-	position: relative;
-	left: -1.5rem;
-	padding-inline-start: 1em;
 }
 
 /* Make clickable heading links for better navigation */
 .heading-anchor {
-	position: absolute;
 	color: var(--text-light);
-	left: -2rem;
 	text-decoration: none;
 	font-weight: normal;
-	opacity: 0;
-	transition: opacity 0.2s;
-}
-h2:hover .heading-anchor,
-h3:hover .heading-anchor {
-	opacity: 0.8;
+	opacity: .4;
+	transition: opacity .2s;
+
+	&:hover { opacity: .8; }
 }
 
-@media (max-width: 767px) {
-	body > main {
-		padding: 1.5rem 1rem;
-	}
-	body > main h2, body > main h3 {
-		left: 1rem;
-		width: calc(100% - 1rem);
-	}
-	.heading-anchor {
-		opacity: 0.4;
+/* Boxes */
+.comparison {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 1.5rem;
+	margin: 1.5rem 0;
+}
+
+@media (min-width: 768px) {
+	.comparison {
+		grid-template-columns: 1fr 1fr;
 	}
 }
 
-/* Example boxes */
+.good-practice, .bad-practice {
+	border: 1px solid var(--border);
+	border-radius: var(--border-radius);
+	border-top: 4px solid var(--practice-color);
+	padding: 0 1rem;
+}
+.good-practice {
+	--practice-color: hsl(145, 63%, 49%); }
+.bad-practice {
+	--practice-color: hsl(340, 82%, 52%); }
+
 .example {
 	border: 1px solid var(--border);
 	border-radius: var(--border-radius);
@@ -337,49 +336,116 @@ h3:hover .heading-anchor {
 }
 
 /* Information blocks */
-.note, .tip, .warning {
+.note, .tip, .warning, .callout, .troubleshooting {
 	padding: 1rem 1.25rem;
 	margin: 1.5rem 0;
 	border-radius: var(--border-radius);
 	position: relative;
 	font-size: 0.95rem;
 	line-height: 1.5;
-}
-
-.note {
-	border-left: 4px solid var(--primary);
+	background-color: var(--bg-sidebar);
 	border-radius: 0 var(--border-radius) var(--border-radius) 0;
-}
+	--block-color: var(--primary);
+	border-left: 4px solid var(--block-color);
 
+	h4 { margin-top: 0; }
+}
 .tip {
-	border-left: 4px solid hsl(145, 63%, 49%);
-	border-radius: 0 var(--border-radius) var(--border-radius) 0;
-}
-
+	--block-color: hsl(145, 63%, 49%); }
 .warning {
-	border-left: 4px solid hsl(48, 89%, 50%);
-	border-radius: 0 var(--border-radius) var(--border-radius) 0;
-}
+	--block-color: hsl(48, 89%, 50%); }
 
-.note::before, .tip::before, .warning::before {
+.callout {
+	--block-color: hsl(231, 48%, 70%); }
+
+.troubleshooting {
+	--block-color: hsl(340, 82%, 52%); }
+
+.note::before, .tip::before, .warning::before, .callout::before, .troubleshooting::before {
 	font-weight: 600;
 	display: block;
 	margin-bottom: 0.5rem;
+	color: var(--block-color);
 }
 
 .note::before {
-	content: "Note";
-	color: var(--primary);
-}
-
-.tip::before {
-	content: "Tip";
-	color: hsl(145, 63%, 49%);
-}
-
+	content: "Note"; }
 .warning::before {
-	content: "Warning";
-	color: hsl(48, 89%, 50%);
+	content: "Warning"; }
+
+/* Function table styling */
+.function-table {
+	border: 1px solid var(--border);
+	border-radius: var(--border-radius);
+	padding: 1rem;
+	margin: 1.5rem 0;
+	background-color: var(--bg-sidebar);
+}
+
+.function-table h4 {
+	margin-top: 0;
+	color: var(--primary);
+	font-family: var(--font-mono);
+	border-bottom: 1px solid var(--border);
+	padding-bottom: 0.5rem;
+	margin-bottom: 1rem;
+}
+
+.function-table dl {
+	margin: 0;
+}
+
+.function-table dt {
+	font-weight: 600;
+	margin-top: 0.75rem;
+}
+
+.function-table dd {
+	margin-left: 1rem;
+	margin-bottom: 0.75rem;
+	white-space: pre-wrap;
+	word-wrap: break-word;
+}
+
+/* Tabs styling */
+.tabs {
+	border: 1px solid var(--border);
+	border-radius: var(--border-radius);
+	margin: 1.5rem 0;
+	overflow: hidden;
+}
+
+.tab {
+	padding: 1rem;
+	border-top: 1px solid var(--border);
+}
+
+.tab:first-child {
+	border-top: none;
+}
+
+.tab h4 {
+	margin-top: 0;
+	margin-bottom: 0.75rem;
+	font-size: 1.1rem;
+}
+
+@media (min-width: 768px) {
+	.tabs {
+		display: flex;
+		flex-wrap: wrap;
+	}
+
+	.tab {
+		flex: 1;
+		min-width: 50%;
+		border-top: none;
+		border-left: 1px solid var(--border);
+	}
+
+	.tab:first-child {
+		border-left: none;
+	}
 }
 
 /* Prev/Next buttons */

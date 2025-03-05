@@ -150,7 +150,7 @@ function MyComponent() {
 				el("p", t`Manually update the DOM in response to events:`),
 				el(code, { src: fileURL("./components/examples/scopes/imperative.js"), page_id }),
 			),
-			el("div", { className: "tab", "data-tab": "imperative" }).append(
+			el("div", { className: "tab", "data-tab": "mixed" }).append(
 				el("h4", t`❌ Mixed Approach`),
 				el("p", t`Just AVOID:`),
 				el(code, { src: fileURL("./components/examples/scopes/mixed.js"), page_id }),
