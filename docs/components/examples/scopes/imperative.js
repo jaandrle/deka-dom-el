@@ -1,31 +1,25 @@
 /* PSEUDO-CODE!!! */
-import { el, on, scope } from "deka-dom-el";
-function component(){
-	const { host }= scope;
-	const ul= el("ul");
-	const ac= new AbortController();
-	fetchAPI({ signal: ac.signal }).then(data=> {
-		data.forEach(d=> ul.append(el("li", d)));
-	});
-	host(
-		/* element was remove before data fetched */
-		on.disconnected(()=> ac.abort())
+import { el, scope } from "deka-dom-el";
+function Counter() {
+	const { host } = scope;
+
+	let count = 0;
+	const counterText = el("p", "Count: 0");
+
+	// Manually update DOM element
+	const increment = () => {
+		count++;
+		counterText.textContent = "Count: " + count;
+		host().querySelector("button").disabled = count >= 10;
+	};
+	setTimeout(increment, 1000);
+	// or fetchAPI().then(increment);
+
+	return el("div").append(
+		counterText,
+		el("button", {
+			onclick: increment,
+			textContent: "Increment"
+		})
 	);
-	return ul;
-	/**
-	 * NEVER EVER!!
-	 * let data;
-	 * fetchAPI().then(d=> data= O(d));
-	 *
-	 * OR NEVER EVER!!
-	 * const ul= el("ul");
-	 * fetchAPI().then(d=> {
-	 *	const data= O("data");
-	 *	ul.append(el("li", data));
-	 * });
-	 *
-	 * // THE HOST IS PROBABLY DIFFERENT THAN
-	 * // YOU EXPECT AND OBSERVABLES MAY BE
-	 * // UNEXPECTEDLY REMOVED!!!
-	 * */
 }

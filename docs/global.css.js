@@ -208,6 +208,12 @@ pre code {
 	background-color: transparent;
 	padding: 0;
 }
+.illustration:not(:has( .comparison)) pre {
+	background: none;
+	border-style: dashed !important;
+	width: fit-content;
+	padding: 1em 2em;
+}
 
 /* Layout */
 @media (min-width: 768px) {

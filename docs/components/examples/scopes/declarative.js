@@ -1,35 +1,26 @@
-/* PSEUDO-CODE!!! */
 import { el } from "deka-dom-el";
 import { S } from "deka-dom-el/signals";
-function component(){
-	/* prepare changeable data */
-	const dataA= S("data");
-	const dataB= S("data");
-	/* define data flow (can be asynchronous) */
-	fetchAPI().then(data_new=> dataA(data_new));
-	setTimeout(()=> dataB("DATA"));
-	/* declarative UI */
-	return el().append(
-		el("h1", {
-			textContent: "Example",
-			/* declarative attribute(s) */
-			classList: { declarative: dataB }
-		}),
-		el("ul").append(
-			/* declarative element(s) */
-			S.el(dataA, data=> data.map(d=> el("li", d)))
-		),
-		el("ul").append(
-			/* declarative component(s) */
-			S.el(dataA, data=> data.map(d=> el(subcomponent, d)))
-		)
+function Counter() {
+	// Define state
+	const count = S(0);
+
+	// Define behavior
+	const increment = () => count.set(count.get() + 1);
+
+	// Define data flow
+	setTimeout(increment, 1000);
+	// or fetchAPI().then(increment);
+
+	// Declarative UI (how to render data/`count`)
+	// …automatically updates when changes
+	return el("div").append(
+		// declarative element(s)
+		el("p", S(() => "Count: " + count.get())),
+		el("button", {
+			onclick: increment,
+			textContent: "Increment",
+			// declarative attribute(s)
+			disabled: S(() => count.get() >= 10)
+		})
 	);
-}
-function subcomponent({ id }){
-	/* prepare changeable data */
-	const textContent= S("…");
-	/* define data flow (can be asynchronous) */
-	fetchAPI(id).then(text=> textContent(text));
-	/* declarative UI */
-	return el("li", { textContent, dataId: id });
 }

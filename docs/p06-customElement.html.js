@@ -201,22 +201,16 @@ export function page({ pkg, info }){
 		el("div", { className: "illustration" }).append(
 			el("h4", t`Shadow DOM Encapsulation`),
 			el("pre").append(el("code", `
-┌─────────────────────────────────┐
-│ <my-custom-element>             │
-│                                 │
-│  ┌─────────────────────────┐    │
-│  │ #shadow-root           │    │
-│  │                         │    │
-│  │  Created with DDE:      │    │
-│  │  ┌─────────────────┐    │    │
-│  │  │ <div>           │    │    │
-│  │  │   <h2>Title</h2> │    │    │
-│  │  │   <p>Content</p> │    │    │
-│  │  └─────────────────┘    │    │
-│  │                         │    │
-│  └─────────────────────────┘    │
-│                                 │
-└─────────────────────────────────┘
+<my-custom-element>
+
+  ┌─────────────────────────┐
+    #shadow-root
+
+     Created with DDE:
+     ┌──────────────────┐
+       <div>
+         <h2>Title</h2>
+         <p>Content</p>
 			`))
 		),
 		el(example, { src: fileURL("./components/examples/customElement/shadowRoot.js"), page_id }),
@@ -229,9 +223,10 @@ export function page({ pkg, info }){
 
 		el(h3, t`Working with Slots`),
 		el("p").append(...T`
-			Slots allow users of your component to insert content inside it. When using DDE, you can simulate the
-			slot mechanism with the ${el("code", "simulateSlots")} function:
+			Besides the encapsulation, the Shadow DOM allows for using the ${el("a", references.mdn_shadow_dom_slot).append(
+			el("strong", t`<slot>`), t` element(s)`)}. You can simulate this feature using ${el("code", "simulateSlots")}:
 		`),
+		el(example, { src: fileURL("./components/examples/customElement/simulateSlots.js"), page_id }),
 		el("div", { className: "function-table" }).append(
 			el("h4", t`simulateSlots`),
 			el("dl").append(
@@ -240,15 +235,6 @@ export function page({ pkg, info }){
 				el("dt", t`Parameters`),
 				el("dd", t`A mapping object of slot names to DOM elements`)
 			)
-		),
-		el(example, { src: fileURL("./components/examples/customElement/simulateSlots.js"), page_id }),
-
-		el("div", { className: "tip" }).append(
-			el("p").append(...T`
-				${el("strong", "When to use simulateSlots:")} This approach is useful when you need to distribute
-				content from the light DOM into specific locations in the shadow DOM, particularly in environments
-				where native slots might not be fully supported.
-			`)
 		),
 
 		el(h3, t`Best Practices for Web Components with DDE`),

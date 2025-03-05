@@ -195,7 +195,7 @@ export function code({ id, src, content, language= "js", className= host.slice(1
 		dataJS= "todo";
 	}
 	return el("div", { id, className, dataJS }).append(
-		el("code", { className: "language-"+language, textContent: content })
+		el("code", { className: "language-"+language, textContent: content.trim() })
 	);
 }
 let is_registered= {};

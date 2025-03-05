@@ -55,8 +55,7 @@ export function page({ pkg, info }){
 				el("li", t`Automatic UI updates when data changes`),
 				el("li", t`Clean separation between data, logic, and UI`),
 				el("li", t`Small runtime with minimal overhead`),
-				el("li", t`Works seamlessly with DDE's DOM creation`),
-				el("li", t`No dependencies or framework lock-in`)
+				el("li").append(...T`${el("strong", "In future")} no dependencies or framework lock-in`)
 			)
 		),
 		el(code, { src: fileURL("./components/examples/signals/intro.js"), page_id }),
@@ -68,17 +67,17 @@ export function page({ pkg, info }){
 		`),
 		el("div", { class: "signal-diagram" }).append(
 			el("div", { class: "signal-part" }).append(
-				el("h4", t`α: Create Signal`),
+				el("h4", t`A: Create Signal`),
 				el(code, { content: "const count = S(0);", page_id }),
 				el("p", t`Define a reactive value that can be observed and changed`)
 			),
 			el("div", { class: "signal-part" }).append(
-				el("h4", t`β: React to Changes`),
+				el("h4", t`B: React to Changes`),
 				el(code, { content: "S.on(count, value => updateUI(value));", page_id }),
 				el("p", t`Subscribe to signal changes with callbacks or effects`)
 			),
 			el("div", { class: "signal-part" }).append(
-				el("h4", t`γ: Update Signal`),
+				el("h4", t`C: Update Signal`),
 				el(code, { content: "count.set(count.get() + 1);", page_id }),
 				el("p", t`Modify the signal value, which automatically triggers updates`)
 			)
@@ -90,7 +89,8 @@ export function page({ pkg, info }){
 				Signals implement the ${el("a", { textContent: t`Publish–subscribe pattern`, ...references.wiki_pubsub })},
 				a form of ${el("a", { textContent: t`Event-driven programming`, ...references.wiki_event_driven })}.
 				This architecture allows different parts of your application to stay synchronized through a shared signal,
-				without direct dependencies on each other.
+				without direct dependencies on each other. Compare for example with ${el("a", { textContent:
+				t`fpubsub library`, ...references.fpubsub })}.
 			`)
 		),
 
@@ -110,7 +110,8 @@ export function page({ pkg, info }){
 				el("dd", t`S.on(signal, callback) → runs callback whenever signal changes`),
 
 				el("dt", t`Unsubscribing`),
-				el("dd", t`S.on(signal, callback, { signal: abortController.signal })`)
+				el("dd").append(...T`S.on(signal, callback, { signal: abortController.signal }) → Similarly to the
+					${el("code", "on")} function to register DOM events listener.`)
 			)
 		),
 		el("p").append(...T`
@@ -139,15 +140,6 @@ export function page({ pkg, info }){
 		el("div", { class: "illustration" }).append(
 			el("h4", t`Actions vs. Direct Mutation`),
 			el("div", { class: "comparison" }).append(
-				el("div", { class: "bad-practice" }).append(
-					el("h5", t`❌ Without Actions`),
-					el(code, { content: `
-const todos = S([]);
-// Directly mutating the array
-const items = todos.get();
-items.push("New todo");
-// This WON'T trigger updates!`, page_id }))
-				),
 				el("div", { class: "good-practice" }).append(
 					el("h5", t`✅ With Actions`),
 					el(code, { content: `const todos = S([], {
@@ -159,8 +151,25 @@ items.push("New todo");
 
 // Use the action
 S.action(todos, "add", "New todo");`, page_id })
-				)
+				),
+				el("div", { class: "bad-practice" }).append(
+					el("h5", t`❌ Without Actions`),
+					el(code, { content: `
+const todos = S([]);
+// Directly mutating the array
+const items = todos.get();
+items.push("New todo");
+// This WON'T trigger updates!`, page_id }))
+				),
 		),
+		el("p").append(...T`
+			In some way, you can compare it with ${el("a", { textContent: "useReducer", ...references.mdn_use_reducer })}
+			hook from React. So, the ${el("code", "S(<data>, <actions>)")} pattern creates a store “machine”. We can
+			then invoke (dispatch) registered action by calling ${el("code", "S.action(<signal>, <name>, ...<args>)")}
+			after the action call the signal calls all its listeners. This can be stopped by calling
+			${el("code", "this.stopPropagation()")} in the method representing the given action. As it can be seen in
+			examples, the “store” value is available also in the function for given action (${el("code", "this.value")}).
+		`),
 		el(example, { src: fileURL("./components/examples/signals/actions-demo.js"), page_id }),
 
 		el("p").append(...T`
@@ -182,9 +191,7 @@ S.action(todos, "add", "New todo");`, page_id })
 				${el("strong", "Special Action Methods")}: Signal actions can implement special lifecycle hooks:
 			`),
 			el("ul").append(
-				el("li", t`[S.symbols.onclear]() - Called when the signal is cleared`),
-				el("li", t`[S.symbols.onget]() - Called when the signal value is read`),
-				el("li", t`[S.symbols.onset]() - Called after the signal value is changed`)
+				el("li", t`[S.symbols.onclear]() - Called when the signal is cleared. Use it to clean up resources.`),
 			)
 		),
 
@@ -229,12 +236,12 @@ S.action(items, "push", "Dragonfruit"); // List updates automatically`, page_id 
 			)
 		),
 
-		el(example, { src: fileURL("./components/examples/signals/dom-attrs.js"), page_id }),
 		el("p").append(...T`
 			The ${el("code", "assign")} and ${el("code", "el")} functions detect signals automatically and handle binding.
 			You can use special properties like ${el("code", "dataset")}, ${el("code", "ariaset")}, and
 			${el("code", "classList")} for fine-grained control over specific attribute types.
 		`),
+		el(example, { src: fileURL("./components/examples/signals/dom-attrs.js"), page_id }),
 
 		el("p").append(...T`
 			${el("code", "S.el()")} is especially powerful for conditional rendering and lists:

@@ -1,9 +1,9 @@
 import { S } from "deka-dom-el/signals";
-// α — `signal` represents a reactive value
+// A — `signal` represents a reactive value
 const signal= S(0);
-// β — just reacts on signal changes
+// B — just reacts on signal changes
 S.on(signal, console.log);
-// γ — just updates the value
+// C — just updates the value
 const update= ()=> signal.set(signal.get()+1);
 
 update();

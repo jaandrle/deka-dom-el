@@ -30,53 +30,44 @@ export function page({ pkg, info }){
 	return el(simplePage, { info, pkg }).append(
 		el("h2", t`Building Maintainable UIs with Scopes and Components`),
 		el("p").append(...T`
-			Scopes provide a structured way to organize your UI code into reusable components that properly
-			manage their lifecycle, handle cleanup, and maintain clear boundaries between different parts of your application.
+			For state-less components we can use functions as UI components (see “Elements” page). But in real life,
+			we may need to handle the component live-cycle and provide JavaScript the way to properly use
+			the ${el("a", { textContent: t`Garbage collection`, ...references.garbage_collection })}.
 		`),
-		el("div", { className: "callout" }).append(
-			el("h4", t`Why Use Scopes?`),
-			el("ul").append(
-				el("li", t`Automatic resource cleanup when components are removed from DOM`),
-				el("li", t`Clear component boundaries with explicit host elements`),
-				el("li", t`Simplified event handling with proper "this" binding`),
-				el("li", t`Seamless integration with signals for reactive components`),
-				el("li", t`Better memory management with ${el("a", { textContent: t`GC`, ...references.garbage_collection })}`)
-			)
-		),
 		el(code, { src: fileURL("./components/examples/scopes/intro.js"), page_id }),
+		el("p").append(...T`The library therefore use ${el("em", t`scopes`)} to provide these functionalities.`),
 
 		el(h3, t`Understanding Host Elements and Scopes`),
+		el("p").append(...T`
+			The ${el("strong", "host")} is the name for the element representing the component. This is typically
+			element returned by function. To get reference, you can use ${el("code", "scope.host()")} to applly addons
+			just use ${el("code", "scope.host(...<addons>)")}.
+		`),
 		el("div", { className: "illustration" }).append(
 			el("h4", t`Component Anatomy`),
 			el("pre").append(el("code", `
-┌─────────────────────────────────┐
-│ // 1. Component scope created   │
-│ el(MyComponent);                │
-│                                 │
-│ function MyComponent() {        │
-│   // 2. access the host element │
-│   const { host } = scope;       │
-│                                 │
-│   // 3. Add behavior to host    │
-│   host(                         │
-│     on.click(handleClick)       │
-│   );                            │
-│                                 │
-│   // 4. Return the host element │
-│   return el("div", {           │
-│     className: "my-component"   │
-│   }).append(                    │
-│     el("h2", "Title"),          │
-│     el("p", "Content")          │
-│   );                            │
-│ }                               │
-└─────────────────────────────────┘
-			`))
+// 1. Component scope created
+el(MyComponent);
+
+function MyComponent() {
+  // 2. access the host element
+  const { host } = scope;
+
+  // 3. Add behavior to host
+  host(
+    on.click(handleClick)
+  );
+
+  // 4. Return the host element
+  return el("div", {
+    className: "my-component"
+  }).append(
+    el("h2", "Title"),
+    el("p", "Content")
+  );
+}
+			`.trim()))
 		),
-		el("p").append(...T`
-			The ${el("strong", "host element")} is the root element of your component - typically the element returned
-			by your component function. It serves as the identity of your component in the DOM.
-		`),
 		el("div", { className: "function-table" }).append(
 			el("h4", t`scope.host()`),
 			el("dl").append(
@@ -91,33 +82,23 @@ export function page({ pkg, info }){
 
 		el("div", { className: "tip" }).append(
 			el("p").append(...T`
-				${el("strong", "Best Practice:")} Always capture the host reference at the beginning of your component function
-				using ${el("code", "const { host } = scope")} to avoid scope-related issues, especially with asynchronous code.
-			`)
-		),
-
-		el(h3, t`Class-Based Components`),
-		el("p").append(...T`
-			While functional components are the primary pattern in DDE, you can also create class-based components
-			for more structured organization of component logic.
-		`),
-		el(example, { src: fileURL("./components/examples/scopes/class-component.js"), page_id }),
-
-		el("p").append(...T`
-			This pattern can be useful when:
-		`),
-		el("ul").append(
-			el("li", t`You have complex component logic that benefits from object-oriented organization`),
-			el("li", t`You need private methods and properties for your component`),
-			el("li", t`You're transitioning from another class-based component system`)
-		),
-		el("div", { className: "tip" }).append(
+				${el("strong", "Best Practice:")} Always capture the host reference at the beginning of your component
+				function using ${el("code", "const { host } = scope")} to avoid scope-related issues, especially with
+				asynchronous code.
+			`),
 			el("p").append(...T`
-				${el("strong", "Note:")} Even with class-based components, follow the best practice of storing the host reference
-				early in your component code. This ensures proper access to the host throughout the component's lifecycle.
+				If you are interested in the implementation details, see Class-Based Components section.
 			`)
 		),
 		el(code, { src: fileURL("./components/examples/scopes/good-practise.js"), page_id }),
+
+		el(h3, t`Class-Based Components`),
+		el("p").append(...T`
+			While functional components are the primary pattern in DDE, you can also create class-based components.
+			For this, we implement function ${el("code", "elClass")} and use it to demonstrate implementation details
+			for better understanding of the scope logic.
+		`),
+		el(example, { src: fileURL("./components/examples/scopes/class-component.js"), page_id }),
 
 		el(h3, t`Automatic Cleanup with Scopes`),
 		el("p").append(...T`
@@ -149,76 +130,37 @@ export function page({ pkg, info }){
 
 		el(h3, t`Declarative vs Imperative Components`),
 		el("p").append(...T`
-			Scopes work best with a declarative approach to UI building, especially when combined
-			with ${el("a", { textContent: "signals", ...references.signals })} for state management.
+			The library DOM API and signals works best when used declaratively. It means, you split your app logic
+			into three parts as it was itroduced in ${el("a", { textContent: "Signals", ...references.signals })}.
 		`),
+		el("div", { className: "note" }).append(
+			el("p").append(...T`
+				Strictly speaking, the imperative way of using the library is not prohibited. Just be careful (rather avoid)
+				mixing declarative approach (using signals) and imperative manipulation of elements.
+			`)
+		),
 		el("div", { className: "tabs" }).append(
 			el("div", { className: "tab", "data-tab": "declarative" }).append(
 				el("h4", t`✅ Declarative Approach`),
 				el("p", t`Define what your UI should look like based on state:`),
-				el("pre").append(el("code", `function Counter() {
-	const { host } = scope;
-
-	// Define state
-	const count = S(0);
-
-	// Define behavior
-	const increment = () => count.set(count.get() + 1);
-
-	// UI automatically updates when count changes
-	return el("div").append(
-		el("p", S(() => "Count: " + count.get())),
-		el("button", {
-			onclick: increment,
-			textContent: "Increment"
-		})
-	);
-}`))
+				el(code, { src: fileURL("./components/examples/scopes/declarative.js"), page_id }),
 			),
 			el("div", { className: "tab", "data-tab": "imperative" }).append(
 				el("h4", t`⚠️ Imperative Approach`),
 				el("p", t`Manually update the DOM in response to events:`),
-				el("pre").append(el("code", `function Counter() {
-	const { host } = scope;
-
-	let count = 0;
-	const counterText = el("p", "Count: 0");
-
-	// Manually update DOM element
-	const increment = () => {
-		count++;
-		counterText.textContent = "Count: " + count;
-	};
-
-	return el("div").append(
-		counterText,
-		el("button", {
-			onclick: increment,
-			textContent: "Increment"
-		})
-	);
-}`))
-			)
+				el(code, { src: fileURL("./components/examples/scopes/imperative.js"), page_id }),
+			),
+			el("div", { className: "tab", "data-tab": "imperative" }).append(
+				el("h4", t`❌ Mixed Approach`),
+				el("p", t`Just AVOID:`),
+				el(code, { src: fileURL("./components/examples/scopes/mixed.js"), page_id }),
+			),
 		),
-
-		el(code, { src: fileURL("./components/examples/scopes/declarative.js"), page_id }),
-
-		el("div", { className: "note" }).append(
-			el("p").append(...T`
-				While DDE supports both declarative and imperative approaches, the declarative style is recommended
-				as it leads to more maintainable code with fewer opportunities for bugs. Signals handle the complexity
-				of keeping your UI in sync with your data.
-			`)
-		),
-		el(code, { src: fileURL("./components/examples/scopes/imperative.js"), page_id }),
 
 		el(h3, t`Best Practices for Scopes and Components`),
 		el("ol").append(
 			el("li").append(...T`
 				${el("strong", "Capture host early:")} Use ${el("code", "const { host } = scope")} at component start
-			`),
-			el("li").append(...T`
-				${el("strong", "Return a single root element:")} Components should have one host element that contains all others
 			`),
 			el("li").append(...T`
 				${el("strong", "Prefer declarative patterns:")} Use signals to drive UI updates rather than manual DOM manipulation
