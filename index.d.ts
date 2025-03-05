@@ -77,7 +77,17 @@ export function el<
 	EL extends SupportedElement | ddeDocumentFragment
 >(
 	component: (attr: A)=> EL,
-	attrs?: A extends { textContent: any } ? ( NoInfer<A> | ddeStringable ) : NoInfer<A>,
+	attrs?: NoInfer<A>,
+	...addons: ddeElementAddon<EL>[]
+): EL extends ddeHTMLElementTagNameMap[keyof ddeHTMLElementTagNameMap]
+	? EL
+	: ( EL extends ddeDocumentFragment ? EL : ddeHTMLElement )
+export function el<
+	A extends { textContent: ddeStringable },
+	EL extends SupportedElement | ddeDocumentFragment
+>(
+	component: (attr: A)=> EL,
+	attrs?: NoInfer<A>["textContent"],
 	...addons: ddeElementAddon<EL>[]
 ): EL extends ddeHTMLElementTagNameMap[keyof ddeHTMLElementTagNameMap]
 	? EL

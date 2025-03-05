@@ -44,7 +44,7 @@ export function page({ pkg, info }){
 		),
 		el(example, { src: fileURL("./components/examples/introducing/helloWorld.js"), page_id }),
 
-		el(h3, t`The 3PS Pattern: A Better Way to Build UIs`),
+		el(h3, { textContent: t`The 3PS Pattern: A Better Way to Build UIs`, id: "h-3ps" }),
 		el("p").append(...T`
 			At the heart of DDE is the 3PS (3-Part Separation) pattern. This simple yet powerful approach helps you
 			organize your UI code into three distinct areas, making your applications more maintainable and easier to reason about.

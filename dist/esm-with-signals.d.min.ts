@@ -73,6 +73,26 @@ export function assignAttribute<El extends SupportedElement, ATT extends keyof E
 
 type ExtendedHTMLElementTagNameMap= HTMLElementTagNameMap & CustomElementTagNameMap;
 export function el<
+	A extends ddeComponentAttributes,
+	EL extends SupportedElement | ddeDocumentFragment
+>(
+	component: (attr: A)=> EL,
+	attrs?: NoInfer<A>,
+	...addons: ddeElementAddon<EL>[]
+): EL extends ddeHTMLElementTagNameMap[keyof ddeHTMLElementTagNameMap]
+	? EL
+	: ( EL extends ddeDocumentFragment ? EL : ddeHTMLElement )
+export function el<
+	A extends { textContent: ddeStringable },
+	EL extends SupportedElement | ddeDocumentFragment
+>(
+	component: (attr: A)=> EL,
+	attrs?: NoInfer<A>["textContent"],
+	...addons: ddeElementAddon<EL>[]
+): EL extends ddeHTMLElementTagNameMap[keyof ddeHTMLElementTagNameMap]
+	? EL
+	: ( EL extends ddeDocumentFragment ? EL : ddeHTMLElement )
+export function el<
 	TAG extends keyof ExtendedHTMLElementTagNameMap,
 >(
 	tag_name: TAG,
@@ -89,16 +109,6 @@ export function el(
 	attrs?: ElementAttributes<HTMLElement> | ddeStringable,
 	...addons: ddeElementAddon<HTMLElement>[]
 ): ddeHTMLElement
-
-export function el<
-	C extends (attr: ddeComponentAttributes)=> SupportedElement | ddeDocumentFragment
->(
-	component: C,
-	attrs?: Parameters<C>[0] | ddeStringable,
-	...addons: ddeElementAddon<ReturnType<C>>[]
-): ReturnType<C> extends ddeHTMLElementTagNameMap[keyof ddeHTMLElementTagNameMap]
-	? ReturnType<C>
-	: ( ReturnType<C> extends ddeDocumentFragment ? ReturnType<C> : ddeHTMLElement )
 export { el as createElement }
 
 export function elNS(

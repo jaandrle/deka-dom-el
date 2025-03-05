@@ -63,21 +63,21 @@ export function page({ pkg, info }){
 		el(h3, t`The 3-Part Structure of Signals`),
 		el("p").append(...T`
 			Signals organize your code into three distinct parts, following the
-			${el("a", { textContent: t`3PS principle`, href: "./#h-event-driven-programming--parts-separation--ps" })}:
+			${el("a", { textContent: t`3PS principle`, href: "./#h-3ps" })}:
 		`),
 		el("div", { class: "signal-diagram" }).append(
 			el("div", { class: "signal-part" }).append(
-				el("h4", t`A: Create Signal`),
+				el("h4", t`PART 1: Create Signal`),
 				el(code, { content: "const count = S(0);", page_id }),
 				el("p", t`Define a reactive value that can be observed and changed`)
 			),
 			el("div", { class: "signal-part" }).append(
-				el("h4", t`B: React to Changes`),
+				el("h4", t`PART 2: React to Changes`),
 				el(code, { content: "S.on(count, value => updateUI(value));", page_id }),
 				el("p", t`Subscribe to signal changes with callbacks or effects`)
 			),
 			el("div", { class: "signal-part" }).append(
-				el("h4", t`C: Update Signal`),
+				el("h4", t`PART 3: Update Signal`),
 				el(code, { content: "count.set(count.get() + 1);", page_id }),
 				el("p", t`Modify the signal value, which automatically triggers updates`)
 			)
