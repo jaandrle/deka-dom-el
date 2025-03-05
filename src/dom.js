@@ -72,6 +72,12 @@ export const scope= {
 		if(scopes.length===1) return;
 		return scopes.pop();
 	},
+
+	isolate(fn){
+		this.push({ prevent: true });
+		fn();
+		this.pop();
+	}
 };
 /**
  * Chainable append function for elements

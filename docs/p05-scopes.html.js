@@ -165,19 +165,19 @@ function MyComponent() {
 		el("div", { className: "function-table" }).append(
 			el("h4", t`Manual Scope Control API`),
 			el("dl").append(
+				el("dt", t`scope.current`),
+				el("dd", t`Returns the currently active scope object.`),
+
+				el("dt", t`scope.isolate(callback)`),
+				el("dd", t`Executes the callback function within a temporary scope, then automatically restores the previous scope.
+					Safer than manual push/pop for most use cases.`),
+
 				el("dt", t`scope.push()`),
 				el("dd", t`Creates a new scope and makes it the current active scope. All signals and subscriptions
 					created after this call will be associated with this new scope.`),
 
 				el("dt", t`scope.pop()`),
 				el("dd", t`Restores the previous scope that was active before the matching push() call.`),
-
-				el("dt", t`scope.current()`),
-				el("dd", t`Returns the currently active scope object.`),
-
-				el("dt", t`scope.withScope(callback)`),
-				el("dd", t`Executes the callback function within a temporary scope, then automatically restores the previous scope.
-					Safer than manual push/pop for most use cases.`)
 			)
 		),
 		el("p").append(...T`
@@ -188,29 +188,8 @@ function MyComponent() {
 			el("li", t`Creating detached reactive logic that shouldn't be tied to a component's lifecycle`),
 			el("li", t`Building utilities that work with signals but need scope isolation`)
 		),
-		el(code, { content: `// Inside a component
-function SomeComponent() {
-  // Create an isolated scope for a specific operation
-  scope.push(); // Start new scope
-
-  // These signals are in the new scope
-  const isolatedCount = S(0);
-  const isolatedDerived = S(() => isolatedCount.get() * 2);
-
-  // Clean up by returning to previous scope
-  scope.pop();
-
-  // Alternative: Use withScope for automatic scope management
-  scope.withScope(() => {
-    // This code runs in an isolated scope
-    const tempSignal = S("temporary");
-
-    // No need for pop() - scope is restored automatically
-  });
-
-  // Rest of component remains in the original scope
-  return el("div");
-}`, page_id }),
+		el(example, { src: fileURL("./components/examples/scopes/custom-scope.js"), page_id }),
+		el(example, { src: fileURL("./components/examples/scopes/with-scope.js"), page_id }),
 		el("div", { className: "warning" }).append(
 			el("p").append(...T`
 				${el("strong", "Be careful with manual scope control!")} Always ensure you have matching push() and pop() calls,

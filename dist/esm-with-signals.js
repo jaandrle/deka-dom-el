@@ -175,6 +175,11 @@ var scope = {
 	pop() {
 		if (scopes.length === 1) return;
 		return scopes.pop();
+	},
+	isolate(fn) {
+		this.push({ prevent: true });
+		fn();
+		this.pop();
 	}
 };
 function append(...els) {

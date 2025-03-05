@@ -101,10 +101,7 @@ export function page({ pkg, info }){
 		el("div", { className: "tabs" }).append(
 			el("div", { className: "tab", "data-tab": "html-attr" }).append(
 				el("h4", t`HTML Attribute Style`),
-				el(code, { content: `el("button", {
-	textContent: "click me",
-	"=onclick": "console.log(event)"
-})`, page_id }),
+				el(code, { src: fileURL("./components/examples/events/attribute-event.js"), page_id }),
 				el("p").append(...T`
 					Forces usage as an HTML attribute. Corresponds to
 					${el("code", `<button onclick="console.log(event)">click me</button>`)}. This can be particularly
@@ -113,17 +110,12 @@ export function page({ pkg, info }){
 			),
 			el("div", { className: "tab", "data-tab": "property" }).append(
 				el("h4", t`Property Assignment`),
-				el(code, { content: `el("button", {
-	textContent: "click me",
-	onclick: console.log
-})`, page_id }),
+				el(code, { src: fileURL("./components/examples/events/property-event.js"), page_id }),
 				el("p", t`Assigns the event handler directly to the element's property.`)
 			),
 			el("div", { className: "tab", "data-tab": "addon" }).append(
 				el("h4", t`Addon Approach`),
-				el(code, { content: `el("button", {
-	textContent: "click me"
-}, on("click", console.log))`, page_id }),
+				el(code, { src: fileURL("./components/examples/events/chain-event.js"), page_id }),
 				el("p", t`Uses the addon pattern, see above.`)
 			)
 		),

@@ -77,33 +77,11 @@ export function page({ pkg, info }){
 			el("div", { class: "comparison" }).append(
 				el("div").append(
 					el("h5", t`Native DOM API`),
-					el(code, { content: `// Create element with properties
-const button = document.createElement('button');
-button.textContent = "Click me";
-button.className = "primary";
-button.disabled = true;
-
-// Or using Object.assign()
-const button = Object.assign(
-  document.createElement('button'),
-  {
-    textContent: "Click me",
-    className: "primary",
-    disabled: true
-  }
-);`, page_id })
+					el(code, { src: fileURL("./components/examples/elements/native-dom-create.js"), page_id })
 				),
 				el("div").append(
 					el("h5", t`DDE Approach`),
-					el(code, { content: `// Create element with properties
-const button = el("button", {
-  textContent: "Click me",
-  className: "primary",
-  disabled: true
-});
-
-// Shorter and more expressive
-// than the native approach`, page_id })
+					el(code, { src: fileURL("./components/examples/elements/dde-dom-create.js"), page_id })
 				)
 			)
 		),
@@ -159,29 +137,11 @@ const button = el("button", {
 			el("div", { class: "comparison" }).append(
 				el("div", { class: "bad-practice" }).append(
 					el("h5", t`❌ Native DOM API`),
-					el(code, { content: `// Verbose, needs temp variables
-const div = document.createElement('div');
-const h1 = document.createElement('h1');
-h1.textContent = 'Title';
-div.appendChild(h1);
-
-const p = document.createElement('p');
-p.textContent = 'Paragraph';
-div.appendChild(p);
-
-// appendChild doesn't return parent
-// so chaining is not possible`, page_id })
+					el(code, { src: fileURL("./components/examples/elements/native-dom-tree.js"), page_id })
 				),
 				el("div", { class: "good-practice" }).append(
 					el("h5", t`✅ DDE Approach`),
-					el(code, { content: `// Chainable, natural nesting
-const div = el("div").append(
-  el("h1", "Title"),
-  el("p", "Paragraph")
-);
-
-// append() returns parent element
-// making chains easy and intuitive`, page_id })
+					el(code, { src: fileURL("./components/examples/elements/dde-dom-tree.js"), page_id })
 				)
 			)
 		),
