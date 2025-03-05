@@ -54,7 +54,8 @@ type IsReadonly<T, K extends keyof T> =
 type ElementAttributes<T extends SupportedElement>= Partial<{
 	[K in keyof _fromElsInterfaces<T>]:
 		_fromElsInterfaces<T>[K] extends ((...p: any[])=> any)
-			? _fromElsInterfaces<T>[K] | ((...p: Parameters<_fromElsInterfaces<T>[K]>)=> ddeSignal<ReturnType<_fromElsInterfaces<T>[K]>>)
+			? _fromElsInterfaces<T>[K] | ((...p: Parameters<_fromElsInterfaces<T>[K]>)=>
+																	ddeSignal<ReturnType<_fromElsInterfaces<T>[K]>>)
 			: (IsReadonly<_fromElsInterfaces<T>, K> extends false
 				? _fromElsInterfaces<T>[K] | ddeSignal<_fromElsInterfaces<T>[K]>
 				: ddeStringable)
@@ -146,6 +147,8 @@ export function simulateSlots<EL extends SupportedElement | DocumentFragment>(
 	body: EL,
 ): EL
 
+export function dispatchEvent(name: keyof DocumentEventMap | string, element: SupportedElement):
+	(data?: any)=> void;
 export function dispatchEvent(name: keyof DocumentEventMap | string, options?: EventInit):
 	(element: SupportedElement, data?: any)=> void;
 export function dispatchEvent(

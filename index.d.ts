@@ -147,6 +147,8 @@ export function simulateSlots<EL extends SupportedElement | DocumentFragment>(
 	body: EL,
 ): EL
 
+export function dispatchEvent(name: keyof DocumentEventMap | string, element: SupportedElement):
+	(data?: any)=> void;
 export function dispatchEvent(name: keyof DocumentEventMap | string, options?: EventInit):
 	(element: SupportedElement, data?: any)=> void;
 export function dispatchEvent(

@@ -11,6 +11,7 @@ import { oAssign, onAbort } from './helpers.js';
  * @returns {Function} Function that dispatches the event
  */
 export function dispatchEvent(name, options, host){
+	if(typeof options==="function"){ host= options; options= null; }
 	if(!options) options= {};
 	return function dispatch(element, ...d){
 		if(host){

@@ -569,6 +569,10 @@ function observedAttributes2(instance) {
 
 // src/events.js
 function dispatchEvent(name, options, host) {
+	if (typeof options === "function") {
+		host = options;
+		options = null;
+	}
 	if (!options) options = {};
 	return function dispatch(element, ...d) {
 		if (host) {
