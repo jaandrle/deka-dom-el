@@ -33,7 +33,7 @@ export function page({ pkg, info }){
 			Scopes provide a structured way to organize your UI code into reusable components that properly
 			manage their lifecycle, handle cleanup, and maintain clear boundaries between different parts of your application.
 		`),
-		el("div", { class: "dde-callout" }).append(
+		el("div", { className: "callout" }).append(
 			el("h4", t`Why Use Scopes?`),
 			el("ul").append(
 				el("li", t`Automatic resource cleanup when components are removed from DOM`),
@@ -46,7 +46,7 @@ export function page({ pkg, info }){
 		el(code, { src: fileURL("./components/examples/scopes/intro.js"), page_id }),
 
 		el(h3, t`Understanding Host Elements and Scopes`),
-		el("div", { class: "dde-illustration" }).append(
+		el("div", { className: "illustration" }).append(
 			el("h4", t`Component Anatomy`),
 			el("pre").append(el("code", `
 ┌─────────────────────────────────┐
@@ -77,7 +77,7 @@ export function page({ pkg, info }){
 			The ${el("strong", "host element")} is the root element of your component - typically the element returned
 			by your component function. It serves as the identity of your component in the DOM.
 		`),
-		el("div", { class: "dde-function-table" }).append(
+		el("div", { className: "function-table" }).append(
 			el("h4", t`scope.host()`),
 			el("dl").append(
 				el("dt", t`When called with no arguments`),
@@ -89,7 +89,7 @@ export function page({ pkg, info }){
 		),
 		el(example, { src: fileURL("./components/examples/scopes/scopes-and-hosts.js"), page_id }),
 
-		el("div", { class: "dde-tip" }).append(
+		el("div", { className: "tip" }).append(
 			el("p").append(...T`
 				${el("strong", "Best Practice:")} Always capture the host reference at the beginning of your component function
 				using ${el("code", "const { host } = scope")} to avoid scope-related issues, especially with asynchronous code.
@@ -111,7 +111,7 @@ export function page({ pkg, info }){
 			el("li", t`You need private methods and properties for your component`),
 			el("li", t`You're transitioning from another class-based component system`)
 		),
-		el("div", { class: "dde-tip" }).append(
+		el("div", { className: "tip" }).append(
 			el("p").append(...T`
 				${el("strong", "Note:")} Even with class-based components, follow the best practice of storing the host reference
 				early in your component code. This ensures proper access to the host throughout the component's lifecycle.
@@ -124,7 +124,7 @@ export function page({ pkg, info }){
 			One of the most powerful features of scopes is automatic cleanup when components are removed from the DOM.
 			This prevents memory leaks and ensures resources are properly released.
 		`),
-		el("div", { class: "dde-illustration" }).append(
+		el("div", { className: "illustration" }).append(
 			el("h4", t`Lifecycle Flow`),
 			el("pre").append(el("code", `
 1. Component created → scope established
@@ -139,7 +139,7 @@ export function page({ pkg, info }){
 		),
 		el(example, { src: fileURL("./components/examples/scopes/cleaning.js"), page_id }),
 
-		el("div", { class: "dde-note" }).append(
+		el("div", { className: "note" }).append(
 			el("p").append(...T`
 				In this example, when you click "Remove", the component is removed from the DOM, and all its associated
 				resources are automatically cleaned up, including the signal subscription that updates the text content.
@@ -152,8 +152,8 @@ export function page({ pkg, info }){
 			Scopes work best with a declarative approach to UI building, especially when combined
 			with ${el("a", { textContent: "signals", ...references.signals })} for state management.
 		`),
-		el("div", { class: "dde-tabs" }).append(
-			el("div", { class: "tab", "data-tab": "declarative" }).append(
+		el("div", { className: "tabs" }).append(
+			el("div", { className: "tab", "data-tab": "declarative" }).append(
 				el("h4", t`✅ Declarative Approach`),
 				el("p", t`Define what your UI should look like based on state:`),
 				el("pre").append(el("code", `function Counter() {
@@ -175,7 +175,7 @@ export function page({ pkg, info }){
 	);
 }`))
 			),
-			el("div", { class: "tab", "data-tab": "imperative" }).append(
+			el("div", { className: "tab", "data-tab": "imperative" }).append(
 				el("h4", t`⚠️ Imperative Approach`),
 				el("p", t`Manually update the DOM in response to events:`),
 				el("pre").append(el("code", `function Counter() {
@@ -203,7 +203,7 @@ export function page({ pkg, info }){
 
 		el(code, { src: fileURL("./components/examples/scopes/declarative.js"), page_id }),
 
-		el("div", { class: "dde-note" }).append(
+		el("div", { className: "note" }).append(
 			el("p").append(...T`
 				While DDE supports both declarative and imperative approaches, the declarative style is recommended
 				as it leads to more maintainable code with fewer opportunities for bugs. Signals handle the complexity
@@ -231,7 +231,7 @@ export function page({ pkg, info }){
 			`)
 		),
 
-		el("div", { class: "dde-troubleshooting" }).append(
+		el("div", { className: "troubleshooting" }).append(
 			el("h4", t`Common Scope Pitfalls`),
 			el("dl").append(
 				el("dt", t`Losing host reference in async code`),

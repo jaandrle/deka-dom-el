@@ -37,7 +37,7 @@ ${host} h1 {
 
 ${host} .version-badge {
 	font-size: 0.75rem;
-	background-color: rgba(150, 150, 150, 0.2);
+	background-color: hsla(0, 0%, 59%, 0.2);
 	padding: 0.25rem 0.5rem;
 	border-radius: var(--border-radius);
 }
@@ -57,13 +57,13 @@ ${host} .github-link {
 	font-size: 0.875rem;
 	padding: 0.375rem 0.75rem;
 	border-radius: var(--border-radius);
-	background-color: rgba(0, 0, 0, 0.2);
+	background-color: hsla(0, 0%, 0%, 0.2);
 	text-decoration: none;
 	transition: background-color 0.2s;
 }
 
 ${host} .github-link:hover {
-	background-color: rgba(0, 0, 0, 0.3);
+	background-color: hsla(0, 0%, 0%, 0.3);
 	text-decoration: none;
 }
 
@@ -85,39 +85,26 @@ ${host_nav} a {
 	padding: 0.625rem 0.75rem;
 	border-radius: var(--border-radius);
 	color: var(--text);
-	text-decoration: none;
-	transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+	transition: background-color 0.1s ease, color 0.1s ease, transform 0.1s ease, box-shadow 0.1s ease;
 	line-height: 1.2;
-}
-
-${host_nav} a:hover {
-	background-color: rgba(var(--primary-rgb), 0.08); /* Using CSS variables for better theming */
-	text-decoration: none;
-	transform: translateY(-1px);
-	color: var(--primary);
 }
 
 ${host_nav} a.current,
 ${host_nav} a[aria-current=page] {
-	background-color: var(--nav-current-bg, var(--primary-dark));
-	color: var(--nav-current-text, white);
+	background-color: hsl(var(--primary-hs), 40%);
+	color: whitesmoke;
 	font-weight: 600;
-	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+	box-shadow: var(--shadow);
 }
 
-${host_nav} a.current:hover,
-${host_nav} a[aria-current=page]:hover {
-	background-color: var(--primary);
-	color: white;
+${host_nav} a:hover {
+	background-color: hsl(var(--primary-hs), 45%);
+	color: whitesmoke;
 	transform: translateY(-1px);
 }
 
 ${host_nav} a .nav-number {
-	display: inline-block;
-	width: 1.5rem;
-	text-align: right;
-	margin-right: 0.5rem;
-	opacity: 0.7;
+	color: rgb(from currentColor r g b / .75);
 }
 
 ${host_nav} a:first-child {
@@ -172,11 +159,6 @@ export function header({ info: { href, title, description }, pkg }){
 		head({ title: pageTitle, description, pkg })
 	);
 
-	// Add theme color meta tag
-	document.head.append(
-		el("meta", { name: "theme-color", content: "#3f51b5" })
-	);
-
 	return el().append(
 		// Header section with accessibility support
 		el("header", { role: "banner", className: header.name }).append(
@@ -225,7 +207,7 @@ function nav({ href }){
 				el("span", {
 					className: "nav-number",
 					"aria-hidden": "true",
-					textContent: `${i+1}.`
+					textContent: `${i+1}. `
 				}),
 				p.title
 			);

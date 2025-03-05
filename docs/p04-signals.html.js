@@ -48,7 +48,7 @@ export function page({ pkg, info }){
 			Signals provide a simple yet powerful way to create reactive applications with DDE. They handle the
 			fundamental challenge of keeping your UI in sync with changing data in a declarative, efficient way.
 		`),
-		el("div", { class: "dde-callout" }).append(
+		el("div", { class: "callout" }).append(
 			el("h4", t`What Makes Signals Special?`),
 			el("ul").append(
 				el("li", t`Fine-grained reactivity without complex state management`),
@@ -66,7 +66,7 @@ export function page({ pkg, info }){
 			Signals organize your code into three distinct parts, following the
 			${el("a", { textContent: t`3PS principle`, href: "./#h-event-driven-programming--parts-separation--ps" })}:
 		`),
-		el("div", { class: "dde-signal-diagram" }).append(
+		el("div", { class: "signal-diagram" }).append(
 			el("div", { class: "signal-part" }).append(
 				el("h4", t`α: Create Signal`),
 				el(code, { content: "const count = S(0);", page_id }),
@@ -85,7 +85,7 @@ export function page({ pkg, info }){
 		),
 		el(example, { src: fileURL("./components/examples/signals/signals.js"), page_id }),
 
-		el("div", { class: "dde-note" }).append(
+		el("div", { class: "note" }).append(
 			el("p").append(...T`
 				Signals implement the ${el("a", { textContent: t`Publish–subscribe pattern`, ...references.wiki_pubsub })},
 				a form of ${el("a", { textContent: t`Event-driven programming`, ...references.wiki_event_driven })}.
@@ -95,7 +95,7 @@ export function page({ pkg, info }){
 		),
 
 		el(h3, t`Signal Essentials: Core API`),
-		el("div", { class: "dde-function-table" }).append(
+		el("div", { class: "function-table" }).append(
 			el("dl").append(
 				el("dt", t`Creating a Signal`),
 				el("dd", t`S(initialValue) → creates a signal with the given value`),
@@ -136,7 +136,7 @@ export function page({ pkg, info }){
 			When working with objects, arrays, or other complex data structures, Signal Actions provide
 			a structured way to modify state while maintaining reactivity.
 		`),
-		el("div", { class: "dde-illustration" }).append(
+		el("div", { class: "illustration" }).append(
 			el("h4", t`Actions vs. Direct Mutation`),
 			el("div", { class: "comparison" }).append(
 				el("div", { class: "bad-practice" }).append(
@@ -177,7 +177,7 @@ S.action(todos, "add", "New todo");`, page_id })
 		`),
 		el(example, { src: fileURL("./components/examples/signals/actions-todos.js"), page_id }),
 
-		el("div", { class: "dde-tip" }).append(
+		el("div", { class: "tip" }).append(
 			el("p").append(...T`
 				${el("strong", "Special Action Methods")}: Signal actions can implement special lifecycle hooks:
 			`),
@@ -193,7 +193,7 @@ S.action(todos, "add", "New todo");`, page_id })
 			Signals really shine when connected to your UI. DDE provides several ways to bind signals to DOM elements:
 		`),
 
-		el("div", { class: "dde-tabs" }).append(
+		el("div", { class: "tabs" }).append(
 			el("div", { class: "tab", "data-tab": "attributes" }).append(
 				el("h4", t`Reactive Attributes`),
 				el("p", t`Bind signal values directly to element attributes, properties, or styles:`),
@@ -263,7 +263,7 @@ S.action(items, "push", "Dragonfruit"); // List updates automatically`, page_id 
 			`)
 		),
 
-		el("div", { class: "dde-troubleshooting" }).append(
+		el("div", { class: "troubleshooting" }).append(
 			el("h4", t`Common Signal Pitfalls`),
 			el("dl").append(
 				el("dt", t`UI not updating when array/object changes`),

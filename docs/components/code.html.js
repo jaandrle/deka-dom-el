@@ -31,7 +31,7 @@ ${host} {
 	overflow: auto;
 	border-radius: var(--border-radius);
 	font-family: var(--font-mono);
-	font-size: 0.8rem;
+	font-size: .85rem;
 	line-height: 1.5;
 	position: relative;
 	margin-block: 1rem;

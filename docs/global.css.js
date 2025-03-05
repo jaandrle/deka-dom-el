@@ -1,14 +1,14 @@
 import { styles } from "./ssr.js";
 styles.css`
 :root {
-	--primary: #b71c1c;
-	--primary-light: #f05545;
-	--primary-dark: #7f0000;
-	--primary-rgb: 183, 28, 28;
-	--secondary: #700037;
-	--secondary-light: #ae1357;
-	--secondary-dark: #4a0027;
-	--secondary-rgb: 112, 0, 55;
+	--primary: hsl(0, 74%, 42%);
+	--primary-light: hsl(5, 87%, 61%);
+	--primary-dark: hsl(0, 100%, 25%);
+	--primary-hs: 0, 74%;
+	--secondary: hsl(330, 100%, 22%);
+	--secondary-light: hsl(339, 80%, 38%);
+	--secondary-dark: hsl(328, 100%, 15%);
+	--secondary-hs: 330, 100%;
 
 	--font-main: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
 		Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
@@ -20,50 +20,49 @@ styles.css`
 	--header-height: 4rem;
 	--border-radius: 0.375rem;
 
-	--bg: #ffffff;
-	--bg-sidebar: #fff5f5;
-	--text: #1a1313;
-	--text-light: #555050;
-	--code-bg: #f9f2f2;
-	--code-text: #9a0000;
-	--border: #d8c0c0;
-	--selection: rgba(183, 28, 28, 0.15);
-	--marked: #b71c1c;
+	--bg: hsl(0, 0%, 100%);
+	--bg-sidebar: hsl(0, 100%, 98%);
+	--text: hsl(0, 16%, 15%);
+	--text-light: hsl(0, 4%, 33%);
+	--code-bg: hsl(0, 39%, 97%);
+	--code-text: hsl(0, 100%, 30%);
+	--border: hsl(0, 32%, 80%);
+	--selection: hsl(var(--primary-hs), 90%);
+	--marked: var(--primary);
 	--accent: var(--secondary);
-	--shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+	--shadow: 0 2px 6px hsla(0, 0%, 0%, 0.15);
+	--shadow-sm: 0 2px 4px hsla(0, 0%, 0%, 0.15);
 
-	--link-color: #9a0000;
-	--link-hover: #7f0000;
-	--button-text: #ffffff;
+
+	--link-color: hsl(0, 100%, 30%);
+	--link-hover: hsl(0, 100%, 25%);
+	--button-text: hsl(0, 0%, 100%);
 }
 
 @media (prefers-color-scheme: dark) {
 	:root {
-		--bg: #121212;
-		--bg-sidebar: #1a1212;
-		--text: #ffffff;
-		--text-light: #cccccc;
-		--code-bg: #2c2020;
-		--code-text: #ff9e80;
-		--border: #4d3939;
-		--selection: rgba(255, 99, 71, 0.25);
-		--primary: #b74141;
-		--primary-light: #ff867f;
-		--primary-dark: #c62828;
-		--secondary: #f02b47;
-		--secondary-light: #ff6090;
-		--secondary-dark: #b0003a;
+		--bg: hsl(0, 0%, 7%);
+		--bg-sidebar: hsl(0, 9%, 9%);
+		--text: hsl(0, 0%, 100%);
+		--text-light: hsl(0, 0%, 80%);
+		--code-bg: hsl(0, 18%, 15%);
+		--code-text: hsl(20, 100%, 75%);
+		--border: hsl(0, 14%, 27%);
+		--selection: hsla(9, 100%, 64%, 0.25);
+		--primary: hsl(0, 48%, 49%);
+		--primary-light: hsl(5, 100%, 75%);
+		--primary-dark: hsl(0, 67%, 47%);
+		--secondary: hsl(350, 87%, 55%);
+		--secondary-light: hsl(341, 100%, 69%);
+		--secondary-dark: hsl(340, 100%, 35%);
 		--accent: var(--secondary);
 
-		--link-color: #ff5252;
-		--link-hover: #ff867f;
-		--button-text: #ffffff;
+		--link-color: hsl(0, 100%, 66%);
+		--link-hover: hsl(5, 100%, 75%);
+		--button-text: hsl(0, 0%, 100%);
 
-		--nav-current-bg: #aa2222;
-		--nav-current-text: #ffffff;
-
-		--primary-rgb: 255, 82, 82;
-		--secondary-rgb: 233, 30, 99;
+		--primary-hs: 0, 48%;
+		--secondary-hs: 350, 87%;
 	}
 }
 
@@ -78,7 +77,7 @@ html {
 
 /* Accessibility improvements */
 :focus {
-	outline: 3px solid rgba(63, 81, 181, 0.5);
+	outline: 3px solid hsl(231, 48%, 70%);
 	outline-offset: 2px;
 }
 
@@ -87,7 +86,7 @@ html {
 }
 
 :focus-visible {
-	outline: 3px solid rgba(63, 81, 181, 0.5);
+	outline: 3px solid hsl(231, 48%, 70%);
 	outline-offset: 2px;
 }
 
@@ -127,7 +126,7 @@ body {
 	background-color: var(--bg);
 	color: var(--text);
 	line-height: 1.6;
-	font-size: 1rem;
+	font-size: 1.05rem;
 	display: grid;
 	grid-template-columns: 100%;
 	grid-template-areas:
@@ -342,20 +341,17 @@ h3:hover .heading-anchor {
 }
 
 .note {
-	background-color: rgba(63, 81, 181, 0.08);
 	border-left: 4px solid var(--primary);
 	border-radius: 0 var(--border-radius) var(--border-radius) 0;
 }
 
 .tip {
-	background-color: rgba(46, 204, 113, 0.08);
-	border-left: 4px solid #2ecc71;
+	border-left: 4px solid hsl(145, 63%, 49%);
 	border-radius: 0 var(--border-radius) var(--border-radius) 0;
 }
 
 .warning {
-	background-color: rgba(241, 196, 15, 0.08);
-	border-left: 4px solid #f1c40f;
+	border-left: 4px solid hsl(48, 89%, 50%);
 	border-radius: 0 var(--border-radius) var(--border-radius) 0;
 }
 
@@ -372,12 +368,12 @@ h3:hover .heading-anchor {
 
 .tip::before {
 	content: "Tip";
-	color: #2ecc71;
+	color: hsl(145, 63%, 49%);
 }
 
 .warning::before {
 	content: "Warning";
-	color: #f1c40f;
+	color: hsl(48, 89%, 50%);
 }
 
 /* Prev/Next buttons */

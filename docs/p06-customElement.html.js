@@ -59,7 +59,7 @@ export function page({ pkg, info }){
 			to create reusable, encapsulated custom elements with all the benefits of DDE's declarative DOM
 			construction and reactivity system.
 		`),
-		el("div", { class: "dde-callout" }).append(
+		el("div", { className: "callout" }).append(
 			el("h4", t`Why Combine DDE with Web Components?`),
 			el("ul").append(
 				el("li", t`Declarative DOM creation within your components`),
@@ -92,7 +92,7 @@ export function page({ pkg, info }){
 		`),
 		el(code, { src: fileURL("./components/examples/customElement/native-basic.js"), page_id }),
 
-		el("div", { class: "dde-note" }).append(
+		el("div", { className: "note" }).append(
 			el("p").append(...T`
 				For complete information on Web Components, see the
 				${el("a", references.mdn_custom_elements).append(el("strong", t`MDN documentation`))}.
@@ -107,7 +107,7 @@ export function page({ pkg, info }){
 			Custom Elements. This is done with ${el("code", "customElementWithDDE")}, which makes your Custom Element
 			compatible with DDE's event handling.
 		`),
-		el("div", { class: "dde-function-table" }).append(
+		el("div", { className: "function-table" }).append(
 			el("h4", t`customElementWithDDE`),
 			el("dl").append(
 				el("dt", t`Purpose`),
@@ -120,7 +120,7 @@ export function page({ pkg, info }){
 		),
 		el(example, { src: fileURL("./components/examples/customElement/customElementWithDDE.js"), page_id }),
 
-		el("div", { class: "dde-tip" }).append(
+		el("div", { className: "tip" }).append(
 			el("p").append(...T`
 				${el("strong", "Key Point:")} The ${el("code", "customElementWithDDE")} function adds event dispatching
 				to your Custom Element lifecycle methods, making them work seamlessly with DDE's event system.
@@ -132,7 +132,7 @@ export function page({ pkg, info }){
 			The next step is to use DDE's component rendering within your Custom Element. This is done with
 			${el("code", "customElementRender")}, which connects your DDE component function to the Custom Element.
 		`),
-		el("div", { class: "dde-function-table" }).append(
+		el("div", { className: "function-table" }).append(
 			el("h4", t`customElementRender`),
 			el("dl").append(
 				el("dt", t`Purpose`),
@@ -151,7 +151,7 @@ export function page({ pkg, info }){
 		),
 		el(example, { src: fileURL("./components/examples/customElement/dde.js"), page_id }),
 
-		el("div", { class: "dde-note" }).append(
+		el("div", { className: "note" }).append(
 			el("p").append(...T`
 				In this example, we're using Shadow DOM (${el("code", "this.attachShadow()")}) for encapsulation,
 				but you can also render directly to the element with ${el("code", "customElementRender(this, ...)")}.
@@ -163,7 +163,7 @@ export function page({ pkg, info }){
 			One of the most powerful features of integrating DDE with Web Components is connecting HTML attributes
 			to DDE's reactive signals system. This creates truly reactive custom elements.
 		`),
-		el("div", { class: "dde-tip" }).append(
+		el("div", { className: "tip" }).append(
 			el("p").append(...T`
 				${el("strong", "Two Ways to Handle Attributes:")}
 			`),
@@ -182,7 +182,7 @@ export function page({ pkg, info }){
 		`),
 		el(example, { src: fileURL("./components/examples/customElement/observedAttributes.js"), page_id }),
 
-		el("div", { class: "dde-callout" }).append(
+		el("div", { className: "callout" }).append(
 			el("h4", t`How S.observedAttributes Works`),
 			el("p").append(...T`
 				1. Takes each attribute listed in static observedAttributes
@@ -198,7 +198,7 @@ export function page({ pkg, info }){
 			Shadow DOM provides encapsulation for your component's styles and markup. When using DDE with Shadow DOM,
 			you get the best of both worlds: encapsulation plus declarative DOM creation.
 		`),
-		el("div", { class: "dde-illustration" }).append(
+		el("div", { className: "illustration" }).append(
 			el("h4", t`Shadow DOM Encapsulation`),
 			el("pre").append(el("code", `
 ┌─────────────────────────────────┐
@@ -232,7 +232,7 @@ export function page({ pkg, info }){
 			Slots allow users of your component to insert content inside it. When using DDE, you can simulate the
 			slot mechanism with the ${el("code", "simulateSlots")} function:
 		`),
-		el("div", { class: "dde-function-table" }).append(
+		el("div", { className: "function-table" }).append(
 			el("h4", t`simulateSlots`),
 			el("dl").append(
 				el("dt", t`Purpose`),
@@ -243,7 +243,7 @@ export function page({ pkg, info }){
 		),
 		el(example, { src: fileURL("./components/examples/customElement/simulateSlots.js"), page_id }),
 
-		el("div", { class: "dde-tip" }).append(
+		el("div", { className: "tip" }).append(
 			el("p").append(...T`
 				${el("strong", "When to use simulateSlots:")} This approach is useful when you need to distribute
 				content from the light DOM into specific locations in the shadow DOM, particularly in environments
@@ -273,7 +273,7 @@ export function page({ pkg, info }){
 			`)
 		),
 
-		el("div", { class: "dde-troubleshooting" }).append(
+		el("div", { className: "troubleshooting" }).append(
 			el("h4", t`Common Issues`),
 			el("dl").append(
 				el("dt", t`Events not firing properly`),
