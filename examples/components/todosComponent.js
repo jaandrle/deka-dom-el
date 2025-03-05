@@ -45,7 +45,7 @@ export function todosComponent({ todos= [ "Task A" ] }= {}){
 				: el("ul").append(
 					...Array.from(ts).map(([ value, textContent ])=>
 						memo(value, ()=> el(todoComponent, { textContent, value, className }, onremove)))
-				)
+				),
 			),
 			el("p", "Click to the text to edit it.")
 		),
@@ -54,7 +54,7 @@ export function todosComponent({ todos= [ "Task A" ] }= {}){
 			el("label", "New todo: ").append(
 				el("input", { name, type: "text", required: true }),
 			),
-			el("button", "+")
+			el("button", "+"),
 		),
 		el("div").append(
 			el("h3", "Output (JSON):"),
