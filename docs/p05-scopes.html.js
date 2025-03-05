@@ -1,6 +1,7 @@
 import { T, t } from "./utils/index.js";
 export const info= {
 	title: t`Scopes and Components`,
+	fullTitle: t`Building Maintainable UIs with Scopes and Components`,
 	description: t`Organizing UI into reusable, manageable components`,
 };
 
@@ -28,7 +29,6 @@ const references= {
 export function page({ pkg, info }){
 	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
-		el("h2", t`Building Maintainable UIs with Scopes and Components`),
 		el("p").append(...T`
 			For state-less components we can use functions as UI components (see “Elements” page). But in real life,
 			we may need to handle the component live-cycle and provide JavaScript the way to properly use

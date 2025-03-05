@@ -78,18 +78,19 @@ ${host_nav} a {
 	line-height: 1.2;
 }
 
-${host_nav} a.current,
 ${host_nav} a[aria-current=page] {
 	background-color: hsl(var(--primary-hs), 40%);
 	color: whitesmoke;
 	font-weight: 600;
 	box-shadow: var(--shadow);
+	text-decoration: none;
 }
 
 ${host_nav} a:hover {
 	background-color: hsl(var(--primary-hs), 45%);
 	color: whitesmoke;
 	transform: translateY(-1px);
+	text-decoration: none;
 }
 
 ${host_nav} a .nav-number {
@@ -192,7 +193,6 @@ function nav({ href, pkg }){
 				href: isIndex ? "./" : p.href,
 				title: p.description || `Go to ${p.title}`,
 				"aria-current": isCurrent ? "page" : null,
-				classList: { current: isCurrent }
 			}).append(
 				el("span", {
 					className: "nav-number",

@@ -1,6 +1,7 @@
 import { T, t } from "./utils/index.js";
 export const info= {
 	title: t`Server-Side Rendering (SSR)`,
+	fullTitle: t`Server-Side Rendering with deka-dom-el`,
 	description: t`Using deka-dom-el for server-side rendering with jsdom to generate static HTML.`,
 };
 
@@ -15,7 +16,6 @@ const fileURL= url=> new URL(url, import.meta.url);
 export function page({ pkg, info }){
 	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
-		el("h2", t`Server-Side Rendering with deka-dom-el`),
 		el("p").append(...T`
 			deka-dom-el isn't limited to browser environments. Thanks to its flexible architecture,
 			it can be used for server-side rendering (SSR) to generate static HTML files.

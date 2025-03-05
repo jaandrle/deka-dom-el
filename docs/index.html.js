@@ -2,6 +2,7 @@ import { t, T } from "./utils/index.js";
 export const info= {
 	href: "./",
 	title: t`Introduction`,
+	fullTitle: t`Vanilla for flavouring — a full-fledged feast for large projects`,
 	description: t`A lightweight, reactive DOM library for creating dynamic UIs with a declarative syntax`,
 };
 
@@ -26,7 +27,6 @@ const references= {
 export function page({ pkg, info }){
 	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
-		el("h2", t`Vanilla for flavouring — a full-fledged feast for large projects`),
 		el("p").append(...T`
 			Welcome to Deka DOM Elements (DDE) — a lightweight library for building dynamic UIs with a
 			declarative syntax that stays close to the native DOM API. DDE gives you powerful reactive

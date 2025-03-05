@@ -3,9 +3,8 @@ const host= "."+example.name;
 styles.css`
 ${host} {
 	grid-column: full-main;
-	width: 100%;
-	max-width: calc(9/5 * var(--body-max-width));
-	height: calc(3/5 * var(--body-max-width));
+	width: calc(100% - .75em);
+	height: calc(4/6 * var(--body-max-width));
 	margin: 2rem auto;
 	border-radius: var(--border-radius);
 	box-shadow: var(--shadow);
@@ -26,7 +25,6 @@ ${host} .runtime {
 /* Dark mode styles for CodeMirror */
 .CodeMirror, .CodeMirror-gutters {
 	background: var(--code-bg) !important;
-	border: 1px solid var(--border) !important;
 	color: var(--text) !important;
 }
 

@@ -1,6 +1,7 @@
 import { T, t } from "./utils/index.js";
 export const info= {
 	title: t`Elements`,
+	fullTitle: t`Declarative DOM Element Creation`,
 	description: t`Building user interfaces with declarative DOM element creation.`,
 };
 
@@ -48,7 +49,6 @@ const references= {
 export function page({ pkg, info }){
 	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
-		el("h2", t`Declarative DOM Element Creation`),
 		el("p").append(...T`
 			Building user interfaces in JavaScript often involves creating and manipulating DOM elements.
 			DDE provides a simple yet powerful approach to element creation that is declarative, chainable,

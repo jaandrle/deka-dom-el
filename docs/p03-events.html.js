@@ -1,6 +1,7 @@
 import { T, t } from "./utils/index.js";
 export const info= {
 	title: t`Events and Addons`,
+	fullTitle: t`Declarative Event Handling and Addons`,
 	description: t`Using events and addons for declarative UI interactions.`,
 };
 
@@ -45,7 +46,6 @@ const references= {
 export function page({ pkg, info }){
 	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
-		el("h2", t`Declarative Event Handling and Addons`),
 		el("p").append(...T`
 			Events are at the core of interactive web applications. DDE provides a clean, declarative approach to
 			handling DOM events and extends this pattern with a powerful Addon system to incorporate additional

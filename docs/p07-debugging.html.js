@@ -1,6 +1,7 @@
 import { T, t } from "./utils/index.js";
 export const info= {
 	title: t`Debugging`,
+	fullTitle: t`Debugging applications with deka-dom-el`,
 	description: t`Techniques for debugging applications using deka-dom-el, especially signals.`,
 };
 
@@ -16,7 +17,6 @@ const fileURL= url=> new URL(url, import.meta.url);
 export function page({ pkg, info }){
 	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
-		el("h2", t`Debugging applications with deka-dom-el`),
 		el("p").append(...T`
 			Debugging is an essential part of application development. This guide provides techniques
 			and best practices for debugging applications built with deka-dom-el, with a focus on signals.

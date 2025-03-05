@@ -1,6 +1,7 @@
 import { T, t } from "./utils/index.js";
 export const info= {
 	title: t`Web Components`,
+	fullTitle: t`Using Web Components with DDE: Better Together`,
 	description: t`Using custom elements in combinantion with DDE`,
 };
 
@@ -53,7 +54,6 @@ const references= {
 export function page({ pkg, info }){
 	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
-		el("h2", t`Using Web Components with DDE: Better Together`),
 		el("p").append(...T`
 			DDE pairs powerfully with ${el("a", references.mdn_web_components).append(el("strong", t`Web Components`))}
 			to create reusable, encapsulated custom elements with all the benefits of DDE's declarative DOM

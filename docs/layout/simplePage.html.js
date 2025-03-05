@@ -19,8 +19,7 @@ export function simplePage({ pkg, info }){
 
 		// Main content area
 		el("main", { id: "main-content", role: "main" }).append(
-			// Page title as an h1
-			el("h1", { className: "page-title", textContent: info.title }),
+			el("h2", { textContent: info.fullTitle || info.title }),
 
 			// Main content from child elements
 			el("slot"),

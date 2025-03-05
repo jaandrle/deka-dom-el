@@ -1,6 +1,7 @@
 import { T, t } from "./utils/index.js";
 export const info= {
 	title: t`Signals and Reactivity`,
+	fullTitle: t`Building Reactive UIs with Signals`,
 	description: t`Managing reactive UI state with signals.`,
 };
 
@@ -43,7 +44,6 @@ const references= {
 export function page({ pkg, info }){
 	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
-		el("h2", t`Building Reactive UIs with Signals`),
 		el("p").append(...T`
 			Signals provide a simple yet powerful way to create reactive applications with DDE. They handle the
 			fundamental challenge of keeping your UI in sync with changing data in a declarative, efficient way.

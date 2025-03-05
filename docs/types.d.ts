@@ -4,6 +4,7 @@ export type Info= {
 	id: string,
 	href: string,
 	title: string,
+	fullTitle: string,
 	description: string,
 }
 export type Pages=Info[];

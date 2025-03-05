@@ -247,17 +247,16 @@ body > main > *, body > main slot > * {
 }
 
 /* Page title with ID anchor for skip link */
-body > main .page-title {
+h2 {
 	margin-top: 0;
 	border-bottom: 1px solid var(--border);
 	padding-bottom: 0.75rem;
 	margin-bottom: 1.5rem;
 	color: var(--primary);
-	position: relative;
 }
 
 /* Section headings with better visual hierarchy */
-body > main h2, body > main h3 {
+body > main h3, body > main h4 {
 	scroll-margin-top: calc(var(--header-height) + 1rem);
 }
 
@@ -296,33 +295,6 @@ body > main h2, body > main h3 {
 	--practice-color: hsl(145, 63%, 49%); }
 .bad-practice {
 	--practice-color: hsl(340, 82%, 52%); }
-
-.example {
-	border: 1px solid var(--border);
-	border-radius: var(--border-radius);
-	margin: 2rem 0;
-	overflow: hidden;
-	box-shadow: var(--shadow-sm);
-	transition: box-shadow 0.2s;
-}
-
-.example:hover {
-	box-shadow: var(--shadow);
-}
-
-.example-header {
-	background-color: var(--bg-sidebar);
-	padding: 0.75rem 1rem;
-	border-bottom: 1px solid var(--border);
-	font-weight: 600;
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-}
-
-.example-content {
-	padding: 1.25rem;
-}
 
 /* Icon styling */
 .icon {
