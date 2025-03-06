@@ -14,9 +14,7 @@ ${host} {
 	background-color: var(--primary);
 	color: white;
 	box-shadow: var(--shadow);
-	min-height: calc(var(--header-height) - 1em);
-	--_m: .75em;
-	margin: var(--_m) var(--_m) 0 var(--_m);
+	height: fit-content;
 	border-radius: var(--border-radius);
 }
 
@@ -60,8 +58,9 @@ ${host_nav} .github-link {
 ${host_nav} {
 	grid-area: sidebar;
 	background-color: var(--bg-sidebar);
-	border-right: 1px solid var(--border);
-	padding: 1.5rem 1rem;
+	border: 1px solid var(--border);
+	border-radius: var(--border-radius);
+	padding: 1rem;
 	overflow-y: auto;
 	display: flex;
 	flex-direction: column;
@@ -97,7 +96,13 @@ ${host_nav} a .nav-number {
 	color: rgb(from currentColor r g b / .75);
 }
 
-/* Mobile navigation */
+@media (min-width: 768px) {
+	${host_nav} {
+		height: fit-content;
+		position: sticky;
+		top: .5rem;
+	}
+}
 @media (max-width: 767px) {
 	${host_nav} {
 		padding: 0.75rem;

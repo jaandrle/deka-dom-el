@@ -121,27 +121,11 @@ html {
 	transform: translateX(0);
 }
 
-body {
-	font-family: var(--font-main);
-	background-color: var(--bg);
-	color: var(--text);
-	line-height: 1.6;
-	font-size: 1.05rem;
-	display: grid;
-	grid-template-columns: 100%;
-	grid-template-areas:
-		"header"
-		"sidebar"
-		"content";
-	min-height: 100vh;
-	margin: 0;
-}
-
+/* Typography */
 ::selection {
 	background-color: var(--selection);
 }
 
-/* Typography */
 h1, h2, h3, h4, h5, h6 {
 	margin-bottom: 1rem;
 	margin-top: 2rem;
@@ -194,6 +178,7 @@ code {
 	background-color: var(--code-bg);
 	color: var(--code-text);
 	padding: 0.2em 0.4em;
+	word-wrap: break-word;
 }
 
 pre {
@@ -210,6 +195,24 @@ pre code {
 }
 
 /* Layout */
+body {
+	font-family: var(--font-main);
+	background-color: var(--bg);
+	color: var(--text);
+	line-height: 1.6;
+	font-size: 1.05rem;
+	display: grid;
+	grid-template-columns: 100%;
+	grid-template-areas:
+		"header"
+		"sidebar"
+		"content";
+	min-height: 100vh;
+	margin: 0;
+	--_gap: .75em;
+	gap: var(--_gap);
+	padding: var(--_gap);
+}
 @media (min-width: 768px) {
 	body {
 		grid-template-rows: var(--header-height) 1fr;
@@ -219,11 +222,8 @@ pre code {
 			"sidebar content";
 	}
 }
-
-/* Main content */
 body > main {
 	grid-area: content;
-	padding-block: 2rem;
 	max-width: 100%;
 	overflow-x: hidden;
 	display: grid;
@@ -232,7 +232,6 @@ body > main {
 	[main-start] min(var(--body-max-width), 90%) [main-end]
 	1fr [full-main-end];
 }
-
 body > main > *, body > main slot > * {
 	width: 100%;
 	max-width: 100%;
@@ -270,11 +269,15 @@ body > main h3, body > main h4 {
 	grid-column: full-main;
 	width: calc(100% - .75em);
 }
-.illustration:not(:has( .comparison)) pre {
-	background: none;
-	border-style: dashed !important;
-	width: fit-content;
-	padding: 1em 2em;
+.illustration:not(:has( .comparison)){
+	grid-column: main;
+
+	pre {
+		background: none;
+		border-style: dashed !important;
+		width: fit-content;
+		padding: 1em 2em;
+	}
 }
 
 .comparison {
@@ -415,18 +418,21 @@ body > main h3, body > main h4 {
 @media (min-width: 768px) {
 	.tabs {
 		display: flex;
-		flex-wrap: wrap;
+		flex-flow: row wrap;
 	}
 
 	.tab {
 		flex: 1;
 		min-width: 50%;
 		border-top: none;
-		border-left: 1px solid var(--border);
+		display: flex;
+		flex-flow: column nowrap;
+		align-items: center;
+		text-align: justify;
 	}
 
 	.tab:first-child {
-		border-left: none;
+		border-inline-end: 1px solid var(--border);
 	}
 }
 

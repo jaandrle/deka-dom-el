@@ -32,7 +32,12 @@ export function page({ pkg, info }){
 		el("p").append(...T`
 			The simplest way to debug a signal is to log its current value by calling the get method:
 		`),
-		el(code, { content: "const signal = S(0);\nconsole.log('Current value:', signal.get());", page_id }),
+		el(code, { content: `
+const signal = S(0);
+console.log('Current value:', signal.get());
+// without triggering updates
+console.log('Current value:', signal.valueOf());
+			`, page_id }),
 		el("p").append(...T`
 			You can also monitor signal changes by adding a listener:
 		`),
@@ -43,7 +48,7 @@ export function page({ pkg, info }){
 
 		el("h4", t`Debugging derived signals`),
 		el("p").append(...T`
-			With derived signals (created with S(() => computation)), debugging is a bit more complex
+			With derived signals (created with ${el("code", "S(() => computation))")}), debugging is a bit more complex
 			because the value depends on other signals. To understand why a derived signal isn't updating correctly:
 		`),
 		el("ol").append(
@@ -117,30 +122,15 @@ export function page({ pkg, info }){
 		el("p").append(...T`
 			Elements created with the deka-dom-el library have special properties to aid in debugging:
 		`),
+		el("p").append(...T`
+			${el("code", "<element>.__dde_reactive")} - An array property on DOM elements that tracks signal-to-element
+			relationships.  This allows you to quickly identify which elements are reactive and what signals they're
+			bound to.  Each entry in the array contains:
+		`),
 		el("ul").append(
-			el("li").append(...T`
-				${el("code", "__dde_reactive")} - An array property on DOM elements that tracks signal-to-element relationships.
-				This allows you to quickly identify which elements are reactive and what signals they're bound to.
-				Each entry in the array contains:
-			`),
-			el("ul").append(
-				el("li", "A pair of signal and listener function: [signal, listener]"),
-				el("li", "Additional context information about the element or attribute"),
-				el("li", "Automatically managed by signal.el(), signal.observedAttributes(), and processReactiveAttribute()")
-			),
-			el("li").append(...T`
-				${el("code", "__dde_signal")} - A Symbol property used to identify and store the internal state of signal objects.
-				It contains the following information:
-			`),
-			el("ul").append(
-				el("li", "value: The current value of the signal"),
-				el("li", "listeners: A Set of functions called when the signal value changes"),
-				el("li", "actions: Custom actions that can be performed on the signal"),
-				el("li", "onclear: Functions to run when the signal is cleared"),
-				el("li", "host: Reference to the host element or scope"),
-				el("li", "defined: Stack trace information for debugging"),
-				el("li", "readonly: Boolean flag indicating if the signal is read-only")
-			),
+			el("li", "A pair of signal and listener function: [signal, listener]"),
+			el("li", "Additional context information about the element or attribute"),
+			el("li", "Automatically managed by signal.el(), signal.observedAttributes(), and processReactiveAttribute()")
 		),
 		el("p").append(...T`
 			These properties make it easier to understand the reactive structure of your application when inspecting elements.
@@ -149,8 +139,24 @@ export function page({ pkg, info }){
 
 		el("h4", t`Examining signal connections`),
 		el("p").append(...T`
-			You can inspect signal relationships and bindings in the DevTools console using ${el("code", "$0.__dde_reactive")}.
-			In the console you will see a list of ${el("code", "[ [ signal, listener ], element, property ]")}, where:
+			${el("code", "<signal>.__dde_signal")} - A Symbol property used to identify and store the internal state of
+			signal objects. It contains the following information:
+		`),
+		el("ul").append(
+			el("li", "listeners: A Set of functions called when the signal value changes"),
+			el("li", "actions: Custom actions that can be performed on the signal"),
+			el("li", "onclear: Functions to run when the signal is cleared"),
+			el("li", "host: Reference to the host element/scope"),
+			el("li", "defined: Stack trace information for debugging"),
+			el("li", "readonly: Boolean flag indicating if the signal is read-only")
+		),
+		el("p").append(...T`
+			…to determine the current value of the signal, call ${el("code", "signal.valueOf()")}.
+		`),
+		el("p").append(...T`
+			You can inspect (host) element relationships and bindings with signals in the DevTools console using
+			${el("code", "$0.__dde_reactive")} (for currently selected element). In the console you will see a list of
+			${el("code", "[ [ signal, listener ], element, property ]")}, where:
 		`),
 		el("ul").append(
 			el("li", "signal — the signal triggering the changes"),
@@ -160,7 +166,7 @@ export function page({ pkg, info }){
 		),
 		el("p").append(...T`
 			…the structure of \`__dde_reactive\` utilizes the browser's behavior of packing the first field,
-			so you can see the element and property that changes in the console right away
+			so you can see the element and property that changes in the console right away.
 		`),
 
 		el("h4", t`Debugging with breakpoints`),

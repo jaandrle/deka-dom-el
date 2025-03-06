@@ -35,7 +35,7 @@ ${host} {
 	line-height: 1.5;
 	position: relative;
 	margin-block: 1rem;
-	width: 100%;
+	max-width: 100%;
 }
 
 /* Light mode overrides to match GitHub-like theme */

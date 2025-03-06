@@ -82,11 +82,11 @@ export function page({ pkg, info }){
 				)
 			)
 		),
-		el(example, { src: fileURL("./components/examples/events/compare.js"), page_id }),
 		el("p").append(...T`
 			The main benefit of DDE's approach is that it works as an Addon, making it easy to integrate
 			directly into element declarations.
 		`),
+		el(example, { src: fileURL("./components/examples/events/compare.js"), page_id }),
 
 		el(h3, t`Removing Event Listeners`),
 		el("div", { className: "note" }).append(
@@ -200,12 +200,12 @@ export function page({ pkg, info }){
 		),
 
 		el(h3, t`Dispatching Custom Events`),
-		el(example, { src: fileURL("./components/examples/events/compareDispatch.js"), page_id }),
 		el("p").append(...T`
 			This makes it easy to implement component communication through events,
 			following standard web platform patterns. The curried approach allows for easy reuse
 			of event dispatchers throughout your application.
 		`),
+		el(example, { src: fileURL("./components/examples/events/compareDispatch.js"), page_id }),
 
 		el(h3, t`Best Practices`),
 		el("ol").append(

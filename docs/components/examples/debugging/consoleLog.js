@@ -5,6 +5,7 @@ const greeting = S(() => {
 	// log derived signals
 	const log = "Hello, " + name.get();
 	console.log(log);
+	console.log(name.valueOf());
 	return log;
 });
 
