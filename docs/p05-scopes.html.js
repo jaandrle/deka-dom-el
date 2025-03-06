@@ -30,7 +30,7 @@ export function page({ pkg, info }){
 	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
 		el("p").append(...T`
-			For state-less components we can use functions as UI components (see “Elements” page). But in real life,
+			For state-less components we can use functions as UI components (see "Elements" page). But in real life,
 			we may need to handle the component live-cycle and provide JavaScript the way to properly use
 			the ${el("a", { textContent: t`Garbage collection`, ...references.garbage_collection })}.
 		`),
@@ -40,8 +40,12 @@ export function page({ pkg, info }){
 		el(h3, t`Understanding Host Elements and Scopes`),
 		el("p").append(...T`
 			The ${el("strong", "host")} is the name for the element representing the component. This is typically
-			element returned by function. To get reference, you can use ${el("code", "scope.host()")} to applly addons
+			element returned by function. To get reference, you can use ${el("code", "scope.host()")} to apply addons
 			just use ${el("code", "scope.host(...<addons>)")}.
+		`),
+		el("p").append(...T`
+			Scopes are primarily needed when signals are used in DOM templates (with ${el("code", "el")}, ${el("code", "assign")}, or ${el("code", "S.el")}). 
+			They provide a way for automatically removing signal listeners and cleaning up unused signals when components are removed from the DOM.
 		`),
 		el("div", { className: "illustration" }).append(
 			el("h4", t`Component Anatomy`),
@@ -143,62 +147,18 @@ function MyComponent() {
 			el("div", { className: "tab", "data-tab": "declarative" }).append(
 				el("h4", t`✅ Declarative Approach`),
 				el("p", t`Define what your UI should look like based on state:`),
-				el(code, { src: fileURL("./components/examples/scopes/declarative.js"), page_id }),
+				el(code, { src: fileURL("./components/examples/scopes/declarative.js"), page_id })
 			),
 			el("div", { className: "tab", "data-tab": "imperative" }).append(
 				el("h4", t`⚠️ Imperative Approach`),
 				el("p", t`Manually update the DOM in response to events:`),
-				el(code, { src: fileURL("./components/examples/scopes/imperative.js"), page_id }),
+				el(code, { src: fileURL("./components/examples/scopes/imperative.js"), page_id })
 			),
 			el("div", { className: "tab", "data-tab": "mixed" }).append(
 				el("h4", t`❌ Mixed Approach`),
 				el("p", t`Just AVOID:`),
-				el(code, { src: fileURL("./components/examples/scopes/mixed.js"), page_id }),
-			),
-		),
-
-		el(h3, t`Advanced: Custom Scoping Control`),
-		el("p").append(...T`
-			In more complex applications, you may need finer control over scopes. DDE provides
-			manual scope control mechanisms through ${el("code", "scope.push()")} and ${el("code", "scope.pop()")}.
-		`),
-		el("div", { className: "function-table" }).append(
-			el("h4", t`Manual Scope Control API`),
-			el("dl").append(
-				el("dt", t`scope.current`),
-				el("dd", t`Returns the currently active scope object.`),
-
-				el("dt", t`scope.isolate(callback)`),
-				el("dd", t`Executes the callback function within a temporary scope, then automatically restores the previous scope.
-					Safer than manual push/pop for most use cases.`),
-
-				el("dt", t`scope.push()`),
-				el("dd", t`Creates a new scope and makes it the current active scope. All signals and subscriptions
-					created after this call will be associated with this new scope.`),
-
-				el("dt", t`scope.pop()`),
-				el("dd", t`Restores the previous scope that was active before the matching push() call.`),
+				el(code, { src: fileURL("./components/examples/scopes/mixed.js"), page_id })
 			)
-		),
-		el("p").append(...T`
-			Custom scoping is particularly useful for:
-		`),
-		el("ul").append(
-			el("li", t`Isolating signal dependencies in async operations`),
-			el("li", t`Creating detached reactive logic that shouldn't be tied to a component's lifecycle`),
-			el("li", t`Building utilities that work with signals but need scope isolation`)
-		),
-		el(example, { src: fileURL("./components/examples/scopes/custom-scope.js"), page_id }),
-		el(example, { src: fileURL("./components/examples/scopes/with-scope.js"), page_id }),
-		el("div", { className: "warning" }).append(
-			el("p").append(...T`
-				${el("strong", "Be careful with manual scope control!")} Always ensure you have matching push() and pop() calls,
-				preferably in the same function. Unbalanced scope management can lead to memory leaks or unexpected behavior.
-			`),
-			el("p").append(...T`
-				For most use cases, prefer using the automatic scope management provided by components.
-				Manual scope control should be considered an advanced feature.
-			`)
 		),
 
 		el(h3, t`Best Practices for Scopes and Components`),

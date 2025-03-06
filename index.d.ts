@@ -237,8 +237,6 @@ export const scope: {
 	pushRoot(): ReturnType<Array<Scope>["push"]>,
 	/** Removes last/current child scope. */
 	pop(): ReturnType<Array<Scope>["pop"]>,
-	/** Runs function in a new (isolated) scope */
-	isolate(fn: Function): void,
 };
 
 export function customElementRender<

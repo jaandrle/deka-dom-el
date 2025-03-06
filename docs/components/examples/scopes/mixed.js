@@ -21,9 +21,7 @@ function Counter() {
 	setTimeout(()=> {
 		// ok, BUT consider extract to separate function
 		// see section below for more info
-		scope.push();
 		const ok= S(0);
-		scope.pop();
 		S.on(ok, console.log);
 		setInterval(()=> ok.set(ok.get() + 1), 100);
 	}, 100);
