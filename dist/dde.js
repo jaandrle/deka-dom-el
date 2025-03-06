@@ -154,11 +154,6 @@ var scope = {
 	pop() {
 		if (scopes.length === 1) return;
 		return scopes.pop();
-	},
-	isolate(fn) {
-		this.push({ prevent: true });
-		fn();
-		this.pop();
 	}
 };
 function append(...els) {
@@ -624,7 +619,7 @@ on.disconnectedAsAbort = function(host) {
 	const a = new AbortController();
 	store_abort.set(host, a);
 	host(on.disconnected(() => a.abort()));
-	return a;
+	return a.signal;
 };
 var els_attribute_store = /* @__PURE__ */ new WeakSet();
 on.attributeChanged = function(listener, options) {

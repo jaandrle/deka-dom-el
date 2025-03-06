@@ -1,6 +1,6 @@
 import { queueSignalWrite, mark } from "./helpers.js";
 export { mark };
-import { hasOwn, Defined, oCreate, isProtoFrom, oAssign } from "../helpers.js";
+import { hasOwn, Defined, oCreate, oAssign } from "../helpers.js";
 
 const Signal = oCreate(null, {
 	get: { value(){ return read(this); } },
@@ -18,7 +18,7 @@ const SignalReadOnly= oCreate(Signal, {
  * @returns {boolean} True if the value is a signal
  */
 export function isSignal(candidate){
-	return isProtoFrom(candidate, Signal);
+	return candidate && candidate[mark];
 }
 
 /**

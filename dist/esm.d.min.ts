@@ -76,7 +76,7 @@ export function el<
 	A extends ddeComponentAttributes,
 	EL extends SupportedElement | ddeDocumentFragment
 >(
-	component: (attr: A)=> EL,
+	component: (attr: A, ...rest: any[])=> EL,
 	attrs?: NoInfer<A>,
 	...addons: ddeElementAddon<EL>[]
 ): EL extends ddeHTMLElementTagNameMap[keyof ddeHTMLElementTagNameMap]
@@ -86,7 +86,7 @@ export function el<
 	A extends { textContent: ddeStringable },
 	EL extends SupportedElement | ddeDocumentFragment
 >(
-	component: (attr: A)=> EL,
+	component: (attr: A, ...rest: any[])=> EL,
 	attrs?: NoInfer<A>["textContent"],
 	...addons: ddeElementAddon<EL>[]
 ): EL extends ddeHTMLElementTagNameMap[keyof ddeHTMLElementTagNameMap]
@@ -237,8 +237,6 @@ export const scope: {
 	pushRoot(): ReturnType<Array<Scope>["push"]>,
 	/** Removes last/current child scope. */
 	pop(): ReturnType<Array<Scope>["pop"]>,
-	/** Runs function in a new (isolated) scope */
-	isolate(fn: Function): void,
 };
 
 export function customElementRender<
