@@ -5,7 +5,6 @@ ${host} {
 	grid-column: full-main;
 	width: calc(100% - .75em);
 	height: calc(4/6 * var(--body-max-width));
-	margin: 2rem auto;
 	border-radius: var(--border-radius);
 	box-shadow: var(--shadow);
 	border: 1px solid var(--border);

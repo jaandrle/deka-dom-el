@@ -208,12 +208,6 @@ pre code {
 	background-color: transparent;
 	padding: 0;
 }
-.illustration:not(:has( .comparison)) pre {
-	background: none;
-	border-style: dashed !important;
-	width: fit-content;
-	padding: 1em 2em;
-}
 
 /* Layout */
 @media (min-width: 768px) {
@@ -272,11 +266,27 @@ body > main h3, body > main h4 {
 }
 
 /* Boxes */
+.illustration{
+	grid-column: full-main;
+	width: calc(100% - .75em);
+}
+.illustration:not(:has( .comparison)) pre {
+	background: none;
+	border-style: dashed !important;
+	width: fit-content;
+	padding: 1em 2em;
+}
+
 .comparison {
 	display: grid;
 	grid-template-columns: 1fr;
-	gap: 1.5rem;
+	gap: calc(.75em / 2);
 	margin: 1.5rem 0;
+
+	> div {
+		width: 100%;
+		overflow: hidden;
+	}
 }
 
 @media (min-width: 768px) {
