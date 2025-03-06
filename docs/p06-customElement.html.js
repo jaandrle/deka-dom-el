@@ -2,7 +2,7 @@ import { T, t } from "./utils/index.js";
 export const info= {
 	title: t`Web Components`,
 	fullTitle: t`Using Web Components with DDE: Better Together`,
-	description: t`Using custom elements in combinantion with DDE`,
+	description: t`Using custom elements in combination with DDE`,
 };
 
 import { el } from "deka-dom-el";

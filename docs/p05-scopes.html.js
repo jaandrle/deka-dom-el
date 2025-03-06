@@ -30,22 +30,23 @@ export function page({ pkg, info }){
 	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
 		el("p").append(...T`
-			For state-less components we can use functions as UI components (see "Elements" page). But in real life,
-			we may need to handle the component live-cycle and provide JavaScript the way to properly use
+			For state-less components we can use functions as UI components (see “Elements” page). But in real life,
+			we may need to handle the component's life-cycle and provide JavaScript the way to properly use
 			the ${el("a", { textContent: t`Garbage collection`, ...references.garbage_collection })}.
 		`),
 		el(code, { src: fileURL("./components/examples/scopes/intro.js"), page_id }),
-		el("p").append(...T`The library therefore use ${el("em", t`scopes`)} to provide these functionalities.`),
+		el("p").append(...T`The library therefore uses ${el("em", t`scopes`)} to provide these functionalities.`),
 
 		el(h3, t`Understanding Host Elements and Scopes`),
 		el("p").append(...T`
-			The ${el("strong", "host")} is the name for the element representing the component. This is typically
-			element returned by function. To get reference, you can use ${el("code", "scope.host()")} to apply addons
+			The ${el("strong", "host")} is the name for the element representing the component. This is typically the
+			element returned by a function. To get a reference, you can use ${el("code", "scope.host()")}. To apply addons,
 			just use ${el("code", "scope.host(...<addons>)")}.
 		`),
 		el("p").append(...T`
-			Scopes are primarily needed when signals are used in DOM templates (with ${el("code", "el")}, ${el("code", "assign")}, or ${el("code", "S.el")}). 
-			They provide a way for automatically removing signal listeners and cleaning up unused signals when components are removed from the DOM.
+			Scopes are primarily needed when signals are used in DOM templates (with ${el("code", "el")}, ${el("code",
+				"assign")}, or ${el("code", "S.el")}). They provide a way for automatically removing signal listeners
+			and cleaning up unused signals when components are removed from the DOM.
 		`),
 		el("div", { className: "illustration" }).append(
 			el("h4", t`Component Anatomy`),
@@ -134,13 +135,13 @@ function MyComponent() {
 
 		el(h3, t`Declarative vs Imperative Components`),
 		el("p").append(...T`
-			The library DOM API and signals works best when used declaratively. It means, you split your app logic
-			into three parts as it was itroduced in ${el("a", { textContent: "Signals", ...references.signals })}.
+			The library DOM API and signals work best when used declaratively. It means you split your app's logic
+			into three parts as introduced in ${el("a", { textContent: "Signals", ...references.signals })}.
 		`),
 		el("div", { className: "note" }).append(
 			el("p").append(...T`
-				Strictly speaking, the imperative way of using the library is not prohibited. Just be careful (rather avoid)
-				mixing declarative approach (using signals) and imperative manipulation of elements.
+				Strictly speaking, the imperative way of using the library is not prohibited. Just be careful to avoid
+				mixing the declarative approach (using signals) with imperative manipulation of elements.
 			`)
 		),
 		el("div", { className: "tabs" }).append(
@@ -156,7 +157,7 @@ function MyComponent() {
 			),
 			el("div", { className: "tab", "data-tab": "mixed" }).append(
 				el("h4", t`❌ Mixed Approach`),
-				el("p", t`Just AVOID:`),
+				el("p", t`This approach should be avoided:`),
 				el(code, { src: fileURL("./components/examples/scopes/mixed.js"), page_id })
 			)
 		),

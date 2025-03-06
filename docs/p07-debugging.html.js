@@ -104,7 +104,7 @@ export function page({ pkg, info }){
 		el("p").append(...T`
 			When using ${el("code", "S.el()")}, deka-dom-el creates reactive elements in the DOM
 			that are automatically updated when signal values change. These elements are wrapped in special
-			comment nodes for debugging (to be true they are also used internaly, so please do not edit them by hand):
+			comment nodes for debugging (to be true they are also used internally, so please do not edit them by hand):
 		`),
 		el(code, { src: fileURL("./components/examples/debugging/dom-reactive-mark.js"), page_id }),
 		el("p").append(...T`
@@ -150,16 +150,16 @@ export function page({ pkg, info }){
 		el("h4", t`Examining signal connections`),
 		el("p").append(...T`
 			You can inspect signal relationships and bindings in the DevTools console using ${el("code", "$0.__dde_reactive")}.
-			In console you will see list of ${el("code", "[ [ signal, listener ], element, property ]")}, where:
+			In the console you will see a list of ${el("code", "[ [ signal, listener ], element, property ]")}, where:
 		`),
 		el("ul").append(
 			el("li", "signal — the signal triggering the changes"),
-			el("li", "listener — the listener function (this is internal function for dde)"),
+			el("li", "listener — the listener function (this is an internal function for DDE)"),
 			el("li", "element — the DOM element that is bound to the signal"),
 			el("li", "property — the attribute or property name which is changing based on the signal"),
 		),
 		el("p").append(...T`
-			…the structure of \`__dde_reactive\` use the behavior of the browser that packs the first field,
+			…the structure of \`__dde_reactive\` utilizes the browser's behavior of packing the first field,
 			so you can see the element and property that changes in the console right away
 		`),
 

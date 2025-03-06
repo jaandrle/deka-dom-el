@@ -45,15 +45,15 @@ export function page({ pkg, info }){
 	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
 		el("p").append(...T`
-			Signals provide a simple yet powerful way to create reactive applications with DDE. They handle the
-			fundamental challenge of keeping your UI in sync with changing data in a declarative, efficient way.
+			Signals provide a simple yet powerful way to create reactive applications with DDE. They handle the
+			fundamental challenge of keeping your UI in sync with changing data in a declarative, efficient way.
 		`),
 		el("div", { class: "callout" }).append(
 			el("h4", t`What Makes Signals Special?`),
 			el("ul").append(
 				el("li", t`Fine-grained reactivity without complex state management`),
 				el("li", t`Automatic UI updates when data changes`),
-				el("li", t`Clean separation between data, logic, and UI`),
+				el("li", t`Clean separation between data, logic, and UI`),
 				el("li", t`Small runtime with minimal overhead`),
 				el("li").append(...T`${el("strong", "In future")} no dependencies or framework lock-in`)
 			)
@@ -98,13 +98,13 @@ export function page({ pkg, info }){
 		el("div", { class: "function-table" }).append(
 			el("dl").append(
 				el("dt", t`Creating a Signal`),
-				el("dd", t`S(initialValue) → creates a signal with the given value`),
+				el("dd", t`S(initialValue) → creates a signal with the given value`),
 
 				el("dt", t`Reading a Signal`),
 				el("dd", t`signal.get() → returns the current value`),
 
 				el("dt", t`Writing to a Signal`),
-				el("dd", t`signal.set(newValue) → updates the value and notifies subscribers`),
+				el("dd", t`signal.set(newValue) → updates the value and notifies subscribers`),
 
 				el("dt", t`Subscribing to Changes`),
 				el("dd", t`S.on(signal, callback) → runs callback whenever signal changes`),
@@ -123,7 +123,7 @@ export function page({ pkg, info }){
 		el(h3, t`Derived Signals: Computed Values`),
 		el("p").append(...T`
 			Computed values (also called derived signals) automatically update when their dependencies change.
-			Create them by passing a function to S():
+			Create them by passing a function to S():
 		`),
 		el(example, { src: fileURL("./components/examples/signals/derived.js"), page_id }),
 		el("p").append(...T`
@@ -254,7 +254,7 @@ S.action(items, "push", "Dragonfruit"); // List updates automatically`, page_id 
 		`),
 		el("ol").append(
 			el("li").append(...T`
-				${el("strong", "Keep signals small and focused")}: Use many small signals rather than a few large ones
+				${el("strong", "Keep signals small and focused")}: Use many small signals rather than a few large ones
 			`),
 			el("li").append(...T`
 				${el("strong", "Use derived signals for computations")}: Don't recompute values in multiple places

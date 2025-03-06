@@ -47,8 +47,8 @@ export function page({ pkg, info }){
 	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
 		el("p").append(...T`
-			Events are at the core of interactive web applications. DDE provides a clean, declarative approach to
-			handling DOM events and extends this pattern with a powerful Addon system to incorporate additional
+			Events are at the core of interactive web applications. DDE provides a clean, declarative approach to
+			handling DOM events and extends this pattern with a powerful Addon system to incorporate additional
 			functionalities into your UI templates.
 		`),
 		el("div", { className: "callout" }).append(
@@ -84,7 +84,7 @@ export function page({ pkg, info }){
 		),
 		el(example, { src: fileURL("./components/examples/events/compare.js"), page_id }),
 		el("p").append(...T`
-			The main benefit of DDE's approach is that it works as an Addon, making it easy to integrate
+			The main benefit of DDE's approach is that it works as an Addon, making it easy to integrate
 			directly into element declarations.
 		`),
 
@@ -127,7 +127,7 @@ export function page({ pkg, info }){
 		el(h3, t`Understanding Addons`),
 		el("p").append(...T`
 			Addons are a powerful pattern in DDE that extends beyond just event handling.
-			An Addon is any function that accepts an HTML element as its first parameter.
+			An Addon is any function that accepts an HTML element as its first parameter.
 		`),
 		el("div", { className: "callout" }).append(
 			el("h4", t`What Can Addons Do?`),
@@ -151,7 +151,7 @@ export function page({ pkg, info }){
 
 		el(h3, t`Lifecycle Events`),
 		el("p").append(...T`
-			Addons are called immediately when an element is created, even before it's connected to the live DOM.
+			Addons are called immediately when an element is created, even before it's connected to the live DOM.
 			You can think of an Addon as an "oncreate" event handler.
 		`),
 		el("p").append(...T`

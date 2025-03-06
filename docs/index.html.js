@@ -3,7 +3,7 @@ export const info= {
 	href: "./",
 	title: t`Introduction`,
 	fullTitle: t`Vanilla for flavouring — a full-fledged feast for large projects`,
-	description: t`A lightweight, reactive DOM library for creating dynamic UIs with a declarative syntax`,
+	description: t`A lightweight, reactive DOM library for creating dynamic UIs with a declarative syntax`,
 };
 
 import { el } from "deka-dom-el";
@@ -28,15 +28,15 @@ export function page({ pkg, info }){
 	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
 		el("p").append(...T`
-			Welcome to Deka DOM Elements (DDE) — a lightweight library for building dynamic UIs with a
-			declarative syntax that stays close to the native DOM API. DDE gives you powerful reactive
-			tools without the complexity and overhead of larger frameworks.
+			Welcome to Deka DOM Elements (DDE) — a lightweight library for building dynamic UIs with a declarative
+			syntax that stays close to the native DOM API. DDE gives you powerful reactive tools without the complexity
+			and overhead of larger frameworks.
 		`),
 		el("div", { className: "callout" }).append(
 			el("h4", t`What Makes DDE Special`),
 			el("ul").append(
 				el("li", t`No build step required — use directly in the browser`),
-				el("li", t`Lightweight core (~10-15kB minified) with zero dependencies`),
+				el("li", t`Lightweight core (~10–15kB minified) with zero dependencies`),
 				el("li", t`Natural DOM API — work with real DOM nodes, not abstractions`),
 				el("li", t`Built-in reactivity with powerful signals system`),
 				el("li", t`Clean code organization with the 3PS pattern`)
@@ -47,7 +47,8 @@ export function page({ pkg, info }){
 		el(h3, { textContent: t`The 3PS Pattern: A Better Way to Build UIs`, id: "h-3ps" }),
 		el("p").append(...T`
 			At the heart of DDE is the 3PS (3-Part Separation) pattern. This simple yet powerful approach helps you
-			organize your UI code into three distinct areas, making your applications more maintainable and easier to reason about.
+			organize your UI code into three distinct areas, making your applications more maintainable and easier
+			to reason about.
 		`),
 		el("div", { className: "illustration" }).append(
 			el("div", { className: "tabs" }).append(
@@ -77,30 +78,31 @@ export function page({ pkg, info }){
 		),
 
 		el("p").append(...T`
-			By separating these concerns, your code becomes more modular, testable, and easier to maintain. This approach
-			shares principles with more formal patterns like ${el("a", { textContent: "MVVM", ...references.w_mvv })} and
-			${el("a", { textContent: "MVC", ...references.w_mvc })}, but with less overhead and complexity.
+			By separating these concerns, your code becomes more modular, testable, and easier to maintain. This
+			approach shares principles with more formal patterns like ${el("a", { textContent: "MVVM",
+				...references.w_mvv })} and ${el("a", { textContent: "MVC", ...references.w_mvc })}, but with less
+			overhead and complexity.
 		`),
 
 		el("div", { className: "note" }).append(
 			el("p").append(...T`
 				The 3PS pattern becomes especially powerful when combined with components, allowing you to create
-				reusable pieces of UI with encapsulated state and behavior. You'll learn more about this in the
+				reusable pieces of UI with encapsulated state and behavior. You'll learn more about this in the
 				following sections.
 			`)
 		),
 
 		el(h3, t`How to Use This Documentation`),
 		el("p").append(...T`
-			This guide will take you through DDE's features step by step:
+			This guide will take you through DDE's features step by step:
 		`),
 		el("ol").append(
-			el("li").append(...T`${el("strong", "Elements")} — Creating and manipulating DOM elements`),
-			el("li").append(...T`${el("strong", "Events")} — Handling user interactions and lifecycle events`),
+			el("li").append(...T`${el("strong", "Elements")} — Creating and manipulating DOM elements`),
+			el("li").append(...T`${el("strong", "Events")} — Handling user interactions and lifecycle events`),
 			el("li").append(...T`${el("strong", "Signals")} — Adding reactivity to your UI`),
 			el("li").append(...T`${el("strong", "Scopes")} — Managing component lifecycles`),
 			el("li").append(...T`${el("strong", "Custom Elements")} — Building web components`),
-			el("li").append(...T`${el("strong", "Debugging")} — Tools to help you build and fix your apps`),
+			el("li").append(...T`${el("strong", "Debugging")} — Tools to help you build and fix your apps`),
 			el("li").append(...T`${el("strong", "SSR")} — Server-side rendering with DDE`)
 		),
 		el("p").append(...T`

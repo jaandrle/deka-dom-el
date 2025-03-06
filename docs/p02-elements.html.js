@@ -50,7 +50,7 @@ export function page({ pkg, info }){
 	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
 		el("p").append(...T`
-			Building user interfaces in JavaScript often involves creating and manipulating DOM elements.
+			Building user interfaces in JavaScript often involves creating and manipulating DOM elements.
 			DDE provides a simple yet powerful approach to element creation that is declarative, chainable,
 			and maintains a clean syntax close to HTML structure.
 		`),
@@ -71,7 +71,7 @@ export function page({ pkg, info }){
 		el("p").append(...T`
 			In standard JavaScript, you create DOM elements using the
 			${el("a", references.mdn_create).append(el("code", "document.createElement()"))} method
-			and then set properties individually or with Object.assign():
+			and then set properties individually or with Object.assign():
 		`),
 		el("div", { class: "illustration" }).append(
 			el("div", { class: "comparison" }).append(
@@ -85,16 +85,17 @@ export function page({ pkg, info }){
 				)
 			)
 		),
-		el(example, { src: fileURL("./components/examples/elements/dekaCreateElement.js"), page_id }),
 		el("p").append(...T`
 			The ${el("code", "el")} function provides a simple wrapper around ${el("code", "document.createElement")}
 			with enhanced property assignment.
 		`),
+		el(example, { src: fileURL("./components/examples/elements/dekaCreateElement.js"), page_id }),
 
 		el(h3, t`Advanced Property Assignment`),
 		el("p").append(...T`
-			The ${el("code", "assign")} function is the heart of DDE's element property handling. It provides
-			intelligent assignment of both properties (IDL) and attributes:
+			The ${el("code", "assign")} function is the heart of DDE's element property handling. It is internally used
+			to assign properties using the ${el("code", "el")} function. ${el("code", "assign")} provides intelligent
+			assignment of both properties (IDL) and attributes:
 		`),
 		el("div", { class: "function-table" }).append(
 			el("dl").append(
@@ -145,21 +146,21 @@ export function page({ pkg, info }){
 				)
 			)
 		),
-		el(example, { src: fileURL("./components/examples/elements/dekaAppend.js"), page_id }),
 		el("p").append(...T`
-			This chainable approach results in code that more closely mirrors the structure of your HTML,
-			making it easier to understand and maintain.
+			This chainable pattern is much cleaner and easier to follow, especially for deeply nested elements.
+			It also makes it simple to add multiple children to a parent element in a single fluent expression.
 		`),
+		el(example, { src: fileURL("./components/examples/elements/dekaAppend.js"), page_id }),
 
-		el(h3, t`Building Reusable Components`),
+		el(h3, t`Using Components to Build UI Fragments`),
 		el("p").append(...T`
-			DDE makes it simple to create reusable element components through regular JavaScript functions.
-			The ${el("code", "el()")} function accepts a component function as its first argument:
+			The ${el("code", "el")} function is overloaded to support both tag names and function components.
+			This lets you refactor complex UI trees into reusable pieces:
 		`),
 		el(example, { src: fileURL("./components/examples/elements/dekaBasicComponent.js"), page_id }),
 		el("p").append(...T`
-			Component functions receive props as their argument and return element(s). This pattern
-			encourages code reuse and better organization of your UI code.
+			Component functions receive the properties object as their first argument, just like regular elements.
+			This makes it easy to pass data down to components and create reusable UI fragments.
 		`),
 		el("div", { class: "tip" }).append(
 			el("p").append(...T`
@@ -180,41 +181,21 @@ export function page({ pkg, info }){
 			using the same consistent interface.
 		`),
 
-		el(h3, t`Best Practices`),
+		el(h3, t`Best Practices for Declarative DOM Creation`),
 		el("ol").append(
 			el("li").append(...T`
-				${el("strong", "Prefer composition over complexity")}: Create small component functions that can be
-				combined rather than large, complex templates
+				${el("strong", "Use component functions for reusable UI fragments:")} Extract common UI patterns
+				into reusable functions that return elements.
 			`),
 			el("li").append(...T`
-				${el("strong", "Use meaningful component names")}: Name your component functions after the elements or
-				patterns they create
+				${el("strong", "Leverage destructuring for cleaner component code:")} Use
+				${el("a", { textContent: "destructuring", ...references.mdn_destruct })} to extract properties
+				from the props object for cleaner component code.
 			`),
 			el("li").append(...T`
-				${el("strong", "Destructure for better readability")}: Use ${el("code", "const { div, p, button } = el")}
-				to create element-specific functions
+				${el("strong", "Leverage chainable methods for better performance:")} Use chainable methods like
+				${el("code", ".append()")} to build complex DOM trees for better performance and cleaner code.
 			`),
-			el("li").append(...T`
-				${el("strong", "Be consistent with property usage")}: Prefer using the same pattern (property vs attribute)
-				throughout your code
-			`)
-		),
-
-		el("div", { class: "troubleshooting" }).append(
-			el("h4", t`Common Element Creation Pitfalls`),
-			el("dl").append(
-				el("dt", t`Elements not showing up in DOM`),
-				el("dd", t`Remember to append elements to the document or a parent that's already in the document`),
-
-				el("dt", t`Properties not being applied correctly`),
-				el("dd", t`Check if you're mixing up property (IDL) names with attribute names (e.g., className vs class)`),
-
-				el("dt", t`Event listeners not working`),
-				el("dd", t`Ensure you're using the correct event binding approach (see Events section)`),
-
-				el("dt", t`SVG elements not rendering correctly`),
-				el("dd", t`Make sure you're using elNS with the correct SVG namespace for SVG elements`)
-			)
 		),
 
 		el(mnemonic)

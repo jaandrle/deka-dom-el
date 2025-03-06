@@ -16,6 +16,13 @@ const fileURL= url=> new URL(url, import.meta.url);
 export function page({ pkg, info }){
 	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
+		el("div", { className: "warning" }).append(
+			el("p").append(...T`
+				This part of the documentation is primarily intended for technical enthusiasts and library authors.
+				For regular users, this capability will hopefully be covered by third-party libraries or frameworks
+				that provide simpler SSR integration using deka-dom-el.
+			`)
+		),
 		el("p").append(...T`
 			deka-dom-el isn't limited to browser environments. Thanks to its flexible architecture,
 			it can be used for server-side rendering (SSR) to generate static HTML files.
@@ -29,11 +36,11 @@ export function page({ pkg, info }){
 			SSR offers several benefits:
 		`),
 		el("ul").append(
-			el("li", t`Improved SEO - Search engines can easily index fully rendered content`),
-			el("li", t`Faster initial page load - Users see content immediately without waiting for JavaScript to load`),
-			el("li", t`Better performance on low-powered devices - Less JavaScript processing on the client`),
-			el("li", t`Content available without JavaScript - Useful for users who have disabled JavaScript`),
-			el("li", t`Static site generation - Build files once, serve them many times`)
+			el("li", t`Improved SEO — Search engines can easily index fully rendered content`),
+			el("li", t`Faster initial page load — Users see content immediately without waiting for JavaScript to load`),
+			el("li", t`Better performance on low-powered devices — Less JavaScript processing on the client`),
+			el("li", t`Content available without JavaScript — Useful for users who have disabled JavaScript`),
+			el("li", t`Static site generation — Build files once, serve them many times`)
 		),
 
 		el(h3, t`How jsdom Integration Works`),
