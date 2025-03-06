@@ -4,7 +4,7 @@ echo("Building static documentation files…");
 echo("Preparing…");
 import { path_target, pages as pages_registered, styles, dispatchEvent, t } from "../docs/ssr.js";
 import { createHTMl } from "./docs/jsdom.js";
-import { register } from "../jsdom.js";
+import { register, queue } from "../jsdom.js";
 const pkg= s.cat("package.json").xargs(JSON.parse);
 
 if(s.test("-d", path_target.root)){
@@ -31,6 +31,7 @@ for(const { id, info } of pages){
 	serverDOM.document.body.append(
 		el(page, { pkg, info }),
 	);
+	await queue();
 
 	echo.use("-R", `Writing ${id}.html…`);
 	dispatchEvent("oneachrender", document);

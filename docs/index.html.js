@@ -104,6 +104,7 @@ export function page({ pkg, info }){
 			el("li").append(...T`${el("strong", "Custom Elements")} — Building web components`),
 			el("li").append(...T`${el("strong", "Debugging")} — Tools to help you build and fix your apps`),
 			el("li").append(...T`${el("strong", "Extensions")} — Integrating third-party functionalities`),
+			el("li").append(...T`${el("strong", "Ireland Components")} — Creating interactive demos with server-side pre-rendering`),
 			el("li").append(...T`${el("strong", "SSR")} — Server-side rendering with DDE`)
 		),
 		el("p").append(...T`

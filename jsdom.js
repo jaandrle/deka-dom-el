@@ -17,7 +17,7 @@ env.setDeleteAttr= function(obj, prop, value){
 	if(value) return obj.setAttribute(prop, "");
 	obj.removeAttribute(prop);
 };
-const keys= { H: "HTMLElement", S: "SVGElement", F: "DocumentFragment", M: "MutationObserver", D: "document" };
+const keys= { H: "HTMLElement", S: "SVGElement", F: "DocumentFragment", D: "document" };
 let env_bk= {};
 let dom_last;
 

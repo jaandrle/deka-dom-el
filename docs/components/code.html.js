@@ -236,12 +236,11 @@ function registerClientPart(page_id){
 		`),
 	);
 
-	// Register our highlighting script to run after Shiki loads
-	const scriptElement = el("script", { type: "module" });
-
 	registerClientFile(
 		new URL("./code.js.js", import.meta.url),
-		scriptElement
+		{
+			head: el("script", { type: "module" }),
+		}
 	);
 
 	is_registered[page_id]= true;

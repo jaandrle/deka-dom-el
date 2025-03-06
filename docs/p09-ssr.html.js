@@ -18,9 +18,10 @@ export function page({ pkg, info }){
 	return el(simplePage, { info, pkg }).append(
 		el("div", { className: "warning" }).append(
 			el("p").append(...T`
-				This part of the documentation is primarily intended for technical enthusiasts and library authors.
-				For regular users, this capability will hopefully be covered by third-party libraries or frameworks
-				that provide simpler SSR integration using deka-dom-el.
+				This part of the documentation is primarily intended for technical enthusiasts and documentation
+				authors. It describes an advanced feature, not a core part of the library. Most users will not need to
+				implement this functionality directly in their applications. This capability will hopefully be covered
+				by third-party libraries or frameworks that provide simpler SSR integration using deka-dom-el.
 			`)
 		),
 		el("p").append(...T`
