@@ -102,7 +102,8 @@ export function page({ pkg, info }){
 			el("li").append(...T`${el("strong", "Signals")} — Adding reactivity to your UI`),
 			el("li").append(...T`${el("strong", "Scopes")} — Managing component lifecycles`),
 			el("li").append(...T`${el("strong", "Custom Elements")} — Building web components`),
-			el("li").append(...T`${el("strong", "Debugging")} — Tools to help you build and fix your apps`),
+			el("li").append(...T`${el("strong", "Debugging")} — Tools to help you build and fix your apps`),
+			el("li").append(...T`${el("strong", "Extensions")} — Integrating third-party functionalities`),
 			el("li").append(...T`${el("strong", "SSR")} — Server-side rendering with DDE`)
 		),
 		el("p").append(...T`

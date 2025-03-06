@@ -12,7 +12,7 @@ import { code } from "./components/code.html.js";
 /** @param {string} url */
 const fileURL= url=> new URL(url, import.meta.url);
 
-/** @param {import("./types.d.ts").PageAttrs} attrs */
+/** @param {import("./types.js").PageAttrs} attrs */
 export function page({ pkg, info }){
 	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(

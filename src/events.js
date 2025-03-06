@@ -95,8 +95,8 @@ const store_abort= new WeakMap();
 /**
  * Creates an AbortController that triggers when the element disconnects
  *
- * @param {Element|Function} host - Host element or function taking an element
- * @returns {AbortController} AbortController that aborts on disconnect
+ * @param {Function} host - Host element or function taking an element
+ * @returns {AbortSignal} AbortSignal that aborts on disconnect
  */
 on.disconnectedAsAbort= function(host){
 	if(store_abort.has(host)) return store_abort.get(host);
@@ -104,7 +104,7 @@ on.disconnectedAsAbort= function(host){
 	const a= new AbortController();
 	store_abort.set(host, a);
 	host(on.disconnected(()=> a.abort()));
-	return a;
+	return a.signal;
 };
 
 /** Store for elements with attribute observers */
