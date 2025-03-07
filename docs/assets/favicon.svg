@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#333333" />
-      <stop offset="100%" stop-color="#222222" />
-    </linearGradient>
-    <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#e32c2c" />
-      <stop offset="100%" stop-color="#ff5252" />
-    </linearGradient>
-    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
-      <feDropShadow dx="0" dy="0.5" stdDeviation="0.5" flood-color="#000" flood-opacity="0.3"/>
-    </filter>
-  </defs>
-  
-  <!-- Square background with rounded corners -->
-  <rect x="2" y="2" width="28" height="28" rx="4" ry="4" fill="url(#bgGradient)" />
-  
-  <!-- Subtle code brackets as background element -->
-  <g opacity="0.15" fill="#fff">
-    <path d="M10,7.5 L6.25,16 L10,24.5" stroke="#fff" stroke-width="1" fill="none"/>
-    <path d="M22,7.5 L25.75,16 L22,24.5" stroke="#fff" stroke-width="1" fill="none"/>
-  </g>
-  
-  <!-- lowercase dde letters -->
-  <text x="16" y="21" text-anchor="middle" font-family="'Fira Code', 'JetBrains Mono', 'Source Code Pro', 'SF Mono', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace" font-size="14" font-weight="bold" fill="url(#textGradient)" filter="url(#shadow)">dde</text>
+	<defs>
+	<linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+		<stop offset="0%" stop-color="#333333" />
+		<stop offset="100%" stop-color="#222222" />
+	</linearGradient>
+	<linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+		<stop offset="0%" stop-color="#e32c2c" />
+		<stop offset="100%" stop-color="#ff5252" />
+	</linearGradient>
+	<filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+		<feDropShadow dx="0" dy="0.5" stdDeviation="0.5" flood-color="#000" flood-opacity="0.3"/>
+	</filter>
+	</defs>
+
+	<!-- Square background with rounded corners -->
+	<rect x="2" y="2" width="28" height="28" rx="4" ry="4" fill="url(#bgGradient)" />
+
+	<!-- Subtle code brackets as background element -->
+	<g opacity="0.15" fill="#fff">
+	<path d="M10,7.5 L6.25,16 L10,24.5" stroke="#fff" stroke-width="1" fill="none"/>
+	<path d="M22,7.5 L25.75,16 L22,24.5" stroke="#fff" stroke-width="1" fill="none"/>
+	</g>
+
+	<!-- lowercase dde letters -->
+	<text x="16" y="21" text-anchor="middle" font-family="'Fira Code', 'JetBrains Mono', 'Source Code Pro', 'SF Mono', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace" font-size="14" font-weight="bold" fill="url(#textGradient)" filter="url(#shadow)">dde</text>
 </svg>

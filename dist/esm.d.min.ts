@@ -72,6 +72,20 @@ export function assignAttribute<El extends SupportedElement, ATT extends keyof E
 ): ElementAttributes<El>[ATT]
 
 type ExtendedHTMLElementTagNameMap= HTMLElementTagNameMap & CustomElementTagNameMap;
+export namespace el {
+	/**
+	 * Creates a marker comment for elements
+	 *
+	 * @param attrs - Marker attributes
+	 * @param [is_open=false] - Whether the marker is open-ended
+	 * @returns Comment node marker
+	 */
+	export function mark(
+		attrs: { type: "component"|"reactive"|"later", name?: string, host?: "this"|"parentElement" },
+		is_open?: boolean
+	): Comment;
+}
+
 export function el<
 	A extends ddeComponentAttributes,
 	EL extends SupportedElement | ddeDocumentFragment
@@ -250,6 +264,27 @@ export function customElementRender<
 export function customElementWithDDE<EL extends (new ()=> HTMLElement)>(custom_element: EL): EL
 export function lifecyclesToEvents<EL extends (new ()=> HTMLElement)>(custom_element: EL): EL
 export function observedAttributes(custom_element: HTMLElement): Record<string, string>
+
+/**
+ * This is used primarly for server side rendering. To be sure that all async operations
+ * are finished before the page is sent to the client.
+ * ```
+ *	// on component
+ *	function component(){
+ *		…
+ *		queue(fetch(...).then(...));
+ *	}
+ *
+ * // building the page
+ * async function build(){
+ *		const { component }= await import("./component.js");
+ *		document.body.append(el(component));
+ *		await queue();
+ *		retutn document.body.innerHTML;
+ *	}
+ * ```
+ * */
+export function queue(promise?: Promise<unknown>): Promise<unknown>;
 
 /* TypeScript MEH */
 declare global{

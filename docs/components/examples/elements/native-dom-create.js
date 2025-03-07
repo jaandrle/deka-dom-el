@@ -6,12 +6,12 @@ button.disabled = true;
 
 // Or using Object.assign()
 const button2 = Object.assign(
-  document.createElement('button'),
-  {
-    textContent: "Click me",
-    className: "primary",
-    disabled: true
-  }
+	document.createElement('button'),
+	{
+	textContent: "Click me",
+	className: "primary",
+	disabled: true
+	}
 );
 
 // Add to DOM

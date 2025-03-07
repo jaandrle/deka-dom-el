@@ -42,7 +42,7 @@ s.echo(styles.content).to(path_target.css+styles.name);
 // Copy assets
 echo("Copying assets…");
 if(s.test("-d", "docs/assets")) {
-  s.cp("-r", "docs/assets/*", path_target.assets);
+	s.cp("-r", "docs/assets/*", path_target.assets);
 }
 
 dispatchEvent("onssrend");

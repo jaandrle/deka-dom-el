@@ -20,7 +20,7 @@ export function ireland({ src, exportName = "default", props = {} }) {
 	// relative src against the current directory
 	const path= "./"+relative(dir, src.pathname);
 	const id = "ireland-" + generateComponentId(src);
-	const element = el.mark({ type: "ireland", name: ireland.name });
+	const element = el.mark({ type: "later", name: ireland.name });
 	queue(import(path).then(module => {
 		const component = module[exportName];
 		element.replaceWith(el(component, props, mark(id)));

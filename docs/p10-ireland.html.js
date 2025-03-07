@@ -2,7 +2,8 @@ import { T, t } from "./utils/index.js";
 export const info= {
 	title: t`Ireland Components`,
 	fullTitle: t`Interactive Demo Components with Server-Side Pre-Rendering`,
-	description: t`Creating live, interactive component examples in documentation with server-side rendering and client-side hydration.`,
+	description: t`Creating live, interactive component examples in documentation with server-side
+		rendering and client-side hydration.`,
 };
 
 import { el } from "deka-dom-el";
@@ -19,10 +20,11 @@ export function page({ pkg, info }){
 	return el(simplePage, { info, pkg }).append(
 		el("div", { className: "warning" }).append(
 			el("p").append(...T`
-				This part of the documentation is primarily intended for technical enthusiasts and documentation
-				authors. It describes an advanced feature, not a core part of the library. Most users will not need to
-				implement this functionality directly in their applications. This capability will hopefully be covered
-				by third-party libraries or frameworks that provide simpler SSR integration using deka-dom-el.
+				This part of the documentation is primarily intended for technical enthusiasts and authors of
+				3rd-party libraries. It describes an advanced feature, not a core part of the library. Most users will
+				not need to implement this functionality directly in their applications. This capability will hopefully
+				be covered by third-party libraries or frameworks that provide simpler SSR integration using
+				deka-dom-el.
 			`)
 		),
 
@@ -61,14 +63,15 @@ export function page({ pkg, info }){
 		el(h3, t`Implementation Architecture`),
 		el("p").append(...T`
 			The core of the Ireland system is implemented in ${el("code", "docs/components/ireland.html.js")}.
-			It integrates with the SSR build process using the ${el("code", "registerClientFile")} function from ${el("code", "docs/ssr.js")}.
+			It integrates with the SSR build process using the ${el("code", "registerClientFile")} function
+			from ${el("code", "docs/ssr.js")}.
 		`),
 
 		el(code, { content: `
 // Basic usage of an ireland component
 el(ireland, {
-  src: fileURL("./components/examples/path/to/component.js"),
-  exportName: "NamedExport", // optional, defaults to "default",
+	src: fileURL("./components/examples/path/to/component.js"),
+	exportName: "NamedExport", // optional, defaults to "default",
 })`, page_id }),
 
 		el("p").append(...T`
@@ -96,27 +99,27 @@ import { path_target, dispatchEvent } from "../docs/ssr.js";
 
 // For each page, render it on the server
 for(const { id, info } of pages) {
-  // Create a virtual DOM environment for server-side rendering
-  const serverDOM = createHTMl("");
-  serverDOM.registerGlobally("HTMLScriptElement");
-  
-  // Register deka-dom-el with the virtual DOM
-  const { el } = await register(serverDOM.dom);
-  
-  // Import and render the page component
-  const { page } = await import(\`../docs/\${id}.html.js\`);
-  serverDOM.document.body.append(
-    el(page, { pkg, info }),
-  );
-  
-  // Process the queue of asynchronous operations
-  await queue();
-  
-  // Trigger render event handlers
-  dispatchEvent("oneachrender", document);
-  
-  // Write the HTML to the output file
-  s.echo(serverDOM.serialize()).to(path_target.root+id+".html");
+	// Create a virtual DOM environment for server-side rendering
+	const serverDOM = createHTMl("");
+	serverDOM.registerGlobally("HTMLScriptElement");
+
+	// Register deka-dom-el with the virtual DOM
+	const { el } = await register(serverDOM.dom);
+
+	// Import and render the page component
+	const { page } = await import(\`../docs/\${id}.html.js\`);
+	serverDOM.document.body.append(
+	el(page, { pkg, info }),
+	);
+
+	// Process the queue of asynchronous operations
+	await queue();
+
+	// Trigger render event handlers
+	dispatchEvent("oneachrender", document);
+
+	// Write the HTML to the output file
+	s.echo(serverDOM.serialize()).to(path_target.root+id+".html");
 }
 
 // Final build step - trigger SSR end event
@@ -126,107 +129,107 @@ dispatchEvent("onssrend");
 		el(code, { content: `
 // From docs/ssr.js - File registration system
 export function registerClientFile(url, { head, folder = "", replacer } = {}) {
-  // Ensure folder path ends with a slash
-  if(folder && !folder.endsWith("/")) folder += "/";
-  
-  // Extract filename from URL
-  const file_name = url.pathname.split("/").pop();
-  
-  // Create target directory if needed
-  s.mkdir("-p", path_target.root+folder);
-  
-  // Get file content and apply optional replacer function
-  let content = s.cat(url);
-  if(replacer) content = s.echo(replacer(content.toString()));
-  
-  // Write content to the output directory
-  content.to(path_target.root+folder+file_name);
+	// Ensure folder path ends with a slash
+	if(folder && !folder.endsWith("/")) folder += "/";
 
-  // If a head element was provided, add it to the document
-  if(!head) return;
-  head[head instanceof HTMLScriptElement ? "src" : "href"] = file_name;
-  document.head.append(head);
+	// Extract filename from URL
+	const file_name = url.pathname.split("/").pop();
+
+	// Create target directory if needed
+	s.mkdir("-p", path_target.root+folder);
+
+	// Get file content and apply optional replacer function
+	let content = s.cat(url);
+	if(replacer) content = s.echo(replacer(content.toString()));
+
+	// Write content to the output directory
+	content.to(path_target.root+folder+file_name);
+
+	// If a head element was provided, add it to the document
+	if(!head) return;
+	head[head instanceof HTMLScriptElement ? "src" : "href"] = file_name;
+	document.head.append(head);
 }
 `, page_id }),
 		el("h4", t`Server-Side Rendering`),
 		el(code, { content: `
 // From docs/components/ireland.html.js - Server-side component implementation
 export function ireland({ src, exportName = "default", props = {} }) {
-  // Calculate relative path for imports
-  const path = "./"+relative(dir, src.pathname);
-  
-  // Generate unique ID for this component instance
-  const id = "ireland-" + generateComponentId(src);
-  
-  // Create placeholder element
-  const element = el.mark({ type: "ireland", name: ireland.name });
-  
-  // Import and render the component during SSR
-  queue(import(path).then(module => {
-    const component = module[exportName];
-    element.replaceWith(el(component, props, mark(id)));
-  }));
+	// Calculate relative path for imports
+	const path = "./"+relative(dir, src.pathname);
 
-  // Register client-side hydration on first component
-  if(!componentsRegistry.size)
-    addEventListener("oneachrender", registerClientPart);
-  
-  // Store component info for client-side hydration
-  componentsRegistry.set(id, {
-    src,
-    path: dirFE+"/"+path.split("/").pop(),
-    exportName,
-    props,
-  });
+	// Generate unique ID for this component instance
+	const id = "ireland-" + generateComponentId(src);
 
-  return element;
+	// Create placeholder element
+	const element = el.mark({ type: "later", name: ireland.name });
+
+	// Import and render the component during SSR
+	queue(import(path).then(module => {
+	const component = module[exportName];
+	element.replaceWith(el(component, props, mark(id)));
+	}));
+
+	// Register client-side hydration on first component
+	if(!componentsRegistry.size)
+	addEventListener("oneachrender", registerClientPart);
+
+	// Store component info for client-side hydration
+	componentsRegistry.set(id, {
+	src,
+	path: dirFE+"/"+path.split("/").pop(),
+	exportName,
+	props,
+	});
+
+	return element;
 }
 
 // Register client-side resources
 function registerClientPart() {
-  // Process all component registrations
-  const todo = Array.from(componentsRegistry.entries())
-    .map(([ id, d ]) => {
-      // Copy the component source file to output directory
-      registerClientFile(d.src, {
-        folder: dirFE,
-        // Replace bare imports for browser compatibility
-        replacer(file) {
-          return file.replaceAll(
-            / from "deka-dom-el(\/signals)?";/g, 
-            \` from "./esm-with-signals.js";\`
-          );
-        }
-      });
-      return [ id, d ];
-    });
-  
-  // Serialize the component registry for client-side use
-  const store = JSON.stringify(JSON.stringify(todo));
-  
-  // Copy client-side scripts to output
-  registerClientFile(new URL("./ireland.js.js", import.meta.url));
-  registerClientFile(new URL("../../dist/esm-with-signals.js", import.meta.url), { folder: dirFE });
-  
-  // Add import map for package resolution
-  document.head.append(
-    el("script", { type: "importmap" }).append(\`
+	// Process all component registrations
+	const todo = Array.from(componentsRegistry.entries())
+	.map(([ id, d ]) => {
+		// Copy the component source file to output directory
+		registerClientFile(d.src, {
+		folder: dirFE,
+		// Replace bare imports for browser compatibility
+		replacer(file) {
+			return file.replaceAll(
+				/ from "deka-dom-el(\/signals)?";/g,
+				\` from "./esm-with-signals.js";\`
+			);
+		}
+	});
+		return [ id, d ];
+	});
+
+	// Serialize the component registry for client-side use
+	const store = JSON.stringify(JSON.stringify(todo));
+
+	// Copy client-side scripts to output
+	registerClientFile(new URL("./ireland.js.js", import.meta.url));
+	registerClientFile(new URL("../../dist/esm-with-signals.js", import.meta.url), { folder: dirFE });
+
+	// Add import map for package resolution
+	document.head.append(
+	el("script", { type: "importmap" }).append(\`
 {
-  "imports": {
-    "deka-dom-el": "./\${dirFE}/esm-with-signals.js",
-    "deka-dom-el/signals": "./\${dirFE}/esm-with-signals.js"
-  }
+	"imports": {
+	"deka-dom-el": "./\${dirFE}/esm-with-signals.js",
+	"deka-dom-el/signals": "./\${dirFE}/esm-with-signals.js"
+	}
 }
-    \`.trim())
-  );
-  
-  // Add bootstrap script to load components
-  document.body.append(
-    el("script", { type: "module" }).append(\`
+	\`.trim())
+	);
+
+	// Add bootstrap script to load components
+	document.body.append(
+	el("script", { type: "module" }).append(\`
 import { loadIrelands } from "./ireland.js.js";
 loadIrelands(new Map(JSON.parse(\${store})));
-    \`.trim())
-  );
+	\`.trim())
+	);
 }
 `, page_id }),
 		el("h4", t`Client-Side Hydration`),
@@ -235,22 +238,22 @@ loadIrelands(new Map(JSON.parse(\${store})));
 import { el } from "./irelands/esm-with-signals.js";
 
 export function loadIrelands(store) {
-  // Find all marked components in the DOM
-  document.body.querySelectorAll("[data-dde-mark]").forEach(ireland => {
-    const { ddeMark } = ireland.dataset;
-    
-    // Skip if this component isn't in our registry
-    if(!store.has(ddeMark)) return;
-    
-    // Get component information
-    const { path, exportName, props } = store.get(ddeMark);
-    
-    // Dynamically import the component module
-    import("./" + path).then(module => {
-      // Replace the server-rendered element with the client-side version
-      ireland.replaceWith(el(module[exportName], props));
-    });
-  });
+	// Find all marked components in the DOM
+	document.body.querySelectorAll("[data-dde-mark]").forEach(ireland => {
+	const { ddeMark } = ireland.dataset;
+
+	// Skip if this component isn't in our registry
+	if(!store.has(ddeMark)) return;
+
+	// Get component information
+	const { path, exportName, props } = store.get(ddeMark);
+
+	// Dynamically import the component module
+	import("./" + path).then(module => {
+		// Replace the server-rendered element with the client-side version
+		ireland.replaceWith(el(module[exportName], props));
+	});
+	});
 }
 `, page_id }),
 
@@ -287,7 +290,7 @@ export function loadIrelands(store) {
 				${el("strong", "Export a function:")} Components should be exported as named or default functions
 			`),
 			el("li").append(...T`
-				${el("strong", "Return a DOM element:")} The function should return a valid DOM element created with ${el("code", "el()")}
+
 			`),
 			el("li").append(...T`
 				${el("strong", "Accept props:")} Components should accept a props object, even if not using it

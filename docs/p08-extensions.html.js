@@ -42,8 +42,8 @@ export function page({ pkg, info }){
 // Basic structure of an addon
 function myAddon(config) {
 	return function(element) {
-	  // Apply functionality to element
-	  element.dataset.myAddon = config.option;
+		// Apply functionality to element
+		element.dataset.myAddon = config.option;
 	};
 }
 
@@ -67,18 +67,15 @@ el("div", { id: "example" }, myAddon({ option: "value" }));
 // Third-party library addon with proper cleanup
 function externalLibraryAddon(config, signal) {
 	return function(element) {
-	  // Get an abort signal that triggers on element disconnection
-	  const signal = on.disconnectedAsAbort(element);
+		// Initialize the third-party library
+		const instance = new ExternalLibrary(element, config);
 
-	  // Initialize the third-party library
-	  const instance = new ExternalLibrary(element, config);
+		// Set up cleanup when the element is removed
+		signal.addEventListener('abort', () => {
+			instance.destroy();
+		});
 
-	  // Set up cleanup when the element is removed
-	  signal.addEventListener('abort', () => {
-	    instance.destroy();
-	  });
-
-	  return element;
+		return element;
 	};
 }
 // dde component
@@ -157,8 +154,8 @@ function createEnhancedSignal(initialValue) {
 
 	// Return the original signal with added methods
 	return Object.assign(signal, {
-	  increment,
-	  decrement
+		increment,
+		decrement
 	});
 }
 
@@ -240,10 +237,12 @@ console.log(doubled.get()); // 10`, page_id }),
 			el("h4", t`Common Extension Pitfalls`),
 			el("dl").append(
 				el("dt", t`Leaking event listeners or resources`),
-				el("dd", t`Always use AbortSignal-based cleanup to automatically remove listeners when elements are disconnected`),
+				el("dd", t`Always use AbortSignal-based cleanup to automatically remove listeners when elements
+					are disconnected`),
 
 				el("dt", t`Tight coupling with library internals`),
-				el("dd", t`Focus on standard DOM APIs and clean interfaces rather than depending on deka-dom-el implementation details`),
+				el("dd", t`Focus on standard DOM APIs and clean interfaces rather than depending on deka-dom-el
+					implementation details`),
 
 				el("dt", t`Mutating element prototypes`),
 				el("dd", t`Prefer compositional approaches with addons over modifying element prototypes`),

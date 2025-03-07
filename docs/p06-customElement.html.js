@@ -202,15 +202,14 @@ export function page({ pkg, info }){
 			el("h4", t`Shadow DOM Encapsulation`),
 			el("pre").append(el("code", `
 <my-custom-element>
+  ┌─────────────────────────┐
+    #shadow-root
 
-  ┌─────────────────────────┐
-    #shadow-root
-
-     Created with DDE:
-     ┌──────────────────┐
-       <div>
-         <h2>Title</h2>
-         <p>Content</p>
+      Created with DDE:
+    ┌──────────────────┐
+      <div>
+       <h2>Title</h2>
+       <p>Content</p>
 			`))
 		),
 		el(example, { src: fileURL("./components/examples/customElement/shadowRoot.js"), page_id }),

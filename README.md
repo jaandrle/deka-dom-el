@@ -3,7 +3,7 @@
 | [*mirrored* on Gitea](https://gitea.jaandrle.cz/jaandrle/deka-dom-el)
 
 <p align="center">
-  <img src="docs/assets/logo.svg" alt="Deka DOM Elements Logo" width="180" height="180">
+	<img src="docs/assets/logo.svg" alt="Deka DOM Elements Logo" width="180" height="180">
 </p>
 
 # Deka DOM Elements
@@ -15,40 +15,40 @@
 ```javascript
 // 🌟 Reactive component with clear separation of concerns
 document.body.append(
-  el(EmojiCounter, { initial: "🚀" })
+	el(EmojiCounter, { initial: "🚀" })
 );
 
 function EmojiCounter({ initial }) {
-  // ✨ State - Define reactive data
-  const count = S(0);
-  const emoji = S(initial);
+	// ✨ State - Define reactive data
+	const count = S(0);
+	const emoji = S(initial);
 
-  /** @param {HTMLOptionElement} el */
-  const isSelected= el=> (el.selected= el.value===initial);
-  
-  // 🔄 View - UI updates automatically when signals change
-  return el().append(
-    el("p", {
-      className: "output",
-      textContent: S(() =>
-        `Hello World ${emoji.get().repeat(clicks.get())}`),
-    }),
-    
-    // 🎮 Controls - Update state on events
-    el("button", { textContent: "Add Emoji" },
-      on("click", () => count.set(count.get() + 1))
-    ),
-    
-    el("select", null, on("change", e => emoji.set(e.target.value)))
+	/** @param {HTMLOptionElement} el */
+	const isSelected= el=> (el.selected= el.value===initial);
+	
+	// 🔄 View - UI updates automatically when signals change
+	return el().append(
+	el("p", {
+		className: "output",
+		textContent: S(() =>
+		`Hello World ${emoji.get().repeat(clicks.get())}`),
+	}),
+	
+	// 🎮 Controls - Update state on events
+	el("button", { textContent: "Add Emoji" },
+		on("click", () => count.set(count.get() + 1))
+	),
+	
+	el("select", null, on("change", e => emoji.set(e.target.value)))
 	.append(
-      el(Option, "🎉", isSelected),
-      el(Option, "🚀", isSelected),
-      el(Option, "💖", isSelected),
-    )
-  );
+		el(Option, "🎉", isSelected),
+		el(Option, "🚀", isSelected),
+		el(Option, "💖", isSelected),
+	)
+	);
 }
 function Option({ textContent }){
-  return Ol("option", { value: textContent, textContent });
+	return Ol("option", { value: textContent, textContent });
 }
 ```
 
@@ -68,11 +68,16 @@ Creating reactive elements, components, and Web Components using the native
 
 ## Why Another Library?
 
-This library bridges the gap between minimal solutions like van/hyperscript and more comprehensive frameworks like [solid-js](https://github.com/solidjs/solid), offering a balanced trade-off between size, complexity, and usability.
+This library bridges the gap between minimal solutions like van/hyperscript and more comprehensive frameworks like
+[solid-js](https://github.com/solidjs/solid), offering a balanced trade-off between size, complexity, and usability.
 
-Following functional programming principles, Deka DOM Elements starts with pure JavaScript (DOM API) and gradually adds auxiliary functions. These range from minor improvements to advanced features for building complete declarative reactive UI templates.
+Following functional programming principles, Deka DOM Elements starts with pure JavaScript (DOM API) and gradually adds
+auxiliary functions. These range from minor improvements to advanced features for building complete declarative
+reactive UI templates.
 
-A key advantage: any internal function (`assign`, `classListDeclarative`, `on`, `dispatchEvent`, `S`, etc.) can be used independently while also working seamlessly together. This modular approach makes it easier to integrate the library into existing projects.
+A key advantage: any internal function (`assign`, `classListDeclarative`, `on`, `dispatchEvent`, `S`, etc.) can be used
+independently while also working seamlessly together. This modular approach makes it easier to integrate the library
+into existing projects.
 
 ## Getting Started
 
@@ -88,7 +93,7 @@ A key advantage: any internal function (`assign`, `classListDeclarative`, `on`, 
 ```html
 <script src="https://cdn.jsdelivr.net/gh/jaandrle/deka-dom-el/dist/dde-with-signals.min.js"></script>
 <script type="module">
-  const { el, S } = dde;
+	const { el, S } = dde;
 </script>
 ```
 
@@ -112,4 +117,5 @@ Signals are the reactive backbone of Deka DOM Elements:
 - [adamhaile/S](https://github.com/adamhaile/S) - Simple, clean, fast reactive programming
 - [hyperhype/hyperscript](https://github.com/hyperhype/hyperscript) - Create HyperText with JavaScript
 - [potch/signals](https://github.com/potch/signals) - A small reactive signals library
-- [jaandrle/dollar_dom_component](https://github.com/jaandrle/dollar_dom_component) - Functional DOM components without JSX/virtual DOM
+- [jaandrle/dollar_dom_component](https://github.com/jaandrle/dollar_dom_component) -
+	Functional DOM components without JSX/virtual DOM

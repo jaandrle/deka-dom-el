@@ -2,9 +2,9 @@ import { el } from "deka-dom-el";
 
 // Create element with properties
 const button = el("button", {
-  textContent: "Click me",
-  className: "primary",
-  disabled: true
+	textContent: "Click me",
+	className: "primary",
+	disabled: true
 });
 
 // Shorter and more expressive

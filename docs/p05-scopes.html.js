@@ -55,21 +55,21 @@ export function page({ pkg, info }){
 el(MyComponent);
 
 function MyComponent() {
-  // 2. access the host element
-  const { host } = scope;
+  // 2. access the host element
+  const { host } = scope;
 
-  // 3. Add behavior to host
-  host(
-    on.click(handleClick)
-  );
+  // 3. Add behavior to host
+  host(
+  on.click(handleClick)
+  );
 
-  // 4. Return the host element
-  return el("div", {
-    className: "my-component"
-  }).append(
-    el("h2", "Title"),
-    el("p", "Content")
-  );
+  // 4. Return the host element
+  return el("div", {
+  className: "my-component"
+  }).append(
+  el("h2", "Title"),
+  el("p", "Content")
+  );
 }
 			`.trim()))
 		),
@@ -118,9 +118,9 @@ function MyComponent() {
 3. Component interactions happen
 4. Component removed from DOM → disconnected event
 5. Automatic cleanup of:
-	- Event listeners
-	- Signal subscriptions
-	- Custom cleanup code
+  - Event listeners
+  - Signal subscriptions
+  - Custom cleanup code
 			`))
 		),
 		el(example, { src: fileURL("./components/examples/scopes/cleaning.js"), page_id }),
@@ -166,6 +166,9 @@ function MyComponent() {
 		el("ol").append(
 			el("li").append(...T`
 				${el("strong", "Capture host early:")} Use ${el("code", "const { host } = scope")} at component start
+			`),
+			el("li").append(...T`
+				${el("strong", "Define signals as constants:")} ${el("code", "const counter = S(0);")}
 			`),
 			el("li").append(...T`
 				${el("strong", "Prefer declarative patterns:")} Use signals to drive UI updates rather than manual DOM manipulation

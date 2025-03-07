@@ -73,14 +73,17 @@ export function assignAttribute<El extends SupportedElement, ATT extends keyof E
 
 type ExtendedHTMLElementTagNameMap= HTMLElementTagNameMap & CustomElementTagNameMap;
 export namespace el {
-  /**
-   * Creates a marker comment for elements
-   * 
-   * @param {{ type: "component"|"reactive"|"ireland"|"later", name?: string, host?: "this"|"parentElement" }} attrs - Marker attributes
-   * @param {boolean} [is_open=false] - Whether the marker is open-ended
-   * @returns {Comment} Comment node marker
-   */
-  export function mark(attrs: { type: "component"|"reactive"|"ireland"|"later", name?: string, host?: "this"|"parentElement" }, is_open?: boolean): Comment;
+	/**
+	 * Creates a marker comment for elements
+	 *
+	 * @param attrs - Marker attributes
+	 * @param [is_open=false] - Whether the marker is open-ended
+	 * @returns Comment node marker
+	 */
+	export function mark(
+		attrs: { type: "component"|"reactive"|"later", name?: string, host?: "this"|"parentElement" },
+		is_open?: boolean
+	): Comment;
 }
 
 export function el<
