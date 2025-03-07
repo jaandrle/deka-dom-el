@@ -1,10 +1,10 @@
 import { S } from "deka-dom-el/signals";
-// α — `signal` represents a reactive value
+// PART 1 — `signal` represents a reactive value
 const signal= S(0);
-// β — just reacts on signal changes
+// PART 2 — just reacts on signal changes
 S.on(signal, console.log);
-// γ — just updates the value
-const update= ()=> signal(signal()+1);
+// PART 3 — just updates the value
+const update= ()=> signal.set(signal.get()+1);
 
 update();
 const interval= 5*1000;

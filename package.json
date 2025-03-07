@@ -1,6 +1,6 @@
 {
 	"name": "deka-dom-el",
-	"version": "0.8.0",
+	"version": "0.9.0",
 	"description": "A low-code library that simplifies the creation of native DOM elements/components using small wrappers and tweaks.",
 	"author": "Jan Andrle <andrle.jan@centrum.cz>",
 	"license": "MIT",
@@ -29,8 +29,8 @@
 			"types": "./jsdom.d.ts"
 		},
 		"./src/signals-lib": {
-			"import": "./src/signals-lib.js",
-			"types": "./src/signals-lib.d.ts"
+			"import": "./src/signals-lib/signals-lib.js",
+			"types": "./src/signals-lib/signals-lib.d.ts"
 		}
 	},
 	"files": [
@@ -53,7 +53,8 @@
 		"globals": {
 			"requestIdleCallback": false,
 			"AbortController": false,
-			"AbortSignal": false
+			"AbortSignal": false,
+			"FinalizationRegistry": false
 		}
 	},
 	"size-limit": [
@@ -65,7 +66,7 @@
 		},
 		{
 			"path": "./signals.js",
-			"limit": "12 kB",
+			"limit": "12.5 kB",
 			"gzip": false,
 			"brotli": false
 		},
@@ -77,7 +78,7 @@
 		},
 		{
 			"path": "./index-with-signals.js",
-			"limit": "5.25 kB"
+			"limit": "5.5 kB"
 		}
 	],
 	"modifyEsbuildConfig": {
@@ -91,11 +92,11 @@
 		"typescript"
 	],
 	"devDependencies": {
-		"@size-limit/preset-small-lib": "~11.0",
-		"dts-bundler": "~0.1",
+		"@size-limit/preset-small-lib": "~11.2",
+		"dts-bundle-generator": "~9.5",
 		"editorconfig-checker": "~6.0",
-		"esbuild": "~0.24",
-		"jsdom": "~25.0",
+		"esbuild": "~0.25",
+		"jsdom": "~26.0",
 		"jshint": "~2.13",
 		"nodejsscript": "^1.0.2",
 		"size-limit-node-esbuild": "~0.3"

@@ -1,5 +1,4 @@
-declare global{ /* ddeSignal */ }
-
+import type { Signal as ddeSignal } from "./signals";
 type CustomElementTagNameMap= { '#text': Text, '#comment': Comment }
 type SupportedElement=
 		HTMLElementTagNameMap[keyof HTMLElementTagNameMap]
@@ -9,8 +8,8 @@ type SupportedElement=
 declare global {
 	type ddeComponentAttributes= Record<any, any> | undefined;
 	type ddeElementAddon<El extends SupportedElement | DocumentFragment | Node>= (element: El)=> any;
-	type ddeString= string | ddeSignal<string>
-	type ddeStringable= ddeString | number | ddeSignal<number>
+	type ddeString= string | ddeSignal<string, {}>
+	type ddeStringable= ddeString | number | ddeSignal<number, {}>
 }
 type PascalCase= `${Capitalize<string>}${string}`;
 type AttrsModified= {
@@ -18,13 +17,13 @@ type AttrsModified= {
 	 * Use string like in HTML (internally uses `*.setAttribute("style", *)`), or object representation (like DOM API).
 	 */
 	style: Partial<CSSStyleDeclaration> | ddeString
-		| Partial<{ [K in keyof CSSStyleDeclaration]: ddeSignal<CSSStyleDeclaration[K]> }>
+		| Partial<{ [K in keyof CSSStyleDeclaration]: ddeSignal<CSSStyleDeclaration[K], {}> }>
 	/**
 	 * Provide option to add/remove/toggle CSS clasess (index of object) using 1/0/-1.
 	 * In fact `el.classList.toggle(class_name)` for `-1` and `el.classList.toggle(class_name, Boolean(...))`
 	 * for others.
 	 */
-	classList: Record<string,-1|0|1|boolean|ddeSignal<-1|0|1|boolean>>,
+	classList: Record<string,-1|0|1|boolean|ddeSignal<-1|0|1|boolean, {}>>,
 	/**
 	 * Used by the dataset HTML attribute to represent data for custom attributes added to elements.
 	 * Values are converted to string (see {@link DOMStringMap}).
@@ -52,9 +51,13 @@ type IsReadonly<T, K extends keyof T> =
  * @private
  */
 type ElementAttributes<T extends SupportedElement>= Partial<{
-	[K in keyof _fromElsInterfaces<T>]: IsReadonly<_fromElsInterfaces<T>, K> extends false
-		? _fromElsInterfaces<T>[K] | ddeSignal<_fromElsInterfaces<T>[K]>
-		: ddeStringable
+	[K in keyof _fromElsInterfaces<T>]:
+		_fromElsInterfaces<T>[K] extends ((...p: any[])=> any)
+			? _fromElsInterfaces<T>[K] | ((...p: Parameters<_fromElsInterfaces<T>[K]>)=>
+																	ddeSignal<ReturnType<_fromElsInterfaces<T>[K]>, {}>)
+			: (IsReadonly<_fromElsInterfaces<T>, K> extends false
+				? _fromElsInterfaces<T>[K] | ddeSignal<_fromElsInterfaces<T>[K], {}>
+				: ddeStringable)
 } & AttrsModified> & Record<string, any>;
 export function classListDeclarative<El extends SupportedElement>(
 	element: El,
@@ -68,6 +71,40 @@ export function assignAttribute<El extends SupportedElement, ATT extends keyof E
 ): ElementAttributes<El>[ATT]
 
 type ExtendedHTMLElementTagNameMap= HTMLElementTagNameMap & CustomElementTagNameMap;
+export namespace el {
+	/**
+	 * Creates a marker comment for elements
+	 *
+	 * @param attrs - Marker attributes
+	 * @param [is_open=false] - Whether the marker is open-ended
+	 * @returns Comment node marker
+	 */
+	export function mark(
+		attrs: { type: "component"|"reactive"|"later", name?: string, host?: "this"|"parentElement" },
+		is_open?: boolean
+	): Comment;
+}
+
+export function el<
+	A extends ddeComponentAttributes,
+	EL extends SupportedElement | ddeDocumentFragment
+>(
+	component: (attr: A, ...rest: any[])=> EL,
+	attrs?: NoInfer<A>,
+	...addons: ddeElementAddon<EL>[]
+): EL extends ddeHTMLElementTagNameMap[keyof ddeHTMLElementTagNameMap]
+	? EL
+	: ( EL extends ddeDocumentFragment ? EL : ddeHTMLElement )
+export function el<
+	A extends { textContent: ddeStringable },
+	EL extends SupportedElement | ddeDocumentFragment
+>(
+	component: (attr: A, ...rest: any[])=> EL,
+	attrs?: NoInfer<A>["textContent"],
+	...addons: ddeElementAddon<EL>[]
+): EL extends ddeHTMLElementTagNameMap[keyof ddeHTMLElementTagNameMap]
+	? EL
+	: ( EL extends ddeDocumentFragment ? EL : ddeHTMLElement )
 export function el<
 	TAG extends keyof ExtendedHTMLElementTagNameMap,
 >(
@@ -85,16 +122,6 @@ export function el(
 	attrs?: ElementAttributes<HTMLElement> | ddeStringable,
 	...addons: ddeElementAddon<HTMLElement>[]
 ): ddeHTMLElement
-
-export function el<
-	C extends (attr: ddeComponentAttributes)=> SupportedElement | ddeDocumentFragment
->(
-	component: C,
-	attrs?: Parameters<C>[0] | ddeStringable,
-	...addons: ddeElementAddon<ReturnType<C>>[]
-): ReturnType<C> extends ddeHTMLElementTagNameMap[keyof ddeHTMLElementTagNameMap]
-	? ReturnType<C>
-	: ( ReturnType<C> extends ddeDocumentFragment ? ReturnType<C> : ddeHTMLElement )
 export { el as createElement }
 
 export function elNS(
@@ -115,7 +142,7 @@ export function elNS(
 >(
 	tag_name: TAG,
 	attrs?: ddeStringable | Partial<{
-		[key in keyof EL]: EL[key] | ddeSignal<EL[key]> | string | number | boolean
+		[key in keyof EL]: EL[key] | ddeSignal<EL[key], {}> | string | number | boolean
 	}>,
 	...addons: ddeElementAddon<NoInfer<EL>>[]
 )=> ddeMathMLElement
@@ -143,6 +170,8 @@ export function simulateSlots<EL extends SupportedElement | DocumentFragment>(
 	body: EL,
 ): EL
 
+export function dispatchEvent(name: keyof DocumentEventMap | string, element: SupportedElement):
+	(data?: any)=> void;
 export function dispatchEvent(name: keyof DocumentEventMap | string, options?: EventInit):
 	(element: SupportedElement, data?: any)=> void;
 export function dispatchEvent(
@@ -216,7 +245,7 @@ export const scope: {
 
 	state: Scope[],
 	/** Adds new child scope. All attributes are inherited by default. */
-	push(scope: Partial<Scope>): ReturnType<Array<Scope>["push"]>,
+	push(scope?: Partial<Scope>): ReturnType<Array<Scope>["push"]>,
 	/** Adds root scope as a child of the current scope. */
 	pushRoot(): ReturnType<Array<Scope>["push"]>,
 	/** Removes last/current child scope. */
@@ -225,7 +254,7 @@ export const scope: {
 
 export function customElementRender<
 	EL extends HTMLElement,
-	P extends any = Record<string, string | ddeSignal<string>>
+	P extends any = Record<string, string | ddeSignal<string, {}>>
 >(
 	target: ShadowRoot | EL,
 	render: (props: P)=> SupportedElement | DocumentFragment,
@@ -234,6 +263,27 @@ export function customElementRender<
 export function customElementWithDDE<EL extends (new ()=> HTMLElement)>(custom_element: EL): EL
 export function lifecyclesToEvents<EL extends (new ()=> HTMLElement)>(custom_element: EL): EL
 export function observedAttributes(custom_element: HTMLElement): Record<string, string>
+
+/**
+ * This is used primarly for server side rendering. To be sure that all async operations
+ * are finished before the page is sent to the client.
+ * ```
+ *	// on component
+ *	function component(){
+ *		…
+ *		queue(fetch(...).then(...));
+ *	}
+ *
+ * // building the page
+ * async function build(){
+ *		const { component }= await import("./component.js");
+ *		document.body.append(el(component));
+ *		await queue();
+ *		retutn document.body.innerHTML;
+ *	}
+ * ```
+ * */
+export function queue(promise?: Promise<unknown>): Promise<unknown>;
 
 /* TypeScript MEH */
 declare global{

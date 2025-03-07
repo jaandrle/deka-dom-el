@@ -1,7 +1,8 @@
 export { t } from "./utils/index.js";
 export const path_target= {
 	root: "dist/docs/",
-	css: "dist/docs/"
+	css: "dist/docs/",
+	assets: "dist/docs/assets/"
 };
 /**
  * This variable will be filled with the list of pages during the build process (see `bs/docs.js`).
@@ -12,16 +13,23 @@ export let pages= [];
  * @typedef registerClientFile
  * @type {function}
  * @param {URL} url
- * @param {HTMLScriptElement|HTMLLinkElement} [element_head]
+ * @param {Object} [options]
+ * @param {HTMLScriptElement|HTMLLinkElement} [options.head]
+ * @param {string} [options.folder]
+ * @param {function} [options.replacer]
  * */
-export function registerClientFile(url, element_head){
+export function registerClientFile(url, { head, folder= "", replacer }= {}){
+	if(folder && !folder.endsWith("/")) folder+= "/";
 	const file_name= url.pathname.split("/").pop();
-	s.cat(url).to(path_target.root+file_name);
+	s.mkdir("-p", path_target.root+folder);
+	let content= s.cat(url)
+	if(replacer) content= s.echo(replacer(content.toString()));
+	content.to(path_target.root+folder+file_name);
 
-	if(!element_head) return;
-	element_head[element_head instanceof HTMLScriptElement ? "src" : "href"]= file_name;
+	if(!head) return;
+	head[head instanceof HTMLScriptElement ? "src" : "href"]= file_name;
 	document.head.append(
-		element_head
+		head
 	);
 }
 

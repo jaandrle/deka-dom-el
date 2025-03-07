@@ -20,7 +20,7 @@ document.body.append(
 		el("span", { textContent: "test", slot: "test" }),
 	),
 	el(thirdParty),
-	el(CustomSlottingHTMLElement.tagName, { onclick: ()=> toggle(!toggle()) }).append(
+	el(CustomSlottingHTMLElement.tagName, { onclick: ()=> toggle.set(!toggle.get()) }).append(
 		el("strong", { slot: "name", textContent: "Honzo" }),
 		S.el(toggle, is=> is
 			? el("span", "…default slot")

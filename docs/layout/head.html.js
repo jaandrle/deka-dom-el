@@ -1,38 +1,220 @@
 import { el, elNS } from "deka-dom-el";
-import { pages } from "../ssr.js";
+import { pages, styles } from "../ssr.js";
+const host= "."+header.name;
+const host_nav= "."+nav.name;
+styles.css`
+/* Header */
+${host} {
+	grid-area: header;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0.75rem 1.5rem;
+	background-color: var(--primary);
+	color: white;
+	box-shadow: var(--shadow);
+	height: fit-content;
+	border-radius: var(--border-radius);
+}
+
+${host} .header-title {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+}
+
+${host} h1 {
+	font-size: 1.25rem;
+	margin: 0;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	color: white;
+}
+
+${host} .version-badge {
+	font-size: 0.75rem;
+	background-color: hsla(0, 0%, 59%, 0.2);
+	padding: 0.25rem 0.5rem;
+	border-radius: var(--border-radius);
+}
+
+${host} p {
+	display: block;
+	font-size: 0.875rem;
+	opacity: 0.9;
+	margin: 0;
+}
+
+${host_nav} .github-link {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	font-size: 0.9rem;
+}
+
+/* Navigation */
+${host_nav} {
+	grid-area: sidebar;
+	background-color: var(--bg-sidebar);
+	border: 1px solid var(--border);
+	border-radius: var(--border-radius);
+	padding: 1rem;
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+${host_nav} a {
+	display: flex;
+	align-items: center;
+	padding: 0.625rem 0.75rem;
+	border-radius: var(--border-radius);
+	color: var(--text);
+	transition: background-color 0.1s ease, color 0.1s ease, transform 0.1s ease, box-shadow 0.1s ease;
+	line-height: 1.2;
+}
+
+${host_nav} a[aria-current=page] {
+	background-color: hsl(var(--primary-hs), 40%);
+	color: whitesmoke;
+	font-weight: 600;
+	box-shadow: var(--shadow);
+	text-decoration: none;
+}
+
+${host_nav} a:hover {
+	background-color: hsl(var(--primary-hs), 45%);
+	color: whitesmoke;
+	transform: translateY(-1px);
+	text-decoration: none;
+}
+
+${host_nav} a .nav-number {
+	color: rgb(from currentColor r g b / .75);
+}
+
+@media (min-width: 768px) {
+	${host_nav} {
+		height: fit-content;
+		position: sticky;
+		top: .5rem;
+	}
+}
+@media (max-width: 767px) {
+	${host_nav} {
+		padding: 0.75rem;
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		border-bottom: 1px solid var(--border);
+		border-right: none;
+		justify-content: center;
+	}
+
+	${host_nav} a {
+		font-size: 0.875rem;
+		padding: 0.375rem 0.75rem;
+		white-space: nowrap;
+	}
+
+	${host_nav} a .nav-number {
+		width: auto;
+		margin-right: 0.25rem;
+	}
+
+	${host_nav} a:first-child {
+		margin-bottom: 0;
+		margin-right: 0.5rem;
+		min-width: 100%;
+		justify-content: center;
+	}
+}
+`;
 /**
  * @param {object} def
  * @param {import("../types.d.ts").Info} def.info
  * @param {import("../types.d.ts").Pkg} def.pkg Package information.
  * */
 export function header({ info: { href, title, description }, pkg }){
-	title= `\`${pkg.name}\` — ${title}`;
+	const pageTitle = `${pkg.name} — ${title}`;
+
+	// Add meta elements to the head
 	document.head.append(
-		head({ title, description, pkg })
+		head({ title: pageTitle, description, pkg })
 	);
+
 	return el().append(
-		el("header").append(
-			el("h1", title),
-			el("p", description)
-		),
-		el("nav").append(
-			el("a", { href: pkg.homepage }).append(
-				el(iconGitHub),
-				"GitHub"
+		// Header section with accessibility support
+		el("header", { role: "banner", className: header.name }).append(
+			el("div", { className: "header-title" }).append(
+				el("img", {
+					src: "assets/logo.svg",
+					alt: "DDE Logo",
+					width: "32",
+					height: "32",
+					style: "margin-right: 0.5rem;"
+				}),
+				el("h1").append(
+					el("a", { href: pages[0].href, textContent: pkg.name, title: "Go to documentation homepage" }),
+				),
+				el("span", {
+					className: "version-badge",
+					"aria-label": "Version",
+					textContent: pkg.version || ""
+				})
 			),
-			...pages.map((p, i)=> el("a", {
-				href: p.href==="index" ? "./" : p.href,
-				textContent: (i+1) + ". " + p.title,
-				title: p.description,
-				classList: { current: p.href===href }
-			}))
-		)
+			el("p", description),
+		),
+
+		// Navigation between pages
+		nav({ href, pkg })
+	);
+}
+function nav({ href, pkg }){
+	return el("nav", {
+		role: "navigation",
+		"aria-label": "Main navigation",
+		className: nav.name
+	}).append(
+		el("a", {
+			href: pkg.homepage,
+			className: "github-link",
+			"aria-label": "View on GitHub",
+			target: "_blank",
+			rel: "noopener noreferrer",
+		}).append(
+			el(iconGitHub),
+			"GitHub"
+		),
+		...pages.map((p, i) => {
+			const isIndex = p.href === "index";
+			const isCurrent = p.href === href;
+
+			return el("a", {
+				href: isIndex ? "./" : p.href,
+				title: p.description || `Go to ${p.title}`,
+				"aria-current": isCurrent ? "page" : null,
+			}).append(
+				el("span", {
+					className: "nav-number",
+					"aria-hidden": "true",
+					textContent: `${i+1}. `
+				}),
+				p.title
+			);
+		}),
 	);
 }
 function head({ title, description, pkg }){
 	return el().append(
 		el("meta", { name: "viewport", content: "width=device-width, initial-scale=1" }),
 		el("meta", { name: "description", content: description }),
+		el("meta", { name: "theme-color", content: "#b71c1c" }),
+		el("link", { rel: "icon", href: "assets/favicon.svg", type: "image/svg+xml" }),
 		el("title", title),
 		el(metaAuthor),
 		el(metaTwitter, pkg),
@@ -53,7 +235,7 @@ function metaTwitter({ name, description, homepage }){
 		el("meta", { name: "twitter:url", content: homepage }),
 		el("meta", { name: "twitter:title", content: name }),
 		el("meta", { name: "twitter:description", content: description }),
-		//el("meta", { name: "twitter:image", content: "" }),
+		el("meta", { name: "twitter:image", content: homepage + "/assets/logo.svg" }),
 		el("meta", { name: "twitter:creator", content: "@jaandrle" }),
 	);
 }
@@ -62,7 +244,7 @@ function metaFacebook({ name, description, homepage }){
 		el("meta", { name: "og:url", content: homepage }),
 		el("meta", { name: "og:title", content: name }),
 		el("meta", { name: "og:description", content: description }),
-		//el("meta", { name: "og:image", content: "" }),
+		el("meta", { name: "og:image", content: homepage + "/assets/logo.svg" }),
 		el("meta", { name: "og:creator", content: "@jaandrle" }),
 	);
 }

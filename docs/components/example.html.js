@@ -1,16 +1,100 @@
 import { styles } from "../ssr.js";
 const host= "."+example.name;
 styles.css`
-${host}{
+${host} {
 	grid-column: full-main;
-	width: 100%;
-	max-width: calc(9/5 * var(--body-max-width));
-	height: calc(3/5 * var(--body-max-width));
-	margin-inline: auto;
+	width: calc(100% - .75em);
+	height: calc(4/6 * var(--body-max-width));
+	border-radius: var(--border-radius);
+	box-shadow: var(--shadow);
+	border: 1px solid var(--border);
 }
+${host} .runtime {
+	background-color: whitesmoke;
+}
+
+/* CodeMirror styling to match our theme */
+.CodeMirror {
+	height: 100% !important;
+	font-family: var(--font-mono) !important;
+	font-size: .85rem !important;
+	line-height: 1.5 !important;
+}
+
+/* Dark mode styles for CodeMirror */
 .CodeMirror, .CodeMirror-gutters {
-	background: #212121 !important;
-	border: 1px solid white;
+	background: var(--code-bg) !important;
+	color: var(--text) !important;
+}
+
+/* Light mode adjustments for CodeMirror - using CSS variables */
+@media (prefers-color-scheme: light) {
+	/* Core syntax elements */
+	.cm-s-material .cm-keyword { color: var(--shiki-token-keyword, #d73a49) !important; }
+	.cm-s-material .cm-atom { color: var(--shiki-token-constant, #005cc5) !important; }
+	.cm-s-material .cm-number { color: var(--shiki-token-number, #005cc5) !important; }
+	.cm-s-material .cm-def { color: var(--shiki-token-function, #6f42c1) !important; }
+	.cm-s-material .cm-variable { color: var(--shiki-token-variable, #24292e) !important; }
+	.cm-s-material .cm-variable-2 { color: var(--shiki-token-variable, #24292e) !important; }
+	.cm-s-material .cm-variable-3 { color: var(--shiki-token-variable, #24292e) !important; }
+	.cm-s-material .cm-property { color: var(--shiki-token-property, #005cc5) !important; }
+	.cm-s-material .cm-operator { color: var(--shiki-token-operator, #d73a49) !important; }
+	.cm-s-material .cm-comment { color: var(--shiki-token-comment, #6a737d) !important; }
+	.cm-s-material .cm-string { color: var(--shiki-token-string, #22863a) !important; }
+	.cm-s-material .cm-string-2 { color: var(--shiki-token-string, #22863a) !important; }
+	.cm-s-material .cm-tag { color: var(--shiki-token-tag, #22863a) !important; }
+	.cm-s-material .cm-attribute { color: var(--shiki-token-attribute, #005cc5) !important; }
+	.cm-s-material .cm-bracket { color: var(--shiki-token-punctuation, #24292e) !important; }
+	.cm-s-material .cm-punctuation { color: var(--shiki-token-punctuation, #24292e) !important; }
+	.cm-s-material .cm-link { color: var(--shiki-token-link, #0366d6) !important; }
+	.cm-s-material .cm-error { color: #f44336 !important; }
+}
+
+/* Handle theme toggle */
+html[data-theme="light"] .CodeMirror {
+	background: #f5f7fa !important;
+}
+
+html[data-theme="light"] .CodeMirror-gutters {
+	background: #f5f7fa !important;
+	border-right: 1px solid #e5e7eb !important;
+}
+
+/* Also apply the same styles to CodeMirror with data-theme */
+html[data-theme="light"] .cm-s-material .cm-keyword { color: var(--shiki-token-keyword, #d73a49) !important; }
+html[data-theme="light"] .cm-s-material .cm-atom { color: var(--shiki-token-constant, #005cc5) !important; }
+html[data-theme="light"] .cm-s-material .cm-number { color: var(--shiki-token-number, #005cc5) !important; }
+html[data-theme="light"] .cm-s-material .cm-def { color: var(--shiki-token-function, #6f42c1) !important; }
+html[data-theme="light"] .cm-s-material .cm-variable { color: var(--shiki-token-variable, #24292e) !important; }
+html[data-theme="light"] .cm-s-material .cm-variable-2 { color: var(--shiki-token-variable, #24292e) !important; }
+html[data-theme="light"] .cm-s-material .cm-variable-3 { color: var(--shiki-token-variable, #24292e) !important; }
+html[data-theme="light"] .cm-s-material .cm-property { color: var(--shiki-token-property, #005cc5) !important; }
+html[data-theme="light"] .cm-s-material .cm-operator { color: var(--shiki-token-operator, #d73a49) !important; }
+html[data-theme="light"] .cm-s-material .cm-comment { color: var(--shiki-token-comment, #6a737d) !important; }
+html[data-theme="light"] .cm-s-material .cm-string { color: var(--shiki-token-string, #22863a) !important; }
+html[data-theme="light"] .cm-s-material .cm-string-2 { color: var(--shiki-token-string, #22863a) !important; }
+html[data-theme="light"] .cm-s-material .cm-tag { color: var(--shiki-token-tag, #22863a) !important; }
+html[data-theme="light"] .cm-s-material .cm-attribute { color: var(--shiki-token-attribute, #005cc5) !important; }
+html[data-theme="light"] .cm-s-material .cm-bracket { color: var(--shiki-token-punctuation, #24292e) !important; }
+html[data-theme="light"] .cm-s-material .cm-punctuation { color: var(--shiki-token-punctuation, #24292e) !important; }
+html[data-theme="light"] .cm-s-material .cm-link { color: var(--shiki-token-link, #0366d6) !important; }
+html[data-theme="light"] .cm-s-material .cm-error { color: #f44336 !important; }
+
+/* Mobile adjustments */
+@media (max-width: 767px) {
+	${host} {
+		height: 50vh;
+		max-width: 100%;
+	}
+	${host} main {
+		flex-grow: 1;
+		display: flex;
+		flex-direction: column;
+	}
+	${host} main > * {
+		width: 100%;
+		max-width: 100% !important;
+	}
 }
 `;
 
