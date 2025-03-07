@@ -9,7 +9,7 @@ export async function build({ files, filesOut, minify= "partial", iife= true }){
 		echo(`Processing ${file} (minified: ${minify})`);
 		const out= filesOut(file);
 		const esbuild_output= buildEsbuild({ file, out, minify });
-		echoVariant(esbuild_output.stderr.split("\n")[1].trim()+ " (esbuild)");
+		echoVariant(esbuild_output.stderr.split("\n")[1].trim());
 
 		const file_dts= file_root+".d.ts";
 		const file_dts_out= filesOut(file_dts);
@@ -25,21 +25,22 @@ export async function build({ files, filesOut, minify= "partial", iife= true }){
 	return 0;
 
 	async function toIIFE(file, file_root){
-		const name= "iife";
-		const out= filesOut(file_root+".js", name);
+		const fileMark= "iife";
+		const name= "DDE";
+		const out= filesOut(file_root+".js", fileMark);
 
 		const params= [
 			"--format=iife",
-			"--global-name=dde",
+			"--global-name="+name,
 		];
 		const dde_output= buildEsbuild({ file, out, minify, params });
-		echoVariant(`${out} (${file} → globalThis.${name})`)
+		echoVariant(`${out} (${name})`)
 
 		const file_dts= file_root+".d.ts";
-		const file_dts_out= filesOut(file_dts, name);
+		const file_dts_out= filesOut(file_dts, fileMark);
 		echoVariant(file_dts_out, true);
 		buildDts({
-			name,
+			name: fileMark,
 			bundle: out,
 			entry: file_dts,
 		})

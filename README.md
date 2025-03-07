@@ -6,7 +6,7 @@
 	<img src="docs/assets/logo.svg" alt="Deka DOM Elements Logo" width="180" height="180">
 </p>
 
-# Deka DOM Elements (dd<el> or dde)
+# Deka DOM Elements (dd\<el\> or DDE)
 
 ***Vanilla for flavouring — a full-fledged feast for large projects***
 
@@ -74,7 +74,7 @@ Creating reactive elements, components, and Web Components using the native
 This library bridges the gap between minimal solutions like van/hyperscript and more comprehensive frameworks like
 [solid-js](https://github.com/solidjs/solid), offering a balanced trade-off between size, complexity, and usability.
 
-Following functional programming principles, dd<el> starts with pure JavaScript (DOM API) and gradually adds
+Following functional programming principles, dd\<el\> starts with pure JavaScript (DOM API) and gradually adds
 auxiliary functions. These range from minor improvements to advanced features for building complete declarative
 reactive UI templates.
 
@@ -96,7 +96,7 @@ into existing projects.
 ```html
 <script src="https://cdn.jsdelivr.net/gh/jaandrle/deka-dom-el/dist/iife-with-signals.min.js"></script>
 <script type="module">
-	const { el, S } = dde;
+	const { el, S } = DDE;
 </script>
 ```
 

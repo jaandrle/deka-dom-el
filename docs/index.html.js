@@ -28,7 +28,7 @@ export function page({ pkg, info }){
 	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
 		el("p").append(...T`
-			Welcome to Deka DOM Elements (dd<el> or dde) — a lightweight library for building dynamic UIs with
+			Welcome to Deka DOM Elements (dd<el> or DDE) — a lightweight library for building dynamic UIs with
 			a declarative syntax that stays close to the native DOM API. dd<el> gives you powerful reactive tools
 			without the complexity and overhead of larger frameworks.
 		`),
