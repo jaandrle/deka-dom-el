@@ -48,7 +48,7 @@ function EmojiCounter({ initial }) {
 	);
 }
 function Option({ textContent }){
-	return Ol("option", { value: textContent, textContent });
+	return el("option", { value: textContent, textContent });
 }
 ```
 
