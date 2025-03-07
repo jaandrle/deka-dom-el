@@ -51,11 +51,11 @@ export function page({ pkg, info }){
 	return el(simplePage, { info, pkg }).append(
 		el("p").append(...T`
 			Building user interfaces in JavaScript often involves creating and manipulating DOM elements.
-			DDE provides a simple yet powerful approach to element creation that is declarative, chainable,
+			dd<el> provides a simple yet powerful approach to element creation that is declarative, chainable,
 			and maintains a clean syntax close to HTML structure.
 		`),
 		el("div", { class: "callout" }).append(
-			el("h4", t`DDE Elements: Key Benefits`),
+			el("h4", t`dd<el> Elements: Key Benefits`),
 			el("ul").append(
 				el("li", t`Declarative element creation with intuitive property assignment`),
 				el("li", t`Chainable methods for natural DOM tree construction`),
@@ -67,7 +67,7 @@ export function page({ pkg, info }){
 
 		el(code, { src: fileURL("./components/examples/elements/intro.js"), page_id }),
 
-		el(h3, t`Creating Elements: Native vs DDE`),
+		el(h3, t`Creating Elements: Native vs dd<el>`),
 		el("p").append(...T`
 			In standard JavaScript, you create DOM elements using the
 			${el("a", references.mdn_create).append(el("code", "document.createElement()"))} method
@@ -80,7 +80,7 @@ export function page({ pkg, info }){
 					el(code, { src: fileURL("./components/examples/elements/native-dom-create.js"), page_id })
 				),
 				el("div").append(
-					el("h5", t`DDE Approach`),
+					el("h5", t`dd<el> Approach`),
 					el(code, { src: fileURL("./components/examples/elements/dde-dom-create.js"), page_id })
 				)
 			)
@@ -93,9 +93,9 @@ export function page({ pkg, info }){
 
 		el(h3, t`Advanced Property Assignment`),
 		el("p").append(...T`
-			The ${el("code", "assign")} function is the heart of DDE's element property handling. It is internally used
-			to assign properties using the ${el("code", "el")} function. ${el("code", "assign")} provides intelligent
-			assignment of both properties (IDL) and attributes:
+			The ${el("code", "assign")} function is the heart of dd<el>'s element property handling. It is internally
+			used to assign properties using the ${el("code", "el")} function. ${el("code", "assign")} provides
+			intelligent assignment of both properties (IDL) and attributes:
 		`),
 		el("div", { class: "function-table" }).append(
 			el("dl").append(
@@ -130,8 +130,8 @@ export function page({ pkg, info }){
 
 		el(h3, t`Building DOM Trees with Chainable Methods`),
 		el("p").append(...T`
-			One of the most powerful features of DDE is its approach to building element trees.
-			Unlike the native DOM API which doesn't return the parent after appendChild(), DDE's
+			One of the most powerful features of dd<el> is its approach to building element trees.
+			Unlike the native DOM API which doesn't return the parent after appendChild(), dd<el>'s
 			append() always returns the parent element:
 		`),
 		el("div", { class: "illustration" }).append(
@@ -141,7 +141,7 @@ export function page({ pkg, info }){
 					el(code, { src: fileURL("./components/examples/elements/native-dom-tree.js"), page_id })
 				),
 				el("div", { class: "good-practice" }).append(
-					el("h5", t`✅ DDE Approach`),
+					el("h5", t`✅ dd<el> Approach`),
 					el(code, { src: fileURL("./components/examples/elements/dde-dom-tree.js"), page_id })
 				)
 			)
@@ -172,8 +172,9 @@ export function page({ pkg, info }){
 
 		el(h3, t`Working with SVG and Other Namespaces`),
 		el("p").append(...T`
-			For non-HTML elements like SVG, MathML, or custom namespaces, DDE provides the ${el("code", "elNS")} function
-			which corresponds to the native ${el("a", references.mdn_ns).append(el("code", "document.createElementNS"))}:
+			For non-HTML elements like SVG, MathML, or custom namespaces, dd<el> provides the ${el("code", "elNS")}
+			function which corresponds to the native ${el("a", references.mdn_ns).append(el("code",
+				"document.createElementNS"))}:
 		`),
 		el(example, { src: fileURL("./components/examples/elements/dekaElNS.js"), page_id }),
 		el("p").append(...T`

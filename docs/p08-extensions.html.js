@@ -1,8 +1,8 @@
 import { T, t } from "./utils/index.js";
 export const info= {
 	title: t`Extensions and 3rd Party`,
-	fullTitle: t`Extending deka-dom-el with Third-Party Functionalities`,
-	description: t`How to extend deka-dom-el with third-party libraries and custom functionalities.`,
+	fullTitle: t`Extending dd<el> with Third-Party Functionalities`,
+	description: t`How to extend dd<el> with third-party libraries and custom functionalities.`,
 };
 
 import { el } from "deka-dom-el";
@@ -17,14 +17,14 @@ export function page({ pkg, info }){
 	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
 		el("p").append(...T`
-			deka-dom-el is designed with extensibility in mind. This page covers how to separate
+			dd<el> is designed with extensibility in mind. This page covers how to separate
 			third-party functionalities and integrate them seamlessly with the library, focusing on
 			proper resource cleanup and interoperability.
 		`),
 
 		el(h3, t`DOM Element Extensions with Addons`),
 		el("p").append(...T`
-			The primary method for extending DOM elements in deka-dom-el is through the Addon pattern.
+			The primary method for extending DOM elements in dd<el> is through the Addon pattern.
 			Addons are functions that take an element and applying some functionality to it. This pattern enables a
 			clean, functional approach to element enhancement.
 		`),
@@ -55,7 +55,7 @@ el("div", { id: "example" }, myAddon({ option: "value" }));
 		el("p").append(...T`
 			When extending elements with functionality that uses resources like event listeners, timers,
 			or external subscriptions, it's critical to clean up these resources when the element is removed
-			from the DOM. deka-dom-el provides utilities for this through AbortSignal integration.
+			from the DOM. dd<el> provides utilities for this through AbortSignal integration.
 		`),
 		el("div", { className: "tip" }).append(
 			el("p").append(...T`
@@ -111,7 +111,7 @@ function enhancementElement({ signal, ...config }) {
 				el("div", { className: "tab" }).append(
 					el("h5", t`⚠️ Library-Dependent`),
 					el(code, { content: `
-// Tightly coupled to deka-dom-el
+// Tightly coupled to dd<el>
 function enhancementElement(config) {
 	return function(element) {
 		// do something
@@ -127,7 +127,7 @@ function enhancementElement(config) {
 
 		el(h3, t`Signal Extensions and Future Compatibility`),
 		el("p").append(...T`
-			Unlike DOM elements, signal functionality in deka-dom-el currently lacks a standardized
+			Unlike DOM elements, signal functionality in dd<el> currently lacks a standardized
 			way to create library-independent extensions. This is because signals are implemented
 			differently across libraries.
 		`),
@@ -135,7 +135,7 @@ function enhancementElement(config) {
 			el("p").append(...T`
 				In the future, JavaScript may include built-in signals through the
 				${el("a", { href: "https://github.com/tc39/proposal-signals", textContent: "TC39 Signals Proposal" })}.
-				deka-dom-el is designed with future compatibility in mind and will hopefully support these
+				dd<el> is designed with future compatibility in mind and will hopefully support these
 				native signals without breaking changes when they become available.
 			`)
 		),
@@ -241,7 +241,7 @@ console.log(doubled.get()); // 10`, page_id }),
 					are disconnected`),
 
 				el("dt", t`Tight coupling with library internals`),
-				el("dd", t`Focus on standard DOM APIs and clean interfaces rather than depending on deka-dom-el
+				el("dd", t`Focus on standard DOM APIs and clean interfaces rather than depending on dd<el>
 					implementation details`),
 
 				el("dt", t`Mutating element prototypes`),

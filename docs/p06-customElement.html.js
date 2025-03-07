@@ -1,8 +1,8 @@
 import { T, t } from "./utils/index.js";
 export const info= {
 	title: t`Web Components`,
-	fullTitle: t`Using Web Components with DDE: Better Together`,
-	description: t`Using custom elements in combination with DDE`,
+	fullTitle: t`Using Web Components with dd<el>: Better Together`,
+	description: t`Using custom elements in combination with dd<el>`,
 };
 
 import { el } from "deka-dom-el";
@@ -55,12 +55,12 @@ export function page({ pkg, info }){
 	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
 		el("p").append(...T`
-			DDE pairs powerfully with ${el("a", references.mdn_web_components).append(el("strong", t`Web Components`))}
-			to create reusable, encapsulated custom elements with all the benefits of DDE's declarative DOM
-			construction and reactivity system.
+			dd<el> pairs powerfully with ${el("a", references.mdn_web_components).append(el("strong", t`Web
+				Components`))} to create reusable, encapsulated custom elements with all the benefits of dd<el>'s
+				declarative DOM construction and reactivity system.
 		`),
 		el("div", { className: "callout" }).append(
-			el("h4", t`Why Combine DDE with Web Components?`),
+			el("h4", t`Why Combine dd<el> with Web Components?`),
 			el("ul").append(
 				el("li", t`Declarative DOM creation within your components`),
 				el("li", t`Reactive attribute updates through signals`),
@@ -88,7 +88,7 @@ export function page({ pkg, info }){
 			`)
 		),
 		el("p").append(...T`
-			Let's start with a basic Custom Element example without DDE to establish the foundation:
+			Let's start with a basic Custom Element example without dd<el> to establish the foundation:
 		`),
 		el(code, { src: fileURL("./components/examples/customElement/native-basic.js"), page_id }),
 
@@ -101,17 +101,17 @@ export function page({ pkg, info }){
 			`)
 		),
 
-		el(h3, t`DDE Integration: Step 1 - Event Handling`),
+		el(h3, t`dd<el> Integration: Step 1 - Event Handling`),
 		el("p").append(...T`
-			The first step in integrating DDE with Web Components is enabling DDE's event system to work with your
+			The first step in integrating dd<el> with Web Components is enabling dd<el>'s event system to work with your
 			Custom Elements. This is done with ${el("code", "customElementWithDDE")}, which makes your Custom Element
-			compatible with DDE's event handling.
+			compatible with dd<el>'s event handling.
 		`),
 		el("div", { className: "function-table" }).append(
 			el("h4", t`customElementWithDDE`),
 			el("dl").append(
 				el("dt", t`Purpose`),
-				el("dd", t`Enables DDE's event system to work with your Custom Element`),
+				el("dd", t`Enables dd<el>'s event system to work with your Custom Element`),
 				el("dt", t`Usage`),
 				el("dd", t`customElementWithDDE(YourElementClass)`),
 				el("dt", t`Benefits`),
@@ -123,20 +123,20 @@ export function page({ pkg, info }){
 		el("div", { className: "tip" }).append(
 			el("p").append(...T`
 				${el("strong", "Key Point:")} The ${el("code", "customElementWithDDE")} function adds event dispatching
-				to your Custom Element lifecycle methods, making them work seamlessly with DDE's event system.
+				to your Custom Element lifecycle methods, making them work seamlessly with dd<el>'s event system.
 			`)
 		),
 
-		el(h3, t`DDE Integration: Step 2 - Rendering Components`),
+		el(h3, t`dd<el> Integration: Step 2 - Rendering Components`),
 		el("p").append(...T`
-			The next step is to use DDE's component rendering within your Custom Element. This is done with
-			${el("code", "customElementRender")}, which connects your DDE component function to the Custom Element.
+			The next step is to use dd<el>'s component rendering within your Custom Element. This is done with
+			${el("code", "customElementRender")}, which connects your dd<el> component function to the Custom Element.
 		`),
 		el("div", { className: "function-table" }).append(
 			el("h4", t`customElementRender`),
 			el("dl").append(
 				el("dt", t`Purpose`),
-				el("dd", t`Connects a DDE component function to a Custom Element`),
+				el("dd", t`Connects a dd<el> component function to a Custom Element`),
 				el("dt", t`Parameters`),
 				el("dd").append(
 					el("ol").append(
@@ -160,8 +160,8 @@ export function page({ pkg, info }){
 
 		el(h3, t`Reactive Web Components with Signals`),
 		el("p").append(...T`
-			One of the most powerful features of integrating DDE with Web Components is connecting HTML attributes
-			to DDE's reactive signals system. This creates truly reactive custom elements.
+			One of the most powerful features of integrating dd<el> with Web Components is connecting HTML attributes
+			to dd<el>'s reactive signals system. This creates truly reactive custom elements.
 		`),
 		el("div", { className: "tip" }).append(
 			el("p").append(...T`
@@ -186,7 +186,7 @@ export function page({ pkg, info }){
 			el("h4", t`How S.observedAttributes Works`),
 			el("ol").append(
 				el("li", t`Takes each attribute listed in static observedAttributes`),
-				el("li", t`Creates a DDE signal for each one`),
+				el("li", t`Creates a dd<el> signal for each one`),
 				el("li", t`Automatically updates these signals when attributes change`),
 				el("li", t`Passes the signals to your component function`),
 				el("li", t`Your component reacts to changes through signal subscriptions`)
@@ -195,7 +195,7 @@ export function page({ pkg, info }){
 
 		el(h3, t`Working with Shadow DOM`),
 		el("p").append(...T`
-			Shadow DOM provides encapsulation for your component's styles and markup. When using DDE with Shadow DOM,
+			Shadow DOM provides encapsulation for your component's styles and markup. When using dd<el> with Shadow DOM,
 			you get the best of both worlds: encapsulation plus declarative DOM creation.
 		`),
 		el("div", { className: "illustration" }).append(
@@ -205,7 +205,7 @@ export function page({ pkg, info }){
   ┌─────────────────────────┐
     #shadow-root
 
-      Created with DDE:
+      Created with dd<el>
     ┌──────────────────┐
       <div>
        <h2>Title</h2>
@@ -236,9 +236,9 @@ export function page({ pkg, info }){
 			)
 		),
 
-		el(h3, t`Best Practices for Web Components with DDE`),
+		el(h3, t`Best Practices for Web Components with dd<el>`),
 		el("p").append(...T`
-			When combining DDE with Web Components, follow these recommendations:
+			When combining dd<el> with Web Components, follow these recommendations:
 		`),
 		el("ol").append(
 			el("li").append(...T`

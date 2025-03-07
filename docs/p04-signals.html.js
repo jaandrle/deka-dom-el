@@ -45,7 +45,7 @@ export function page({ pkg, info }){
 	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
 		el("p").append(...T`
-			Signals provide a simple yet powerful way to create reactive applications with DDE. They handle the
+			Signals provide a simple yet powerful way to create reactive applications with dd<el>. They handle the
 			fundamental challenge of keeping your UI in sync with changing data in a declarative, efficient way.
 		`),
 		el("div", { class: "callout" }).append(
@@ -197,7 +197,7 @@ items.push("New todo");
 
 		el(h3, t`Connecting Signals to the DOM`),
 		el("p").append(...T`
-			Signals really shine when connected to your UI. DDE provides several ways to bind signals to DOM elements:
+			Signals really shine when connected to your UI. dd<el> provides several ways to bind signals to DOM elements:
 		`),
 
 		el("div", { class: "tabs" }).append(

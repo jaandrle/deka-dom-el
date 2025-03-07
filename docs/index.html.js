@@ -28,12 +28,12 @@ export function page({ pkg, info }){
 	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
 		el("p").append(...T`
-			Welcome to Deka DOM Elements (DDE) — a lightweight library for building dynamic UIs with a declarative
-			syntax that stays close to the native DOM API. DDE gives you powerful reactive tools without the complexity
-			and overhead of larger frameworks.
+			Welcome to Deka DOM Elements (dd<el> or dde) — a lightweight library for building dynamic UIs with
+			a declarative syntax that stays close to the native DOM API. dd<el> gives you powerful reactive tools
+			without the complexity and overhead of larger frameworks.
 		`),
 		el("div", { className: "callout" }).append(
-			el("h4", t`What Makes DDE Special`),
+			el("h4", t`What Makes dd<el> Special`),
 			el("ul").append(
 				el("li", t`No build step required — use directly in the browser`),
 				el("li", t`Lightweight core (~10–15kB minified) with zero dependencies`),
@@ -46,7 +46,7 @@ export function page({ pkg, info }){
 
 		el(h3, { textContent: t`The 3PS Pattern: A Better Way to Build UIs`, id: "h-3ps" }),
 		el("p").append(...T`
-			At the heart of DDE is the 3PS (3-Part Separation) pattern. This simple yet powerful approach helps you
+			At the heart of dd<el> is the 3PS (3-Part Separation) pattern. This simple yet powerful approach helps you
 			organize your UI code into three distinct areas, making your applications more maintainable and easier
 			to reason about.
 		`),
@@ -57,7 +57,7 @@ export function page({ pkg, info }){
 					el(code, { src: fileURL("./components/examples/introducing/3ps-before.js"), page_id }),
 				),
 				el("div", { className: "tab" }).append(
-					el("h5", t`DDE's 3PS Pattern`),
+					el("h5", t`dd<el>'s 3PS Pattern`),
 					el(code, { src: fileURL("./components/examples/introducing/3ps.js"), page_id }),
 				)
 			)
@@ -94,7 +94,7 @@ export function page({ pkg, info }){
 
 		el(h3, t`How to Use This Documentation`),
 		el("p").append(...T`
-			This guide will take you through DDE's features step by step:
+			This guide will take you through dd<el>'s features step by step:
 		`),
 		el("ol").append(
 			el("li").append(...T`${el("strong", "Elements")} — Creating and manipulating DOM elements`),
@@ -106,7 +106,7 @@ export function page({ pkg, info }){
 			el("li").append(...T`${el("strong", "Extensions")} — Integrating third-party functionalities`),
 			el("li").append(...T`${el("strong", "Ireland Components")} —
 				Creating interactive demos with server-side pre-rendering`),
-			el("li").append(...T`${el("strong", "SSR")} — Server-side rendering with DDE`)
+			el("li").append(...T`${el("strong", "SSR")} — Server-side rendering with dd<el>`)
 		),
 		el("p").append(...T`
 			Each section builds on the previous ones, so we recommend following them in order.

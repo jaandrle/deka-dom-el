@@ -47,12 +47,12 @@ export function page({ pkg, info }){
 	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
 		el("p").append(...T`
-			Events are at the core of interactive web applications. DDE provides a clean, declarative approach to
+			Events are at the core of interactive web applications. dd<el> provides a clean, declarative approach to
 			handling DOM events and extends this pattern with a powerful Addon system to incorporate additional
 			functionalities into your UI templates.
 		`),
 		el("div", { className: "callout" }).append(
-			el("h4", t`Why DDE's Event System and Addons Matters`),
+			el("h4", t`Why dd<el>'s Event System and Addons Matters`),
 			el("ul").append(
 				el("li", t`Integrate event handling directly in element declarations`),
 				el("li", t`Leverage lifecycle events for better component design`),
@@ -68,7 +68,8 @@ export function page({ pkg, info }){
 		el("p").append(...T`
 			In JavaScript you can listen to native DOM events using
 			${el("a", references.mdn_listen).append(el("code", "element.addEventListener(type, listener, options)"))}.
-			DDE provides an alternative approach with arguments ordered differently to better fit its declarative style:
+			dd<el> provides an alternative approach with arguments ordered differently to better fit its declarative
+			style:
 		`),
 		el("div", { className: "illustration" }).append(
 			el("div", { className: "tabs" }).append(
@@ -77,13 +78,13 @@ export function page({ pkg, info }){
 					el(code, { content: `element.addEventListener('click', callback, options);`, page_id })
 				),
 				el("div", { className: "tab" }).append(
-					el("h5", t`DDE Approach`),
+					el("h5", t`dd<el> Approach`),
 					el(code, { content: `on('click', callback, options)(element);`, page_id })
 				)
 			)
 		),
 		el("p").append(...T`
-			The main benefit of DDE's approach is that it works as an Addon, making it easy to integrate
+			The main benefit of dd<el>'s approach is that it works as an Addon, making it easy to integrate
 			directly into element declarations.
 		`),
 		el(example, { src: fileURL("./components/examples/events/compare.js"), page_id }),
@@ -91,7 +92,7 @@ export function page({ pkg, info }){
 		el(h3, t`Removing Event Listeners`),
 		el("div", { className: "note" }).append(
 			el("p").append(...T`
-				Unlike the native addEventListener/removeEventListener pattern, DDE uses the ${el("a", {
+				Unlike the native addEventListener/removeEventListener pattern, dd<el> uses the ${el("a", {
 				textContent: "AbortSignal", ...references.mdn_abortListener })} for declarative approach for removal:
 			`)
 		),
@@ -126,7 +127,7 @@ export function page({ pkg, info }){
 
 		el(h3, t`Understanding Addons`),
 		el("p").append(...T`
-			Addons are a powerful pattern in DDE that extends beyond just event handling.
+			Addons are a powerful pattern in dd<el> that extends beyond just event handling.
 			An Addon is any function that accepts an HTML element as its first parameter.
 		`),
 		el("div", { className: "callout" }).append(
@@ -155,7 +156,7 @@ export function page({ pkg, info }){
 			You can think of an Addon as an "oncreate" event handler.
 		`),
 		el("p").append(...T`
-			DDE provides three additional lifecycle events that correspond to custom element lifecycle callbacks:
+			dd<el> provides three additional lifecycle events that correspond to custom element lifecycle callbacks:
 		`),
 		el("div", { className: "function-table" }).append(
 			el("dl").append(
@@ -173,7 +174,7 @@ export function page({ pkg, info }){
 
 		el("div", { className: "note" }).append(
 			el("p").append(...T`
-				For regular elements (non-custom elements), DDE uses
+				For regular elements (non-custom elements), dd<el> uses
 				${el("a", references.mdn_mutation).append(el("code", "MutationObserver"), " | MDN")}
 				internally to track lifecycle events.
 			`)
@@ -194,7 +195,7 @@ export function page({ pkg, info }){
 					…see section later in documentation regarding hosts elements
 				`),
 				el("li").append(...T`
-					DDE ensures that connected/disconnected events fire only once for better predictability
+					dd<el> ensures that connected/disconnected events fire only once for better predictability
 				`)
 			)
 		),

@@ -99,7 +99,7 @@ function MyComponent() {
 
 		el(h3, t`Class-Based Components`),
 		el("p").append(...T`
-			While functional components are the primary pattern in DDE, you can also create class-based components.
+			While functional components are the primary pattern in dd<el>, you can also create class-based components.
 			For this, we implement function ${el("code", "elClass")} and use it to demonstrate implementation details
 			for better understanding of the scope logic.
 		`),
@@ -114,7 +114,7 @@ function MyComponent() {
 			el("h4", t`Lifecycle Flow`),
 			el("pre").append(el("code", `
 1. Component created → scope established
-2. Component added to DOM → connected event
+2. Component add<el> to DOM → connected event
 3. Component interactions happen
 4. Component removed from DOM → disconnected event
 5. Automatic cleanup of:
@@ -177,7 +177,8 @@ function MyComponent() {
 				${el("strong", "Keep components focused:")} Each component should do one thing well
 			`),
 			el("li").append(...T`
-				${el("strong", "Add explicit cleanup:")} For resources not managed by DDE, use ${el("code", "on.disconnected")}
+				${el("strong", "Add explicit cleanup:")} For resources not managed by dd<el>, use ${el("code",
+					"on.disconnected")}
 			`)
 		),
 

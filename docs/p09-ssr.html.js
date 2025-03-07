@@ -1,8 +1,8 @@
 import { T, t } from "./utils/index.js";
 export const info= {
 	title: t`Server-Side Rendering (SSR)`,
-	fullTitle: t`Server-Side Rendering with deka-dom-el`,
-	description: t`Using deka-dom-el for server-side rendering with jsdom to generate static HTML.`,
+	fullTitle: t`Server-Side Rendering with dd<el>`,
+	description: t`Using dd<el> for server-side rendering with jsdom to generate static HTML.`,
 };
 
 import { el } from "deka-dom-el";
@@ -22,11 +22,11 @@ export function page({ pkg, info }){
 				3rd-party libraries. It describes an advanced feature, not a core part of the library. Most users will
 				not need to implement this functionality directly in their applications. This capability will hopefully
 				be covered by third-party libraries or frameworks that provide simpler SSR integration using
-				deka-dom-el.
+				dd<el>.
 			`)
 		),
 		el("p").append(...T`
-			deka-dom-el isn't limited to browser environments. Thanks to its flexible architecture,
+			dd<el> isn't limited to browser environments. Thanks to its flexible architecture,
 			it can be used for server-side rendering (SSR) to generate static HTML files.
 			This is achieved through integration with for example ${el("a", { href: "https://github.com/tmpvar/jsdom",
 			textContent: "jsdom" })}, a JavaScript implementation of web standards for Node.js.
@@ -47,12 +47,12 @@ export function page({ pkg, info }){
 
 		el(h3, t`How jsdom Integration Works`),
 		el("p").append(...T`
-			The jsdom export in deka-dom-el provides the necessary tools to use the library in Node.js
+			The jsdom export in dd<el> provides the necessary tools to use the library in Node.js
 			by integrating with jsdom. Here's what it does:
 		`),
 		el("ol").append(
 			el("li", t`Creates a virtual DOM environment in Node.js using jsdom`),
-			el("li", t`Registers DOM globals like HTMLElement, document, etc. for deka-dom-el to use`),
+			el("li", t`Registers DOM globals like HTMLElement, document, etc. for dd<el> to use`),
 			el("li", t`Sets an SSR flag in the environment to enable SSR-specific behaviors`),
 			el("li", t`Provides a promise queue system for managing async operations during rendering`),
 			el("li", t`Handles DOM property/attribute mapping differences between browsers and jsdom`)
@@ -61,14 +61,14 @@ export function page({ pkg, info }){
 
 		el(h3, t`Basic SSR Example`),
 		el("p").append(...T`
-			Here's a simple example of how to use deka-dom-el for server-side rendering in a Node.js script:
+			Here's a simple example of how to use dd<el> for server-side rendering in a Node.js script:
 		`),
 		el(code, { src: fileURL("./components/examples/ssr/basic-example.js"), page_id }),
 
 		el(h3, t`Building a Static Site Generator`),
 		el("p").append(...T`
-			You can build a complete static site generator with deka-dom-el. In fact, this documentation site
-			is built using deka-dom-el for server-side rendering! Here's how the documentation build process works:
+			You can build a complete static site generator with dd<el>. In fact, this documentation site
+			is built using dd<el> for server-side rendering! Here's how the documentation build process works:
 		`),
 		el(code, { src: fileURL("./components/examples/ssr/static-site-generator.js"), page_id }),
 
@@ -109,7 +109,7 @@ export function page({ pkg, info }){
 
 		el(h3, t`SSR Considerations and Limitations`),
 		el("p").append(...T`
-			When using deka-dom-el for SSR, keep these considerations in mind:
+			When using dd<el> for SSR, keep these considerations in mind:
 		`),
 		el("ul").append(
 			el("li", t`Browser-specific APIs like window.localStorage are not available in jsdom by default`),
@@ -124,7 +124,7 @@ export function page({ pkg, info }){
 
 		el(h3, t`Real Example: How This Documentation is Built`),
 		el("p").append(...T`
-			This documentation site itself is built using deka-dom-el's SSR capabilities.
+			This documentation site itself is built using dd<el>'s SSR capabilities.
 			The build process collects all page components, renders them with jsdom, and outputs static HTML files.
 		`),
 		el(code, { src: fileURL("./components/examples/ssr/static-site-generator.js"), page_id }),

@@ -24,7 +24,7 @@ export function page({ pkg, info }){
 				3rd-party libraries. It describes an advanced feature, not a core part of the library. Most users will
 				not need to implement this functionality directly in their applications. This capability will hopefully
 				be covered by third-party libraries or frameworks that provide simpler SSR integration using
-				deka-dom-el.
+				dd<el>.
 			`)
 		),
 
@@ -103,7 +103,7 @@ for(const { id, info } of pages) {
 	const serverDOM = createHTMl("");
 	serverDOM.registerGlobally("HTMLScriptElement");
 
-	// Register deka-dom-el with the virtual DOM
+	// Register dd<el> with the virtual DOM
 	const { el } = await register(serverDOM.dom);
 
 	// Import and render the page component
@@ -355,7 +355,7 @@ export function loadIrelands(store) {
 
 			el("p").append(...T`
 				This documentation site itself is built using the techniques described here,
-				showcasing how deka-dom-el can be used to create both the documentation and
+				showcasing how dd<el> can be used to create both the documentation and
 				the interactive examples within it. The implementation here is simplified for clarity,
 				while a production-ready system would need to address the considerations above.
 			`)

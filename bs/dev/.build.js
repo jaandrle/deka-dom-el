@@ -1,10 +1,9 @@
 #!/usr/bin/env -S npx nodejsscript
-import { bundle, bundle as bundleDTS } from "dts-bundler";
 const css= echo.css`
 	.info{ color: gray; }
 `;
 
-export async function build({ files, filesOut, minify= "partial", dde= true }){
+export async function build({ files, filesOut, minify= "partial", iife= true }){
 	for(const file_root of files){
 		const file= file_root+".js";
 		echo(`Processing ${file} (minified: ${minify})`);
@@ -21,17 +20,17 @@ export async function build({ files, filesOut, minify= "partial", dde= true }){
 		});
 		echoVariant(file_dts_out);
 
-		if(dde) toDDE(file, file_root);
+		if(iife) toIIFE(file, file_root);
 	}
 	return 0;
 
-	async function toDDE(file, file_root){
-		const name= "dde";
+	async function toIIFE(file, file_root){
+		const name= "iife";
 		const out= filesOut(file_root+".js", name);
 
 		const params= [
 			"--format=iife",
-			"--global-name="+name,
+			"--global-name=dde",
 		];
 		const dde_output= buildEsbuild({ file, out, minify, params });
 		echoVariant(`${out} (${file} → globalThis.${name})`)

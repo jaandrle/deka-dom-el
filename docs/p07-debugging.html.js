@@ -1,8 +1,8 @@
 import { T, t } from "./utils/index.js";
 export const info= {
 	title: t`Debugging`,
-	fullTitle: t`Debugging applications with deka-dom-el`,
-	description: t`Techniques for debugging applications using deka-dom-el, especially signals.`,
+	fullTitle: t`Debugging applications with dd<el>`,
+	description: t`Techniques for debugging applications using dd<el>, especially signals.`,
 };
 
 import { el } from "deka-dom-el";
@@ -19,7 +19,7 @@ export function page({ pkg, info }){
 	return el(simplePage, { info, pkg }).append(
 		el("p").append(...T`
 			Debugging is an essential part of application development. This guide provides techniques
-			and best practices for debugging applications built with deka-dom-el, with a focus on signals.
+			and best practices for debugging applications built with dd<el>, with a focus on signals.
 		`),
 
 		el(h3, t`Debugging signals`),
@@ -87,14 +87,14 @@ console.log('Current value:', signal.valueOf());
 		),
 		el(code, { src: fileURL("./components/examples/debugging/debouncing.js"), page_id }),
 
-		el(h3, t`Browser DevTools tips for deka-dom-el`),
+		el(h3, t`Browser DevTools tips for dd<el>`),
 		el("p").append(...T`
-			When debugging in the browser, deka-dom-el provides several helpful DevTools-friendly features:
+			When debugging in the browser, dd<el> provides several helpful DevTools-friendly features:
 		`),
 
 		el("h4", t`Identifying components in the DOM`),
 		el("p").append(...T`
-			deka-dom-el marks components in the DOM with special comment nodes to help you identify component boundaries.
+			dd<el> marks components in the DOM with special comment nodes to help you identify component boundaries.
 			Components created with ${el("code", "el(ComponentFunction)")} are marked with comment nodes
 			${el("code", "<!--<dde:mark type=\"component\" name=\"MyComponent\" host=\"parentElement\"/>-->")} and
 			includes:
@@ -107,7 +107,7 @@ console.log('Current value:', signal.valueOf());
 
 		el("h4", t`Finding reactive elements in the DOM`),
 		el("p").append(...T`
-			When using ${el("code", "S.el()")}, deka-dom-el creates reactive elements in the DOM
+			When using ${el("code", "S.el()")}, dd<el> creates reactive elements in the DOM
 			that are automatically updated when signal values change. These elements are wrapped in special
 			comment nodes for debugging (to be true they are also used internally, so please do not edit them by hand):
 		`),
@@ -120,7 +120,7 @@ console.log('Current value:', signal.valueOf());
 
 		el("h4", t`DOM inspection properties`),
 		el("p").append(...T`
-			Elements created with the deka-dom-el library have special properties to aid in debugging:
+			Elements created with the dd<el> library have special properties to aid in debugging:
 		`),
 		el("p").append(...T`
 			${el("code", "<element>.__dde_reactive")} - An array property on DOM elements that tracks signal-to-element
@@ -160,7 +160,7 @@ console.log('Current value:', signal.valueOf());
 		`),
 		el("ul").append(
 			el("li", "signal — the signal triggering the changes"),
-			el("li", "listener — the listener function (this is an internal function for DDE)"),
+			el("li", "listener — the listener function (this is an internal function for dd<el>)"),
 			el("li", "element — the DOM element that is bound to the signal"),
 			el("li", "property — the attribute or property name which is changing based on the signal"),
 		),

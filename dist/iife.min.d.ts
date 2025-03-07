@@ -779,6 +779,6 @@ export {
 	elNS as createElementNS,
 };
 
-export as namespace dde;
+export as namespace iife;
 
 export {};

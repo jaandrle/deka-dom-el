@@ -27,7 +27,7 @@ $.api("")
 		files: [ "signals" ],
 		filesOut(file){ return "dist/."+file; },
 		minify: "no",
-		dde: false,
+		iife: false,
 	});
 	return $.exit(regular);
 })
