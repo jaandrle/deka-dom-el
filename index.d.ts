@@ -1,5 +1,4 @@
-declare global{ /* ddeSignal */ }
-
+import type { Signal as ddeSignal } from "./signals";
 type CustomElementTagNameMap= { '#text': Text, '#comment': Comment }
 type SupportedElement=
 		HTMLElementTagNameMap[keyof HTMLElementTagNameMap]
@@ -9,8 +8,8 @@ type SupportedElement=
 declare global {
 	type ddeComponentAttributes= Record<any, any> | undefined;
 	type ddeElementAddon<El extends SupportedElement | DocumentFragment | Node>= (element: El)=> any;
-	type ddeString= string | ddeSignal<string>
-	type ddeStringable= ddeString | number | ddeSignal<number>
+	type ddeString= string | ddeSignal<string, {}>
+	type ddeStringable= ddeString | number | ddeSignal<number, {}>
 }
 type PascalCase= `${Capitalize<string>}${string}`;
 type AttrsModified= {
@@ -18,13 +17,13 @@ type AttrsModified= {
 	 * Use string like in HTML (internally uses `*.setAttribute("style", *)`), or object representation (like DOM API).
 	 */
 	style: Partial<CSSStyleDeclaration> | ddeString
-		| Partial<{ [K in keyof CSSStyleDeclaration]: ddeSignal<CSSStyleDeclaration[K]> }>
+		| Partial<{ [K in keyof CSSStyleDeclaration]: ddeSignal<CSSStyleDeclaration[K], {}> }>
 	/**
 	 * Provide option to add/remove/toggle CSS clasess (index of object) using 1/0/-1.
 	 * In fact `el.classList.toggle(class_name)` for `-1` and `el.classList.toggle(class_name, Boolean(...))`
 	 * for others.
 	 */
-	classList: Record<string,-1|0|1|boolean|ddeSignal<-1|0|1|boolean>>,
+	classList: Record<string,-1|0|1|boolean|ddeSignal<-1|0|1|boolean, {}>>,
 	/**
 	 * Used by the dataset HTML attribute to represent data for custom attributes added to elements.
 	 * Values are converted to string (see {@link DOMStringMap}).
@@ -55,9 +54,9 @@ type ElementAttributes<T extends SupportedElement>= Partial<{
 	[K in keyof _fromElsInterfaces<T>]:
 		_fromElsInterfaces<T>[K] extends ((...p: any[])=> any)
 			? _fromElsInterfaces<T>[K] | ((...p: Parameters<_fromElsInterfaces<T>[K]>)=>
-																	ddeSignal<ReturnType<_fromElsInterfaces<T>[K]>>)
+																	ddeSignal<ReturnType<_fromElsInterfaces<T>[K]>, {}>)
 			: (IsReadonly<_fromElsInterfaces<T>, K> extends false
-				? _fromElsInterfaces<T>[K] | ddeSignal<_fromElsInterfaces<T>[K]>
+				? _fromElsInterfaces<T>[K] | ddeSignal<_fromElsInterfaces<T>[K], {}>
 				: ddeStringable)
 } & AttrsModified> & Record<string, any>;
 export function classListDeclarative<El extends SupportedElement>(
@@ -143,7 +142,7 @@ export function elNS(
 >(
 	tag_name: TAG,
 	attrs?: ddeStringable | Partial<{
-		[key in keyof EL]: EL[key] | ddeSignal<EL[key]> | string | number | boolean
+		[key in keyof EL]: EL[key] | ddeSignal<EL[key], {}> | string | number | boolean
 	}>,
 	...addons: ddeElementAddon<NoInfer<EL>>[]
 )=> ddeMathMLElement
@@ -255,7 +254,7 @@ export const scope: {
 
 export function customElementRender<
 	EL extends HTMLElement,
-	P extends any = Record<string, string | ddeSignal<string>>
+	P extends any = Record<string, string | ddeSignal<string, {}>>
 >(
 	target: ShadowRoot | EL,
 	render: (props: P)=> SupportedElement | DocumentFragment,

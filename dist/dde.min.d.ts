@@ -66,8 +66,7 @@ export interface signal {
 	el<S extends any>(signal: Signal<S, any>, el: (v: S) => Element | Element[] | DocumentFragment): DocumentFragment;
 	observedAttributes(custom_element: HTMLElement): Record<string, Signal<string, {}>>;
 }
-export const signal: signal;
-export const S: signal;
+declare const signal: signal;
 declare global {
 	type ddeSignal<T, A = {}> = Signal<T, A>;
 	type ddeAction<V> = Action<V>;
@@ -779,5 +778,7 @@ export {
 	el as createElement,
 	elNS as createElementNS,
 };
+
+export as namespace dde;
 
 export {};

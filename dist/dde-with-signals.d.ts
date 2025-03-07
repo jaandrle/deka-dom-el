@@ -780,4 +780,6 @@ export {
 	elNS as createElementNS,
 };
 
+export as namespace dde;
+
 export {};
