@@ -1,5 +1,5 @@
 import { JSDOM } from "jsdom";
-const html_default= "<!doctype html><html><head><meta charset=\"utf-8\"></head><body></body></html>";
+const html_default= "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"></head><body></body></html>";
 let keys= [];
 let dom= null;
 import { relative } from 'node:path';
