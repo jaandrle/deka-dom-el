@@ -25,26 +25,27 @@ function EmojiCounter({ initial }) {
 
 	/** @param {HTMLOptionElement} el */
 	const isSelected= el=> (el.selected= el.value===initial);
-	
+
 	// 🔄 View - UI updates automatically when signals change
 	return el().append(
-	el("p", {
-		className: "output",
-		textContent: S(() =>
-		`Hello World ${emoji.get().repeat(clicks.get())}`),
-	}),
-	
-	// 🎮 Controls - Update state on events
-	el("button", { textContent: "Add Emoji" },
-		on("click", () => count.set(count.get() + 1))
-	),
-	
-	el("select", null, on("change", e => emoji.set(e.target.value)))
-	.append(
-		el(Option, "🎉", isSelected),
-		el(Option, "🚀", isSelected),
-		el(Option, "💖", isSelected),
-	)
+		el("p", {
+			className: "output",
+			textContent: S(() =>
+				`Hello World ${emoji.get().repeat(clicks.get())}`),
+		}),
+
+		// 🎮 Controls - Update state on events
+		el("button", { textContent: "Add Emoji" },
+			on("click", () => count.set(count.get() + 1))
+		),
+
+		el("select", null,
+			on("change", e => emoji.set(e.target.value))
+		).append(
+			el(Option, "🎉", isSelected),
+			el(Option, "🚀", isSelected),
+			el(Option, "💖", isSelected),
+		)
 	);
 }
 function Option({ textContent }){
@@ -61,10 +62,12 @@ Creating reactive elements, components, and Web Components using the native
 - ✅ **No build step required** — use directly in browsers or Node.js
 - ☑️ **Lightweight** — ~10-15kB minified (original goal 10kB) with zero/minimal dependencies
 - ✅ **Declarative & functional approach** for clean, maintainable code
-- ✅ **Optional signals** with support for custom reactive implementations
+- ✅ **Signals and events** for reactive UI
+- ✅ **Optional build-in signals** with support for custom reactive implementations
 - ✅ **Server-side rendering** support via [jsdom](https://github.com/jsdom/jsdom)
-- 🔄 **TypeScript support** (work in progress)
-- 🔄 **Enhanced Web Components** support (work in progress)
+- ✅ **TypeScript support** (work in progress)
+- ☑️ **Support for debugging with browser DevTools** without extensions
+- ☑️ **Enhanced Web Components** support (work in progress)
 
 ## Why Another Library?
 
