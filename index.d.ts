@@ -262,7 +262,6 @@ export function customElementRender<
 ): EL
 export function customElementWithDDE<EL extends (new ()=> HTMLElement)>(custom_element: EL): EL
 export function lifecyclesToEvents<EL extends (new ()=> HTMLElement)>(custom_element: EL): EL
-export function observedAttributes(custom_element: HTMLElement): Record<string, string>
 
 /**
  * This is used primarly for server side rendering. To be sure that all async operations

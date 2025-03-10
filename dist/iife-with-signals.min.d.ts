@@ -214,7 +214,6 @@ export const scope: {
 export function customElementRender<EL extends HTMLElement, P extends any = Record<string, string | Signal<string, {}>>>(target: ShadowRoot | EL, render: (props: P) => SupportedElement | DocumentFragment, props?: P | ((el: EL) => P)): EL;
 export function customElementWithDDE<EL extends (new () => HTMLElement)>(custom_element: EL): EL;
 export function lifecyclesToEvents<EL extends (new () => HTMLElement)>(custom_element: EL): EL;
-export function observedAttributes(custom_element: HTMLElement): Record<string, string>;
 /**
  * This is used primarly for server side rendering. To be sure that all async operations
  * are finished before the page is sent to the client.

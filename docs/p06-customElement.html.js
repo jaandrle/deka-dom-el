@@ -115,7 +115,7 @@ export function page({ pkg, info }){
 				el("dt", t`Usage`),
 				el("dd", t`customElementWithDDE(YourElementClass)`),
 				el("dt", t`Benefits`),
-				el("dd", t`Allows using on.connected(), on.disconnected(), etc. with your element`)
+				el("dd", t`Allows using on.connected(), on.disconnected() or S.observedAttributes().`)
 			)
 		),
 		el(example, { src: fileURL("./components/examples/customElement/customElementWithDDE.js"), page_id }),
@@ -142,7 +142,8 @@ export function page({ pkg, info }){
 					el("ol").append(
 						el("li", t`Target (usually this or this.shadowRoot)`),
 						el("li", t`Component function that returns a DOM tree`),
-						el("li", t`Optional: Attributes transformer function (default or S.observedAttributes)`)
+						el("li", t`Optional: Attributes transformer function (empty by default or
+							S.observedAttributes)`)
 					)
 				),
 				el("dt", t`Returns`),
@@ -169,7 +170,8 @@ export function page({ pkg, info }){
 			`),
 			el("ol").append(
 				el("li").append(...T`
-					${el("code", "observedAttributes")} - Passes attributes as regular values (static)
+					Using standard attribute access (${el("code", "this.getAttribute(<name>)")}) - Passes attributes as
+					regular values (static)
 				`),
 				el("li").append(...T`
 					${el("code", "S.observedAttributes")} - Transforms attributes into signals (reactive)
@@ -177,7 +179,7 @@ export function page({ pkg, info }){
 			)
 		),
 		el("p").append(...T`
-			Using ${el("code", "S.observedAttributes")} creates a reactive connection between your element's attributes
+			Using the ${el("code", "S.observedAttributes")} creates a reactive connection between your element's attributes
 			and its internal rendering. When attributes change, your component automatically updates!
 		`),
 		el(example, { src: fileURL("./components/examples/customElement/observedAttributes.js"), page_id }),

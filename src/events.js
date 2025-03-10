@@ -106,35 +106,3 @@ on.disconnectedAsAbort= function(host){
 	host(on.disconnected(()=> a.abort()));
 	return a.signal;
 };
-
-/** Store for elements with attribute observers */
-const els_attribute_store= new WeakSet();
-
-/**
- * Creates a function to register attribute change event listeners
- *
- * @param {Function} listener - Event handler
- * @param {Object} [options] - Event listener options
- * @returns {Function} Function that registers the attribute change listener
- */
-on.attributeChanged= function(listener, options){
-	if(typeof options !== "object")
-		options= {};
-	return function registerElement(element){
-		element.addEventListener(eva, listener, options);
-		if(element[keyLTE] || els_attribute_store.has(element))
-			return element;
-
-		if(!env.M) return element;
-
-		const observer= new env.M(function(mutations){
-			for(const { attributeName, target } of mutations)
-				target.dispatchEvent(
-					new CustomEvent(eva, { detail: [ attributeName, target.getAttribute(attributeName) ] }));
-		});
-		const c= onAbort(options.signal, ()=> observer.disconnect());
-		if(c) observer.observe(element, { attributes: true });
-		//TODO: clean up when element disconnected
-		return element;
-	};
-};

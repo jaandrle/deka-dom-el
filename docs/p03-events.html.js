@@ -165,9 +165,6 @@ export function page({ pkg, info }){
 
 				el("dt", t`on.disconnected(callback)`),
 				el("dd", t`Fires when the element is removed from the DOM`),
-
-				el("dt", t`on.attributeChanged(callback, attributeName)`),
-				el("dd", t`Fires when the specified attribute changes`)
 			)
 		),
 		el(example, { src: fileURL("./components/examples/events/live-cycle.js"), page_id }),

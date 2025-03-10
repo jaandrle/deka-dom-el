@@ -159,7 +159,7 @@ signal.clear= function(...signals){
 };
 /** Property key for tracking reactive elements */
 const key_reactive= "__dde_reactive";
-import { enviroment as env } from "../dom-common.js";
+import { enviroment as env, eva } from "../dom-common.js";
 import { el } from "../dom.js";
 import { scope } from "../dom.js";
 import { on } from "../events.js";
@@ -265,7 +265,7 @@ const key_attributes= "__dde_attributes";
 signal.observedAttributes= function(element){
 	const store= element[key_attributes]= {};
 	const attrs= observedAttributes(element, observedAttribute(store));
-	on.attributeChanged(function attributeChangeToSignal({ detail }){
+	on(eva, function attributeChangeToSignal({ detail }){
 		/*! This maps attributes to signals (`S.observedAttributes`).
 			Investigate `__dde_attributes` key of the element. */
 		const [ name, value ]= detail;

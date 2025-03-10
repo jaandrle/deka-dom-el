@@ -21,16 +21,6 @@ function onAbort(signal, listener) {
 		signal.removeEventListener("abort", listener);
 	};
 }
-function observedAttributes(instance, observedAttribute) {
-	const { observedAttributes: observedAttributes3 = [] } = instance.constructor;
-	return observedAttributes3.reduce(function(out, name) {
-		out[kebabToCamel(name)] = observedAttribute(instance, name);
-		return out;
-	}, {});
-}
-function kebabToCamel(name) {
-	return name.replace(/-./g, (x) => x[1].toUpperCase());
-}
 
 // src/signals-lib/common.js
 var signals_global = {
@@ -522,7 +512,7 @@ function connectionsChangesObserverConstructor() {
 }
 
 // src/customElement.js
-function customElementRender(target, render, props = observedAttributes2) {
+function customElementRender(target, render, props = {}) {
 	const custom_element = target.host || target;
 	scope.push({
 		scope: custom_element,
@@ -562,9 +552,6 @@ function lifecyclesToEvents(class_declaration) {
 function wrapMethod(obj, method, apply) {
 	obj[method] = new Proxy(obj[method] || (() => {
 	}), { apply });
-}
-function observedAttributes2(instance) {
-	return observedAttributes(instance, (i, n) => i.getAttribute(n));
 }
 
 // src/events.js
@@ -619,26 +606,6 @@ on.disconnectedAsAbort = function(host) {
 	host(on.disconnected(() => a.abort()));
 	return a.signal;
 };
-var els_attribute_store = /* @__PURE__ */ new WeakSet();
-on.attributeChanged = function(listener, options) {
-	if (typeof options !== "object")
-		options = {};
-	return function registerElement(element) {
-		element.addEventListener(eva, listener, options);
-		if (element[keyLTE] || els_attribute_store.has(element))
-			return element;
-		if (!enviroment.M) return element;
-		const observer = new enviroment.M(function(mutations) {
-			for (const { attributeName, target } of mutations)
-				target.dispatchEvent(
-					new CustomEvent(eva, { detail: [attributeName, target.getAttribute(attributeName)] })
-				);
-		});
-		const c = onAbort(options.signal, () => observer.disconnect());
-		if (c) observer.observe(element, { attributes: true });
-		return element;
-	};
-};
 export {
 	assign,
 	assignAttribute,
@@ -653,7 +620,6 @@ export {
 	createElementNS as elNS,
 	elementAttribute,
 	lifecyclesToEvents,
-	observedAttributes2 as observedAttributes,
 	on,
 	queue,
 	registerReactivity,

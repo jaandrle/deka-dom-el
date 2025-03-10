@@ -35,7 +35,6 @@ var DDE = (() => {
 		elementAttribute: () => elementAttribute,
 		isSignal: () => isSignal,
 		lifecyclesToEvents: () => lifecyclesToEvents,
-		observedAttributes: () => observedAttributes2,
 		on: () => on,
 		queue: () => queue,
 		registerReactivity: () => registerReactivity,
@@ -78,8 +77,8 @@ var DDE = (() => {
 		};
 	}
 	function observedAttributes(instance, observedAttribute2) {
-		const { observedAttributes: observedAttributes3 = [] } = instance.constructor;
-		return observedAttributes3.reduce(function(out, name) {
+		const { observedAttributes: observedAttributes2 = [] } = instance.constructor;
+		return observedAttributes2.reduce(function(out, name) {
 			out[kebabToCamel(name)] = observedAttribute2(instance, name);
 			return out;
 		}, {});
@@ -591,7 +590,7 @@ var DDE = (() => {
 	}
 
 	// src/customElement.js
-	function customElementRender(target, render, props = observedAttributes2) {
+	function customElementRender(target, render, props = {}) {
 		const custom_element = target.host || target;
 		scope.push({
 			scope: custom_element,
@@ -631,9 +630,6 @@ var DDE = (() => {
 	function wrapMethod(obj, method, apply) {
 		obj[method] = new Proxy(obj[method] || (() => {
 		}), { apply });
-	}
-	function observedAttributes2(instance) {
-		return observedAttributes(instance, (i, n) => i.getAttribute(n));
 	}
 
 	// src/events.js
@@ -687,26 +683,6 @@ var DDE = (() => {
 		store_abort.set(host, a);
 		host(on.disconnected(() => a.abort()));
 		return a.signal;
-	};
-	var els_attribute_store = /* @__PURE__ */ new WeakSet();
-	on.attributeChanged = function(listener, options) {
-		if (typeof options !== "object")
-			options = {};
-		return function registerElement(element) {
-			element.addEventListener(eva, listener, options);
-			if (element[keyLTE] || els_attribute_store.has(element))
-				return element;
-			if (!enviroment.M) return element;
-			const observer = new enviroment.M(function(mutations) {
-				for (const { attributeName, target } of mutations)
-					target.dispatchEvent(
-						new CustomEvent(eva, { detail: [attributeName, target.getAttribute(attributeName)] })
-					);
-			});
-			const c = onAbort(options.signal, () => observer.disconnect());
-			if (c) observer.observe(element, { attributes: true });
-			return element;
-		};
 	};
 
 	// src/signals-lib/helpers.js
@@ -892,7 +868,7 @@ var DDE = (() => {
 	signal.observedAttributes = function(element) {
 		const store = element[key_attributes] = {};
 		const attrs = observedAttributes(element, observedAttribute(store));
-		on.attributeChanged(function attributeChangeToSignal({ detail }) {
+		on(eva, function attributeChangeToSignal({ detail }) {
 			/*! This maps attributes to signals (`S.observedAttributes`).
 				Investigate `__dde_attributes` key of the element. */
 			const [name, value] = detail;

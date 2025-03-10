@@ -2,7 +2,6 @@
 import {
 	customElementRender,
 	customElementWithDDE,
-	observedAttributes,
 } from "deka-dom-el";
 /** @type {ddePublicElementTagNameMap} */
 import { S } from "deka-dom-el/signals";
