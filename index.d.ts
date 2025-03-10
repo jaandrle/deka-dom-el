@@ -243,6 +243,11 @@ export const scope: {
 	 * */
 	host: (...addons: ddeElementAddon<SupportedElement>[])=> HTMLElement,
 
+	/**
+	 * Creates/gets an AbortController that triggers when the element disconnects
+	 * */
+	signal: AbortSignal,
+
 	state: Scope[],
 	/** Adds new child scope. All attributes are inherited by default. */
 	push(scope?: Partial<Scope>): ReturnType<Array<Scope>["push"]>,

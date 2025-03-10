@@ -78,6 +78,215 @@ var evc = "dde:connected";
 var evd = "dde:disconnected";
 var eva = "dde:attributeChanged";
 
+// src/events-observer.js
+var c_ch_o = enviroment.M ? connectionsChangesObserverConstructor() : new Proxy({}, {
+	get() {
+		return () => {
+		};
+	}
+});
+function connectionsChangesObserverConstructor() {
+	const store = /* @__PURE__ */ new Map();
+	let is_observing = false;
+	const observerListener = (stop2) => function(mutations) {
+		for (const mutation of mutations) {
+			if (mutation.type !== "childList") continue;
+			if (observerAdded(mutation.addedNodes, true)) {
+				stop2();
+				continue;
+			}
+			if (observerRemoved(mutation.removedNodes, true))
+				stop2();
+		}
+	};
+	const observer = new enviroment.M(observerListener(stop));
+	return {
+		/**
+		* Creates an observer for a specific element
+		* @param {Element} element - Element to observe
+		* @returns {Function} Cleanup function
+		*/
+		observe(element) {
+			const o = new enviroment.M(observerListener(() => {
+			}));
+			o.observe(element, { childList: true, subtree: true });
+			return () => o.disconnect();
+		},
+		/**
+		* Register a connection listener for an element
+		* @param {Element} element - Element to watch
+		* @param {Function} listener - Callback for connection event
+		*/
+		onConnected(element, listener) {
+			start();
+			const listeners = getElementStore(element);
+			if (listeners.connected.has(listener)) return;
+			listeners.connected.add(listener);
+			listeners.length_c += 1;
+		},
+		/**
+		* Unregister a connection listener
+		* @param {Element} element - Element being watched
+		* @param {Function} listener - Callback to remove
+		*/
+		offConnected(element, listener) {
+			if (!store.has(element)) return;
+			const ls = store.get(element);
+			if (!ls.connected.has(listener)) return;
+			ls.connected.delete(listener);
+			ls.length_c -= 1;
+			cleanWhenOff(element, ls);
+		},
+		/**
+		* Register a disconnection listener for an element
+		* @param {Element} element - Element to watch
+		* @param {Function} listener - Callback for disconnection event
+		*/
+		onDisconnected(element, listener) {
+			start();
+			const listeners = getElementStore(element);
+			if (listeners.disconnected.has(listener)) return;
+			listeners.disconnected.add(listener);
+			listeners.length_d += 1;
+		},
+		/**
+		* Unregister a disconnection listener
+		* @param {Element} element - Element being watched
+		* @param {Function} listener - Callback to remove
+		*/
+		offDisconnected(element, listener) {
+			if (!store.has(element)) return;
+			const ls = store.get(element);
+			ls.disconnected.delete(listener);
+			ls.length_d -= 1;
+			cleanWhenOff(element, ls);
+		}
+	};
+	function cleanWhenOff(element, ls) {
+		if (ls.length_c || ls.length_d)
+			return;
+		store.delete(element);
+		stop();
+	}
+	function getElementStore(element) {
+		if (store.has(element)) return store.get(element);
+		const out = {
+			connected: /* @__PURE__ */ new WeakSet(),
+			length_c: 0,
+			disconnected: /* @__PURE__ */ new WeakSet(),
+			length_d: 0
+		};
+		store.set(element, out);
+		return out;
+	}
+	function start() {
+		if (is_observing) return;
+		is_observing = true;
+		observer.observe(enviroment.D.body, { childList: true, subtree: true });
+	}
+	function stop() {
+		if (!is_observing || store.size) return;
+		is_observing = false;
+		observer.disconnect();
+	}
+	function requestIdle() {
+		return new Promise(function(resolve) {
+			(requestIdleCallback || requestAnimationFrame)(resolve);
+		});
+	}
+	async function collectChildren(element) {
+		if (store.size > 30)
+			await requestIdle();
+		const out = [];
+		if (!isInstance(element, Node)) return out;
+		for (const el of store.keys()) {
+			if (el === element || !isInstance(el, Node)) continue;
+			if (element.contains(el))
+				out.push(el);
+		}
+		return out;
+	}
+	function observerAdded(addedNodes, is_root) {
+		let out = false;
+		for (const element of addedNodes) {
+			if (is_root) collectChildren(element).then(observerAdded);
+			if (!store.has(element)) continue;
+			const ls = store.get(element);
+			if (!ls.length_c) continue;
+			element.dispatchEvent(new Event(evc));
+			ls.connected = /* @__PURE__ */ new WeakSet();
+			ls.length_c = 0;
+			if (!ls.length_d) store.delete(element);
+			out = true;
+		}
+		return out;
+	}
+	function observerRemoved(removedNodes, is_root) {
+		let out = false;
+		for (const element of removedNodes) {
+			if (is_root) collectChildren(element).then(observerRemoved);
+			if (!store.has(element)) continue;
+			const ls = store.get(element);
+			if (!ls.length_d) continue;
+			(globalThis.queueMicrotask || setTimeout)(dispatchRemove(element));
+			out = true;
+		}
+		return out;
+	}
+	function dispatchRemove(element) {
+		return () => {
+			if (element.isConnected) return;
+			element.dispatchEvent(new Event(evd));
+			store.delete(element);
+		};
+	}
+}
+
+// src/events.js
+function dispatchEvent(name, options, host) {
+	if (typeof options === "function") {
+		host = options;
+		options = null;
+	}
+	if (!options) options = {};
+	return function dispatch(element, ...d) {
+		if (host) {
+			d.unshift(element);
+			element = typeof host === "function" ? host() : host;
+		}
+		const event = d.length ? new CustomEvent(name, oAssign({ detail: d[0] }, options)) : new Event(name, options);
+		return element.dispatchEvent(event);
+	};
+}
+function on(event, listener, options) {
+	return function registerElement(element) {
+		element.addEventListener(event, listener, options);
+		return element;
+	};
+}
+var lifeOptions = (obj) => oAssign({}, typeof obj === "object" ? obj : null, { once: true });
+on.connected = function(listener, options) {
+	options = lifeOptions(options);
+	return function registerElement(element) {
+		element.addEventListener(evc, listener, options);
+		if (element[keyLTE]) return element;
+		if (element.isConnected) return element.dispatchEvent(new Event(evc)), element;
+		const c = onAbort(options.signal, () => c_ch_o.offConnected(element, listener));
+		if (c) c_ch_o.onConnected(element, listener);
+		return element;
+	};
+};
+on.disconnected = function(listener, options) {
+	options = lifeOptions(options);
+	return function registerElement(element) {
+		element.addEventListener(evd, listener, options);
+		if (element[keyLTE]) return element;
+		const c = onAbort(options.signal, () => c_ch_o.offDisconnected(element, listener));
+		if (c) c_ch_o.onDisconnected(element, listener);
+		return element;
+	};
+};
+
 // src/dom.js
 function queue(promise) {
 	return enviroment.q(promise);
@@ -89,6 +298,7 @@ var scopes = [{
 	host: (c) => c ? c(enviroment.D.body) : enviroment.D.body,
 	prevent: true
 }];
+var store_abort = /* @__PURE__ */ new WeakMap();
 var scope = {
 	/**
 	* Gets the current scope
@@ -103,6 +313,17 @@ var scope = {
 	*/
 	get host() {
 		return this.current.host;
+	},
+	/**
+	* Creates/gets an AbortController that triggers when the element disconnects
+	* */
+	get signal() {
+		const { host } = this;
+		if (store_abort.has(host)) return store_abort.get(host);
+		const a = new AbortController();
+		store_abort.set(host, a);
+		host(on.disconnected(() => a.abort()));
+		return a.signal;
 	},
 	/**
 	* Prevents default behavior in the current scope
@@ -347,170 +568,6 @@ function setDelete(obj, key, val) {
 	return Reflect.deleteProperty(obj, key);
 }
 
-// src/events-observer.js
-var c_ch_o = enviroment.M ? connectionsChangesObserverConstructor() : new Proxy({}, {
-	get() {
-		return () => {
-		};
-	}
-});
-function connectionsChangesObserverConstructor() {
-	const store = /* @__PURE__ */ new Map();
-	let is_observing = false;
-	const observerListener = (stop2) => function(mutations) {
-		for (const mutation of mutations) {
-			if (mutation.type !== "childList") continue;
-			if (observerAdded(mutation.addedNodes, true)) {
-				stop2();
-				continue;
-			}
-			if (observerRemoved(mutation.removedNodes, true))
-				stop2();
-		}
-	};
-	const observer = new enviroment.M(observerListener(stop));
-	return {
-		/**
-		* Creates an observer for a specific element
-		* @param {Element} element - Element to observe
-		* @returns {Function} Cleanup function
-		*/
-		observe(element) {
-			const o = new enviroment.M(observerListener(() => {
-			}));
-			o.observe(element, { childList: true, subtree: true });
-			return () => o.disconnect();
-		},
-		/**
-		* Register a connection listener for an element
-		* @param {Element} element - Element to watch
-		* @param {Function} listener - Callback for connection event
-		*/
-		onConnected(element, listener) {
-			start();
-			const listeners = getElementStore(element);
-			if (listeners.connected.has(listener)) return;
-			listeners.connected.add(listener);
-			listeners.length_c += 1;
-		},
-		/**
-		* Unregister a connection listener
-		* @param {Element} element - Element being watched
-		* @param {Function} listener - Callback to remove
-		*/
-		offConnected(element, listener) {
-			if (!store.has(element)) return;
-			const ls = store.get(element);
-			if (!ls.connected.has(listener)) return;
-			ls.connected.delete(listener);
-			ls.length_c -= 1;
-			cleanWhenOff(element, ls);
-		},
-		/**
-		* Register a disconnection listener for an element
-		* @param {Element} element - Element to watch
-		* @param {Function} listener - Callback for disconnection event
-		*/
-		onDisconnected(element, listener) {
-			start();
-			const listeners = getElementStore(element);
-			if (listeners.disconnected.has(listener)) return;
-			listeners.disconnected.add(listener);
-			listeners.length_d += 1;
-		},
-		/**
-		* Unregister a disconnection listener
-		* @param {Element} element - Element being watched
-		* @param {Function} listener - Callback to remove
-		*/
-		offDisconnected(element, listener) {
-			if (!store.has(element)) return;
-			const ls = store.get(element);
-			ls.disconnected.delete(listener);
-			ls.length_d -= 1;
-			cleanWhenOff(element, ls);
-		}
-	};
-	function cleanWhenOff(element, ls) {
-		if (ls.length_c || ls.length_d)
-			return;
-		store.delete(element);
-		stop();
-	}
-	function getElementStore(element) {
-		if (store.has(element)) return store.get(element);
-		const out = {
-			connected: /* @__PURE__ */ new WeakSet(),
-			length_c: 0,
-			disconnected: /* @__PURE__ */ new WeakSet(),
-			length_d: 0
-		};
-		store.set(element, out);
-		return out;
-	}
-	function start() {
-		if (is_observing) return;
-		is_observing = true;
-		observer.observe(enviroment.D.body, { childList: true, subtree: true });
-	}
-	function stop() {
-		if (!is_observing || store.size) return;
-		is_observing = false;
-		observer.disconnect();
-	}
-	function requestIdle() {
-		return new Promise(function(resolve) {
-			(requestIdleCallback || requestAnimationFrame)(resolve);
-		});
-	}
-	async function collectChildren(element) {
-		if (store.size > 30)
-			await requestIdle();
-		const out = [];
-		if (!isInstance(element, Node)) return out;
-		for (const el of store.keys()) {
-			if (el === element || !isInstance(el, Node)) continue;
-			if (element.contains(el))
-				out.push(el);
-		}
-		return out;
-	}
-	function observerAdded(addedNodes, is_root) {
-		let out = false;
-		for (const element of addedNodes) {
-			if (is_root) collectChildren(element).then(observerAdded);
-			if (!store.has(element)) continue;
-			const ls = store.get(element);
-			if (!ls.length_c) continue;
-			element.dispatchEvent(new Event(evc));
-			ls.connected = /* @__PURE__ */ new WeakSet();
-			ls.length_c = 0;
-			if (!ls.length_d) store.delete(element);
-			out = true;
-		}
-		return out;
-	}
-	function observerRemoved(removedNodes, is_root) {
-		let out = false;
-		for (const element of removedNodes) {
-			if (is_root) collectChildren(element).then(observerRemoved);
-			if (!store.has(element)) continue;
-			const ls = store.get(element);
-			if (!ls.length_d) continue;
-			(globalThis.queueMicrotask || setTimeout)(dispatchRemove(element));
-			out = true;
-		}
-		return out;
-	}
-	function dispatchRemove(element) {
-		return () => {
-			if (element.isConnected) return;
-			element.dispatchEvent(new Event(evd));
-			store.delete(element);
-		};
-	}
-}
-
 // src/customElement.js
 function customElementRender(target, render, props = {}) {
 	const custom_element = target.host || target;
@@ -553,59 +610,6 @@ function wrapMethod(obj, method, apply) {
 	obj[method] = new Proxy(obj[method] || (() => {
 	}), { apply });
 }
-
-// src/events.js
-function dispatchEvent(name, options, host) {
-	if (typeof options === "function") {
-		host = options;
-		options = null;
-	}
-	if (!options) options = {};
-	return function dispatch(element, ...d) {
-		if (host) {
-			d.unshift(element);
-			element = typeof host === "function" ? host() : host;
-		}
-		const event = d.length ? new CustomEvent(name, oAssign({ detail: d[0] }, options)) : new Event(name, options);
-		return element.dispatchEvent(event);
-	};
-}
-function on(event, listener, options) {
-	return function registerElement(element) {
-		element.addEventListener(event, listener, options);
-		return element;
-	};
-}
-var lifeOptions = (obj) => oAssign({}, typeof obj === "object" ? obj : null, { once: true });
-on.connected = function(listener, options) {
-	options = lifeOptions(options);
-	return function registerElement(element) {
-		element.addEventListener(evc, listener, options);
-		if (element[keyLTE]) return element;
-		if (element.isConnected) return element.dispatchEvent(new Event(evc)), element;
-		const c = onAbort(options.signal, () => c_ch_o.offConnected(element, listener));
-		if (c) c_ch_o.onConnected(element, listener);
-		return element;
-	};
-};
-on.disconnected = function(listener, options) {
-	options = lifeOptions(options);
-	return function registerElement(element) {
-		element.addEventListener(evd, listener, options);
-		if (element[keyLTE]) return element;
-		const c = onAbort(options.signal, () => c_ch_o.offDisconnected(element, listener));
-		if (c) c_ch_o.onDisconnected(element, listener);
-		return element;
-	};
-};
-var store_abort = /* @__PURE__ */ new WeakMap();
-on.disconnectedAsAbort = function(host) {
-	if (store_abort.has(host)) return store_abort.get(host);
-	const a = new AbortController();
-	store_abort.set(host, a);
-	host(on.disconnected(() => a.abort()));
-	return a.signal;
-};
 export {
 	assign,
 	assignAttribute,

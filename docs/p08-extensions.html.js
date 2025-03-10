@@ -59,7 +59,7 @@ el("div", { id: "example" }, myAddon({ option: "value" }));
 		`),
 		el("div", { className: "tip" }).append(
 			el("p").append(...T`
-				The ${el("code", "on.disconnectedAsAbort")} utility creates an AbortSignal that automatically
+				The ${el("code", "scope.signal")} property creates an AbortSignal that automatically
 				triggers when an element is disconnected from the DOM, making cleanup much easier to manage.
 			`)
 		),
@@ -80,8 +80,7 @@ function externalLibraryAddon(config, signal) {
 }
 // dde component
 function Component(){
-	const { host }= scope;
-	const signal= on.disconnectedAsAbort(host);
+	const { signal }= scope;
 	return el("div", null, externalLibraryAddon({ option: "value" }, signal));
 }
 		`.trim(), page_id }),
@@ -213,7 +212,7 @@ console.log(doubled.get()); // 10`, page_id }),
 		el("ol").append(
 			el("li").append(...T`
 				${el("strong", "Use AbortSignals for cleanup:")} Always implement proper resource cleanup with
-				${el("code", "on.disconnectedAsAbort")} or similar mechanisms
+				${el("code", "scope.signal")} or similar mechanisms
 			`),
 			el("li").append(...T`
 				${el("strong", "Separate core logic from library adaptation:")} Make your core functionality work
