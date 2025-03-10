@@ -3,7 +3,7 @@ const css= echo.css`
 	.info{ color: gray; }
 `;
 
-export async function build({ files, filesOut, minify= "partial", iife= true }){
+export function build({ files, filesOut, minify= "partial", iife= true, types= true }){
 	for(const file_root of files){
 		const file= file_root+".js";
 		echo(`Processing ${file} (minified: ${minify})`);
@@ -11,20 +11,22 @@ export async function build({ files, filesOut, minify= "partial", iife= true }){
 		const esbuild_output= buildEsbuild({ file, out, minify });
 		echoVariant(esbuild_output.stderr.split("\n")[1].trim());
 
-		const file_dts= file_root+".d.ts";
-		const file_dts_out= filesOut(file_dts);
-		echoVariant(file_dts_out, true);
-		buildDts({
-			bundle: out,
-			entry: file_dts,
-		});
-		echoVariant(file_dts_out);
+		if(types){
+			const file_dts= file_root+".d.ts";
+			const file_dts_out= filesOut(file_dts);
+			echoVariant(file_dts_out, true);
+			buildDts({
+				bundle: out,
+				entry: file_dts,
+			});
+			echoVariant(file_dts_out);
+		}
 
-		if(iife) toIIFE(file, file_root);
+		if(iife) toIIFE(file, file_root, types);
 	}
 	return 0;
 
-	async function toIIFE(file, file_root){
+	function toIIFE(file, file_root, types){
 		const fileMark= "iife";
 		const name= "DDE";
 		const out= filesOut(file_root+".js", fileMark);
@@ -36,6 +38,7 @@ export async function build({ files, filesOut, minify= "partial", iife= true }){
 		const dde_output= buildEsbuild({ file, out, minify, params });
 		echoVariant(`${out} (${name})`)
 
+		if(!types) return dde_output;
 		const file_dts= file_root+".d.ts";
 		const file_dts_out= filesOut(file_dts, fileMark);
 		echoVariant(file_dts_out, true);

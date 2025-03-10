@@ -1,5 +1,5 @@
 export { registerReactivity } from './signals-lib/common.js';
-import { enviroment as env, keyLTE, evc, evd, eva } from './dom-common.js';
+import { keyLTE, evc, evd } from './dom-common.js';
 import { oAssign, onAbort } from './helpers.js';
 
 /**

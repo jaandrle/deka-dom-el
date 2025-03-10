@@ -4,11 +4,13 @@ const files= [ "index", "index-with-signals" ];
 
 $.api("")
 .command("main", "Build main files", { default: true })
-.action(async function main(){
+.option("--no-types", "Also generate d.ts files", false)
+.action(async function main({ types }){
 	const regular = await build({
 		files,
 		filesOut,
 		minify: "no",
+		types,
 	});
 	const min = await build({
 		files,
@@ -18,6 +20,7 @@ $.api("")
 			return out.slice(0, idx)+".min"+out.slice(idx);
 		},
 		minify: "full",
+		types,
 	});
 	return $.exit(regular + min);
 })
