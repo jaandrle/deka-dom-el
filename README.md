@@ -122,3 +122,4 @@ Signals are the reactive backbone of Deka DOM Elements:
 - [potch/signals](https://github.com/potch/signals) - A small reactive signals library
 - [jaandrle/dollar_dom_component](https://github.com/jaandrle/dollar_dom_component) -
 	Functional DOM components without JSX/virtual DOM
+- [mxjp/rvx: A signal based frontend framework](https://github.com/mxjp/rvx)

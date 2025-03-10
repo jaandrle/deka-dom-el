@@ -31,6 +31,19 @@ export function page({ pkg, info }){
 			This is achieved through integration with for example ${el("a", { href: "https://github.com/tmpvar/jsdom",
 			textContent: "jsdom" })}, a JavaScript implementation of web standards for Node.js.
 		`),
+		el("p").append(...T`
+			Additionally, you might consider using these alternative solutions:
+		`),
+		el("ul").append(
+			el("li").append(...T`
+				${el("a", { href: "https://github.com/capricorn86/happy-dom", textContent: "happy-dom" })} - A JavaScript implementation
+				of a web browser without its graphical user interface that's faster than jsdom
+			`),
+			el("li").append(...T`
+				${el("a", { href: "https://github.com/WebReflection/linkedom", textContent: "linkedom" })} - A lightweight DOM implementation
+				specifically designed for SSR with significantly better performance than jsdom
+			`),
+		),
 		el(code, { src: fileURL("./components/examples/ssr/intro.js"), page_id }),
 
 		el(h3, t`Why Server-Side Rendering?`),
