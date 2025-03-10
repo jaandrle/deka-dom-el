@@ -80,10 +80,11 @@ export type CustomElementTagNameMap = {
 export type SupportedElement = HTMLElementTagNameMap[keyof HTMLElementTagNameMap] | SVGElementTagNameMap[keyof SVGElementTagNameMap] | MathMLElementTagNameMap[keyof MathMLElementTagNameMap] | CustomElementTagNameMap[keyof CustomElementTagNameMap];
 declare global {
 	type ddeComponentAttributes = Record<any, any> | undefined;
-	type ddeElementAddon<El extends SupportedElement | DocumentFragment | Node> = (element: El) => any;
+	type ddeElementAddon<El extends SupportedElement | DocumentFragment | Node> = (element: El, ...rest: any) => any;
 	type ddeString = string | Signal<string, {}>;
 	type ddeStringable = ddeString | number | Signal<number, {}>;
 }
+export type Host<EL extends SupportedElement> = (...addons: ddeElementAddon<EL>[]) => EL;
 export type PascalCase = `${Capitalize<string>}${string}`;
 export type AttrsModified = {
 	/**
@@ -166,9 +167,9 @@ export function simulateSlots<EL extends SupportedElement | DocumentFragment>(ro
  * @param body Body of the custom element
  * */
 export function simulateSlots<EL extends SupportedElement | DocumentFragment>(el: HTMLElement, body: EL): EL;
-declare function dispatchEvent$1(name: keyof DocumentEventMap | string, element: SupportedElement): (data?: any) => void;
+declare function dispatchEvent$1(name: keyof DocumentEventMap | string, host: Host<SupportedElement>): (data?: any) => void;
 declare function dispatchEvent$1(name: keyof DocumentEventMap | string, options?: EventInit): (element: SupportedElement, data?: any) => void;
-declare function dispatchEvent$1(name: keyof DocumentEventMap | string, options: EventInit | null, element: SupportedElement | (() => SupportedElement)): (data?: any) => void;
+declare function dispatchEvent$1(name: keyof DocumentEventMap | string, options: EventInit | null, host: Host<SupportedElement>): (data?: any) => void;
 export interface On {
 	/** Listens to the DOM event. See {@link Document.addEventListener} */
 	<Event extends keyof DocumentEventMap, EE extends ddeElementAddon<SupportedElement> = ddeElementAddon<HTMLElement>>(type: Event, listener: (this: EE extends ddeElementAddon<infer El> ? El : never, ev: DocumentEventMap[Event]) => any, options?: AddEventListenerOptions): EE;
@@ -186,7 +187,7 @@ export interface On {
 export const on: On;
 export type Scope = {
 	scope: Node | Function | Object;
-	host: ddeElementAddon<any>;
+	host: Host<SupportedElement>;
 	custom_element: false | HTMLElement;
 	prevent: boolean;
 };
@@ -202,7 +203,7 @@ export const scope: {
 	 * It can be also used to register Addon(s) (functions to be called when component is initized)
 	 * — `scope.host(on.connected(console.log))`.
 	 * */
-	host: (...addons: ddeElementAddon<SupportedElement>[]) => HTMLElement;
+	host: Host<SupportedElement>;
 	/**
 	 * Creates/gets an AbortController that triggers when the element disconnects
 	 * */

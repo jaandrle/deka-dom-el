@@ -1,4 +1,3 @@
-export { registerReactivity } from './signals-lib/common.js';
 import { keyLTE, evc, evd } from './dom-common.js';
 import { oAssign, onAbort } from './helpers.js';
 

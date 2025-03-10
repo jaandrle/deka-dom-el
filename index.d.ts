@@ -7,10 +7,11 @@ type SupportedElement=
 	|	CustomElementTagNameMap[keyof CustomElementTagNameMap]
 declare global {
 	type ddeComponentAttributes= Record<any, any> | undefined;
-	type ddeElementAddon<El extends SupportedElement | DocumentFragment | Node>= (element: El)=> any;
+	type ddeElementAddon<El extends SupportedElement | DocumentFragment | Node>= (element: El, ...rest: any)=> any;
 	type ddeString= string | ddeSignal<string, {}>
 	type ddeStringable= ddeString | number | ddeSignal<number, {}>
 }
+type Host<EL extends SupportedElement>= (...addons: ddeElementAddon<EL>[])=> EL;
 type PascalCase= `${Capitalize<string>}${string}`;
 type AttrsModified= {
 	/**
@@ -170,14 +171,14 @@ export function simulateSlots<EL extends SupportedElement | DocumentFragment>(
 	body: EL,
 ): EL
 
-export function dispatchEvent(name: keyof DocumentEventMap | string, element: SupportedElement):
+export function dispatchEvent(name: keyof DocumentEventMap | string, host: Host<SupportedElement>):
 	(data?: any)=> void;
 export function dispatchEvent(name: keyof DocumentEventMap | string, options?: EventInit):
 	(element: SupportedElement, data?: any)=> void;
 export function dispatchEvent(
 	name: keyof DocumentEventMap | string,
 	options: EventInit | null,
-	element: SupportedElement | (()=> SupportedElement)
+	host: Host<SupportedElement>
 ): (data?: any)=> void;
 interface On{
 	/** Listens to the DOM event. See {@link Document.addEventListener} */
@@ -225,7 +226,7 @@ export const on: On;
 
 type Scope= {
 	scope: Node | Function | Object,
-	host: ddeElementAddon<any>,
+	host: Host<SupportedElement>,
 	custom_element: false | HTMLElement,
 	prevent: boolean
 };
@@ -241,7 +242,7 @@ export const scope: {
 	 * It can be also used to register Addon(s) (functions to be called when component is initized)
 	 * — `scope.host(on.connected(console.log))`.
 	 * */
-	host: (...addons: ddeElementAddon<SupportedElement>[])=> HTMLElement,
+	host: Host<SupportedElement>,
 
 	/**
 	 * Creates/gets an AbortController that triggers when the element disconnects
