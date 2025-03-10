@@ -207,33 +207,6 @@ function registerClientPart(page_id){
 	document.head.append(
 		// Use a newer version of Shiki with better performance
 		el("script", { src: "https://cdn.jsdelivr.net/npm/shiki@0.14.3/dist/index.unpkg.iife.js", defer: true }),
-		// Make sure we can match Flems styling in dark/light mode
-		el("style", `
-			/* Ensure CodeMirror and Shiki use the same font */
-			.CodeMirror *, .shiki * {
-				font-family: var(--font-mono) !important;
-			}
-
-			/* Style Shiki's output to match our theme */
-			.shiki {
-				background-color: var(--shiki-color-background) !important;
-				color: var(--shiki-color-text) !important;
-				padding: 1rem;
-				border-radius: var(--border-radius);
-				tab-size: 2;
-			}
-
-			/* Ensure Shiki code tokens use our CSS variables */
-			.shiki .keyword { color: var(--shiki-token-keyword) !important; }
-			.shiki .constant { color: var(--shiki-token-constant) !important; }
-			.shiki .string { color: var(--shiki-token-string) !important; }
-			.shiki .comment { color: var(--shiki-token-comment) !important; }
-			.shiki .function { color: var(--shiki-token-function) !important; }
-			.shiki .operator, .shiki .punctuation { color: var(--shiki-token-punctuation) !important; }
-			.shiki .parameter { color: var(--shiki-token-parameter) !important; }
-			.shiki .variable { color: var(--shiki-token-variable) !important; }
-			.shiki .property { color: var(--shiki-token-property) !important; }
-		`),
 	);
 
 	registerClientFile(
