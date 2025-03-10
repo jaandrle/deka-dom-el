@@ -58,6 +58,7 @@ var enviroment = {
 	setDeleteAttr,
 	ssr: "",
 	D: globalThis.document,
+	N: globalThis.Node,
 	F: globalThis.DocumentFragment,
 	H: globalThis.HTMLElement,
 	S: globalThis.SVGElement,
@@ -198,9 +199,9 @@ function connectionsChangesObserverConstructor() {
 		if (store.size > 30)
 			await requestIdle();
 		const out = [];
-		if (!isInstance(element, Node)) return out;
+		if (!isInstance(element, enviroment.N)) return out;
 		for (const el of store.keys()) {
-			if (el === element || !isInstance(el, Node)) continue;
+			if (el === element || !isInstance(el, enviroment.N)) continue;
 			if (element.contains(el))
 				out.push(el);
 		}

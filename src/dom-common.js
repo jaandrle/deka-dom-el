@@ -14,6 +14,7 @@ export const enviroment= {
 	setDeleteAttr,
 	ssr: "",
 	D: globalThis.document,
+	N: globalThis.Node,
 	F: globalThis.DocumentFragment,
 	H: globalThis.HTMLElement,
 	S: globalThis.SVGElement,
