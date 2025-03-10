@@ -170,7 +170,6 @@ export function cache(store= oCreate()){
 /**
  * Creates a reactive DOM element that re-renders when signal changes
  *
- * @TODO Third argument for handle `cache_tmp` in re-render
  * @param {Object} s - Signal object to watch
  * @param {Function} map - Function mapping signal value to DOM elements
  * @returns {DocumentFragment} Fragment containing reactive elements

@@ -214,6 +214,7 @@ function connectionsChangesObserverConstructor(){
 
 			const ls= store.get(element);
 			if(!ls.length_d) continue;
+			// support for S.el, see https://vuejs.org/guide/extras/web-components.html#lifecycle
 			(globalThis.queueMicrotask || setTimeout)(dispatchRemove(element));
 			out= true;
 		}

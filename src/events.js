@@ -47,7 +47,6 @@ import { c_ch_o } from "./events-observer.js";
 const lifeOptions= obj=> oAssign({}, typeof obj==="object" ? obj : null, { once: true });
 
 //TODO: cleanUp when event before abort?
-//TODO: docs (e.g.) https://nolanlawson.com/2024/01/13/web-component-gotcha-constructor-vs-connectedcallback/
 
 /**
  * Creates a function to register connected lifecycle event listeners

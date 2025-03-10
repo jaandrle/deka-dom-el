@@ -36,11 +36,6 @@ const references= {
 	mdn_mutation: {
 		href: "https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver",
 	},
-	/** TODO Readding the element to the DOM fix by Vue */
-	vue_fix: {
-		title: t`Vue and Web Components, lifecycle implementation readding the element to the DOM`,
-		href: "https://vuejs.org/guide/extras/web-components.html#lifecycle",
-	}
 };
 /** @param {import("./types.d.ts").PageAttrs} attrs */
 export function page({ pkg, info }){
