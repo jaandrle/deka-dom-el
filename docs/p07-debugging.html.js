@@ -111,7 +111,7 @@ console.log('Current value:', signal.valueOf());
 			that are automatically updated when signal values change. These elements are wrapped in special
 			comment nodes for debugging (to be true they are also used internally, so please do not edit them by hand):
 		`),
-		el(code, { src: fileURL("./components/examples/debugging/dom-reactive-mark.js"), page_id }),
+		el(code, { src: fileURL("./components/examples/debugging/dom-reactive-mark.html"), page_id }),
 		el("p").append(...T`
 			This is particularly useful when debugging why a reactive section isn't updating as expected.
 			You can inspect the elements between the comment nodes to see their current state and the

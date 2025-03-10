@@ -146,6 +146,7 @@ export namespace el {
 		host?: "this" | "parentElement";
 	}, is_open?: boolean): Comment;
 }
+export function chainableAppend<EL extends SupportedElement>(el: EL): EL | ddeHTMLElement;
 export function el<A extends ddeComponentAttributes, EL extends SupportedElement | ddeDocumentFragment>(component: (attr: A, ...rest: any[]) => EL, attrs?: NoInfer<A>, ...addons: ddeElementAddon<EL>[]): EL extends ddeHTMLElementTagNameMap[keyof ddeHTMLElementTagNameMap] ? EL : (EL extends ddeDocumentFragment ? EL : ddeHTMLElement);
 export function el<A extends {
 	textContent: ddeStringable;
@@ -158,7 +159,6 @@ export function elNS(namespace: "http://www.w3.org/1998/Math/MathML"): <TAG exte
 	[key in keyof EL]: EL[key] | Signal<EL[key], {}> | string | number | boolean;
 }>, ...addons: ddeElementAddon<NoInfer<EL>>[]) => ddeMathMLElement;
 export function elNS(namespace: string): (tag_name: string, attrs?: string | ddeStringable | Record<string, any>, ...addons: ddeElementAddon<SupportedElement>[]) => SupportedElement;
-export function chainableAppend<EL extends SupportedElement>(el: EL): EL;
 /** Simulate slots for ddeComponents */
 export function simulateSlots<EL extends SupportedElement | DocumentFragment>(root: EL): EL;
 /**

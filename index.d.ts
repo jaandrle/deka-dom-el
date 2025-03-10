@@ -85,6 +85,7 @@ export namespace el {
 		is_open?: boolean
 	): Comment;
 }
+export function chainableAppend<EL extends SupportedElement>(el: EL): EL | ddeHTMLElement
 
 export function el<
 	A extends ddeComponentAttributes,
@@ -156,7 +157,6 @@ export function elNS(
 )=> SupportedElement
 export { elNS as createElementNS }
 
-export function chainableAppend<EL extends SupportedElement>(el: EL): EL;
 /** Simulate slots for ddeComponents */
 export function simulateSlots<EL extends SupportedElement | DocumentFragment>(
 	root: EL,
