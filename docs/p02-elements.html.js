@@ -60,7 +60,7 @@ export function page({ pkg, info }){
 				el("li", t`Declarative element creation with intuitive property assignment`),
 				el("li", t`Chainable methods for natural DOM tree construction`),
 				el("li", t`Simplified component patterns for code reuse`),
-				el("li", t`Normalized property/attribute handling across browsers`),
+				el("li", t`Normalized declarative property/attribute handling across browsers`),
 				el("li", t`Smart element return values for cleaner code flow`)
 			)
 		),
@@ -95,7 +95,8 @@ export function page({ pkg, info }){
 		el("p").append(...T`
 			The ${el("code", "assign")} function is the heart of dd<el>'s element property handling. It is internally
 			used to assign properties using the ${el("code", "el")} function. ${el("code", "assign")} provides
-			intelligent assignment of both properties (IDL) and attributes:
+			intelligent assignment of both ${el("a", { textContent: "properties (IDL)", ...references.mdn_idl })}
+			and attributes:
 		`),
 		el("div", { class: "function-table" }).append(
 			el("dl").append(
@@ -131,7 +132,7 @@ export function page({ pkg, info }){
 		el(h3, t`Building DOM Trees with Chainable Methods`),
 		el("p").append(...T`
 			One of the most powerful features of dd<el> is its approach to building element trees.
-			Unlike the native DOM API which doesn't return the parent after appendChild(), dd<el>'s
+			Unlike the native DOM API which doesn't return the parent after append(), dd<el>'s
 			append() always returns the parent element:
 		`),
 		el("div", { class: "illustration" }).append(

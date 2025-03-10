@@ -3,6 +3,7 @@ const paragraph= el("p", "See live-cycle events in console.",
 	el=> log({ type: "dde:created", detail: el }),
 	on.connected(log),
 	on.disconnected(log),
+);
 
 document.body.append(
 	paragraph,

@@ -36,7 +36,7 @@ const references= {
 	mdn_mutation: {
 		href: "https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver",
 	},
-	/** Readding the element to the DOM fix by Vue */
+	/** TODO Readding the element to the DOM fix by Vue */
 	vue_fix: {
 		title: t`Vue and Web Components, lifecycle implementation readding the element to the DOM`,
 		href: "https://vuejs.org/guide/extras/web-components.html#lifecycle",
@@ -117,7 +117,7 @@ export function page({ pkg, info }){
 			el("div", { className: "tab", "data-tab": "addon" }).append(
 				el("h4", t`Addon Approach`),
 				el(code, { src: fileURL("./components/examples/events/chain-event.js"), page_id }),
-				el("p", t`Uses the addon pattern, see above.`)
+				el("p", t`Uses the addon pattern (so adds the event listener to the element), see above.`)
 			)
 		),
 		el("p").append(...T`
@@ -156,7 +156,8 @@ export function page({ pkg, info }){
 			You can think of an Addon as an "oncreate" event handler.
 		`),
 		el("p").append(...T`
-			dd<el> provides three additional lifecycle events that correspond to custom element lifecycle callbacks:
+			dd<el> provides two additional lifecycle events that correspond to ${el("a", { textContent:
+				"custom element", ...references.mdn_customElements })} lifecycle callbacks:
 		`),
 		el("div", { className: "function-table" }).append(
 			el("dl").append(
@@ -180,7 +181,9 @@ export function page({ pkg, info }){
 		el("div", { className: "warning" }).append(
 			el("ul").append(
 				el("li").append(...T`
-					Always use ${el("code", "on.*")} functions, not ${el("code", "on('dde:*', ...)")}, for proper registration
+					Always use ${el("code", "on.*")} functions as library must ensure proper (MutationObserver)
+					registration, not ${el("code", "on('dde:*', ...)")}, even the native event system is used with event
+					names prefixed with ${el("code", "dde:")}.
 				`),
 				el("li").append(...T`
 					Use lifecycle events sparingly, as they require internal tracking
