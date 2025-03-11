@@ -1,4 +1,4 @@
-import { el, on } from "deka-dom-el";
+import { el } from "deka-dom-el";
 import { S } from "deka-dom-el/signals";
 
 // A HelloWorld component using the 3PS pattern

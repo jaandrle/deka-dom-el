@@ -9,7 +9,7 @@ export class HTMLCustomElement extends HTMLElement{
 		// nice place to render custom element
 	}
 	attributeChangedCallback(name, oldValue, newValue){
-		// listen to attribute changes (see `observedAttributes`)
+		// listen to attribute changes (see `S.observedAttributes`)
 	}
 	disconnectedCallback(){
 		// nice place to clean up

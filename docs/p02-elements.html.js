@@ -54,7 +54,7 @@ export function page({ pkg, info }){
 			dd<el> provides a simple yet powerful approach to element creation that is declarative, chainable,
 			and maintains a clean syntax close to HTML structure.
 		`),
-		el("div", { class: "callout" }).append(
+		el("div", { className: "callout" }).append(
 			el("h4", t`dd<el> Elements: Key Benefits`),
 			el("ul").append(
 				el("li", t`Declarative element creation with intuitive property assignment`),
@@ -71,10 +71,10 @@ export function page({ pkg, info }){
 		el("p").append(...T`
 			In standard JavaScript, you create DOM elements using the
 			${el("a", references.mdn_create).append(el("code", "document.createElement()"))} method
-			and then set properties individually or with Object.assign():
+			and then set properties individually or with ${el("code", "Object.assign()")}:
 		`),
-		el("div", { class: "illustration" }).append(
-			el("div", { class: "comparison" }).append(
+		el("div", { className: "illustration" }).append(
+			el("div", { className: "comparison" }).append(
 				el("div").append(
 					el("h5", t`Native DOM API`),
 					el(code, { src: fileURL("./components/examples/elements/native-dom-create.js"), page_id })
@@ -86,42 +86,45 @@ export function page({ pkg, info }){
 			)
 		),
 		el("p").append(...T`
-			The ${el("code", "el")} function provides a simple wrapper around ${el("code", "document.createElement")}
+			The ${el("code", "el")} function provides a simple wrapper around ${el("code", "document.createElement")}
 			with enhanced property assignment.
 		`),
 		el(example, { src: fileURL("./components/examples/elements/dekaCreateElement.js"), page_id }),
 
 		el(h3, t`Advanced Property Assignment`),
 		el("p").append(...T`
-			The ${el("code", "assign")} function is the heart of dd<el>'s element property handling. It is internally
+			The ${el("code", "assign")} function is the heart of dd<el>’s element property handling. It is internally
 			used to assign properties using the ${el("code", "el")} function. ${el("code", "assign")} provides
 			intelligent assignment of both ${el("a", { textContent: "properties (IDL)", ...references.mdn_idl })}
 			and attributes:
 		`),
-		el("div", { class: "function-table" }).append(
+		el("div", { className: "function-table" }).append(
 			el("dl").append(
 				el("dt", t`Property vs Attribute Priority`),
 				el("dd", t`Prefers IDL properties, falls back to setAttribute() when no writable property exists`),
 
 				el("dt", t`Data and ARIA Attributes`),
-				el("dd", t`Both dataset.* and data-* syntaxes supported (same for ARIA)`),
+				el("dd").append(...T`Both ${el("code", "dataset")}.* and ${el("code", "data-")}* syntaxes supported
+					(same for ${el("em", "ARIA")})`),
 
 				el("dt", t`Style Handling`),
-				el("dd", t`Accepts string or object notation for style property`),
+				el("dd").append(...T`Accepts string or object notation for ${el("code", "style")} property`),
 
 				el("dt", t`Class Management`),
-				el("dd", t`Works with className, class, or classList object for toggling classes`),
+				el("dd").append(...T`Works with ${el("code", "className")}, ${el("code", "class")}, or ${el("code",
+					"classList")} object for toggling classes`),
 
 				el("dt", t`Force Modes`),
-				el("dd", t`Use = prefix to force attribute mode, . prefix to force property mode`),
+				el("dd").append(...T`Use ${el("code", "=")} prefix to force attribute mode, ${el("code", ".")} prefix to
+					force property mode`),
 
 				el("dt", t`Attribute Removal`),
-				el("dd", t`Pass undefined to remove a property or attribute`)
+				el("dd").append(...T`Pass ${el("code", "undefined")} to remove a property or attribute`)
 			)
 		),
 		el(example, { src: fileURL("./components/examples/elements/dekaAssign.js"), page_id }),
 
-		el("div", { class: "note" }).append(
+		el("div", { className: "note" }).append(
 			el("p").append(...T`
 				You can explore standard HTML element properties in the MDN documentation for
 				${el("a", { textContent: "HTMLElement", ...references.mdn_el })} (base class)
@@ -132,16 +135,16 @@ export function page({ pkg, info }){
 		el(h3, t`Building DOM Trees with Chainable Methods`),
 		el("p").append(...T`
 			One of the most powerful features of dd<el> is its approach to building element trees.
-			Unlike the native DOM API which doesn't return the parent after append(), dd<el>'s
-			append() always returns the parent element:
+			Unlike the native DOM API which doesn’t return the parent after ${el("code", "append()")}, dd<el>’s
+			${el("code", "append()")} always returns the parent element:
 		`),
-		el("div", { class: "illustration" }).append(
-			el("div", { class: "comparison" }).append(
-				el("div", { class: "bad-practice" }).append(
+		el("div", { className: "illustration" }).append(
+			el("div", { className: "comparison" }).append(
+				el("div", { className: "bad-practice" }).append(
 					el("h5", t`❌ Native DOM API`),
 					el(code, { src: fileURL("./components/examples/elements/native-dom-tree.js"), page_id })
 				),
-				el("div", { class: "good-practice" }).append(
+				el("div", { className: "good-practice" }).append(
 					el("h5", t`✅ dd<el> Approach`),
 					el(code, { src: fileURL("./components/examples/elements/dde-dom-tree.js"), page_id })
 				)
@@ -149,7 +152,7 @@ export function page({ pkg, info }){
 		),
 		el("p").append(...T`
 			This chainable pattern is much cleaner and easier to follow, especially for deeply nested elements.
-			It also makes it simple to add multiple children to a parent element in a single fluent expression.
+			It also makes it simple to add multiple children to a parent element in a single fluent expression.
 		`),
 		el(example, { src: fileURL("./components/examples/elements/dekaAppend.js"), page_id }),
 
@@ -163,12 +166,17 @@ export function page({ pkg, info }){
 			Component functions receive the properties object as their first argument, just like regular elements.
 			This makes it easy to pass data down to components and create reusable UI fragments.
 		`),
-		el("div", { class: "tip" }).append(
+		el("div", { className: "tip" }).append(
 			el("p").append(...T`
-				It's helpful to use naming conventions similar to native DOM elements for your components.
-				This allows you to use ${el("a", { textContent: "destructuring assignment", ...references.mdn_destruct })}
-				and keeps your code consistent with the DOM API.
-			`)
+				It’s helpful to use naming conventions similar to native DOM elements for your components.
+				This allows you to keeps your code consistent with the DOM API.
+			`),
+			el("p").append(...T`
+				Use ${el("a", { textContent: "destructuring assignment", ...references.mdn_destruct })}
+				to extract the properties from the ${el("code", "props")} and pass them to the component element:
+				${el("code", "function component({ className }){ return el(\"p\", { className }); }")} for make
+				templates cleaner.
+			`),
 		),
 
 		el(h3, t`Working with SVG and Other Namespaces`),
@@ -195,7 +203,7 @@ export function page({ pkg, info }){
 				from the props object for cleaner component code.
 			`),
 			el("li").append(...T`
-				${el("strong", "Leverage chainable methods for better performance:")} Use chainable methods like
+				${el("strong", "Leverage chainable methods for better performance:")} Use chainable methods
 				${el("code", ".append()")} to build complex DOM trees for better performance and cleaner code.
 			`),
 		),

@@ -26,10 +26,10 @@ export function page({ pkg, info }){
 			`)
 		),
 		el("p").append(...T`
-			dd<el> isn't limited to browser environments. Thanks to its flexible architecture,
+			dd<el> isn’t limited to browser environments. Thanks to its flexible architecture,
 			it can be used for server-side rendering (SSR) to generate static HTML files.
 			This is achieved through integration with for example ${el("a", { href: "https://github.com/tmpvar/jsdom",
-			textContent: "jsdom" })}, a JavaScript implementation of web standards for Node.js.
+			textContent: "jsdom" })}, a JavaScript implementation of web standards for Node.js.
 		`),
 		el("p").append(...T`
 			Additionally, you might consider using these alternative solutions:
@@ -37,7 +37,7 @@ export function page({ pkg, info }){
 		el("ul").append(
 			el("li").append(...T`
 				${el("a", { href: "https://github.com/capricorn86/happy-dom", textContent: "happy-dom" })} - A JavaScript implementation
-				of a web browser without its graphical user interface that's faster than jsdom
+				of a web browser without its graphical user interface that’s faster than jsdom
 			`),
 			el("li").append(...T`
 				${el("a", { href: "https://github.com/WebReflection/linkedom", textContent: "linkedom" })} - A lightweight DOM implementation
@@ -61,40 +61,40 @@ export function page({ pkg, info }){
 		el(h3, t`How jsdom Integration Works`),
 		el("p").append(...T`
 			The jsdom export in dd<el> provides the necessary tools to use the library in Node.js
-			by integrating with jsdom. Here's what it does:
+			by integrating with jsdom. Here’s what it does:
 		`),
 		el("ol").append(
-			el("li", t`Creates a virtual DOM environment in Node.js using jsdom`),
+			el("li", t`Creates a virtual DOM environment in Node.js using jsdom`),
 			el("li", t`Registers DOM globals like HTMLElement, document, etc. for dd<el> to use`),
-			el("li", t`Sets an SSR flag in the environment to enable SSR-specific behaviors`),
-			el("li", t`Provides a promise queue system for managing async operations during rendering`),
+			el("li", t`Sets an SSR flag in the environment to enable SSR-specific behaviors`),
+			el("li", t`Provides a promise queue system for managing async operations during rendering`),
 			el("li", t`Handles DOM property/attribute mapping differences between browsers and jsdom`)
 		),
 		el(code, { src: fileURL("./components/examples/ssr/start.js"), page_id }),
 
 		el(h3, t`Basic SSR Example`),
 		el("p").append(...T`
-			Here's a simple example of how to use dd<el> for server-side rendering in a Node.js script:
+			Here’s a simple example of how to use dd<el> for server-side rendering in a Node.js script:
 		`),
 		el(code, { src: fileURL("./components/examples/ssr/basic-example.js"), page_id }),
 
-		el(h3, t`Building a Static Site Generator`),
+		el(h3, t`Building a Static Site Generator`),
 		el("p").append(...T`
-			You can build a complete static site generator with dd<el>. In fact, this documentation site
-			is built using dd<el> for server-side rendering! Here's how the documentation build process works:
+			You can build a complete static site generator with dd<el>. In fact, this documentation site
+			is built using dd<el> for server-side rendering! Here’s how the documentation build process works:
 		`),
 		el(code, { src: fileURL("./components/examples/ssr/static-site-generator.js"), page_id }),
 
 		el(h3, t`Working with Async Content in SSR`),
 		el("p").append(...T`
-			The jsdom export includes a queue system to handle asynchronous operations during rendering.
+			The jsdom export includes a queue system to handle asynchronous operations during rendering.
 			This is crucial for components that fetch data or perform other async tasks.
 		`),
 		el(code, { src: fileURL("./components/examples/ssr/async-data.js"), page_id }),
 
 		el(h3, t`Working with Dynamic Imports for SSR`),
 		el("p").append(...T`
-			When structuring server-side rendering code, a crucial pattern to follow is using dynamic imports
+			When structuring server-side rendering code, a crucial pattern to follow is using dynamic imports
 			for both the deka-dom-el/jsdom module and your page components.
 		`),
 		el("p").append(...T`
@@ -107,7 +107,7 @@ export function page({ pkg, info }){
 			`),
 			el("li").append(...T`
 				${el("strong", "Environment registration timing:")} The jsdom module auto-registers the DOM environment
-				when imported, which must happen ${el("em", "after")} you've created your JSDOM instance and
+				when imported, which must happen ${el("em", "after")} you’ve created your JSDOM instance and
 				${el("em", "before")} you import your components using ${el("code", "import { el } from \"deka-dom-el\";")}.
 			`),
 			el("li").append(...T`
@@ -126,9 +126,9 @@ export function page({ pkg, info }){
 		`),
 		el("ul").append(
 			el("li", t`Browser-specific APIs like window.localStorage are not available in jsdom by default`),
-			el("li", t`Event listeners added during SSR won't be functional in the final HTML unless hydrated on the client`),
+			el("li", t`Event listeners added during SSR won’t be functional in the final HTML unless hydrated on the client`),
 			el("li", t`Some DOM features may behave differently in jsdom compared to real browsers`),
-			el("li", t`For large sites, you may need to optimize memory usage by creating a new jsdom instance for each page`)
+			el("li", t`For large sites, you may need to optimize memory usage by creating a new jsdom instance for each page`)
 		),
 		el("p").append(...T`
 			For advanced SSR applications, consider implementing hydration on the client-side to restore
@@ -137,7 +137,7 @@ export function page({ pkg, info }){
 
 		el(h3, t`Real Example: How This Documentation is Built`),
 		el("p").append(...T`
-			This documentation site itself is built using dd<el>'s SSR capabilities.
+			This documentation site itself is built using dd<el>’s SSR capabilities.
 			The build process collects all page components, renders them with jsdom, and outputs static HTML files.
 		`),
 		el(code, { src: fileURL("./components/examples/ssr/static-site-generator.js"), page_id }),

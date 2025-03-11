@@ -1,5 +1,5 @@
 import { el, on } from "deka-dom-el";
-const paragraph= el("p", "See live-cycle events in console.",
+const paragraph= el("p", "See lifecycle events in console.",
 	el=> log({ type: "dde:created", detail: el }),
 	on.connected(log),
 	on.disconnected(log),

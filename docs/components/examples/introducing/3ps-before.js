@@ -6,9 +6,8 @@ let count = 0;
 button.addEventListener('click', () => {
 	count++;
 	document.querySelector('p').textContent =
-	'Clicked ' + count + ' times';
+		'Clicked ' + count + ' times';
 
-	if (count > 10) {
-	button.disabled = true;
-	}
+	if (count > 10)
+		button.disabled = true;
 });

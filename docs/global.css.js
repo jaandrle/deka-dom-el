@@ -73,6 +73,7 @@ styles.css`
 
 html {
 	scroll-behavior: smooth;
+	tab-size: var(--tab-size, 2rem);
 }
 
 /* Accessibility improvements */

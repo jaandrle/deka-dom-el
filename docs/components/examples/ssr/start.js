@@ -1,6 +1,6 @@
 // Basic jsdom integration example
 import { JSDOM } from "jsdom";
-import { register, unregister, queue } from "deka-dom-el/jsdom.js";
+import { register, unregister, queue } from "deka-dom-el/jsdom";
 
 // Create a jsdom instance
 const dom = new JSDOM("<!DOCTYPE html><html><body></body></html>");

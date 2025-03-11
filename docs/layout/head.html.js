@@ -105,13 +105,8 @@ ${host_nav} a .nav-number {
 }
 @media (max-width: 767px) {
 	${host_nav} {
-		padding: 0.75rem;
 		display: flex;
-		flex-direction: row;
-		flex-wrap: wrap;
-		gap: 0.5rem;
-		border-bottom: 1px solid var(--border);
-		border-right: none;
+		flex-flow: row wrap;
 		justify-content: center;
 	}
 
@@ -121,14 +116,7 @@ ${host_nav} a .nav-number {
 		white-space: nowrap;
 	}
 
-	${host_nav} a .nav-number {
-		width: auto;
-		margin-right: 0.25rem;
-	}
-
 	${host_nav} a:first-child {
-		margin-bottom: 0;
-		margin-right: 0.5rem;
 		min-width: 100%;
 		justify-content: center;
 	}

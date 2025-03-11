@@ -8,7 +8,8 @@ export class HTMLCustomElement extends HTMLElement{
 	connectedCallback(){
 		customElementRender(
 			this.attachShadow({ mode: "open" }),
-			ddeComponent
+			ddeComponent,
+			this
 		);
 	}
 	set attr(value){ this.setAttribute("attr", value); }

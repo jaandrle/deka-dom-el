@@ -189,6 +189,7 @@ import { el } from "deka-dom-el";
  * */
 export function code({ id, src, content, language= "js", className= host.slice(1), page_id }){
 	if(src) content= s.cat(src);
+	content= normalizeIndentation(content);
 	let dataJS;
 	if(page_id){
 		registerClientPart(page_id);
@@ -197,6 +198,10 @@ export function code({ id, src, content, language= "js", className= host.slice(1
 	return el("div", { id, className, dataJS, tabIndex: 0 }).append(
 		el("code", { className: "language-"+language, textContent: content.trim() })
 	);
+}
+export function pre({ content }){
+	content= normalizeIndentation(content);
+	return el("pre").append(el("code", content.trim()));
 }
 let is_registered= {};
 /** @param {string} page_id */
@@ -217,4 +222,10 @@ function registerClientPart(page_id){
 	);
 
 	is_registered[page_id]= true;
+}
+/** @param {string} src */
+function normalizeIndentation(src){
+	const lines= src.split("\n");
+	const min_indent= Math.min(...lines.map(line=> line.search(/\S/)).filter(i=> i >= 0));
+	return lines.map(line=> line.slice(min_indent)).join("\n");
 }

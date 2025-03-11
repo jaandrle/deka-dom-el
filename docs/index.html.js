@@ -36,9 +36,9 @@ export function page({ pkg, info }){
 			el("h4", t`What Makes dd<el> Special`),
 			el("ul").append(
 				el("li", t`No build step required — use directly in the browser`),
-				el("li", t`Lightweight core (~10–15kB minified) with zero dependencies`),
+				el("li", t`Lightweight core (~10–15kB minified) without unnecessary dependencies (0 at now 😇)`),
 				el("li", t`Natural DOM API — work with real DOM nodes, not abstractions`),
-				el("li", t`Built-in reactivity with powerful signals system`),
+				el("li", t`Built-in reactivity with simplified but powerful signals system`),
 				el("li", t`Clean code organization with the 3PS pattern`)
 			)
 		),
@@ -67,7 +67,7 @@ export function page({ pkg, info }){
 		`),
 		el("ol").append(
 			el("li").append(...T`
-				${el("strong", "Create State")}: Define your application's reactive data using signals
+				${el("strong", "Create State")}: Define your application’s reactive data using signals
 			`),
 			el("li").append(...T`
 				${el("strong", "Bind to Elements")}: Define how UI elements react to state changes
@@ -87,14 +87,14 @@ export function page({ pkg, info }){
 		el("div", { className: "note" }).append(
 			el("p").append(...T`
 				The 3PS pattern becomes especially powerful when combined with components, allowing you to create
-				reusable pieces of UI with encapsulated state and behavior. You'll learn more about this in the
+				reusable pieces of UI with encapsulated state and behavior. You’ll learn more about this in the
 				following sections.
 			`)
 		),
 
 		el(h3, t`How to Use This Documentation`),
 		el("p").append(...T`
-			This guide will take you through dd<el>'s features step by step:
+			This guide will take you through dd<el>’s features step by step:
 		`),
 		el("ol").append(
 			el("li").append(...T`${el("strong", "Elements")} — Creating and manipulating DOM elements`),
@@ -104,13 +104,13 @@ export function page({ pkg, info }){
 			el("li").append(...T`${el("strong", "Custom Elements")} — Building web components`),
 			el("li").append(...T`${el("strong", "Debugging")} — Tools to help you build and fix your apps`),
 			el("li").append(...T`${el("strong", "Extensions")} — Integrating third-party functionalities`),
+			el("li").append(...T`${el("strong", "SSR")} — Server-side rendering with dd<el>`),
 			el("li").append(...T`${el("strong", "Ireland Components")} —
 				Creating interactive demos with server-side pre-rendering`),
-			el("li").append(...T`${el("strong", "SSR")} — Server-side rendering with dd<el>`)
 		),
 		el("p").append(...T`
 			Each section builds on the previous ones, so we recommend following them in order.
-			Let's get started with the basics of creating elements!
+			Let’s get started with the basics of creating elements!
 		`),
 	);
 }

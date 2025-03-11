@@ -16,7 +16,9 @@ function Counter() {
 		// THE HOST IS PROBABLY DIFFERENT THAN
 		// YOU EXPECT AND SIGNAL MAY BE
 		// UNEXPECTEDLY REMOVED!!!
-		host().querySelector("button").disabled = count.get() >= 10;
+		S.on(count, (count)=>
+			host().querySelector("button").disabled = count >= 10
+		);
 	};
 	setTimeout(()=> {
 		// ok, BUT consider extract to separate function
