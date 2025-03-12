@@ -35,11 +35,7 @@ function Todos(){
 	/** @type {ddeElementAddon<HTMLInputElement>} */
 	const onToggleAll = on("change", event => {
 		const checked = /** @type {HTMLInputElement} */ (event.target).checked;
-		const todos = todosS.get();
-		todos.forEach(todo => {
-			todo.completed = checked;
-		});
-		todosS.set([...todos]); // Trigger update
+		S.action(todosS, "completeAll", checked);
 	});
 	/** @type {ddeElementAddon<HTMLFormElement>} */
 	const onSubmitNewTodo = on("submit", event => {
@@ -54,8 +50,10 @@ function Todos(){
 		}
 	});
 	const onClearCompleted = on("click", () => S.action(todosS, "clearCompleted"));
-	const onDelete = on("todo:delete", ev => S.action(todosS, "delete", ev.detail));
-	const onEdit = on("todo:edit", ev => S.action(todosS, "edit", ev.detail));
+	const onDelete = on("todo:delete", ev =>
+		S.action(todosS, "delete", /** @type {{ detail: Todo["id"] }} */(ev).detail));
+	const onEdit = on("todo:edit", ev =>
+		S.action(todosS, "edit", /** @type {{ detail: Partial<Todo> & { id: Todo["id"] } }} */(ev).detail));
 
 	return el("section", { className: "todoapp" }).append(
 		el("header", { className: "header" }).append(
@@ -324,6 +322,9 @@ function todosSignal(){
 		 */
 		clearCompleted() {
 			this.value = this.value.filter(todo => !todo.completed);
+		},
+		completeAll(state= true) {
+			this.value.forEach(todo => todo.completed = state);
 		},
 		/**
 		 * Handle cleanup when signal is cleared
