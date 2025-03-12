@@ -17,14 +17,15 @@ export function mnemonic(){
 			" — just ", el("code", "<element>.dispatchEvent(new Event(<event>[, <options>]))")
 		),
 		el("li").append(
-			el("code", "dispatchEvent(<event>, <element>)([<detail>])"),
-			" — just ", el("code", "<element>.dispatchEvent(new Event(<event>))"), " or ",
-			el("code", "<element>.dispatchEvent(new CustomEvent(<event>, { detail: <detail> }))")
-		),
-		el("li").append(
 			el("code", "dispatchEvent(<event>[, <options>])(<element>[, <detail>])"),
 			" — just ", el("code", "<element>.dispatchEvent(new Event(<event>[, <options>] ))"), " or ",
 			el("code", "<element>.dispatchEvent(new CustomEvent(<event>, { detail: <detail> }))")
+		),
+		el("li").append(
+			el("code", "dispatchEvent(<event>[, <options>], <host>)([<detail>])"),
+			" — just ", el("code", "<host>().dispatchEvent(new Event(<event>[, <options>]))"), " or ",
+			el("code", "<host>().dispatchEvent(new CustomEvent(<event>, { detail: <detail> }[, <options>] ))"),
+			" (see scopes section of docs)"
 		),
 	);
 }

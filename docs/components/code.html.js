@@ -189,6 +189,7 @@ import { el } from "deka-dom-el";
  * */
 export function code({ id, src, content, language= "js", className= host.slice(1), page_id }){
 	if(src) content= s.cat(src);
+	content= normalizeIndentation(content);
 	let dataJS;
 	if(page_id){
 		registerClientPart(page_id);
@@ -197,6 +198,10 @@ export function code({ id, src, content, language= "js", className= host.slice(1
 	return el("div", { id, className, dataJS, tabIndex: 0 }).append(
 		el("code", { className: "language-"+language, textContent: content.trim() })
 	);
+}
+export function pre({ content }){
+	content= normalizeIndentation(content);
+	return el("pre").append(el("code", content.trim()));
 }
 let is_registered= {};
 /** @param {string} page_id */
@@ -207,33 +212,6 @@ function registerClientPart(page_id){
 	document.head.append(
 		// Use a newer version of Shiki with better performance
 		el("script", { src: "https://cdn.jsdelivr.net/npm/shiki@0.14.3/dist/index.unpkg.iife.js", defer: true }),
-		// Make sure we can match Flems styling in dark/light mode
-		el("style", `
-			/* Ensure CodeMirror and Shiki use the same font */
-			.CodeMirror *, .shiki * {
-				font-family: var(--font-mono) !important;
-			}
-
-			/* Style Shiki's output to match our theme */
-			.shiki {
-				background-color: var(--shiki-color-background) !important;
-				color: var(--shiki-color-text) !important;
-				padding: 1rem;
-				border-radius: var(--border-radius);
-				tab-size: 2;
-			}
-
-			/* Ensure Shiki code tokens use our CSS variables */
-			.shiki .keyword { color: var(--shiki-token-keyword) !important; }
-			.shiki .constant { color: var(--shiki-token-constant) !important; }
-			.shiki .string { color: var(--shiki-token-string) !important; }
-			.shiki .comment { color: var(--shiki-token-comment) !important; }
-			.shiki .function { color: var(--shiki-token-function) !important; }
-			.shiki .operator, .shiki .punctuation { color: var(--shiki-token-punctuation) !important; }
-			.shiki .parameter { color: var(--shiki-token-parameter) !important; }
-			.shiki .variable { color: var(--shiki-token-variable) !important; }
-			.shiki .property { color: var(--shiki-token-property) !important; }
-		`),
 	);
 
 	registerClientFile(
@@ -244,4 +222,10 @@ function registerClientPart(page_id){
 	);
 
 	is_registered[page_id]= true;
+}
+/** @param {string} src */
+function normalizeIndentation(src){
+	const lines= src.split("\n");
+	const min_indent= Math.min(...lines.map(line=> line.search(/\S/)).filter(i=> i >= 0));
+	return lines.map(line=> line.slice(min_indent)).join("\n");
 }

@@ -1,6 +1,7 @@
 import { signals } from "./signals-lib/common.js";
 import { enviroment as env } from './dom-common.js';
 import { isInstance, isUndef, oAssign } from "./helpers.js";
+import { on } from "./events.js";
 
 /**
  * Queues a promise, this is helpful for crossplatform components (on server side we can wait for all registered
@@ -19,6 +20,8 @@ const scopes= [ {
 	host: c=> c ? c(env.D.body) : env.D.body,
 	prevent: true,
 } ];
+/** Store for disconnect abort controllers */
+const store_abort= new WeakMap();
 /**
  * Scope management utility for tracking component hierarchies
  */
@@ -34,6 +37,19 @@ export const scope= {
 	 * @returns {Function} Host accessor function
 	 */
 	get host(){ return this.current.host; },
+
+	/**
+	 * Creates/gets an AbortController that triggers when the element disconnects
+	 * */
+	get signal(){
+		const { host }= this;
+		if(store_abort.has(host)) return store_abort.get(host);
+
+		const a= new AbortController();
+		store_abort.set(host, a);
+		host(on.disconnected(()=> a.abort()));
+		return a.signal;
+	},
 
 	/**
 	 * Prevents default behavior in the current scope

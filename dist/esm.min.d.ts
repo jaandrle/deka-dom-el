@@ -18,6 +18,7 @@ export type Actions<V> = Record<string | SymbolOnclear, Action<V>>;
 export type OnListenerOptions = Pick<AddEventListenerOptions, "signal"> & {
 	first_time?: boolean;
 };
+export type SElement = Node | Element | DocumentFragment | ddeHTMLElement | ddeSVGElement | ddeDocumentFragment;
 export interface signal {
 	_: Symbol;
 	/**
@@ -63,7 +64,7 @@ export interface signal {
 	 * S.el(listS, list=> list.map(li=> el("li", li)));
 	 * ```
 	 * */
-	el<S extends any>(signal: Signal<S, any>, el: (v: S) => Element | Element[] | DocumentFragment): DocumentFragment;
+	el<S extends any>(signal: Signal<S, any>, el: (v: S) => SElement | SElement[]): DocumentFragment;
 	observedAttributes(custom_element: HTMLElement): Record<string, Signal<string, {}>>;
 }
 declare const signal: signal;
@@ -79,10 +80,11 @@ export type CustomElementTagNameMap = {
 export type SupportedElement = HTMLElementTagNameMap[keyof HTMLElementTagNameMap] | SVGElementTagNameMap[keyof SVGElementTagNameMap] | MathMLElementTagNameMap[keyof MathMLElementTagNameMap] | CustomElementTagNameMap[keyof CustomElementTagNameMap];
 declare global {
 	type ddeComponentAttributes = Record<any, any> | undefined;
-	type ddeElementAddon<El extends SupportedElement | DocumentFragment | Node> = (element: El) => any;
+	type ddeElementAddon<El extends SupportedElement | DocumentFragment | Node> = (element: El, ...rest: any) => any;
 	type ddeString = string | Signal<string, {}>;
 	type ddeStringable = ddeString | number | Signal<number, {}>;
 }
+export type Host<EL extends SupportedElement> = (...addons: ddeElementAddon<EL>[]) => EL;
 export type PascalCase = `${Capitalize<string>}${string}`;
 export type AttrsModified = {
 	/**
@@ -144,6 +146,7 @@ export namespace el {
 		host?: "this" | "parentElement";
 	}, is_open?: boolean): Comment;
 }
+export function chainableAppend<EL extends SupportedElement>(el: EL): EL | ddeHTMLElement;
 export function el<A extends ddeComponentAttributes, EL extends SupportedElement | ddeDocumentFragment>(component: (attr: A, ...rest: any[]) => EL, attrs?: NoInfer<A>, ...addons: ddeElementAddon<EL>[]): EL extends ddeHTMLElementTagNameMap[keyof ddeHTMLElementTagNameMap] ? EL : (EL extends ddeDocumentFragment ? EL : ddeHTMLElement);
 export function el<A extends {
 	textContent: ddeStringable;
@@ -156,7 +159,6 @@ export function elNS(namespace: "http://www.w3.org/1998/Math/MathML"): <TAG exte
 	[key in keyof EL]: EL[key] | Signal<EL[key], {}> | string | number | boolean;
 }>, ...addons: ddeElementAddon<NoInfer<EL>>[]) => ddeMathMLElement;
 export function elNS(namespace: string): (tag_name: string, attrs?: string | ddeStringable | Record<string, any>, ...addons: ddeElementAddon<SupportedElement>[]) => SupportedElement;
-export function chainableAppend<EL extends SupportedElement>(el: EL): EL;
 /** Simulate slots for ddeComponents */
 export function simulateSlots<EL extends SupportedElement | DocumentFragment>(root: EL): EL;
 /**
@@ -165,9 +167,9 @@ export function simulateSlots<EL extends SupportedElement | DocumentFragment>(ro
  * @param body Body of the custom element
  * */
 export function simulateSlots<EL extends SupportedElement | DocumentFragment>(el: HTMLElement, body: EL): EL;
-declare function dispatchEvent$1(name: keyof DocumentEventMap | string, element: SupportedElement): (data?: any) => void;
+declare function dispatchEvent$1(name: keyof DocumentEventMap | string, host: Host<SupportedElement>): (data?: any) => void;
 declare function dispatchEvent$1(name: keyof DocumentEventMap | string, options?: EventInit): (element: SupportedElement, data?: any) => void;
-declare function dispatchEvent$1(name: keyof DocumentEventMap | string, options: EventInit | null, element: SupportedElement | (() => SupportedElement)): (data?: any) => void;
+declare function dispatchEvent$1(name: keyof DocumentEventMap | string, options: EventInit | null, host: Host<SupportedElement>): (data?: any) => void;
 export interface On {
 	/** Listens to the DOM event. See {@link Document.addEventListener} */
 	<Event extends keyof DocumentEventMap, EE extends ddeElementAddon<SupportedElement> = ddeElementAddon<HTMLElement>>(type: Event, listener: (this: EE extends ddeElementAddon<infer El> ? El : never, ev: DocumentEventMap[Event]) => any, options?: AddEventListenerOptions): EE;
@@ -185,7 +187,7 @@ export interface On {
 export const on: On;
 export type Scope = {
 	scope: Node | Function | Object;
-	host: ddeElementAddon<any>;
+	host: Host<SupportedElement>;
 	custom_element: false | HTMLElement;
 	prevent: boolean;
 };
@@ -201,7 +203,11 @@ export const scope: {
 	 * It can be also used to register Addon(s) (functions to be called when component is initized)
 	 * — `scope.host(on.connected(console.log))`.
 	 * */
-	host: (...addons: ddeElementAddon<SupportedElement>[]) => HTMLElement;
+	host: Host<SupportedElement>;
+	/**
+	 * Creates/gets an AbortController that triggers when the element disconnects
+	 * */
+	signal: AbortSignal;
 	state: Scope[];
 	/** Adds new child scope. All attributes are inherited by default. */
 	push(scope?: Partial<Scope>): ReturnType<Array<Scope>["push"]>;
@@ -213,7 +219,6 @@ export const scope: {
 export function customElementRender<EL extends HTMLElement, P extends any = Record<string, string | Signal<string, {}>>>(target: ShadowRoot | EL, render: (props: P) => SupportedElement | DocumentFragment, props?: P | ((el: EL) => P)): EL;
 export function customElementWithDDE<EL extends (new () => HTMLElement)>(custom_element: EL): EL;
 export function lifecyclesToEvents<EL extends (new () => HTMLElement)>(custom_element: EL): EL;
-export function observedAttributes(custom_element: HTMLElement): Record<string, string>;
 /**
  * This is used primarly for server side rendering. To be sure that all async operations
  * are finished before the page is sent to the client.
@@ -234,6 +239,65 @@ export function observedAttributes(custom_element: HTMLElement): Record<string, 
  * ```
  * */
 export function queue(promise?: Promise<unknown>): Promise<unknown>;
+/**
+ * Memoization utility for caching DOM elements to improve performance.
+ * Used to prevent unnecessary recreation of elements when rendering lists or complex components.
+ *
+ * @param key - Unique identifier for the element (usually an ID or unique value)
+ * @param generator - Function that creates the element
+ * @returns The cached element if the key exists, otherwise the result of the generator function
+ *
+ * @example
+ * ```ts
+ * // Within S.el for list rendering
+ * S.el(itemsSignal, (items, memo) =>
+ *   el("ul").append(
+ *     ...items.map(item =>
+ *       memo(item.id, () => el(ItemComponent, item))
+ *     )
+ *   )
+ * )
+ * ```
+ */
+export function memo<T>(key: string | number | object, generator: (key: any) => T): T;
+/**
+ * Memo namespace containing utility functions for memoization.
+ */
+export namespace memo {
+	/**
+	 * Checks if an object is a memo scope.
+	 * @param obj - The object to check
+	 * @returns True if the object is a memo scope
+	 */
+	export function isScope(obj: any): boolean;
+	/**
+	 * Creates a memoized function with optional cleanup support.
+	 *
+	 * @param fun - The function to memoize
+	 * @param options - Configuration options
+	 * @param options.signal - AbortSignal for cleanup
+	 * @param options.onlyLast - When true, only keeps the cache from the most recent call
+	 * @returns A memoized version of the function with a .clear() method
+	 *
+	 * @example
+	 * ```ts
+	 * const renderItems = memo.scope(function(items) {
+	 *	 return items.map(item =>
+	 *		 memo(item.id, () => el("div", item.name))
+	 *	 );
+	 * }, {
+	 *	 signal: controller.signal,
+	 *	 onlyLast: true
+	 * });
+	 * ```
+	 */
+	export function scope<F extends Function>(fun: F, options?: {
+		signal?: AbortSignal;
+		onlyLast?: boolean;
+	}): F & {
+		clear: () => void;
+	};
+}
 /* TypeScript MEH */
 declare global {
 	type ddeAppend<el> = (...nodes: (Node | string)[]) => el;

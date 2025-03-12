@@ -11,6 +11,7 @@ async function renderPage() {
 	const { el } = await register(dom);
 
 	// Create a simple header component
+	// can be separated into a separate file and use `import { el } from "deka-dom-el"`
 	function Header({ title }) {
 		return el("header").append(
 			el("h1", title),

@@ -7,10 +7,10 @@ import { c_ch_o } from "./events-observer.js";
  *
  * @param {Element|ShadowRoot} target - The custom element or shadow root to render into
  * @param {Function} render - The render function that returns content
- * @param {Function|Object} [props=observedAttributes] - Props to pass to the render function
+ * @param {Function|Object} [props= {}] - Props to pass to the render function
  * @returns {Node} The rendered content
  */
-export function customElementRender(target, render, props= observedAttributes){
+export function customElementRender(target, render, props= {}){
 	const custom_element= target.host || target;
 	scope.push({
 		scope: custom_element,
@@ -68,16 +68,4 @@ export { lifecyclesToEvents as customElementWithDDE };
  */
 function wrapMethod(obj, method, apply){
 	obj[method]= new Proxy(obj[method] || (()=> {}), { apply });
-}
-
-import { observedAttributes as oA } from "./helpers.js";
-
-/**
- * Gets observed attributes for a custom element
- *
- * @param {Element} instance - Custom element instance
- * @returns {Object} Object mapping camelCase attribute names to their values
- */
-export function observedAttributes(instance){
-	return oA(instance, (i, n)=> i.getAttribute(n));
 }

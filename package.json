@@ -1,6 +1,6 @@
 {
 	"name": "deka-dom-el",
-	"version": "0.9.0",
+	"version": "0.9.1-alpha",
 	"description": "A low-code library that simplifies the creation of native DOM elements/components using small wrappers and tweaks.",
 	"author": "Jan Andrle <andrle.jan@centrum.cz>",
 	"license": "MIT",
@@ -36,7 +36,8 @@
 	"files": [
 		"*.js",
 		"*.d.ts",
-		"src"
+		"src",
+		"tsconfig.json"
 	],
 	"engines": {
 		"node": ">=18"

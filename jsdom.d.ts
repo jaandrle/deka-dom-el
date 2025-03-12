@@ -3,6 +3,7 @@ export * from "./index.d";
 type JSDOM= {
 	window: Window,
 	document: Document,
+	Node: typeof Node,
 	HTMLElement: typeof HTMLElement,
 	SVGElement: typeof SVGElement,
 	DocumentFragment: typeof DocumentFragment,

@@ -24,7 +24,11 @@ document.body.append(
 );
 
 import { chainableAppend } from "deka-dom-el";
-/** @param {keyof HTMLElementTagNameMap} tag */
+/**
+ * @template {keyof HTMLElementTagNameMap} TAG
+ * @param {TAG} tag
+ * @returns {ddeHTMLElementTagNameMap[TAG] extends HTMLElement ? ddeHTMLElementTagNameMap[TAG] : ddeHTMLElement}
+ * */
 const createElement= tag=> chainableAppend(document.createElement(tag));
 document.body.append(
 	createElement("p").append(

@@ -1,5 +1,4 @@
-export { registerReactivity } from './signals-lib/common.js';
-import { enviroment as env, keyLTE, evc, evd, eva } from './dom-common.js';
+import { keyLTE, evc, evd } from './dom-common.js';
 import { oAssign, onAbort } from './helpers.js';
 
 /**
@@ -48,7 +47,6 @@ import { c_ch_o } from "./events-observer.js";
 const lifeOptions= obj=> oAssign({}, typeof obj==="object" ? obj : null, { once: true });
 
 //TODO: cleanUp when event before abort?
-//TODO: docs (e.g.) https://nolanlawson.com/2024/01/13/web-component-gotcha-constructor-vs-connectedcallback/
 
 /**
  * Creates a function to register connected lifecycle event listeners
@@ -85,56 +83,6 @@ on.disconnected= function(listener, options){
 
 		const c= onAbort(options.signal, ()=> c_ch_o.offDisconnected(element, listener));
 		if(c) c_ch_o.onDisconnected(element, listener);
-		return element;
-	};
-};
-
-/** Store for disconnect abort controllers */
-const store_abort= new WeakMap();
-
-/**
- * Creates an AbortController that triggers when the element disconnects
- *
- * @param {Function} host - Host element or function taking an element
- * @returns {AbortSignal} AbortSignal that aborts on disconnect
- */
-on.disconnectedAsAbort= function(host){
-	if(store_abort.has(host)) return store_abort.get(host);
-
-	const a= new AbortController();
-	store_abort.set(host, a);
-	host(on.disconnected(()=> a.abort()));
-	return a.signal;
-};
-
-/** Store for elements with attribute observers */
-const els_attribute_store= new WeakSet();
-
-/**
- * Creates a function to register attribute change event listeners
- *
- * @param {Function} listener - Event handler
- * @param {Object} [options] - Event listener options
- * @returns {Function} Function that registers the attribute change listener
- */
-on.attributeChanged= function(listener, options){
-	if(typeof options !== "object")
-		options= {};
-	return function registerElement(element){
-		element.addEventListener(eva, listener, options);
-		if(element[keyLTE] || els_attribute_store.has(element))
-			return element;
-
-		if(!env.M) return element;
-
-		const observer= new env.M(function(mutations){
-			for(const { attributeName, target } of mutations)
-				target.dispatchEvent(
-					new CustomEvent(eva, { detail: [ attributeName, target.getAttribute(attributeName) ] }));
-		});
-		const c= onAbort(options.signal, ()=> observer.disconnect());
-		if(c) observer.observe(element, { attributes: true });
-		//TODO: clean up when element disconnected
 		return element;
 	};
 };

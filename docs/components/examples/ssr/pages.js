@@ -17,6 +17,7 @@ async function renderPage() {
 	const { el } = await register(dom);
 
 	// 4. Dynamically import page components
+	// use `import { el } from "deka-dom-el"`
 	const { Header } = await import("./components/Header.js");
 	const { Content } = await import("./components/Content.js");
 

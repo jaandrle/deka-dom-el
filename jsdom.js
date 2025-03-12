@@ -1,4 +1,3 @@
-//TODO: https://www.npmjs.com/package/html-element
 import { enviroment as env } from './src/dom-common.js';
 env.ssr= " ssr";
 
@@ -17,7 +16,9 @@ env.setDeleteAttr= function(obj, prop, value){
 	if(value) return obj.setAttribute(prop, "");
 	obj.removeAttribute(prop);
 };
-const keys= { H: "HTMLElement", S: "SVGElement", F: "DocumentFragment", D: "document" };
+const keys= {
+	N: "Node", H: "HTMLElement", S: "SVGElement", F: "DocumentFragment", D: "document", M: "MutationObserver",
+};
 let env_bk= {};
 let dom_last;
 

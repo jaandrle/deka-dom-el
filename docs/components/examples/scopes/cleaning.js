@@ -14,7 +14,7 @@ function component(){
 	const textContent= S("Click to change text.");
 
 	const onclickChange= on("click", function redispatch(){
-		textContent("Text changed! "+(new Date()).toString())
+		textContent.set("Text changed! "+(new Date()).toString())
 	});
 	return el("p", textContent, onclickChange);
 }

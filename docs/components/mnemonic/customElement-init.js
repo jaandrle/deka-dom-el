@@ -12,10 +12,6 @@ export function mnemonic(){
 			" — register <custom-element> to DDE library, see also `lifecyclesToEvents`, can be also used as decorator",
 		),
 		el("li").append(
-			el("code", "observedAttributes(<custom-element>)"),
-			" — returns record of observed attributes (keys uses camelCase)",
-		),
-		el("li").append(
 			el("code", "S.observedAttributes(<custom-element>)"),
 			" — returns record of observed attributes (keys uses camelCase and values are signals)",
 		),

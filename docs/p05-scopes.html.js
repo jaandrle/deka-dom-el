@@ -10,7 +10,7 @@ import { simplePage } from "./layout/simplePage.html.js";
 import { example } from "./components/example.html.js";
 import { h3 } from "./components/pageUtils.html.js";
 import { mnemonic } from "./components/mnemonic/scopes-init.js";
-import { code } from "./components/code.html.js";
+import { code, pre } from "./components/code.html.js";
 /** @param {string} url */
 const fileURL= url=> new URL(url, import.meta.url);
 const references= {
@@ -31,7 +31,7 @@ export function page({ pkg, info }){
 	return el(simplePage, { info, pkg }).append(
 		el("p").append(...T`
 			For state-less components we can use functions as UI components (see “Elements” page). But in real life,
-			we may need to handle the component's life-cycle and provide JavaScript the way to properly use
+			we may need to handle the component’s life-cycle and provide JavaScript the way to properly use
 			the ${el("a", { textContent: t`Garbage collection`, ...references.garbage_collection })}.
 		`),
 		el(code, { src: fileURL("./components/examples/scopes/intro.js"), page_id }),
@@ -40,56 +40,56 @@ export function page({ pkg, info }){
 		el(h3, t`Understanding Host Elements and Scopes`),
 		el("p").append(...T`
 			The ${el("strong", "host")} is the name for the element representing the component. This is typically the
-			element returned by a function. To get a reference, you can use ${el("code", "scope.host()")}. To apply addons,
+			element returned by a function. To get a reference, you can use ${el("code", "scope.host()")}. To apply addons,
 			just use ${el("code", "scope.host(...<addons>)")}.
 		`),
 		el("p").append(...T`
 			Scopes are primarily needed when signals are used in DOM templates (with ${el("code", "el")}, ${el("code",
-				"assign")}, or ${el("code", "S.el")}). They provide a way for automatically removing signal listeners
+				"assign")}, or ${el("code", "S.el")}). They provide a way for automatically removing signal listeners
 			and cleaning up unused signals when components are removed from the DOM.
 		`),
 		el("div", { className: "illustration" }).append(
 			el("h4", t`Component Anatomy`),
-			el("pre").append(el("code", `
-// 1. Component scope created
-el(MyComponent);
+			el(pre, { content: `
+				// 1. Component scope created
+				el(MyComponent);
 
-function MyComponent() {
-  // 2. access the host element
-  const { host } = scope;
+				function MyComponent() {
+					// 2. access the host element
+					const { host } = scope;
 
-  // 3. Add behavior to host
-  host(
-  on.click(handleClick)
-  );
+					// 3. Add behavior to host
+					host(
+						on.click(handleClick)
+					);
 
-  // 4. Return the host element
-  return el("div", {
-  className: "my-component"
-  }).append(
-  el("h2", "Title"),
-  el("p", "Content")
-  );
-}
-			`.trim()))
+					// 4. Return the host element
+					return el("div", {
+						className: "my-component"
+					}).append(
+						el("h2", "Title"),
+						el("p", "Content")
+					);
+				}
+			` })
 		),
 		el("div", { className: "function-table" }).append(
 			el("h4", t`scope.host()`),
 			el("dl").append(
 				el("dt", t`When called with no arguments`),
-				el("dd", t`Returns a reference to the host element (the root element of your component)`),
+				el("dd", t`Returns a reference to the host element (the root element of your component)`),
 
 				el("dt", t`When called with addons/callbacks`),
-				el("dd", t`Applies the addons to the host element and returns the host element`)
+				el("dd", t`Applies the addons to the host element (and returns the host element)`)
 			)
 		),
 		el(example, { src: fileURL("./components/examples/scopes/scopes-and-hosts.js"), page_id }),
 
 		el("div", { className: "tip" }).append(
 			el("p").append(...T`
-				${el("strong", "Best Practice:")} Always capture the host reference at the beginning of your component
-				function using ${el("code", "const { host } = scope")} to avoid scope-related issues, especially with
-				asynchronous code.
+				${el("strong", "Best Practice:")} Always capture the host reference (or other scope related values) at
+				the beginning of your component function using ${el("code", "const { host } = scope")} to avoid
+				scope-related issues, especially with ${el("em", "asynchronous code")}.
 			`),
 			el("p").append(...T`
 				If you are interested in the implementation details, see Class-Based Components section.
@@ -112,31 +112,32 @@ function MyComponent() {
 		`),
 		el("div", { className: "illustration" }).append(
 			el("h4", t`Lifecycle Flow`),
-			el("pre").append(el("code", `
-1. Component created → scope established
-2. Component add<el> to DOM → connected event
-3. Component interactions happen
-4. Component removed from DOM → disconnected event
-5. Automatic cleanup of:
-  - Event listeners
-  - Signal subscriptions
-  - Custom cleanup code
-			`))
+			el(pre, { content: `
+				1. Component created → scope established
+				2. Component added to DOM → connected event
+				3. Component interactions happen
+				4. Component removed from DOM → disconnected event
+				5. Automatic cleanup of:
+					- Event listeners (browser)
+					- Signal subscriptions (dd<el> and browser)
+					- Custom cleanup code (dd<el> and user)
+			` })
 		),
 		el(example, { src: fileURL("./components/examples/scopes/cleaning.js"), page_id }),
 
 		el("div", { className: "note" }).append(
 			el("p").append(...T`
 				In this example, when you click "Remove", the component is removed from the DOM, and all its associated
-				resources are automatically cleaned up, including the signal subscription that updates the text content.
-				This happens because the library internally registers a disconnected event handler on the host element.
+				resources are automatically cleaned up, including ${el("em",
+					"the signal subscription that updates the text content")}. This happens because the library
+				internally registers a disconnected event handler on the host element.
 			`)
 		),
 
 		el(h3, t`Declarative vs Imperative Components`),
 		el("p").append(...T`
-			The library DOM API and signals work best when used declaratively. It means you split your app's logic
-			into three parts as introduced in ${el("a", { textContent: "Signals", ...references.signals })}.
+			The library DOM API and signals work best when used declaratively. It means you split your app’s logic
+			into three parts as introduced in ${el("a", { textContent: "Signals (3PS)", ...references.signals })}.
 		`),
 		el("div", { className: "note" }).append(
 			el("p").append(...T`
@@ -145,17 +146,17 @@ function MyComponent() {
 			`)
 		),
 		el("div", { className: "tabs" }).append(
-			el("div", { className: "tab", "data-tab": "declarative" }).append(
+			el("div", { className: "tab", dataTab: "declarative" }).append(
 				el("h4", t`✅ Declarative Approach`),
 				el("p", t`Define what your UI should look like based on state:`),
 				el(code, { src: fileURL("./components/examples/scopes/declarative.js"), page_id })
 			),
-			el("div", { className: "tab", "data-tab": "imperative" }).append(
+			el("div", { className: "tab", dataTab: "imperative" }).append(
 				el("h4", t`⚠️ Imperative Approach`),
 				el("p", t`Manually update the DOM in response to events:`),
 				el(code, { src: fileURL("./components/examples/scopes/imperative.js"), page_id })
 			),
-			el("div", { className: "tab", "data-tab": "mixed" }).append(
+			el("div", { className: "tab", dataTab: "mixed" }).append(
 				el("h4", t`❌ Mixed Approach`),
 				el("p", t`This approach should be avoided:`),
 				el(code, { src: fileURL("./components/examples/scopes/mixed.js"), page_id })
@@ -171,7 +172,8 @@ function MyComponent() {
 				${el("strong", "Define signals as constants:")} ${el("code", "const counter = S(0);")}
 			`),
 			el("li").append(...T`
-				${el("strong", "Prefer declarative patterns:")} Use signals to drive UI updates rather than manual DOM manipulation
+				${el("strong", "Prefer declarative patterns:")} Use signals to drive UI updates rather than manual DOM
+				manipulation
 			`),
 			el("li").append(...T`
 				${el("strong", "Keep components focused:")} Each component should do one thing well
@@ -195,7 +197,7 @@ function MyComponent() {
 				el("dd", t`Use arrow functions or .bind() to preserve context`),
 
 				el("dt", t`Mixing declarative and imperative styles`),
-				el("dd", t`Choose one approach and be consistent throughout a component`)
+				el("dd", t`Choose one approach and be consistent throughout a component(s)`)
 			)
 		),
 

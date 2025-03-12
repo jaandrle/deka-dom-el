@@ -167,9 +167,9 @@ function connectionsChangesObserverConstructor(){
 		if(store.size > 30)//TODO?: limit
 			await requestIdle();
 		const out= [];
-		if(!isInstance(element, Node)) return out;
+		if(!isInstance(element, env.N)) return out;
 		for(const el of store.keys()){
-			if(el===element || !isInstance(el, Node)) continue;
+			if(el===element || !isInstance(el, env.N)) continue;
 			if(element.contains(el))
 				out.push(el);
 		}
@@ -214,6 +214,7 @@ function connectionsChangesObserverConstructor(){
 
 			const ls= store.get(element);
 			if(!ls.length_d) continue;
+			// support for S.el, see https://vuejs.org/guide/extras/web-components.html#lifecycle
 			(globalThis.queueMicrotask || setTimeout)(dispatchRemove(element));
 			out= true;
 		}

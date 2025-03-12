@@ -7,10 +7,11 @@ type SupportedElement=
 	|	CustomElementTagNameMap[keyof CustomElementTagNameMap]
 declare global {
 	type ddeComponentAttributes= Record<any, any> | undefined;
-	type ddeElementAddon<El extends SupportedElement | DocumentFragment | Node>= (element: El)=> any;
+	type ddeElementAddon<El extends SupportedElement | DocumentFragment | Node>= (element: El, ...rest: any)=> any;
 	type ddeString= string | ddeSignal<string, {}>
 	type ddeStringable= ddeString | number | ddeSignal<number, {}>
 }
+type Host<EL extends SupportedElement>= (...addons: ddeElementAddon<EL>[])=> EL;
 type PascalCase= `${Capitalize<string>}${string}`;
 type AttrsModified= {
 	/**
@@ -84,6 +85,7 @@ export namespace el {
 		is_open?: boolean
 	): Comment;
 }
+export function chainableAppend<EL extends SupportedElement>(el: EL): EL | ddeHTMLElement
 
 export function el<
 	A extends ddeComponentAttributes,
@@ -155,7 +157,6 @@ export function elNS(
 )=> SupportedElement
 export { elNS as createElementNS }
 
-export function chainableAppend<EL extends SupportedElement>(el: EL): EL;
 /** Simulate slots for ddeComponents */
 export function simulateSlots<EL extends SupportedElement | DocumentFragment>(
 	root: EL,
@@ -170,14 +171,14 @@ export function simulateSlots<EL extends SupportedElement | DocumentFragment>(
 	body: EL,
 ): EL
 
-export function dispatchEvent(name: keyof DocumentEventMap | string, element: SupportedElement):
+export function dispatchEvent(name: keyof DocumentEventMap | string, host: Host<SupportedElement>):
 	(data?: any)=> void;
 export function dispatchEvent(name: keyof DocumentEventMap | string, options?: EventInit):
 	(element: SupportedElement, data?: any)=> void;
 export function dispatchEvent(
 	name: keyof DocumentEventMap | string,
 	options: EventInit | null,
-	element: SupportedElement | (()=> SupportedElement)
+	host: Host<SupportedElement>
 ): (data?: any)=> void;
 interface On{
 	/** Listens to the DOM event. See {@link Document.addEventListener} */
@@ -225,7 +226,7 @@ export const on: On;
 
 type Scope= {
 	scope: Node | Function | Object,
-	host: ddeElementAddon<any>,
+	host: Host<SupportedElement>,
 	custom_element: false | HTMLElement,
 	prevent: boolean
 };
@@ -241,7 +242,12 @@ export const scope: {
 	 * It can be also used to register Addon(s) (functions to be called when component is initized)
 	 * — `scope.host(on.connected(console.log))`.
 	 * */
-	host: (...addons: ddeElementAddon<SupportedElement>[])=> HTMLElement,
+	host: Host<SupportedElement>,
+
+	/**
+	 * Creates/gets an AbortController that triggers when the element disconnects
+	 * */
+	signal: AbortSignal,
 
 	state: Scope[],
 	/** Adds new child scope. All attributes are inherited by default. */
@@ -262,7 +268,6 @@ export function customElementRender<
 ): EL
 export function customElementWithDDE<EL extends (new ()=> HTMLElement)>(custom_element: EL): EL
 export function lifecyclesToEvents<EL extends (new ()=> HTMLElement)>(custom_element: EL): EL
-export function observedAttributes(custom_element: HTMLElement): Record<string, string>
 
 /**
  * This is used primarly for server side rendering. To be sure that all async operations
@@ -284,6 +289,69 @@ export function observedAttributes(custom_element: HTMLElement): Record<string, 
  * ```
  * */
 export function queue(promise?: Promise<unknown>): Promise<unknown>;
+
+/**
+ * Memoization utility for caching DOM elements to improve performance.
+ * Used to prevent unnecessary recreation of elements when rendering lists or complex components.
+ *
+ * @param key - Unique identifier for the element (usually an ID or unique value)
+ * @param generator - Function that creates the element
+ * @returns The cached element if the key exists, otherwise the result of the generator function
+ *
+ * @example
+ * ```ts
+ * // Within S.el for list rendering
+ * S.el(itemsSignal, (items, memo) =>
+ *   el("ul").append(
+ *     ...items.map(item =>
+ *       memo(item.id, () => el(ItemComponent, item))
+ *     )
+ *   )
+ * )
+ * ```
+ */
+export function memo<T>(key: string | number | object, generator: (key: any) => T): T;
+
+/**
+ * Memo namespace containing utility functions for memoization.
+ */
+export namespace memo {
+	/**
+	 * Checks if an object is a memo scope.
+	 * @param obj - The object to check
+	 * @returns True if the object is a memo scope
+	 */
+	export function isScope(obj: any): boolean;
+
+	/**
+	 * Creates a memoized function with optional cleanup support.
+	 *
+	 * @param fun - The function to memoize
+	 * @param options - Configuration options
+	 * @param options.signal - AbortSignal for cleanup
+	 * @param options.onlyLast - When true, only keeps the cache from the most recent call
+	 * @returns A memoized version of the function with a .clear() method
+	 *
+	 * @example
+	 * ```ts
+	 * const renderItems = memo.scope(function(items) {
+	 *	 return items.map(item =>
+	 *		 memo(item.id, () => el("div", item.name))
+	 *	 );
+	 * }, {
+	 *	 signal: controller.signal,
+	 *	 onlyLast: true
+	 * });
+	 * ```
+	 */
+	export function scope<F extends Function>(
+		fun: F,
+		options?: {
+			signal?: AbortSignal;
+			onlyLast?: boolean;
+		}
+	): F & { clear: () => void };
+}
 
 /* TypeScript MEH */
 declare global{

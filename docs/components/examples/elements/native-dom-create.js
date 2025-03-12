@@ -8,12 +8,12 @@ button.disabled = true;
 const button2 = Object.assign(
 	document.createElement('button'),
 	{
-	textContent: "Click me",
-	className: "primary",
-	disabled: true
+		textContent: "Click me",
+		className: "primary",
+		disabled: true
 	}
 );
 
 // Add to DOM
-document.body.appendChild(button);
-document.body.appendChild(button2);
+document.body.append(button);
+document.body.append(button2);

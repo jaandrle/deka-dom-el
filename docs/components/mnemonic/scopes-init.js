@@ -14,6 +14,10 @@ export function mnemonic(){
 		el("li").append(
 			el("code", "scope.host(...<addons>)"),
 			" — use addons to current component",
+		),
+		el("li").append(
+			el("code", "scope.signal"),
+			" — get AbortSignal that triggers when the element disconnects",
 		)
 	);
 }

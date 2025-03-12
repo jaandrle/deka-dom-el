@@ -36,11 +36,6 @@ const references= {
 	mdn_mutation: {
 		href: "https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver",
 	},
-	/** Readding the element to the DOM fix by Vue */
-	vue_fix: {
-		title: t`Vue and Web Components, lifecycle implementation readding the element to the DOM`,
-		href: "https://vuejs.org/guide/extras/web-components.html#lifecycle",
-	}
 };
 /** @param {import("./types.d.ts").PageAttrs} attrs */
 export function page({ pkg, info }){
@@ -48,11 +43,11 @@ export function page({ pkg, info }){
 	return el(simplePage, { info, pkg }).append(
 		el("p").append(...T`
 			Events are at the core of interactive web applications. dd<el> provides a clean, declarative approach to
-			handling DOM events and extends this pattern with a powerful Addon system to incorporate additional
+			handling DOM events and extends this pattern with a powerful Addon system to incorporate additional
 			functionalities into your UI templates.
 		`),
 		el("div", { className: "callout" }).append(
-			el("h4", t`Why dd<el>'s Event System and Addons Matters`),
+			el("h4", t`Why dd<el>’s Event System and Addons Matters`),
 			el("ul").append(
 				el("li", t`Integrate event handling directly in element declarations`),
 				el("li", t`Leverage lifecycle events for better component design`),
@@ -68,23 +63,23 @@ export function page({ pkg, info }){
 		el("p").append(...T`
 			In JavaScript you can listen to native DOM events using
 			${el("a", references.mdn_listen).append(el("code", "element.addEventListener(type, listener, options)"))}.
-			dd<el> provides an alternative approach with arguments ordered differently to better fit its declarative
+			dd<el> provides an alternative approach with arguments ordered differently to better fit its declarative
 			style:
 		`),
 		el("div", { className: "illustration" }).append(
 			el("div", { className: "tabs" }).append(
 				el("div", { className: "tab" }).append(
 					el("h5", t`Native DOM API`),
-					el(code, { content: `element.addEventListener('click', callback, options);`, page_id })
+					el(code, { content: `element.addEventListener("click", callback, options);`, page_id })
 				),
 				el("div", { className: "tab" }).append(
 					el("h5", t`dd<el> Approach`),
-					el(code, { content: `on('click', callback, options)(element);`, page_id })
+					el(code, { content: `on("click", callback, options)(element);`, page_id })
 				)
 			)
 		),
 		el("p").append(...T`
-			The main benefit of dd<el>'s approach is that it works as an Addon, making it easy to integrate
+			The main benefit of dd<el>’s approach is that it works as an Addon (see below), making it easy to integrate
 			directly into element declarations.
 		`),
 		el(example, { src: fileURL("./components/examples/events/compare.js"), page_id }),
@@ -97,10 +92,14 @@ export function page({ pkg, info }){
 			`)
 		),
 		el(example, { src: fileURL("./components/examples/events/abortSignal.js"), page_id }),
+		el("p").append(...T`
+			This is the same for signals (see next section) and works well with scopes and library extendability (
+			see scopes and extensions section).
+		`),
 
 		el(h3, t`Three Ways to Handle Events`),
 		el("div", { className: "tabs" }).append(
-			el("div", { className: "tab", "data-tab": "html-attr" }).append(
+			el("div", { className: "tab", dataTab: "html-attr" }).append(
 				el("h4", t`HTML Attribute Style`),
 				el(code, { src: fileURL("./components/examples/events/attribute-event.js"), page_id }),
 				el("p").append(...T`
@@ -109,25 +108,25 @@ export function page({ pkg, info }){
 					useful for SSR scenarios.
 				`)
 			),
-			el("div", { className: "tab", "data-tab": "property" }).append(
+			el("div", { className: "tab", dataTab: "property" }).append(
 				el("h4", t`Property Assignment`),
 				el(code, { src: fileURL("./components/examples/events/property-event.js"), page_id }),
-				el("p", t`Assigns the event handler directly to the element's property.`)
+				el("p", t`Assigns the event handler directly to the element’s property.`)
 			),
-			el("div", { className: "tab", "data-tab": "addon" }).append(
+			el("div", { className: "tab", dataTab: "addon" }).append(
 				el("h4", t`Addon Approach`),
 				el(code, { src: fileURL("./components/examples/events/chain-event.js"), page_id }),
-				el("p", t`Uses the addon pattern, see above.`)
+				el("p", t`Uses the addon pattern (so adds the event listener to the element), see above.`)
 			)
 		),
 		el("p").append(...T`
 			For a deeper comparison of these approaches, see
-			${el("a", { textContent: "WebReflection's detailed analysis", ...references.web_events })}.
+			${el("a", { textContent: "WebReflection’s detailed analysis", ...references.web_events })}.
 		`),
 
 		el(h3, t`Understanding Addons`),
 		el("p").append(...T`
-			Addons are a powerful pattern in dd<el> that extends beyond just event handling.
+			Addons are a powerful pattern in dd<el> that extends beyond just event handling.
 			An Addon is any function that accepts an HTML element as its first parameter.
 		`),
 		el("div", { className: "callout" }).append(
@@ -152,11 +151,12 @@ export function page({ pkg, info }){
 
 		el(h3, t`Lifecycle Events`),
 		el("p").append(...T`
-			Addons are called immediately when an element is created, even before it's connected to the live DOM.
-			You can think of an Addon as an "oncreate" event handler.
+			Addons are called immediately when an element is created, even before it’s connected to the live DOM.
+			You can think of an Addon as an "oncreate" event handler.
 		`),
 		el("p").append(...T`
-			dd<el> provides three additional lifecycle events that correspond to custom element lifecycle callbacks:
+			dd<el> provides two additional lifecycle events that correspond to ${el("a", { textContent:
+				"custom element", ...references.mdn_customElements })} lifecycle callbacks:
 		`),
 		el("div", { className: "function-table" }).append(
 			el("dl").append(
@@ -165,31 +165,30 @@ export function page({ pkg, info }){
 
 				el("dt", t`on.disconnected(callback)`),
 				el("dd", t`Fires when the element is removed from the DOM`),
-
-				el("dt", t`on.attributeChanged(callback, attributeName)`),
-				el("dd", t`Fires when the specified attribute changes`)
 			)
 		),
 		el(example, { src: fileURL("./components/examples/events/live-cycle.js"), page_id }),
 
 		el("div", { className: "note" }).append(
 			el("p").append(...T`
-				For regular elements (non-custom elements), dd<el> uses
-				${el("a", references.mdn_mutation).append(el("code", "MutationObserver"), " | MDN")}
-				internally to track lifecycle events.
+				For regular elements (non-custom elements), dd<el> uses ${el("a",
+					references.mdn_mutation).append(el("code", "MutationObserver"), " | MDN")} internally to track
+				lifecycle events.
 			`)
 		),
 
 		el("div", { className: "warning" }).append(
 			el("ul").append(
 				el("li").append(...T`
-					Always use ${el("code", "on.*")} functions, not ${el("code", "on('dde:*', ...)")}, for proper registration
+					Always use ${el("code", "on.*")} functions as library must ensure proper (MutationObserver)
+					registration, not ${el("code", "on('dde:*', ...)")}, even the native event system is used with event
+					names prefixed with ${el("code", "dde:")}.
 				`),
 				el("li").append(...T`
 					Use lifecycle events sparingly, as they require internal tracking
 				`),
 				el("li").append(...T`
-					Leverage parent-child relationships: when a parent is removed, all children are also removed
+					Leverage parent-child relationships: when a parent is removed, all children are also removed
 				`),
 				el("li").append(...T`
 					…see section later in documentation regarding hosts elements
@@ -202,11 +201,11 @@ export function page({ pkg, info }){
 
 		el(h3, t`Dispatching Custom Events`),
 		el("p").append(...T`
-			This makes it easy to implement component communication through events,
-			following standard web platform patterns. The curried approach allows for easy reuse
-			of event dispatchers throughout your application.
+			This makes it easy to implement component communication through events, following standard web platform
+			patterns. The curried approach allows for easy reuse of event dispatchers throughout your application.
 		`),
 		el(example, { src: fileURL("./components/examples/events/compareDispatch.js"), page_id }),
+		el(code, { src: fileURL("./components/examples/events/dispatch.js"), page_id }),
 
 		el(h3, t`Best Practices`),
 		el("ol").append(
@@ -217,7 +216,8 @@ export function page({ pkg, info }){
 				${el("strong", "Leverage lifecycle events")}: For component setup and teardown
 			`),
 			el("li").append(...T`
-				${el("strong", "Delegate when possible")}: Add listeners to container elements when handling many similar elements
+				${el("strong", "Delegate when possible")}: Add listeners to container elements when handling many
+				similar elements
 			`),
 			el("li").append(...T`
 				${el("strong", "Maintain consistency")}: Choose one event binding approach and stick with it

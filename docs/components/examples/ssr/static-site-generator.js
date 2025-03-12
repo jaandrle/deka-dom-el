@@ -12,7 +12,7 @@ async function buildSite() {
 	];
 
 	// Create output directory
-	mkdirSync("./dist", { recursive: true });
+	mkdirSync("./dist/docs", { recursive: true });
 
 	// Build each page
 	for (const page of pages) {
@@ -23,6 +23,7 @@ async function buildSite() {
 		const { el } = await register(dom);
 
 		// Import the page component
+		// use `import { el } from "deka-dom-el"`
 		const { default: PageComponent } = await import(page.component);
 
 		// Render the page with its metadata
@@ -35,7 +36,7 @@ async function buildSite() {
 
 		// Write the HTML to a file
 		const html = dom.serialize();
-		writeFileSync(`./dist/${page.id}.html`, html);
+		writeFileSync(`./dist/docs/${page.id}.html`, html);
 
 		console.log(`Built page: ${page.id}.html`);
 	}

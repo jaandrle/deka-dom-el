@@ -1,7 +1,6 @@
 import {
 	customElementRender,
 	customElementWithDDE,
-	observedAttributes,
 	el, on, scope,
 } from "deka-dom-el";
 import { S } from "deka-dom-el/signals";
@@ -9,7 +8,6 @@ export class HTMLCustomElement extends HTMLElement{
 	static tagName= "custom-element";
 	static observedAttributes= [ "attr" ];
 	connectedCallback(){
-		console.log(observedAttributes(this));
 		customElementRender(
 			this.attachShadow({ mode: "open" }),
 			ddeComponent,
