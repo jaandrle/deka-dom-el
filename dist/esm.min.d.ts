@@ -18,6 +18,7 @@ export type Actions<V> = Record<string | SymbolOnclear, Action<V>>;
 export type OnListenerOptions = Pick<AddEventListenerOptions, "signal"> & {
 	first_time?: boolean;
 };
+export type SElement = Node | Element | DocumentFragment | ddeHTMLElement | ddeSVGElement | ddeDocumentFragment;
 export interface signal {
 	_: Symbol;
 	/**
@@ -63,7 +64,7 @@ export interface signal {
 	 * S.el(listS, list=> list.map(li=> el("li", li)));
 	 * ```
 	 * */
-	el<S extends any>(signal: Signal<S, any>, el: (v: S) => Element | Element[] | DocumentFragment): DocumentFragment;
+	el<S extends any>(signal: Signal<S, any>, el: (v: S) => SElement | SElement[]): DocumentFragment;
 	observedAttributes(custom_element: HTMLElement): Record<string, Signal<string, {}>>;
 }
 declare const signal: signal;
