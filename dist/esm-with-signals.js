@@ -645,6 +645,41 @@ function wrapMethod(obj, method, apply) {
 	}), { apply });
 }
 
+// src/memo.js
+var memoMark = "__dde_memo";
+var memo_scope = [];
+function memo(key, generator) {
+	if (!memo_scope.length) return generator(key);
+	const k = typeof key === "object" ? JSON.stringify(key) : key;
+	const [{ cache, after }] = memo_scope;
+	return after(k, hasOwn(cache, k) ? cache[k] : generator(key));
+}
+memo.isScope = function(obj) {
+	return obj[memoMark];
+};
+memo.with = function memoWith(fun, { signal: signal2, onlyLast } = {}) {
+	let cache = oCreate();
+	function memoScope(...args) {
+		if (signal2 && signal2.aborted)
+			return fun.apply(this, args);
+		let cache_local = onlyLast ? cache : oCreate();
+		memo_scope.unshift({
+			cache,
+			after(key, val) {
+				return cache_local[key] = val;
+			}
+		});
+		const out = fun.apply(this, args);
+		memo_scope.shift();
+		cache = cache_local;
+		return out;
+	}
+	memoScope[memoMark] = true;
+	memoScope.clear = () => cache = oCreate();
+	if (signal2) signal2.addEventListener("abort", memoScope.clear);
+	return memoScope;
+};
+
 // src/signals-lib/helpers.js
 var mark = "__dde_signal";
 var queueSignalWrite = /* @__PURE__ */ (() => {
@@ -758,25 +793,18 @@ signal.clear = function(...signals2) {
 	}
 };
 var key_reactive = "__dde_reactive";
-function cache(store = oCreate()) {
-	return (key, fun) => hasOwn(store, key) ? store[key] : store[key] = fun();
-}
 signal.el = function(s, map) {
+	map = memo.isScope(map) ? map : memo.with(map, { onlyLast: true });
 	const mark_start = createElement.mark({ type: "reactive", source: new Defined().compact }, true);
 	const mark_end = mark_start.end;
 	const out = enviroment.D.createDocumentFragment();
 	out.append(mark_start, mark_end);
 	const { current } = scope;
-	let cache_shared = oCreate();
 	const reRenderReactiveElement = (v) => {
 		if (!mark_start.parentNode || !mark_end.parentNode)
 			return removeSignalListener(s, reRenderReactiveElement);
-		const memo = cache(cache_shared);
-		cache_shared = oCreate();
 		scope.push(current);
-		let els = map(v, function useCache(key, fun) {
-			return cache_shared[key] = memo(key, fun);
-		});
+		let els = map(v);
 		scope.pop();
 		if (!Array.isArray(els))
 			els = [els];
@@ -796,7 +824,7 @@ signal.el = function(s, map) {
 	current.host(on.disconnected(
 		() => (
 			/*! Clears cached elements for reactive element `S.el` */
-			cache_shared = {}
+			map.clear()
 		)
 	));
 	return out;
@@ -979,6 +1007,7 @@ export {
 	elementAttribute,
 	isSignal,
 	lifecyclesToEvents,
+	memo,
 	on,
 	queue,
 	registerReactivity,

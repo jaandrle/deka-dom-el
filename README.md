@@ -63,6 +63,7 @@ Creating reactive elements, components, and Web Components using the native
 - ☑️ **Lightweight** — ~10-15kB minified (original goal 10kB) with zero/minimal dependencies
 - ✅ **Declarative & functional approach** for clean, maintainable code
 - ✅ **Signals and events** for reactive UI
+- ✅ **Memoization for performance** — optimize rendering with intelligent caching
 - ✅ **Optional build-in signals** with support for custom reactive implementations
 - ✅ **Server-side rendering** support via [jsdom](https://github.com/jsdom/jsdom)
 - ✅ **TypeScript support** (work in progress)

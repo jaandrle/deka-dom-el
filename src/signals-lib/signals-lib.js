@@ -163,10 +163,8 @@ import { enviroment as env, eva } from "../dom-common.js";
 import { el } from "../dom.js";
 import { scope } from "../dom.js";
 import { on } from "../events.js";
+import { memo } from "../memo.js";
 
-export function cache(store= oCreate()){
-	return (key, fun)=> hasOwn(store, key) ? store[key] : (store[key]= fun());
-}
 /**
  * Creates a reactive DOM element that re-renders when signal changes
  *
@@ -175,21 +173,17 @@ export function cache(store= oCreate()){
  * @returns {DocumentFragment} Fragment containing reactive elements
  */
 signal.el= function(s, map){
+	map= memo.isScope(map) ? map : memo.with(map, { onlyLast: true });
 	const mark_start= el.mark({ type: "reactive", source: new Defined().compact }, true);
 	const mark_end= mark_start.end;
 	const out= env.D.createDocumentFragment();
 	out.append(mark_start, mark_end);
 	const { current }= scope;
-	let cache_shared= oCreate();
 	const reRenderReactiveElement= v=> {
 		if(!mark_start.parentNode || !mark_end.parentNode) // === `isConnected` or wasn’t yet rendered
 			return removeSignalListener(s, reRenderReactiveElement);
-		const memo= cache(cache_shared);
-		cache_shared= oCreate();
 		scope.push(current);
-		let els= map(v, function useCache(key, fun){
-			return (cache_shared[key]= memo(key, fun));
-		});
+		let els= map(v);
 		scope.pop();
 		if(!Array.isArray(els))
 			els= [ els ];
@@ -208,7 +202,7 @@ signal.el= function(s, map){
 	reRenderReactiveElement(s.get());
 	current.host(on.disconnected(()=>
 		/*! Clears cached elements for reactive element `S.el` */
-		cache_shared= {}
+		map.clear()
 	));
 	return out;
 };

@@ -290,6 +290,69 @@ export function lifecyclesToEvents<EL extends (new ()=> HTMLElement)>(custom_ele
  * */
 export function queue(promise?: Promise<unknown>): Promise<unknown>;
 
+/**
+ * Memoization utility for caching DOM elements to improve performance.
+ * Used to prevent unnecessary recreation of elements when rendering lists or complex components.
+ *
+ * @param key - Unique identifier for the element (usually an ID or unique value)
+ * @param generator - Function that creates the element
+ * @returns The cached element if the key exists, otherwise the result of the generator function
+ *
+ * @example
+ * ```ts
+ * // Within S.el for list rendering
+ * S.el(itemsSignal, (items, memo) =>
+ *   el("ul").append(
+ *     ...items.map(item =>
+ *       memo(item.id, () => el(ItemComponent, item))
+ *     )
+ *   )
+ * )
+ * ```
+ */
+export function memo<T>(key: string | number | object, generator: (key: any) => T): T;
+
+/**
+ * Memo namespace containing utility functions for memoization.
+ */
+export namespace memo {
+	/**
+	 * Checks if an object is a memo scope.
+	 * @param obj - The object to check
+	 * @returns True if the object is a memo scope
+	 */
+	export function isScope(obj: any): boolean;
+
+	/**
+	 * Creates a memoized function with optional cleanup support.
+	 *
+	 * @param fun - The function to memoize
+	 * @param options - Configuration options
+	 * @param options.signal - AbortSignal for cleanup
+	 * @param options.onlyLast - When true, only keeps the cache from the most recent call
+	 * @returns A memoized version of the function with a .clear() method
+	 *
+	 * @example
+	 * ```ts
+	 * const renderItems = memo.scope(function(items) {
+	 *	 return items.map(item =>
+	 *		 memo(item.id, () => el("div", item.name))
+	 *	 );
+	 * }, {
+	 *	 signal: controller.signal,
+	 *	 onlyLast: true
+	 * });
+	 * ```
+	 */
+	export function scope<F extends Function>(
+		fun: F,
+		options?: {
+			signal?: AbortSignal;
+			onlyLast?: boolean;
+		}
+	): F & { clear: () => void };
+}
+
 /* TypeScript MEH */
 declare global{
 	type ddeAppend<el>= (...nodes: (Node | string)[])=> el;

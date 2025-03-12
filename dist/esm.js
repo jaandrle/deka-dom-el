@@ -1,4 +1,5 @@
 // src/helpers.js
+var hasOwn = (...a) => Object.prototype.hasOwnProperty.call(...a);
 function isUndef(value) {
 	return typeof value === "undefined";
 }
@@ -7,6 +8,9 @@ function isInstance(obj, cls) {
 }
 function isProtoFrom(obj, cls) {
 	return Object.prototype.isPrototypeOf.call(cls, obj);
+}
+function oCreate(proto = null, p = {}) {
+	return Object.create(proto, p);
 }
 function oAssign(...o) {
 	return Object.assign(...o);
@@ -611,6 +615,41 @@ function wrapMethod(obj, method, apply) {
 	obj[method] = new Proxy(obj[method] || (() => {
 	}), { apply });
 }
+
+// src/memo.js
+var memoMark = "__dde_memo";
+var memo_scope = [];
+function memo(key, generator) {
+	if (!memo_scope.length) return generator(key);
+	const k = typeof key === "object" ? JSON.stringify(key) : key;
+	const [{ cache, after }] = memo_scope;
+	return after(k, hasOwn(cache, k) ? cache[k] : generator(key));
+}
+memo.isScope = function(obj) {
+	return obj[memoMark];
+};
+memo.with = function memoWith(fun, { signal, onlyLast } = {}) {
+	let cache = oCreate();
+	function memoScope(...args) {
+		if (signal && signal.aborted)
+			return fun.apply(this, args);
+		let cache_local = onlyLast ? cache : oCreate();
+		memo_scope.unshift({
+			cache,
+			after(key, val) {
+				return cache_local[key] = val;
+			}
+		});
+		const out = fun.apply(this, args);
+		memo_scope.shift();
+		cache = cache_local;
+		return out;
+	}
+	memoScope[memoMark] = true;
+	memoScope.clear = () => cache = oCreate();
+	if (signal) signal.addEventListener("abort", memoScope.clear);
+	return memoScope;
+};
 export {
 	assign,
 	assignAttribute,
@@ -625,6 +664,7 @@ export {
 	createElementNS as elNS,
 	elementAttribute,
 	lifecyclesToEvents,
+	memo,
 	on,
 	queue,
 	registerReactivity,
