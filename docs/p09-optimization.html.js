@@ -283,10 +283,10 @@ export function page({ pkg, info }){
 		el("p").append(...T`
 			While memoization is a powerful optimization technique, there are some limitations and edge cases to be aware of:
 		`),
-		
+
 		el("h4", t`Document Fragments and Memoization`),
 		el("p").append(...T`
-			One important limitation to understand is how memoization interacts with 
+			One important limitation to understand is how memoization interacts with
 			${el("a", references.mdn_fragment).append("DocumentFragment")} objects.
 			Functions like ${el("code", "S.el")} internally use DocumentFragment to efficiently handle multiple elements,
 			but this can lead to unexpected behavior with memoization.
@@ -297,36 +297,36 @@ export function page({ pkg, info }){
 				// Creates a DocumentFragment internally
 				return S.el(itemsSignal, items => items.map(item => el("div", item)));
 			});
-			
+
 			// After the fragment is appended to the DOM, it becomes empty
 			container.append(memoizedFragment);
-			
+
 			// On subsequent renders, the cached fragment is empty!
 			container.append(memoizedFragment); // Nothing gets appended
 		`, page_id }),
-		
+
 		el("p").append(...T`
 			This happens because a DocumentFragment is emptied when it's appended to the DOM. When the fragment
 			is cached by memo and reused, it's already empty.
 		`),
-		
+
 		el("div", { className: "tip" }).append(
 			el("h5", t`Solution: Memoize Individual Items`),
 			el(code, { content: `
 				// Correct approach: memoize the individual items, not the fragment
-				S.el(itemsSignal, items => items.map(item => 
+				S.el(itemsSignal, items => items.map(item =>
 					memo(item.id, () => el("div", item))
 				));
-				
+
 				// Or use a container element instead of relying on a fragment
-				memo("key", () => 
+				memo("key", () =>
 					el("div", { className: "item-container" }).append(
 						S.el(itemsSignal, items => items.map(item => el("div", item)))
 					)
 				);
 			`, page_id })
 		),
-		
+
 		el("p").append(...T`
 			Generally, you should either:
 		`),
@@ -335,7 +335,7 @@ export function page({ pkg, info }){
 			el("li", t`Wrap the result in a container element instead of relying on fragment behavior`),
 			el("li", t`Be aware that S.el() and similar functions that return multiple elements are using fragments internally`)
 		),
-		
+
 		el("div", { className: "note" }).append(
 			el("p").append(...T`
 				This limitation isn't specific to dd<el> but is related to how DocumentFragment works in the DOM.
@@ -349,7 +349,8 @@ export function page({ pkg, info }){
 			To identify performance bottlenecks in your dd<el> applications:
 		`),
 		el("ol").append(
-			el("li").append(...T`Use ${el("a", references.mdn_perf).append("browser performance tools")} to profile rendering times`),
+			el("li").append(...T`Use ${el("a", references.mdn_perf).append("browser performance tools")} to profile
+				rendering times`),
 			el("li", t`Check for excessive signal updates using S.on() listeners with console.log`),
 			el("li", t`Verify memo usage by inspecting cache hit rates`),
 			el("li", t`Look for components that render more frequently than necessary`)
@@ -376,7 +377,8 @@ export function page({ pkg, info }){
 				${el("strong", "Use derived signals:")} Compute derived values efficiently with signal computations.
 			`),
 			el("li").append(...T`
-				${el("strong", "Avoid memoizing fragments:")} Memoize individual elements or use container elements instead of DocumentFragments.
+				${el("strong", "Avoid memoizing fragments:")} Memoize individual elements or use container elements
+				instead of DocumentFragments.
 			`)
 		),
 
