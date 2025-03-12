@@ -173,7 +173,7 @@ import { memo } from "../memo.js";
  * @returns {DocumentFragment} Fragment containing reactive elements
  */
 signal.el= function(s, map){
-	map= memo.isScope(map) ? map : memo.with(map, { onlyLast: true });
+	map= memo.isScope(map) ? map : memo.scope(map, { onlyLast: true });
 	const mark_start= el.mark({ type: "reactive", source: new Defined().compact }, true);
 	const mark_end= mark_start.end;
 	const out= env.D.createDocumentFragment();

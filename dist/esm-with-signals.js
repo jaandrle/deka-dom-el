@@ -657,9 +657,9 @@ function memo(key, generator) {
 memo.isScope = function(obj) {
 	return obj[memoMark];
 };
-memo.with = function memoWith(fun, { signal: signal2, onlyLast } = {}) {
+memo.scope = function memoScope(fun, { signal: signal2, onlyLast } = {}) {
 	let cache = oCreate();
-	function memoScope(...args) {
+	function memoScope2(...args) {
 		if (signal2 && signal2.aborted)
 			return fun.apply(this, args);
 		let cache_local = onlyLast ? cache : oCreate();
@@ -674,10 +674,10 @@ memo.with = function memoWith(fun, { signal: signal2, onlyLast } = {}) {
 		cache = cache_local;
 		return out;
 	}
-	memoScope[memoMark] = true;
-	memoScope.clear = () => cache = oCreate();
-	if (signal2) signal2.addEventListener("abort", memoScope.clear);
-	return memoScope;
+	memoScope2[memoMark] = true;
+	memoScope2.clear = () => cache = oCreate();
+	if (signal2) signal2.addEventListener("abort", memoScope2.clear);
+	return memoScope2;
 };
 
 // src/signals-lib/helpers.js
@@ -794,7 +794,7 @@ signal.clear = function(...signals2) {
 };
 var key_reactive = "__dde_reactive";
 signal.el = function(s, map) {
-	map = memo.isScope(map) ? map : memo.with(map, { onlyLast: true });
+	map = memo.isScope(map) ? map : memo.scope(map, { onlyLast: true });
 	const mark_start = createElement.mark({ type: "reactive", source: new Defined().compact }, true);
 	const mark_end = mark_start.end;
 	const out = enviroment.D.createDocumentFragment();

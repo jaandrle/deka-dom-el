@@ -671,9 +671,9 @@ var DDE = (() => {
 	memo.isScope = function(obj) {
 		return obj[memoMark];
 	};
-	memo.with = function memoWith(fun, { signal, onlyLast } = {}) {
+	memo.scope = function memoScope(fun, { signal, onlyLast } = {}) {
 		let cache = oCreate();
-		function memoScope(...args) {
+		function memoScope2(...args) {
 			if (signal && signal.aborted)
 				return fun.apply(this, args);
 			let cache_local = onlyLast ? cache : oCreate();
@@ -688,10 +688,10 @@ var DDE = (() => {
 			cache = cache_local;
 			return out;
 		}
-		memoScope[memoMark] = true;
-		memoScope.clear = () => cache = oCreate();
-		if (signal) signal.addEventListener("abort", memoScope.clear);
-		return memoScope;
+		memoScope2[memoMark] = true;
+		memoScope2.clear = () => cache = oCreate();
+		if (signal) signal.addEventListener("abort", memoScope2.clear);
+		return memoScope2;
 	};
 	return __toCommonJS(index_exports);
 })();
