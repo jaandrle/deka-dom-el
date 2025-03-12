@@ -10,7 +10,6 @@ import { simplePage } from "./layout/simplePage.html.js";
 import { h3 } from "./components/pageUtils.html.js";
 import { code } from "./components/code.html.js";
 /** @param {string} url */
-const fileURL= url=> new URL(url, import.meta.url);
 const references= {
 	/** GitHub repository */
 	github: {
@@ -25,7 +24,7 @@ const references= {
 	/** Performance best practices */
 	performance: {
 		title: t`Performance Optimization Guide`,
-		href: "p09-optimization.html", 
+		href: "p09-optimization.html",
 	}
 };
 
@@ -47,19 +46,23 @@ export function page({ pkg, info }){
 			el("h4", t`Guiding Principles`),
 			el("ul").append(
 				el("li").append(...T`
-					${el("strong", "DOM-First Approach:")} Working directly with the real DOM instead of virtual DOM abstractions
+					${el("strong", "DOM-First Approach:")} Working directly with the real DOM instead of virtual DOM
+					abstractions
 				`),
 				el("li").append(...T`
-					${el("strong", "Declarative Syntax:")} Creating UIs by describing what they should look like, not how to create them
+					${el("strong", "Declarative Syntax:")} Creating UIs by describing what they should look like, not
+					how to create them
 				`),
 				el("li").append(...T`
-					${el("strong", "Minimal Overhead:")} Staying close to standard Web APIs without unnecessary abstractions
+					${el("strong", "Minimal Overhead:")} Staying close to standard Web APIs without unnecessary
+					abstractions
 				`),
 				el("li").append(...T`
 					${el("strong", "Progressive Enhancement:")} Starting simple and adding complexity only when needed
 				`),
 				el("li").append(...T`
-					${el("strong", "Functional Composition:")} Building UIs through function composition rather than inheritance
+					${el("strong", "Functional Composition:")} Building UIs through function composition rather than
+					inheritance
 				`),
 				el("li").append(...T`
 					${el("strong", "Clear Patterns:")} Promoting maintainable code organization with the 3PS pattern
@@ -74,7 +77,7 @@ export function page({ pkg, info }){
 		),
 
 		el(h3, t`Case Studies & Real-World Applications`),
-		
+
 		el("h4", t`TodoMVC Implementation`),
 		el("p").append(...T`
 			The ${el("a", references.todomvc).append("TodoMVC implementation")} showcases how dd<el> handles a complete,
@@ -94,7 +97,7 @@ export function page({ pkg, info }){
 		`),
 		el("ul").append(
 			el("li").append(...T`
-				Signal factories like ${el("code", "routerSignal")} and ${el("code", "todosSignal")} 
+				Signal factories like ${el("code", "routerSignal")} and ${el("code", "todosSignal")}
 				encapsulate related functionality
 			`),
 			el("li").append(...T`
@@ -107,7 +110,7 @@ export function page({ pkg, info }){
 				Derived signals simplify complex UI logic like filtering
 			`)
 		),
-		
+
 		el("h4", t`Migrating from Traditional Approaches`),
 		el("p").append(...T`
 			When migrating from traditional DOM manipulation or other frameworks to dd<el>:
@@ -132,78 +135,78 @@ export function page({ pkg, info }){
 				document.getElementById('counter').textContent = count;
 				document.getElementById('status').className = count > 10 ? 'warning' : '';
 			}
-			
+
 			// After: Declarative with dd<el>
 			const countS = S(0);
-			
+
 			el("div").append(
 				el("span", { id: "counter", textContent: countS }),
-				el("div", { 
+				el("div", {
 					id: "status",
 					className: S(() => countS.get() > 10 ? 'warning' : '')
 				})
 			);
 		`, page_id }),
-		
+
 		el(h3, t`Key Concepts Reference`),
-		
+
 		el("div", { className: "function-table" }).append(
 			el("h4", t`Elements & DOM Creation`),
 			el("dl").append(
 				el("dt", t`el(tag|component, props, ...addons)`),
 				el("dd", t`Core function for creating DOM elements with declarative properties`),
-				
+
 				el("dt", t`el().append(...children)`),
 				el("dd", t`Add child elements to a parent element`),
-				
+
 				el("dt", t`memo(key, () => element)`),
 				el("dd", t`Cache and reuse DOM elements for performance optimization`),
-				
+
 				el("dt", t`on(eventType, handler)`),
 				el("dd", t`Attach event handlers to elements as addons`)
 			)
 		),
-		
+
 		el("div", { className: "function-table" }).append(
 			el("h4", t`Signals & Reactivity`),
 			el("dl").append(
 				el("dt", t`S(initialValue)`),
 				el("dd", t`Create a signal with an initial value`),
-				
+
 				el("dt", t`S(() => computation)`),
 				el("dd", t`Create a derived signal that updates when dependencies change`),
-				
+
 				el("dt", t`S.el(signal, data => element)`),
 				el("dd", t`Create reactive elements that update when a signal changes`),
-				
+
 				el("dt", t`S.action(signal, "method", ...args)`),
 				el("dd", t`Call custom methods defined on a signal`),
-				
+
 				el("dt", t`signal.get()`),
 				el("dd", t`Get the current value of a signal`),
-				
+
 				el("dt", t`signal.set(newValue)`),
 				el("dd", t`Update a signal's value and trigger reactive updates`)
 			)
 		),
-		
+
 		el("div", { className: "function-table" }).append(
 			el("h4", t`Component Patterns`),
 			el("dl").append(
 				el("dt", t`Function Components`),
 				el("dd", t`Javascript functions that return DOM elements`),
-				
+
 				el("dt", t`scope Object`),
 				el("dd", t`Provides access to component context, signal, host element`),
-				
+
 				el("dt", t`dispatchEvent(type, element)`),
 				el("dd", t`Creates a function for dispatching custom events`),
-				
+
 				el("dt", t`Signal Factories`),
 				el("dd", t`Functions that create and configure signals with domain-specific behavior`)
 			)
 		),
-		
+
 		el(h3, t`Best Practices Summary`),
 		el("div").append(
 			el("h4", t`Code Organization`),
@@ -225,7 +228,7 @@ export function page({ pkg, info }){
 				`)
 			)
 		),
-		
+
 		el("div").append(
 			el("h4", t`Performance Optimization`),
 			el("ul").append(
@@ -249,27 +252,27 @@ export function page({ pkg, info }){
 				See the ${el("a", references.performance).append("Performance Optimization Guide")} for detailed strategies.
 			`)
 		),
-		
+
 		el("div").append(
 			el("h4", t`Common Pitfalls to Avoid`),
 			el("dl").append(
 				el("dt", t`Excessive DOM Manipulation`),
 				el("dd", t`Let signals handle updates instead of manually manipulating the DOM after creation`),
-				
+
 				el("dt", t`Forgetting to Clean Up Resources`),
 				el("dd", t`Use scope.signal or AbortSignals to handle resource cleanup when elements are removed`),
-				
+
 				el("dt", t`Circular Signal Dependencies`),
 				el("dd", t`Avoid signals that depend on each other in a circular way, which can cause infinite update loops`),
-				
+
 				el("dt", t`Memoizing with Unstable Keys`),
 				el("dd", t`Always use stable, unique identifiers as memo keys, not array indices or objects`),
-				
+
 				el("dt", t`Deep Nesting Without Structure`),
 				el("dd", t`Break deeply nested element structures into smaller, logical component functions`)
 			)
 		),
-		
+
 		el(h3, t`Feature Comparison with Other Libraries`),
 		el("table").append(
 			el("thead").append(
@@ -319,7 +322,7 @@ export function page({ pkg, info }){
 				)
 			)
 		),
-		
+
 		el(h3, t`Looking Ahead: Future Directions`),
 		el("p").append(...T`
 			The dd<el> library continues to evolve, with several areas of focus for future development:
@@ -341,7 +344,7 @@ export function page({ pkg, info }){
 				${el("strong", "TypeScript Enhancements:")} Improved type definitions and inference
 			`)
 		),
-		
+
 		el(h3, t`Contribution and Community`),
 		el("p").append(...T`
 			dd<el> is an open-source project that welcomes contributions from the community:
@@ -360,7 +363,7 @@ export function page({ pkg, info }){
 				Examples and case studies: Share your implementations and solutions
 			`)
 		),
-		
+
 		el("div", { className: "callout" }).append(
 			el("h4", t`Final Thoughts`),
 			el("p").append(...T`
