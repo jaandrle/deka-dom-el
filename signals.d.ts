@@ -12,6 +12,7 @@ type Action<V>= (this: { value: V, stopPropagation(): void }, ...a: any[])=> typ
 type SymbolOnclear= symbol;
 type Actions<V>= Record<string | SymbolOnclear, Action<V>>;
 type OnListenerOptions= Pick<AddEventListenerOptions, "signal"> & { first_time?: boolean };
+type SElement= Node | Element | DocumentFragment | ddeHTMLElement | ddeSVGElement | ddeDocumentFragment;
 interface signal{
 	_: Symbol
 	/**
@@ -61,7 +62,7 @@ interface signal{
 	 * S.el(listS, list=> list.map(li=> el("li", li)));
 	 * ```
 	 * */
-	el<S extends any>(signal: Signal<S, any>, el: (v: S)=> Element | Element[] | DocumentFragment): DocumentFragment;
+	el<S extends any>(signal: Signal<S, any>, el: (v: S)=> SElement | SElement[]): DocumentFragment;
 
 	observedAttributes(custom_element: HTMLElement): Record<string, Signal<string, {}>>;
 }

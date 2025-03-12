@@ -16,7 +16,6 @@ styles.css`
 		SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
 
 	--body-max-width: 40rem;
-	--sidebar-width: 20rem;
 	--header-height: 4rem;
 	--border-radius: 0.375rem;
 
@@ -216,8 +215,8 @@ body {
 }
 @media (min-width: 768px) {
 	body {
-		grid-template-rows: var(--header-height) 1fr;
-		grid-template-columns: var(--sidebar-width) 1fr;
+		grid-template-rows: auto 1fr;
+		grid-template-columns: auto 1fr;
 		grid-template-areas:
 			"header header"
 			"sidebar content";
@@ -251,7 +250,7 @@ h2 {
 
 /* Section headings with better visual hierarchy */
 body > main h3, body > main h4 {
-	scroll-margin-top: calc(var(--header-height) + 1rem);
+	scroll-margin-top: 1rem;
 }
 
 /* Make clickable heading links for better navigation */

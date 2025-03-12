@@ -96,6 +96,18 @@ html[data-theme="light"] .cm-s-material .cm-error { color: #f44336 !important; }
 		max-width: 100% !important;
 	}
 }
+${host}[data-variant=big]{
+	height: 100vh;
+
+	main {
+		flex-flow: column nowrap;
+		flex-grow: 1;
+	}
+	main > * {
+		width: 100%;
+		max-width: 100% !important;
+	}
+}
 `;
 
 const dde_content= s.cat(new URL("../../dist/esm-with-signals.js", import.meta.url)).toString();
@@ -108,15 +120,16 @@ import { relative } from "node:path";
  * @param {object} attrs
  * @param {URL} attrs.src Example code file path
  * @param {"js"|"ts"|"html"|"css"} [attrs.language="js"] Language of the code
+ * @param {"normal"|"big"} [attrs.variant="normal"] Size of the example
  * @param {string} attrs.page_id ID of the page
  * */
-export function example({ src, language= "js", page_id }){
+export function example({ src, language= "js", variant= "normal", page_id }){
 	registerClientPart(page_id);
 	const content= s.cat(src).toString()
 		.replaceAll(/ from "deka-dom-el(\/signals)?";/g, ' from "./esm-with-signals.js";');
 	const id= "code-example-"+generateCodeId(src);
 	return el().append(
-		el(code, { id, content, language, className: example.name }),
+		el(code, { id, content, language, className: example.name }, el=> el.dataset.variant= variant),
 		elCode({ id, content, extension: "."+language })
 	);
 }
