@@ -279,7 +279,8 @@ export function page({ pkg, info }){
 			To identify performance bottlenecks in your dd<el> applications:
 		`),
 		el("ol").append(
-			el("li").append(...T`Use ${el("a", references.mdn_perf).append("browser performance tools")} to profile rendering times`),
+			el("li").append(...T`Use ${el("a", references.mdn_perf).append("browser performance tools")} to profile
+				rendering times`),
 			el("li", t`Check for excessive signal updates using S.on() listeners with console.log`),
 			el("li", t`Verify memo usage by inspecting cache hit rates`),
 			el("li", t`Look for components that render more frequently than necessary`)

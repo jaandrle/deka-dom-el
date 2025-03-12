@@ -138,7 +138,7 @@ export function page({ pkg, info }){
 				native signals without breaking changes when they become available.
 			`)
 		),
-		
+
 		el("h4", t`The Signal Factory Pattern`),
 		el("p").append(...T`
 			A powerful approach for extending signal functionality is the "Signal Factory" pattern.
@@ -163,13 +163,13 @@ export function page({ pkg, info }){
 					}
 				});
 			}
-			
+
 			// Usage
 			const pageS = routerSignal(S);
-			
+
 			// Update URL hash and signal value in one operation
 			S.action(pageS, "set", "active");
-			
+
 			// React to signal changes in the UI
 			el("nav").append(
 				el("a", {
@@ -179,7 +179,7 @@ export function page({ pkg, info }){
 				})
 			);
 		`, page_id }),
-		
+
 		el("div", { className: "callout" }).append(
 			el("h4", t`Benefits of Signal Factories`),
 			el("ul").append(
@@ -190,12 +190,12 @@ export function page({ pkg, info }){
 				el("li", t`Create a clear semantic boundary around related state operations`)
 			)
 		),
-		
+
 		el("p").append(...T`
 			Note how the factory accepts the signal constructor as a parameter, making it easier to test
 			and potentially migrate to different signal implementations in the future.
 		`),
-		
+
 		el("h4", t`Other Signal Extension Approaches`),
 		el("p").append(...T`
 			For simpler cases, you can also extend signals with clear interfaces and isolation to make
@@ -219,7 +219,7 @@ export function page({ pkg, info }){
 			el("button", { textContent: "Increment", onclick: () => counter.increment() });
 			el("div", S.text\`Count: \${counter}\`);
 		`, page_id }),
-		
+
 		el("div", { className: "tip" }).append(
 			el("p").append(...T`
 				When designing signal extensions, consider creating specialized signals for common patterns like:
