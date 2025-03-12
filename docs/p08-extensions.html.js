@@ -124,7 +124,7 @@ export function page({ pkg, info }){
 			)
 		),
 
-		el(h3, t`Signal Extensions and Future Compatibility`),
+		el(h3, t`Signal Extensions and Factory Patterns`),
 		el("p").append(...T`
 			Unlike DOM elements, signal functionality in dd<el> currently lacks a standardized
 			way to create library-independent extensions. This is because signals are implemented
@@ -138,8 +138,67 @@ export function page({ pkg, info }){
 				native signals without breaking changes when they become available.
 			`)
 		),
+		
+		el("h4", t`The Signal Factory Pattern`),
 		el("p").append(...T`
-			For now, when extending signals functionality, focus on clear interfaces and isolation to make
+			A powerful approach for extending signal functionality is the "Signal Factory" pattern.
+			This approach encapsulates specific behavior in a function that creates and configures a signal.
+		`),
+		el(code, { content: `
+			/**
+			 * Creates a signal for managing route state
+			 *
+			 * @param {typeof S} signal - The signal constructor
+			 */
+			function routerSignal(signal){
+				const initial = location.hash.replace("#", "") || "all";
+				return signal(initial, {
+					/**
+					 * Set the current route
+					 * @param {"all"|"active"|"completed"} hash - The route to set
+					 */
+					set(hash){
+						location.hash = hash;
+						this.value = hash;
+					}
+				});
+			}
+			
+			// Usage
+			const pageS = routerSignal(S);
+			
+			// Update URL hash and signal value in one operation
+			S.action(pageS, "set", "active");
+			
+			// React to signal changes in the UI
+			el("nav").append(
+				el("a", {
+					href: "#",
+					className: S(()=> pageS.get() === "all" ? "selected" : ""),
+					textContent: "All"
+				})
+			);
+		`, page_id }),
+		
+		el("div", { className: "callout" }).append(
+			el("h4", t`Benefits of Signal Factories`),
+			el("ul").append(
+				el("li", t`Encapsulate related behavior in a single, reusable function`),
+				el("li", t`Create domain-specific signals with custom actions`),
+				el("li", t`Improve maintainability by centralizing similar logic`),
+				el("li", t`Enable better testability by accepting the signal constructor as a parameter`),
+				el("li", t`Create a clear semantic boundary around related state operations`)
+			)
+		),
+		
+		el("p").append(...T`
+			Note how the factory accepts the signal constructor as a parameter, making it easier to test
+			and potentially migrate to different signal implementations in the future.
+		`),
+		
+		el("h4", t`Other Signal Extension Approaches`),
+		el("p").append(...T`
+			For simpler cases, you can also extend signals with clear interfaces and isolation to make
 			future migration easier.
 		`),
 		el(code, { content: `
@@ -160,6 +219,14 @@ export function page({ pkg, info }){
 			el("button", { textContent: "Increment", onclick: () => counter.increment() });
 			el("div", S.text\`Count: \${counter}\`);
 		`, page_id }),
+		
+		el("div", { className: "tip" }).append(
+			el("p").append(...T`
+				When designing signal extensions, consider creating specialized signals for common patterns like:
+				forms, API requests, persistence, animations, or routing. These can significantly reduce
+				boilerplate code in your applications.
+			`)
+		),
 
 		el(h3, t`Using Signals Independently`),
 		el("p").append(...T`
@@ -203,7 +270,7 @@ export function page({ pkg, info }){
 			el("ul").append(
 				el("li", t`For non-UI state management in your application`),
 				el("li", t`When integrating with other libraries or frameworks`),
-				el("li", t`To minimize bundle size when you don’t need DOM integration`)
+				el("li", t`To minimize bundle size when you don't need DOM integration`)
 			)
 		),
 
@@ -216,6 +283,10 @@ export function page({ pkg, info }){
 			el("li").append(...T`
 				${el("strong", "Separate core logic from library adaptation:")} Make your core functionality work
 				with standard DOM APIs when possible
+			`),
+			el("li").append(...T`
+				${el("strong", "Use signal factories for common patterns:")} Create reusable signal factories that encapsulate
+				domain-specific behavior and state logic
 			`),
 			el("li").append(...T`
 				${el("strong", "Document clearly:")} Provide clear documentation on how your extension works
@@ -244,6 +315,9 @@ export function page({ pkg, info }){
 
 				el("dt", t`Mutating element prototypes`),
 				el("dd", t`Prefer compositional approaches with addons over modifying element prototypes`),
+
+				el("dt", t`Duplicating similar signal logic across components`),
+				el("dd", t`Use signal factories to encapsulate and reuse related signal behavior`),
 
 				el("dt", t`Complex initialization in addons`),
 				el("dd", t`Split complex logic into a separate initialization function that the addon can call`)
