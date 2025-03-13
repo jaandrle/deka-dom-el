@@ -25,21 +25,21 @@ function createDebouncedSignal(initialValue, delay = 300) {
 	// Create two signals: one for immediate updates, one for debounced values
 	const immediateSignal = S(initialValue);
 	const debouncedSignal = S(initialValue);
-	
+
 	// Keep track of the timeout
 	let timeout = null;
-	
+
 	// Set up a listener on the immediate signal
 	S.on(immediateSignal, value => {
 		// Clear any existing timeout
 		if (timeout) clearTimeout(timeout);
-		
+
 		// Set a new timeout to update the debounced signal
 		timeout = setTimeout(() => {
 			debouncedSignal.set(value);
 		}, delay);
 	});
-	
+
 	// Return an object with both signals and a setter function
 	return {
 		// The raw signal that updates immediately

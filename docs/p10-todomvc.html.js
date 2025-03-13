@@ -244,7 +244,7 @@ export function page({ pkg, info }){
 			The derived signal automatically recalculates whenever either the todos list or the current filter changes,
 			ensuring the UI always shows the correct filtered todos.
 		`),
-		
+
 		el("h4", t`2. Toggle All Functionality`),
 		el(code, { content: `
 			/** @type {ddeElementAddon<HTMLInputElement>} */
@@ -252,7 +252,7 @@ export function page({ pkg, info }){
 				const checked = /** @type {HTMLInputElement} */ (event.target).checked;
 				S.action(todosS, "completeAll", checked);
 			});
-			
+
 			// Using the toggle-all functionality in the UI
 			el("input", {
 				id: "toggle-all",
@@ -261,9 +261,9 @@ export function page({ pkg, info }){
 			}, onToggleAll),
 			el("label", { htmlFor: "toggle-all", title: "Mark all as complete" }),
 		`, page_id }),
-		
+
 		el("p").append(T`
-			The "toggle all" checkbox allows users to mark all todos as completed or active. When the checkbox 
+			The "toggle all" checkbox allows users to mark all todos as completed or active. When the checkbox
 			is toggled, it calls the ${el("code", "completeAll")} action on the todos signal, passing the current
 			checked state. This is a good example of how signals and actions can be used to manage application
 			state in a clean, declarative way.
