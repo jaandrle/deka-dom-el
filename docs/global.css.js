@@ -248,7 +248,7 @@ body > main {
 }
 body > main > *, body > main slot > * {
 	width: 100%;
-	max-width: 100%;
+	max-width: calc(var(--body-max-width) * 5/3);
 	margin-inline: auto;
 	grid-column: main;
 }
@@ -281,9 +281,8 @@ body > main h3, body > main h4 {
 /* Boxes */
 .illustration{
 	grid-column: full-main;
-	width: calc(100% - .75em);
 }
-.illustration:not(:has( .comparison)){
+.illustration:not(:has( .comparison)):not(:has( .tabs)) {
 	grid-column: main;
 
 	pre {
