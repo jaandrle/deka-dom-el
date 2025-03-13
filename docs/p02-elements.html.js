@@ -104,14 +104,14 @@ export function page({ pkg, info }){
 				el("dd", t`Prefers IDL properties, falls back to setAttribute() when no writable property exists`),
 
 				el("dt", t`Data and ARIA Attributes`),
-				el("dd").append(T`Both ${el("code", "dataset")}.* and ${el("code", "data-")}* syntaxes supported
-					(same for ${el("em", "ARIA")})`),
+				el("dd").append(T`Both ${el("code", "dataset.keyName")} and ${el("code", "dataKeyName")} syntaxes are
+					supported (same for ${el("code", "aria")}/${el("code", "ariaset")})`),
 
 				el("dt", t`Style Handling`),
 				el("dd").append(T`Accepts string or object notation for ${el("code", "style")} property`),
 
 				el("dt", t`Class Management`),
-				el("dd").append(T`Works with ${el("code", "className")}, ${el("code", "class")}, or ${el("code",
+				el("dd").append(T`Works with ${el("code", "className")} (${el("code", "class")}) and ${el("code",
 					"classList")} object for toggling classes`),
 
 				el("dt", t`Force Modes`),

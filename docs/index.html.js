@@ -33,7 +33,7 @@ export function page({ pkg, info }){
 			without the complexity and overhead of larger frameworks.
 		`),
 		el("div", { className: "callout" }).append(
-			el("h4", t`What Makes dd<el> Special`),
+			el("h4", t`Key Benefits of dd<el>`),
 			el("ul").append(
 				el("li", t`No build step required — use directly in the browser`),
 				el("li", t`Lightweight core (~10–15kB minified) without unnecessary dependencies (0 at now 😇)`),
@@ -44,7 +44,7 @@ export function page({ pkg, info }){
 		),
 		el(example, { src: fileURL("./components/examples/introducing/helloWorld.js"), page_id }),
 
-		el(h3, { textContent: t`The 3PS Pattern: A Better Way to Build UIs`, id: "h-3ps" }),
+		el(h3, { textContent: t`The 3PS Pattern: Simplified architecture pattern`, id: "h-3ps" }),
 		el("p").append(T`
 			At the heart of dd<el> is the 3PS (3-Part Separation) pattern. This simple yet powerful approach helps you
 			organize your UI code into three distinct areas, making your applications more maintainable and easier
@@ -70,7 +70,8 @@ export function page({ pkg, info }){
 				${el("strong", "Create State")}: Define your application’s reactive data using signals
 			`),
 			el("li").append(T`
-				${el("strong", "Bind to Elements")}: Define how UI elements react to state changes
+				${el("strong", "React to Changes")}: Define how UI elements and other parts of your app react to state
+				changes
 			`),
 			el("li").append(T`
 				${el("strong", "Update State")}: Modify state in response to user events or other triggers
@@ -79,9 +80,9 @@ export function page({ pkg, info }){
 
 		el("p").append(T`
 			By separating these concerns, your code becomes more modular, testable, and easier to maintain. This
-			approach shares principles with more formal patterns like ${el("a", { textContent: "MVVM",
-				...references.w_mvv })} and ${el("a", { textContent: "MVC", ...references.w_mvc })}, but with less
-			overhead and complexity.
+			approach ${el("strong", "is not")} something new and/or special to dd<el>. It’s based on ${el("a", {
+				textContent: "MVC", ...references.w_mvc })} (${el("a", { textContent: "MVVM", ...references.w_mvv })}),
+			but is there presented in simpler form.
 		`),
 
 		el("div", { className: "note" }).append(
@@ -89,6 +90,10 @@ export function page({ pkg, info }){
 				The 3PS pattern becomes especially powerful when combined with components, allowing you to create
 				reusable pieces of UI with encapsulated state and behavior. You’ll learn more about this in the
 				following sections.
+			`),
+			el("p").append(T`
+				The 3PS pattern isn’t required to use with dd<el> but it is good practice to follow it or some similar
+				software architecture.
 			`)
 		),
 

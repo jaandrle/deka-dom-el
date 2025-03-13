@@ -7,8 +7,6 @@ const paragraph= el("p", "See lifecycle events in console.",
 
 document.body.append(
 	paragraph,
-	el("button", "Update attribute", on("click", ()=> paragraph.setAttribute("test", Math.random().toString()))),
-	" ",
 	el("button", "Remove", on("click", ()=> paragraph.remove()))
 );
 

@@ -91,7 +91,6 @@ export function page({ pkg, info }){
 			This approach enables better interoperability and future-proofing.
 		`),
 		el("div", { className: "illustration" }).append(
-			el("h4", t`Library-Independent vs. Library-Dependent Extension`),
 			el("div", { className: "tabs" }).append(
 				el("div", { className: "tab" }).append(
 					el("h5", t`✅ Library-Independent`),

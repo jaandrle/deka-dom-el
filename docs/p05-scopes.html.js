@@ -68,7 +68,7 @@ export function page({ pkg, info }){
 						className: "my-component"
 					}).append(
 						el("h2", "Title"),
-						el("p", "Content")
+						el("p", "Content"),
 					);
 				}
 			` })

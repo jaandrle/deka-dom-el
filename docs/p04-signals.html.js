@@ -286,11 +286,12 @@ export function page({ pkg, info }){
 				el("dt", t`UI not updating when array/object changes`),
 				el("dd", t`Use signal actions instead of direct mutation`),
 
+				el("dt", t`UI not updating`),
+				el("dd").append(T`Ensure you passing the (correct) signal not its value (${el("code", "signal")} vs
+					${el("code", "signal.get()")})`),
+
 				el("dt", t`Infinite update loops`),
 				el("dd", t`Check for circular dependencies between signals`),
-
-				el("dt", t`Memory leaks`),
-				el("dd", t`Use AbortController or scope.host() to clean up subscriptions`),
 
 				el("dt", t`Multiple elements updating unnecessarily`),
 				el("dd", t`Split large signals into smaller, more focused ones`)

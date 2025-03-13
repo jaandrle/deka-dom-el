@@ -193,6 +193,20 @@ pre code {
 	background-color: transparent;
 	padding: 0;
 }
+figure {
+	width: 100%;
+	text-align: center;
+	color: var(--text-light);
+	border: 1px dashed var(--border);
+	border-radius: var(--border-radius);
+
+	img {
+		object-fit: contain;
+		border-radius: var(--border-radius);
+		box-shadow: var(--shadow);
+		max-width: 100%;
+	}
+}
 
 /* Layout */
 body {

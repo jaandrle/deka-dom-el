@@ -189,6 +189,10 @@ export function page({ pkg, info }){
 				signal: controller.signal
 			});
 		`, page_id }),
+		el("p").append(T`
+			You can use custom memo scope as function in (e. g. ${el("code", "S.el(signal, renderList)")}) and as
+			(Abort) signal use ${el("code", "scope.signal")}.
+		`),
 
 		el("div", { className: "function-table" }).append(
 			el("dl").append(
@@ -210,10 +214,8 @@ export function page({ pkg, info }){
 			Signals are efficient, but unnecessary updates can impact performance:
 		`),
 		el("ul").append(
-			el("li", t`Avoid setting signal values that haven't actually changed`),
 			el("li", t`For frequently updating values (like scroll position), consider debouncing`),
 			el("li", t`Keep signal computations small and focused`),
-			el("li", t`Use derived signals to compute values only when dependencies change`)
 		),
 
 		el("h4", t`Optimizing List Rendering`),
@@ -250,32 +252,44 @@ export function page({ pkg, info }){
 
 		el("h4", t`Choosing the Right Optimization Approach`),
 		el("p").append(T`
-			While memo is powerful, it's not always the best solution:
+			While ${el("code", "memo")} is powerful, different scenarios call for different optimization techniques:
 		`),
-		el("table").append(
-			el("thead").append(
-				el("tr").append(
-					el("th", "Approach"),
-					el("th", "When to use")
-				)
-			),
-			el("tbody").append(
-				el("tr").append(
-					el("td", "memo"),
-					el("td", "Lists with stable items that infrequently change position")
-				),
-				el("tr").append(
-					el("td", "Signal computations"),
-					el("td", "Derived values that depend on other signals")
-				),
-				el("tr").append(
-					el("td", "Debouncing"),
-					el("td", "High-frequency events like scroll or resize")
-				),
-				el("tr").append(
-					el("td", "Stateful components"),
-					el("td", "Complex components with internal state")
-				)
+		el("div", { className: "function-table" }).append(
+			el("dl").append(
+				el("dt", t`memo`),
+				el("dd").append(T`
+					Best for list rendering where items rarely change or only their properties update.
+					${el("code", "todos.map(todo => memo(todo.id, () => el(TodoItem, todo)))")}
+					Use when you need to cache and reuse DOM elements to avoid recreating them on every render.
+				`),
+
+				el("dt", t`Signal computations`),
+				el("dd").append(T`
+					Ideal for derived values that depend on other signals and need to auto-update.
+					${el("code", "const totalPrice = S(() => items.get().reduce((t, i) => t + i.price, 0))")}
+					Use when calculated values need to stay in sync with changing source data.
+				`),
+
+				el("dt", t`Debouncing/Throttling`),
+				el("dd").append(T`
+					Essential for high-frequency events (scroll, resize) or rapidly changing input values.
+					${el("code", "debounce(e => searchQuery.set(e.target.value), 300)")}
+					Use to limit the rate at which expensive operations execute when triggered by fast events.
+				`),
+
+				el("dt", t`memo.scope`),
+				el("dd").append(T`
+					Useful for using memoization inside any function: ${el("code",
+						"const renderList = memo.scope(items => items.map(...))")}. Use to create isolated memoization
+					contexts that can be cleared or managed independently.
+				`),
+
+				el("dt", t`Stateful components`),
+				el("dd").append(T`
+					For complex UI components with internal state management.
+					${el("code", "el(ComplexComponent, { initialState, onChange })")}
+					Use when a component needs to encapsulate and manage its own state and lifecycle.
+				`)
 			)
 		),
 

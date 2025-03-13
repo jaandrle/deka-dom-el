@@ -7,7 +7,7 @@ const todos= S([], {
 		const removed= this.value.pop();
 		if(removed) S.clear(removed);
 	},
-	[S.symbols.onclear](){ // this covers `O.clear(todos)`
+	[S.symbols.onclear](){ // this covers `S.clear(todos)`
 		S.clear(...this.value);
 	}
 });

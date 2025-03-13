@@ -87,14 +87,14 @@ export function page({ pkg, info }){
 		el(h3, t`Removing Event Listeners`),
 		el("div", { className: "note" }).append(
 			el("p").append(T`
-				Unlike the native addEventListener/removeEventListener pattern, dd<el> uses the ${el("a", {
-				textContent: "AbortSignal", ...references.mdn_abortListener })} for declarative approach for removal:
+				Unlike the native addEventListener/removeEventListener pattern, dd<el> uses ${el("strong", "only")}
+				${el("a", { textContent: "AbortSignal", ...references.mdn_abortListener })} for declarative removal:
 			`)
 		),
 		el(example, { src: fileURL("./components/examples/events/abortSignal.js"), page_id }),
 		el("p").append(T`
 			This is the same for signals (see next section) and works well with scopes and library extendability (
-			see scopes and extensions section).
+			see scopes and extensions section — mainly ${el("code", "scope.signal")}).
 		`),
 
 		el(h3, t`Three Ways to Handle Events`),
@@ -152,7 +152,7 @@ export function page({ pkg, info }){
 		el(h3, t`Lifecycle Events`),
 		el("p").append(T`
 			Addons are called immediately when an element is created, even before it’s connected to the live DOM.
-			You can think of an Addon as an "oncreate" event handler.
+			You can think of an Addon as an “oncreate” event handler.
 		`),
 		el("p").append(T`
 			dd<el> provides two additional lifecycle events that correspond to ${el("a", { textContent:
