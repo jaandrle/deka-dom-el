@@ -45,7 +45,7 @@ const references= {
 export function page({ pkg, info }){
 	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
-		el("p").append(...T`
+		el("p").append(T`
 			As your applications grow, performance becomes increasingly important. dd<el> provides several
 			techniques to optimize rendering performance, especially when dealing with large lists or frequently
 			updating components. This guide focuses on memoization and other optimization strategies.
@@ -63,7 +63,7 @@ export function page({ pkg, info }){
 		el(code, { src: fileURL("./components/examples/optimization/intro.js"), page_id }),
 
 		el(h3, t`Memoization with memo: Native vs dd<el>`),
-		el("p").append(...T`
+		el("p").append(T`
 			In standard JavaScript applications, optimizing list rendering often involves manual caching
 			or relying on complex virtual DOM diffing algorithms. dd<el>'s ${el("code", "memo")} function
 			provides a simpler, more direct approach:
@@ -106,13 +106,13 @@ export function page({ pkg, info }){
 				)
 			)
 		),
-		el("p").append(...T`
+		el("p").append(T`
 			The ${el("a", references.memo_docs).append(el("code", "memo"))} function in dd<el> allows you to
 			cache and reuse DOM elements instead of recreating them on every render, which can
 			significantly improve performance for components that render frequently or contain heavy computations.
 		`),
 
-		el("p").append(...T`
+		el("p").append(T`
 			The memo system is particularly useful for:
 		`),
 		el("ul").append(
@@ -122,7 +122,7 @@ export function page({ pkg, info }){
 		),
 
 		el(h3, t`Using memo with Signal Rendering`),
-		el("p").append(...T`
+		el("p").append(T`
 			The most common use case for memoization is within ${el("code", "S.el()")} when rendering lists with
 			${el("code", "map()")}:
 		`),
@@ -136,7 +136,7 @@ export function page({ pkg, info }){
 			))))
 		`, page_id }),
 
-		el("p").append(...T`
+		el("p").append(T`
 			The ${el("code", "memo")} function in this context:
 		`),
 		el("ol").append(
@@ -149,7 +149,7 @@ export function page({ pkg, info }){
 		el(example, { src: fileURL("./components/examples/optimization/memo.js"), page_id }),
 
 		el(h3, t`Creating Memoization Scopes`),
-		el("p").append(...T`
+		el("p").append(T`
 			The ${el("code", "memo()")} uses cache store defined via the ${el("code", "memo.scope")} function.
 			That is actually what the ${el("code", "S.el")} is doing under the hood:
 		`),
@@ -173,7 +173,7 @@ export function page({ pkg, info }){
 			);
 		`, page_id }),
 
-		el("p").append(...T`
+		el("p").append(T`
 			The scope function accepts options to customize its behavior:
 		`),
 		el(code, { content: `
@@ -193,12 +193,12 @@ export function page({ pkg, info }){
 		el("div", { className: "function-table" }).append(
 			el("dl").append(
 				el("dt", t`onlyLast Option`),
-				el("dd").append(...T`Only keeps the cache from the most recent function call,
+				el("dd").append(T`Only keeps the cache from the most recent function call,
 					which is useful when the entire collection is replaced. ${el("strong", "This is default behavior of ")
 					.append(el("code", "S.el"))}!`),
 
 				el("dt", t`signal Option`),
-				el("dd").append(...T`An ${el("a", references.mdn_abort).append(el("code", "AbortSignal"))}
+				el("dd").append(T`An ${el("a", references.mdn_abort).append(el("code", "AbortSignal"))}
 					that will clear the cache when aborted, helping with memory management`)
 			)
 		),
@@ -206,7 +206,7 @@ export function page({ pkg, info }){
 		el(h3, t`Additional Optimization Techniques`),
 
 		el("h4", t`Minimizing Signal Updates`),
-		el("p").append(...T`
+		el("p").append(T`
 			Signals are efficient, but unnecessary updates can impact performance:
 		`),
 		el("ul").append(
@@ -217,7 +217,7 @@ export function page({ pkg, info }){
 		),
 
 		el("h4", t`Optimizing List Rendering`),
-		el("p").append(...T`
+		el("p").append(T`
 			Beyond memoization, consider these approaches for optimizing list rendering:
 		`),
 		el("ul").append(
@@ -228,17 +228,17 @@ export function page({ pkg, info }){
 		),
 
 		el("div", { className: "tip" }).append(
-			el("p").append(...T`
+			el("p").append(T`
 				Memoization works best when your keys are stable and unique. Use IDs or other persistent
 				identifiers rather than array indices, which can change when items are reordered.
 				`),
-			el("p").append(...T`
+			el("p").append(T`
 				Alternatively you can use any “jsonable” value as key, when the primitive values aren’t enough.
 			`)
 		),
 
 		el("h4", t`Memory Management`),
-		el("p").append(...T`
+		el("p").append(T`
 			To prevent memory leaks and reduce memory consumption:
 		`),
 		el("ul").append(
@@ -249,7 +249,7 @@ export function page({ pkg, info }){
 		),
 
 		el("h4", t`Choosing the Right Optimization Approach`),
-		el("p").append(...T`
+		el("p").append(T`
 			While memo is powerful, it's not always the best solution:
 		`),
 		el("table").append(
@@ -280,12 +280,12 @@ export function page({ pkg, info }){
 		),
 
 		el(h3, t`Known Issues and Limitations`),
-		el("p").append(...T`
+		el("p").append(T`
 			While memoization is a powerful optimization technique, there are some limitations and edge cases to be aware of:
 		`),
 
 		el("h4", t`Document Fragments and Memoization`),
-		el("p").append(...T`
+		el("p").append(T`
 			One important limitation to understand is how memoization interacts with
 			${el("a", references.mdn_fragment).append("DocumentFragment")} objects.
 			Functions like ${el("code", "S.el")} internally use DocumentFragment to efficiently handle multiple elements,
@@ -305,7 +305,7 @@ export function page({ pkg, info }){
 			container.append(memoizedFragment); // Nothing gets appended
 		`, page_id }),
 
-		el("p").append(...T`
+		el("p").append(T`
 			This happens because a DocumentFragment is emptied when it's appended to the DOM. When the fragment
 			is cached by memo and reused, it's already empty.
 		`),
@@ -327,7 +327,7 @@ export function page({ pkg, info }){
 			`, page_id })
 		),
 
-		el("p").append(...T`
+		el("p").append(T`
 			Generally, you should either:
 		`),
 		el("ol").append(
@@ -337,7 +337,7 @@ export function page({ pkg, info }){
 		),
 
 		el("div", { className: "note" }).append(
-			el("p").append(...T`
+			el("p").append(T`
 				This limitation isn't specific to dd<el> but is related to how DocumentFragment works in the DOM.
 				Once a fragment is appended to the DOM, its child nodes are moved from the fragment to the target element,
 				leaving the original fragment empty.
@@ -345,11 +345,11 @@ export function page({ pkg, info }){
 		),
 
 		el(h3, t`Performance Debugging`),
-		el("p").append(...T`
+		el("p").append(T`
 			To identify performance bottlenecks in your dd<el> applications:
 		`),
 		el("ol").append(
-			el("li").append(...T`Use ${el("a", references.mdn_perf).append("browser performance tools")} to profile
+			el("li").append(T`Use ${el("a", references.mdn_perf).append("browser performance tools")} to profile
 				rendering times`),
 			el("li", t`Check for excessive signal updates using S.on() listeners with console.log`),
 			el("li", t`Verify memo usage by inspecting cache hit rates`),
@@ -357,26 +357,26 @@ export function page({ pkg, info }){
 		),
 
 		el("div", { className: "note" }).append(
-			el("p").append(...T`
+			el("p").append(T`
 				For more details on debugging, see the ${el("a", { href: "p07-debugging.html", textContent: "Debugging" })} page.
 			`)
 		),
 
 		el(h3, t`Best Practices for Optimized Rendering`),
 		el("ol").append(
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Use memo for list items:")} Memoize items in lists, especially when they contain complex components.
 			`),
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Clean up with AbortSignals:")} Connect memo caches to component lifecycles using AbortSignals.
 			`),
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Profile before optimizing:")} Identify actual bottlenecks before adding optimization.
 			`),
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Use derived signals:")} Compute derived values efficiently with signal computations.
 			`),
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Avoid memoizing fragments:")} Memoize individual elements or use container elements
 				instead of DocumentFragments.
 			`)

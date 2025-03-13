@@ -41,7 +41,7 @@ const references= {
 export function page({ pkg, info }){
 	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
-		el("p").append(...T`
+		el("p").append(T`
 			Events are at the core of interactive web applications. dd<el> provides a clean, declarative approach to
 			handling DOM events and extends this pattern with a powerful Addon system to incorporate additional
 			functionalities into your UI templates.
@@ -60,7 +60,7 @@ export function page({ pkg, info }){
 		el(code, { src: fileURL("./components/examples/events/intro.js"), page_id }),
 
 		el(h3, t`Events and Listeners: Two Approaches`),
-		el("p").append(...T`
+		el("p").append(T`
 			In JavaScript you can listen to native DOM events using
 			${el("a", references.mdn_listen).append(el("code", "element.addEventListener(type, listener, options)"))}.
 			dd<el> provides an alternative approach with arguments ordered differently to better fit its declarative
@@ -78,7 +78,7 @@ export function page({ pkg, info }){
 				)
 			)
 		),
-		el("p").append(...T`
+		el("p").append(T`
 			The main benefit of dd<el>’s approach is that it works as an Addon (see below), making it easy to integrate
 			directly into element declarations.
 		`),
@@ -86,13 +86,13 @@ export function page({ pkg, info }){
 
 		el(h3, t`Removing Event Listeners`),
 		el("div", { className: "note" }).append(
-			el("p").append(...T`
+			el("p").append(T`
 				Unlike the native addEventListener/removeEventListener pattern, dd<el> uses the ${el("a", {
 				textContent: "AbortSignal", ...references.mdn_abortListener })} for declarative approach for removal:
 			`)
 		),
 		el(example, { src: fileURL("./components/examples/events/abortSignal.js"), page_id }),
-		el("p").append(...T`
+		el("p").append(T`
 			This is the same for signals (see next section) and works well with scopes and library extendability (
 			see scopes and extensions section).
 		`),
@@ -102,7 +102,7 @@ export function page({ pkg, info }){
 			el("div", { className: "tab", dataTab: "html-attr" }).append(
 				el("h4", t`HTML Attribute Style`),
 				el(code, { src: fileURL("./components/examples/events/attribute-event.js"), page_id }),
-				el("p").append(...T`
+				el("p").append(T`
 					Forces usage as an HTML attribute. Corresponds to
 					${el("code", `<button onclick="console.log(event)">click me</button>`)}. This can be particularly
 					useful for SSR scenarios.
@@ -119,13 +119,13 @@ export function page({ pkg, info }){
 				el("p", t`Uses the addon pattern (so adds the event listener to the element), see above.`)
 			)
 		),
-		el("p").append(...T`
+		el("p").append(T`
 			For a deeper comparison of these approaches, see
 			${el("a", { textContent: "WebReflection’s detailed analysis", ...references.web_events })}.
 		`),
 
 		el(h3, t`Understanding Addons`),
-		el("p").append(...T`
+		el("p").append(T`
 			Addons are a powerful pattern in dd<el> that extends beyond just event handling.
 			An Addon is any function that accepts an HTML element as its first parameter.
 		`),
@@ -139,22 +139,22 @@ export function page({ pkg, info }){
 				el("li", t`Capture element references`)
 			)
 		),
-		el("p").append(...T`
+		el("p").append(T`
 			You can use Addons as ≥3rd argument of the ${el("code", "el")} function, making it possible to
 			extend your templates with additional functionality:
 		`),
 		el(example, { src: fileURL("./components/examples/events/templateWithListeners.js"), page_id }),
-		el("p").append(...T`
+		el("p").append(T`
 			As the example shows, you can provide types in JSDoc+TypeScript using the global type
 			${el("code", "ddeElementAddon")}. Notice how Addons can also be used to get element references.
 		`),
 
 		el(h3, t`Lifecycle Events`),
-		el("p").append(...T`
+		el("p").append(T`
 			Addons are called immediately when an element is created, even before it’s connected to the live DOM.
 			You can think of an Addon as an "oncreate" event handler.
 		`),
-		el("p").append(...T`
+		el("p").append(T`
 			dd<el> provides two additional lifecycle events that correspond to ${el("a", { textContent:
 				"custom element", ...references.mdn_customElements })} lifecycle callbacks:
 		`),
@@ -170,7 +170,7 @@ export function page({ pkg, info }){
 		el(example, { src: fileURL("./components/examples/events/live-cycle.js"), page_id }),
 
 		el("div", { className: "note" }).append(
-			el("p").append(...T`
+			el("p").append(T`
 				For regular elements (non-custom elements), dd<el> uses ${el("a",
 					references.mdn_mutation).append(el("code", "MutationObserver"), " | MDN")} internally to track
 				lifecycle events.
@@ -179,28 +179,28 @@ export function page({ pkg, info }){
 
 		el("div", { className: "warning" }).append(
 			el("ul").append(
-				el("li").append(...T`
+				el("li").append(T`
 					Always use ${el("code", "on.*")} functions as library must ensure proper (MutationObserver)
 					registration, not ${el("code", "on('dde:*', ...)")}, even the native event system is used with event
 					names prefixed with ${el("code", "dde:")}.
 				`),
-				el("li").append(...T`
+				el("li").append(T`
 					Use lifecycle events sparingly, as they require internal tracking
 				`),
-				el("li").append(...T`
+				el("li").append(T`
 					Leverage parent-child relationships: when a parent is removed, all children are also removed
 				`),
-				el("li").append(...T`
+				el("li").append(T`
 					…see section later in documentation regarding hosts elements
 				`),
-				el("li").append(...T`
+				el("li").append(T`
 					dd<el> ensures that connected/disconnected events fire only once for better predictability
 				`)
 			)
 		),
 
 		el(h3, t`Dispatching Custom Events`),
-		el("p").append(...T`
+		el("p").append(T`
 			This makes it easy to implement component communication through events, following standard web platform
 			patterns. The curried approach allows for easy reuse of event dispatchers throughout your application.
 		`),
@@ -209,17 +209,17 @@ export function page({ pkg, info }){
 
 		el(h3, t`Best Practices`),
 		el("ol").append(
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Clean up listeners")}: Use AbortSignal to prevent memory leaks
 			`),
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Leverage lifecycle events")}: For component setup and teardown
 			`),
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Delegate when possible")}: Add listeners to container elements when handling many
 				similar elements
 			`),
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Maintain consistency")}: Choose one event binding approach and stick with it
 			`)
 		),

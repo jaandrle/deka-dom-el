@@ -16,21 +16,21 @@ const fileURL= url=> new URL(url, import.meta.url);
 export function page({ pkg, info }){
 	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
-		el("p").append(...T`
+		el("p").append(T`
 			dd<el> is designed with extensibility in mind. This page covers how to separate
 			third-party functionalities and integrate them seamlessly with the library, focusing on
 			proper resource cleanup and interoperability.
 		`),
 
 		el(h3, t`DOM Element Extensions with Addons`),
-		el("p").append(...T`
+		el("p").append(T`
 			The primary method for extending DOM elements in dd<el> is through the Addon pattern.
 			Addons are functions that take an element and applying some functionality to it. This pattern enables
 			a clean, functional approach to element enhancement.
 		`),
 		el("div", { className: "callout" }).append(
 			el("h4", t`What are Addons?`),
-			el("p").append(...T`
+			el("p").append(T`
 				Addons are simply functions with the signature: (element) => void. They:
 			`),
 			el("ul").append(
@@ -52,13 +52,13 @@ export function page({ pkg, info }){
 		`, page_id }),
 
 		el(h3, t`Resource Cleanup with Abort Signals`),
-		el("p").append(...T`
+		el("p").append(T`
 			When extending elements with functionality that uses resources like event listeners, timers,
 			or external subscriptions, it’s critical to clean up these resources when the element is removed
 			from the DOM. dd<el> provides utilities for this through AbortSignal integration.
 		`),
 		el("div", { className: "tip" }).append(
-			el("p").append(...T`
+			el("p").append(T`
 				The ${el("code", "scope.signal")} property creates an AbortSignal that automatically
 				triggers when an element is disconnected from the DOM, making cleanup much easier to manage.
 			`)
@@ -86,7 +86,7 @@ export function page({ pkg, info }){
 		`, page_id }),
 
 		el(h3, t`Building Library-Independent Extensions`),
-		el("p").append(...T`
+		el("p").append(T`
 			When creating extensions, it’s a good practice to make them as library-independent as possible.
 			This approach enables better interoperability and future-proofing.
 		`),
@@ -125,13 +125,13 @@ export function page({ pkg, info }){
 		),
 
 		el(h3, t`Signal Extensions and Factory Patterns`),
-		el("p").append(...T`
+		el("p").append(T`
 			Unlike DOM elements, signal functionality in dd<el> currently lacks a standardized
 			way to create library-independent extensions. This is because signals are implemented
 			differently across libraries.
 		`),
 		el("div", { className: "note" }).append(
-			el("p").append(...T`
+			el("p").append(T`
 				In the future, JavaScript may include built-in signals through the
 				${el("a", { href: "https://github.com/tc39/proposal-signals", textContent: "TC39 Signals Proposal" })}.
 				dd<el> is designed with future compatibility in mind and will hopefully support these
@@ -140,7 +140,7 @@ export function page({ pkg, info }){
 		),
 
 		el("h4", t`The Signal Factory Pattern`),
-		el("p").append(...T`
+		el("p").append(T`
 			A powerful approach for extending signal functionality is the "Signal Factory" pattern.
 			This approach encapsulates specific behavior in a function that creates and configures a signal.
 		`),
@@ -191,13 +191,13 @@ export function page({ pkg, info }){
 			)
 		),
 
-		el("p").append(...T`
+		el("p").append(T`
 			Note how the factory accepts the signal constructor as a parameter, making it easier to test
 			and potentially migrate to different signal implementations in the future.
 		`),
 
 		el("h4", t`Other Signal Extension Approaches`),
-		el("p").append(...T`
+		el("p").append(T`
 			For simpler cases, you can also extend signals with clear interfaces and isolation to make
 			future migration easier.
 		`),
@@ -221,7 +221,7 @@ export function page({ pkg, info }){
 		`, page_id }),
 
 		el("div", { className: "tip" }).append(
-			el("p").append(...T`
+			el("p").append(T`
 				When designing signal extensions, consider creating specialized signals for common patterns like:
 				forms, API requests, persistence, animations, or routing. These can significantly reduce
 				boilerplate code in your applications.
@@ -229,19 +229,19 @@ export function page({ pkg, info }){
 		),
 
 		el(h3, t`Using Signals Independently`),
-		el("p").append(...T`
+		el("p").append(T`
 			While signals are tightly integrated with DDE’s DOM elements, you can also use them independently.
 			This can be useful when you need reactivity in non-UI code or want to integrate with other libraries.
 		`),
-		el("p").append(...T`
+		el("p").append(T`
 			There are two ways to import signals:
 		`),
 		el("ol").append(
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Standard import")}: ${el("code", `import { S } from "deka-dom-el/signals";`)}
 				— This automatically registers signals with DDE’s DOM reactivity system
 			`),
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Independent import")}: ${el("code", `import { S } from "deka-dom-el/src/signals-lib";`)}
 				— This gives you just the signal system without DOM integration
 			`)
@@ -261,7 +261,7 @@ export function page({ pkg, info }){
 			count.set(5); // Logs: 5
 			console.log(doubled.get()); // 10
 		`, page_id }),
-		el("p").append(...T`
+		el("p").append(T`
 			The independent signals API includes all core functionality (${el("code", "S()")}, ${el("code", "S.on()")},
 			${el("code", "S.action()")}).
 		`),
@@ -276,27 +276,27 @@ export function page({ pkg, info }){
 
 		el(h3, t`Best Practices for Extensions`),
 		el("ol").append(
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Use AbortSignals for cleanup:")} Always implement proper resource cleanup with
 				${el("code", "scope.signal")} or similar mechanisms
 			`),
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Separate core logic from library adaptation:")} Make your core functionality work
 				with standard DOM APIs when possible
 			`),
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Use signal factories for common patterns:")} Create reusable signal factories that encapsulate
 				domain-specific behavior and state logic
 			`),
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Document clearly:")} Provide clear documentation on how your extension works
 				and what resources it uses
 			`),
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Follow the Addon pattern:")} Keep to the (element) => element signature for
 				DOM element extensions
 			`),
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Avoid modifying global state:")} Extensions should be self-contained and not
 				affect other parts of the application
 			`)

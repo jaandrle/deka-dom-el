@@ -27,7 +27,7 @@ const references= {
 export function page({ pkg, info }){
 	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
-		el("p").append(...T`
+		el("p").append(T`
 			Welcome to Deka DOM Elements (dd<el> or DDE) — a lightweight library for building dynamic UIs with
 			a declarative syntax that stays close to the native DOM API. dd<el> gives you powerful reactive tools
 			without the complexity and overhead of larger frameworks.
@@ -45,7 +45,7 @@ export function page({ pkg, info }){
 		el(example, { src: fileURL("./components/examples/introducing/helloWorld.js"), page_id }),
 
 		el(h3, { textContent: t`The 3PS Pattern: A Better Way to Build UIs`, id: "h-3ps" }),
-		el("p").append(...T`
+		el("p").append(T`
 			At the heart of dd<el> is the 3PS (3-Part Separation) pattern. This simple yet powerful approach helps you
 			organize your UI code into three distinct areas, making your applications more maintainable and easier
 			to reason about.
@@ -62,22 +62,22 @@ export function page({ pkg, info }){
 				)
 			)
 		),
-		el("p").append(...T`
+		el("p").append(T`
 			The 3PS pattern separates your code into three clear parts:
 		`),
 		el("ol").append(
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Create State")}: Define your application’s reactive data using signals
 			`),
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Bind to Elements")}: Define how UI elements react to state changes
 			`),
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Update State")}: Modify state in response to user events or other triggers
 			`)
 		),
 
-		el("p").append(...T`
+		el("p").append(T`
 			By separating these concerns, your code becomes more modular, testable, and easier to maintain. This
 			approach shares principles with more formal patterns like ${el("a", { textContent: "MVVM",
 				...references.w_mvv })} and ${el("a", { textContent: "MVC", ...references.w_mvc })}, but with less
@@ -85,7 +85,7 @@ export function page({ pkg, info }){
 		`),
 
 		el("div", { className: "note" }).append(
-			el("p").append(...T`
+			el("p").append(T`
 				The 3PS pattern becomes especially powerful when combined with components, allowing you to create
 				reusable pieces of UI with encapsulated state and behavior. You’ll learn more about this in the
 				following sections.
@@ -93,36 +93,36 @@ export function page({ pkg, info }){
 		),
 
 		el(h3, t`How to Use This Documentation`),
-		el("p").append(...T`
+		el("p").append(T`
 			This guide will take you through dd<el>’s features step by step:
 		`),
 		el("ol", { start: 2 }).append(
-			el("li").append(...T`${el("a", { href: "p02-elements.html" }).append(el("strong", "Elements"))} — Creating
+			el("li").append(T`${el("a", { href: "p02-elements.html" }).append(el("strong", "Elements"))} — Creating
 				and manipulating DOM elements`),
-			el("li").append(...T`${el("a", { href: "p03-events.html" }).append(el("strong", "Events and Addons"))} —
+			el("li").append(T`${el("a", { href: "p03-events.html" }).append(el("strong", "Events and Addons"))} —
 				Handling user interactions and lifecycle events`),
-			el("li").append(...T`${el("a", { href: "p04-signals.html" }).append(el("strong", "Signals"))} — Adding
+			el("li").append(T`${el("a", { href: "p04-signals.html" }).append(el("strong", "Signals"))} — Adding
 				reactivity to your UI`),
-			el("li").append(...T`${el("a", { href: "p05-scopes.html" }).append(el("strong", "Scopes"))} — Managing
+			el("li").append(T`${el("a", { href: "p05-scopes.html" }).append(el("strong", "Scopes"))} — Managing
 				component lifecycles`),
-			el("li").append(...T`${el("a", { href: "p06-customElement.html" }).append(el("strong", "Web Components"))} —
+			el("li").append(T`${el("a", { href: "p06-customElement.html" }).append(el("strong", "Web Components"))} —
 				Building native custom elements`),
-			el("li").append(...T`${el("a", { href: "p07-debugging.html" }).append(el("strong", "Debugging"))} — Tools to
+			el("li").append(T`${el("a", { href: "p07-debugging.html" }).append(el("strong", "Debugging"))} — Tools to
 				help you build and fix your apps`),
-			el("li").append(...T`${el("a", { href: "p08-extensions.html" }).append(el("strong", "Extensions"))} —
+			el("li").append(T`${el("a", { href: "p08-extensions.html" }).append(el("strong", "Extensions"))} —
 				Integrating third-party functionalities`),
-			el("li").append(...T`${el("a", { href: "p09-optimization.html" })
+			el("li").append(T`${el("a", { href: "p09-optimization.html" })
 					.append(el("strong", "Performance Optimization"))} — Techniques for optimizing your applications`),
-			el("li").append(...T`${el("a", { href: "p10-todomvc.html" }).append(el("strong", "TodoMVC"))} — A real-world
+			el("li").append(T`${el("a", { href: "p10-todomvc.html" }).append(el("strong", "TodoMVC"))} — A real-world
 				application implementation`),
-			el("li").append(...T`${el("a", { href: "p11-ssr.html" }).append(el("strong", "SSR"))} — Server-side
+			el("li").append(T`${el("a", { href: "p11-ssr.html" }).append(el("strong", "SSR"))} — Server-side
 				rendering with dd<el>`),
-			el("li").append(...T`${el("a", { href: "p12-ireland.html" }).append(el("strong", "Ireland Components"))} —
+			el("li").append(T`${el("a", { href: "p12-ireland.html" }).append(el("strong", "Ireland Components"))} —
 				Interactive demos with server-side pre-rendering`),
-			el("li").append(...T`${el("a", { href: "p13-appendix.html" }).append(el("strong", "Appendix & Summary"))} —
+			el("li").append(T`${el("a", { href: "p13-appendix.html" }).append(el("strong", "Appendix & Summary"))} —
 				Comprehensive reference and best practices`),
 		),
-		el("p").append(...T`
+		el("p").append(T`
 			Each section builds on the previous ones, so we recommend following them in order.
 			Let’s get started with the basics of creating elements!
 		`),

@@ -32,45 +32,45 @@ const references= {
 export function page({ pkg, info }){
 	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
-		el("p").append(...T`
+		el("p").append(T`
 			This reference guide provides a comprehensive summary of dd<el>'s key concepts, best practices,
 			case studies, and advanced techniques. Use it as a quick reference when working with the library
 			or to deepen your understanding of its design principles and patterns.
 		`),
 
 		el(h3, t`Core Principles of dd<el>`),
-		el("p").append(...T`
+		el("p").append(T`
 			At its foundation, dd<el> is built on several core principles that shape its design and usage:
 		`),
 		el("div", { className: "callout" }).append(
 			el("h4", t`Guiding Principles`),
 			el("ul").append(
-				el("li").append(...T`
+				el("li").append(T`
 					${el("strong", "DOM-First Approach:")} Working directly with the real DOM instead of virtual DOM
 					abstractions
 				`),
-				el("li").append(...T`
+				el("li").append(T`
 					${el("strong", "Declarative Syntax:")} Creating UIs by describing what they should look like, not
 					how to create them
 				`),
-				el("li").append(...T`
+				el("li").append(T`
 					${el("strong", "Minimal Overhead:")} Staying close to standard Web APIs without unnecessary
 					abstractions
 				`),
-				el("li").append(...T`
+				el("li").append(T`
 					${el("strong", "Progressive Enhancement:")} Starting simple and adding complexity only when needed
 				`),
-				el("li").append(...T`
+				el("li").append(T`
 					${el("strong", "Functional Composition:")} Building UIs through function composition rather than
 					inheritance
 				`),
-				el("li").append(...T`
+				el("li").append(T`
 					${el("strong", "Clear Patterns:")} Promoting maintainable code organization with the 3PS pattern
 				`),
-				el("li").append(...T`
+				el("li").append(T`
 					${el("strong", "Targeted Reactivity:")} Using signals for efficient, fine-grained updates
 				`),
-				el("li").append(...T`
+				el("li").append(T`
 					${el("strong", "Unix Philosophy:")} Doing one thing well and allowing composability with other tools
 				`)
 			)
@@ -79,7 +79,7 @@ export function page({ pkg, info }){
 		el(h3, t`Case Studies & Real-World Applications`),
 
 		el("h4", t`TodoMVC Implementation`),
-		el("p").append(...T`
+		el("p").append(T`
 			The ${el("a", references.todomvc).append("TodoMVC implementation")} showcases how dd<el> handles a complete,
 			real-world application with all standard features of a modern web app:
 		`),
@@ -92,40 +92,40 @@ export function page({ pkg, info }){
 			el("li", t`Custom event system for component communication`),
 			el("li", t`Proper focus management and accessibility`)
 		),
-		el("p").append(...T`
+		el("p").append(T`
 			Key takeaways from the TodoMVC example:
 		`),
 		el("ul").append(
-			el("li").append(...T`
+			el("li").append(T`
 				Signal factories like ${el("code", "routerSignal")} and ${el("code", "todosSignal")}
 				encapsulate related functionality
 			`),
-			el("li").append(...T`
+			el("li").append(T`
 				Custom events provide clean communication between components
 			`),
-			el("li").append(...T`
+			el("li").append(T`
 				Targeted memoization improves rendering performance dramatically
 			`),
-			el("li").append(...T`
+			el("li").append(T`
 				Derived signals simplify complex UI logic like filtering
 			`)
 		),
 
 		el("h4", t`Migrating from Traditional Approaches`),
-		el("p").append(...T`
+		el("p").append(T`
 			When migrating from traditional DOM manipulation or other frameworks to dd<el>:
 		`),
 		el("ol").append(
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Start with state:")}: Convert global variables or ad-hoc state to signals
 			`),
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Replace query selectors:")}: Replace getElementById/querySelector with direct references to elements
 			`),
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Convert imperative updates:")}: Replace manual DOM updates with declarative signal bindings
 			`),
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Refactor into components:")}: Organize related UI elements into component functions
 			`)
 		),
@@ -211,19 +211,19 @@ export function page({ pkg, info }){
 		el("div").append(
 			el("h4", t`Code Organization`),
 			el("ul").append(
-				el("li").append(...T`
+				el("li").append(T`
 					${el("strong", "Follow the 3PS pattern:")}: Separate state creation, binding to elements, and state updates
 				`),
-				el("li").append(...T`
+				el("li").append(T`
 					${el("strong", "Use component functions:")}: Create reusable UI components as functions
 				`),
-				el("li").append(...T`
+				el("li").append(T`
 					${el("strong", "Create signal factories:")}: Extract reusable signal patterns into factory functions
 				`),
-				el("li").append(...T`
+				el("li").append(T`
 					${el("strong", "Leverage scopes:")}: Use scope for component context and clean resource management
 				`),
-				el("li").append(...T`
+				el("li").append(T`
 					${el("strong", "Event delegation:")}: Prefer component-level event handlers over many individual handlers
 				`)
 			)
@@ -232,23 +232,23 @@ export function page({ pkg, info }){
 		el("div").append(
 			el("h4", t`Performance Optimization`),
 			el("ul").append(
-				el("li").append(...T`
+				el("li").append(T`
 					${el("strong", "Memoize list items:")}: Use ${el("code", "memo")} for items in frequently-updated lists
 				`),
-				el("li").append(...T`
+				el("li").append(T`
 					${el("strong", "Avoid unnecessary signal updates:")}: Only update signals when values actually change
 				`),
-				el("li").append(...T`
+				el("li").append(T`
 					${el("strong", "Use AbortSignals:")}: Clean up resources when components are removed
 				`),
-				el("li").append(...T`
+				el("li").append(T`
 					${el("strong", "Prefer derived signals:")}: Use computed values instead of manual updates
 				`),
-				el("li").append(...T`
+				el("li").append(T`
 					${el("strong", "Avoid memoizing fragments:")}: Never memoize DocumentFragments, only individual elements
 				`)
 			),
-			el("p").append(...T`
+			el("p").append(T`
 				See the ${el("a", references.performance).append("Performance Optimization Guide")} for detailed strategies.
 			`)
 		),
@@ -324,56 +324,56 @@ export function page({ pkg, info }){
 		),
 
 		el(h3, t`Looking Ahead: Future Directions`),
-		el("p").append(...T`
+		el("p").append(T`
 			The dd<el> library continues to evolve, with several areas of focus for future development:
 		`),
 		el("ul").append(
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Future Compatibility:")} Alignment with the TC39 Signals proposal for native browser support
 			`),
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "SSR Improvements:")} Enhanced server-side rendering capabilities
 			`),
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Ecosystem Growth:")} More utilities, patterns, and integrations with other libraries
 			`),
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Documentation Expansion:")} Additional examples, tutorials, and best practices
 			`),
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "TypeScript Enhancements:")} Improved type definitions and inference
 			`)
 		),
 
 		el(h3, t`Contribution and Community`),
-		el("p").append(...T`
+		el("p").append(T`
 			dd<el> is an open-source project that welcomes contributions from the community:
 		`),
 		el("ul").append(
-			el("li").append(...T`
+			el("li").append(T`
 				${el("a", references.github).append("GitHub Repository")}: Star, fork, and contribute to the project
 			`),
-			el("li").append(...T`
+			el("li").append(T`
 				Bug reports and feature requests: Open issues on GitHub
 			`),
-			el("li").append(...T`
+			el("li").append(T`
 				Documentation improvements: Help expand and clarify these guides
 			`),
-			el("li").append(...T`
+			el("li").append(T`
 				Examples and case studies: Share your implementations and solutions
 			`)
 		),
 
 		el("div", { className: "callout" }).append(
 			el("h4", t`Final Thoughts`),
-			el("p").append(...T`
+			el("p").append(T`
 				dd<el> provides a lightweight yet powerful approach to building modern web interfaces
 				with minimal overhead and maximal flexibility. By embracing standard web technologies
 				rather than abstracting them away, it offers a development experience that scales
 				from simple interactive elements to complex applications while remaining close
 				to what makes the web platform powerful.
 			`),
-			el("p").append(...T`
+			el("p").append(T`
 				Whether you're building a small interactive component or a full-featured application,
 				dd<el>'s combination of declarative syntax, targeted reactivity, and pragmatic design
 				provides the tools you need without the complexity you don't.

@@ -29,21 +29,21 @@ const references= {
 export function page({ pkg, info }){
 	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
-		el("p").append(...T`
+		el("p").append(T`
 			For state-less components we can use functions as UI components (see “Elements” page). But in real life,
 			we may need to handle the component’s life-cycle and provide JavaScript the way to properly use
 			the ${el("a", { textContent: t`Garbage collection`, ...references.garbage_collection })}.
 		`),
 		el(code, { src: fileURL("./components/examples/scopes/intro.js"), page_id }),
-		el("p").append(...T`The library therefore uses ${el("em", t`scopes`)} to provide these functionalities.`),
+		el("p").append(T`The library therefore uses ${el("em", t`scopes`)} to provide these functionalities.`),
 
 		el(h3, t`Understanding Host Elements and Scopes`),
-		el("p").append(...T`
+		el("p").append(T`
 			The ${el("strong", "host")} is the name for the element representing the component. This is typically the
 			element returned by a function. To get a reference, you can use ${el("code", "scope.host()")}. To apply addons,
 			just use ${el("code", "scope.host(...<addons>)")}.
 		`),
-		el("p").append(...T`
+		el("p").append(T`
 			Scopes are primarily needed when signals are used in DOM templates (with ${el("code", "el")}, ${el("code",
 				"assign")}, or ${el("code", "S.el")}). They provide a way for automatically removing signal listeners
 			and cleaning up unused signals when components are removed from the DOM.
@@ -86,19 +86,19 @@ export function page({ pkg, info }){
 		el(example, { src: fileURL("./components/examples/scopes/scopes-and-hosts.js"), page_id }),
 
 		el("div", { className: "tip" }).append(
-			el("p").append(...T`
+			el("p").append(T`
 				${el("strong", "Best Practice:")} Always capture the host reference (or other scope related values) at
 				the beginning of your component function using ${el("code", "const { host } = scope")} to avoid
 				scope-related issues, especially with ${el("em", "asynchronous code")}.
 			`),
-			el("p").append(...T`
+			el("p").append(T`
 				If you are interested in the implementation details, see Class-Based Components section.
 			`)
 		),
 		el(code, { src: fileURL("./components/examples/scopes/good-practise.js"), page_id }),
 
 		el(h3, t`Class-Based Components`),
-		el("p").append(...T`
+		el("p").append(T`
 			While functional components are the primary pattern in dd<el>, you can also create class-based components.
 			For this, we implement function ${el("code", "elClass")} and use it to demonstrate implementation details
 			for better understanding of the scope logic.
@@ -106,7 +106,7 @@ export function page({ pkg, info }){
 		el(example, { src: fileURL("./components/examples/scopes/class-component.js"), page_id }),
 
 		el(h3, t`Automatic Cleanup with Scopes`),
-		el("p").append(...T`
+		el("p").append(T`
 			One of the most powerful features of scopes is automatic cleanup when components are removed from the DOM.
 			This prevents memory leaks and ensures resources are properly released.
 		`),
@@ -126,7 +126,7 @@ export function page({ pkg, info }){
 		el(example, { src: fileURL("./components/examples/scopes/cleaning.js"), page_id }),
 
 		el("div", { className: "note" }).append(
-			el("p").append(...T`
+			el("p").append(T`
 				In this example, when you click "Remove", the component is removed from the DOM, and all its associated
 				resources are automatically cleaned up, including ${el("em",
 					"the signal subscription that updates the text content")}. This happens because the library
@@ -135,12 +135,12 @@ export function page({ pkg, info }){
 		),
 
 		el(h3, t`Declarative vs Imperative Components`),
-		el("p").append(...T`
+		el("p").append(T`
 			The library DOM API and signals work best when used declaratively. It means you split your app’s logic
 			into three parts as introduced in ${el("a", { textContent: "Signals (3PS)", ...references.signals })}.
 		`),
 		el("div", { className: "note" }).append(
-			el("p").append(...T`
+			el("p").append(T`
 				Strictly speaking, the imperative way of using the library is not prohibited. Just be careful to avoid
 				mixing the declarative approach (using signals) with imperative manipulation of elements.
 			`)
@@ -165,20 +165,20 @@ export function page({ pkg, info }){
 
 		el(h3, t`Best Practices for Scopes and Components`),
 		el("ol").append(
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Capture host early:")} Use ${el("code", "const { host } = scope")} at component start
 			`),
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Define signals as constants:")} ${el("code", "const counter = S(0);")}
 			`),
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Prefer declarative patterns:")} Use signals to drive UI updates rather than manual DOM
 				manipulation
 			`),
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Keep components focused:")} Each component should do one thing well
 			`),
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Add explicit cleanup:")} For resources not managed by dd<el>, use ${el("code",
 					"on.disconnected")}
 			`)

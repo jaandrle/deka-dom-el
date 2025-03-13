@@ -17,12 +17,14 @@
  *
  * @param {TemplateStringsArray} strings
  * @param {...(string|Node)} values
- * @returns {(string|Node)[]}
+ * @returns {DocumentFragment}
  * */
 export function T(strings, ...values){
 	const out= [];
 	tT(s=> out.push(s), strings, ...values);
-	return out;
+	const fragment= document.createDocumentFragment();
+	fragment.append(...out);
+	return fragment;
 }
 /**
  * Similarly to {@link T}, but for only strings.

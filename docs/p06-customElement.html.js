@@ -59,7 +59,7 @@ const references= {
 export function page({ pkg, info }){
 	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
-		el("p").append(...T`
+		el("p").append(T`
 			dd<el> pairs powerfully with ${el("a", references.mdn_web_components).append(el("strong", t`Web
 				Components`))} to create reusable, encapsulated custom elements with all the benefits of dd<el>’s
 				declarative DOM construction and reactivity system.
@@ -76,29 +76,29 @@ export function page({ pkg, info }){
 		el(code, { src: fileURL("./components/examples/customElement/intro.js"), page_id }),
 
 		el(h3, t`Getting Started: Web Components Basics`),
-		el("p").append(...T`
+		el("p").append(T`
 			Web Components are a set of standard browser APIs that let you create custom HTML elements with
 			encapsulated functionality. They consist of three main technologies:
 		`),
 		el("ul").append(
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Custom Elements:")} Create your own HTML tags with JS-defined behavior
 			`),
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Shadow DOM:")} Encapsulate styles and markup within a component
 			`),
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "HTML Templates:")} Define reusable markup structures (${el("em",
 					"the dd<el> replaces this part")})
 			`)
 		),
-		el("p").append(...T`
+		el("p").append(T`
 			Let’s start with a basic Custom Element example without dd<el> to establish the foundation:
 		`),
 		el(code, { src: fileURL("./components/examples/customElement/native-basic.js"), page_id }),
 
 		el("div", { className: "note" }).append(
-			el("p").append(...T`
+			el("p").append(T`
 				For complete information on Web Components, see the
 				${el("a", references.mdn_custom_elements).append(el("strong", t`MDN documentation`))}.
 				Also, ${el("a", references.custom_elements_tips).append(el("strong", t`Handy Custom Elements Patterns`))}
@@ -107,10 +107,10 @@ export function page({ pkg, info }){
 		),
 
 		el(h3, t`dd<el> Integration: Step 1 - Event Handling`),
-		el("p").append(...T`
+		el("p").append(T`
 			The first step in integrating dd<el> with Web Components is enabling dd<el>’s event system to work with your
 			Custom Elements. This is done with ${el("code", "customElementWithDDE")}, which makes your Custom Element
-			compatible with dd<el>’s event handling. (${el("em").append(...T`Notice that customElementWithDDE is
+			compatible with dd<el>’s event handling. (${el("em").append(T`Notice that customElementWithDDE is
 			actually`)} ${el("a", { textContent: "decorator", ...references.decorators })})
 		`),
 		el("div", { className: "function-table" }).append(
@@ -127,14 +127,14 @@ export function page({ pkg, info }){
 		el(example, { src: fileURL("./components/examples/customElement/customElementWithDDE.js"), page_id }),
 
 		el("div", { className: "tip" }).append(
-			el("p").append(...T`
+			el("p").append(T`
 				${el("strong", "Key Point:")} The ${el("code", "customElementWithDDE")} function adds event dispatching
 				to your Custom Element lifecycle methods, making them work seamlessly with dd<el>’s event system.
 			`)
 		),
 
 		el(h3, t`dd<el> Integration: Step 2 - Rendering Components`),
-		el("p").append(...T`
+		el("p").append(T`
 			The next step is to use dd<el>’s component rendering within your Custom Element. This is done with
 			${el("code", "customElementRender")}, which connects your dd<el> component function to the Custom Element.
 		`),
@@ -159,32 +159,32 @@ export function page({ pkg, info }){
 		el(example, { src: fileURL("./components/examples/customElement/dde.js"), page_id }),
 
 		el("div", { className: "note" }).append(
-			el("p").append(...T`
+			el("p").append(T`
 				In this example, we’re using Shadow DOM (${el("code", "this.attachShadow()")}) for encapsulation,
 				but you can also render directly to the element with ${el("code", "customElementRender(this, ...)")}.
 			`)
 		),
 
 		el(h3, t`Reactive Web Components with Signals`),
-		el("p").append(...T`
+		el("p").append(T`
 			One of the most powerful features of integrating dd<el> with Web Components is connecting HTML attributes
 			to dd<el>’s reactive signals system. This creates truly reactive custom elements.
 		`),
 		el("div", { className: "tip" }).append(
-			el("p").append(...T`
+			el("p").append(T`
 				${el("strong", "Two Ways to Handle Attributes:")}
 			`),
 			el("ol").append(
-				el("li").append(...T`
+				el("li").append(T`
 					Using standard attribute access (${el("code", "this.getAttribute(<name>)")}) - Passes attributes as
 					regular values (static)
 				`),
-				el("li").append(...T`
+				el("li").append(T`
 					${el("code", "S.observedAttributes")} - Transforms attributes into signals (reactive)
 				`)
 			)
 		),
-		el("p").append(...T`
+		el("p").append(T`
 			Using the ${el("code", "S.observedAttributes")} creates a reactive connection between your element’s
 			attributes and its internal rendering. When attributes change, your component automatically updates!
 		`),
@@ -203,7 +203,7 @@ export function page({ pkg, info }){
 		),
 
 		el(h3, t`Working with Shadow DOM`),
-		el("p").append(...T`
+		el("p").append(T`
 			Shadow DOM provides encapsulation for your component’s styles and markup. When using dd<el> with Shadow DOM,
 			you get the best of both worlds: encapsulation plus declarative DOM creation.
 		`),
@@ -223,14 +223,14 @@ export function page({ pkg, info }){
 		),
 		el(example, { src: fileURL("./components/examples/customElement/shadowRoot.js"), page_id }),
 
-		el("p").append(...T`
+		el("p").append(T`
 			For more information on Shadow DOM, see
 			${el("a", { textContent: t`Using Shadow DOM`, ...references.mdn_shadow_dom_depth })}, or the comprehensive
 			${el("a", { textContent: t`Shadow DOM in Depth`, ...references.shadow_dom_depth })}.
 		`),
 
 		el(h3, t`Working with Slots`),
-		el("p").append(...T`
+		el("p").append(T`
 			Besides the encapsulation, the Shadow DOM allows for using the ${el("a", references.mdn_shadow_dom_slot).append(
 			el("strong", t`<slot>`), t` element(s)`)}. You can simulate this feature using ${el("code", "simulateSlots")}:
 		`),
@@ -246,23 +246,23 @@ export function page({ pkg, info }){
 		),
 
 		el(h3, t`Best Practices for Web Components with dd<el>`),
-		el("p").append(...T`
+		el("p").append(T`
 			When combining dd<el> with Web Components, follow these recommendations:
 		`),
 		el("ol").append(
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Always use customElementWithDDE")} to enable event integration
 			`),
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Prefer S.observedAttributes")} for reactive attribute connections
 			`),
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Create reusable component functions")} that your custom elements render
 			`),
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Use scope.host()")} to clean up event listeners and subscriptions
 			`),
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Add setters and getters")} for better property access to your element
 			`)
 		),
