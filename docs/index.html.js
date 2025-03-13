@@ -1,3 +1,4 @@
+import "./components/getLibraryUrl.css.js";
 import { t, T } from "./utils/index.js";
 export const info= {
 	href: "./",
@@ -11,6 +12,7 @@ import { simplePage } from "./layout/simplePage.html.js";
 import { h3 } from "./components/pageUtils.html.js";
 import { example } from "./components/example.html.js";
 import { code } from "./components/code.html.js";
+import { ireland } from "./components/ireland.html.js";
 /** @param {string} url */
 const fileURL= url=> new URL(url, import.meta.url);
 const references= {
@@ -96,6 +98,16 @@ export function page({ pkg, info }){
 				software architecture.
 			`)
 		),
+
+		el(h3, t`Getting Started`),
+		el("p").append(T`
+			To get builded dd<el> to be used immediately in your browser, you can download the latest version from:
+		`),
+		el(ireland, {
+			src: fileURL("./components/getLibraryUrl.js.js"),
+			exportName: "getLibraryUrl",
+			page_id,
+		}),
 
 		el(h3, t`How to Use This Documentation`),
 		el("p").append(T`
