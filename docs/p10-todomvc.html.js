@@ -178,6 +178,13 @@ export function page({ pkg, info }){
 						this.value = this.value.filter(todo => !todo.completed);
 					},
 					/**
+					 * Mark all todos as completed or active
+					 * @param {boolean} state - Whether to mark todos as completed or active
+					 */
+					completeAll(state = true) {
+						this.value.forEach(todo => todo.completed = state);
+					},
+					/**
 					 * Handle cleanup when signal is cleared
 					 */
 					[S.symbols.onclear](){
@@ -237,8 +244,32 @@ export function page({ pkg, info }){
 			The derived signal automatically recalculates whenever either the todos list or the current filter changes,
 			ensuring the UI always shows the correct filtered todos.
 		`),
+		
+		el("h4", t`2. Toggle All Functionality`),
+		el(code, { content: `
+			/** @type {ddeElementAddon<HTMLInputElement>} */
+			const onToggleAll = on("change", event => {
+				const checked = /** @type {HTMLInputElement} */ (event.target).checked;
+				S.action(todosS, "completeAll", checked);
+			});
+			
+			// Using the toggle-all functionality in the UI
+			el("input", {
+				id: "toggle-all",
+				className: "toggle-all",
+				type: "checkbox"
+			}, onToggleAll),
+			el("label", { htmlFor: "toggle-all", title: "Mark all as complete" }),
+		`, page_id }),
+		
+		el("p").append(T`
+			The "toggle all" checkbox allows users to mark all todos as completed or active. When the checkbox 
+			is toggled, it calls the ${el("code", "completeAll")} action on the todos signal, passing the current
+			checked state. This is a good example of how signals and actions can be used to manage application
+			state in a clean, declarative way.
+		`),
 
-		el("h4", t`2. Local Component State`),
+		el("h4", t`3. Local Component State`),
 		el(code, { content: `
 			function TodoItem({ id, title, completed }) {
 				const { host }= scope;
@@ -273,7 +304,7 @@ export function page({ pkg, info }){
 			UI feedback while still communicating changes to the parent via events.
 		`),
 
-		el("h4", t`3. Reactive Properties`),
+		el("h4", t`4. Reactive Properties`),
 		el(code, { content: `
 			// Dynamic class attributes
 			el("a", {

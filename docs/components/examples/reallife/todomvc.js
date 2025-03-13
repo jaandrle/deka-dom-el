@@ -26,28 +26,23 @@ function Todos(){
 		});
 	});
 
-	// Setup hash change listener
-	window.addEventListener("hashchange", () => {
-		const hash = location.hash.replace("#", "") || "all";
-		S.action(pageS, "set", /** @type {"all"|"active"|"completed"} */(hash));
-	});
-
 	/** @type {ddeElementAddon<HTMLInputElement>} */
 	const onToggleAll = on("change", event => {
 		const checked = /** @type {HTMLInputElement} */ (event.target).checked;
 		S.action(todosS, "completeAll", checked);
 	});
+	const formNewTodo = "newTodo";
 	/** @type {ddeElementAddon<HTMLFormElement>} */
 	const onSubmitNewTodo = on("submit", event => {
 		event.preventDefault();
 		const input = /** @type {HTMLInputElement} */(
-			/** @type {HTMLFormElement} */(event.target).elements.namedItem("newTodo")
+			/** @type {HTMLFormElement} */(event.target).elements.namedItem(formNewTodo)
 		);
 		const title = input.value.trim();
-		if (title) {
-			S.action(todosS, "add", title);
-			input.value = "";
-		}
+		if (!title) return;
+
+		S.action(todosS, "add", title);
+		input.value = "";
 	});
 	const onClearCompleted = on("click", () => S.action(todosS, "clearCompleted"));
 	const onDelete = on("todo:delete", ev =>
@@ -61,15 +56,16 @@ function Todos(){
 			el("form", null, onSubmitNewTodo).append(
 				el("input", {
 					className: "new-todo",
-					name: "newTodo",
+					name: formNewTodo,
 					placeholder: "What needs to be done?",
 					autocomplete: "off",
 					autofocus: true
 				})
 			)
 		),
-		S.el(todosS, todos => todos.length
-			? el("main", { className: "main" }).append(
+		S.el(todosS, todos => !todos.length
+			? el()
+			: el("main", { className: "main" }).append(
 				el("input", {
 					id: "toggle-all",
 					className: "toggle-all",
@@ -82,50 +78,40 @@ function Todos(){
 					)
 				)
 			)
-			: el()
 		),
-		S.el(todosS, todos => memo(todos.length, length=> length
-			? el("footer", { className: "footer" }).append(
+		S.el(todosS, todos => !todos.length
+			? el()
+			: el("footer", { className: "footer" }).append(
 				el("span", { className: "todo-count" }).append(
-					S.el(S(() => todosS.get().filter(todo => !todo.completed).length),
-						length=> el("strong").append(
-							length + " ",
-							length === 1 ? "item left" : "items left"
+					noOfLeft(todos)
+				),
+				memo("filters", ()=>
+					el("ul", { className: "filters" }).append(
+						...[ "All", "Active", "Completed" ].map(textContent =>
+							el("li").append(
+								el("a", {
+									textContent,
+									classList: { selected: S(()=> pageS.get() === textContent.toLowerCase()) },
+									href: `#${textContent.toLowerCase()}`
+								})
+							)
 						)
-					)
-				),
-				el("ul", { className: "filters" }).append(
-					el("li").append(
-						el("a", {
-							textContent: "All",
-							className: S(()=> pageS.get() === "all" ? "selected" : ""),
-							href: "#"
-						}),
 					),
-					el("li").append(
-						el("a", {
-							textContent: "Active",
-							className: S(()=> pageS.get() === "active" ? "selected" : ""),
-							href: "#active"
-						}),
-					),
-					el("li").append(
-						el("a", {
-							textContent: "Completed",
-							className: S(()=> pageS.get() === "completed" ? "selected" : ""),
-							href: "#completed"
-						}),
-					)
 				),
-				S.el(S(() => todosS.get().some(todo => todo.completed)),
-					hasTodosCompleted=> hasTodosCompleted
-					? el("button", { textContent: "Clear completed", className: "clear-completed" }, onClearCompleted)
-					: el()
-				)
+				!todos.some(todo => todo.completed)
+					? el()
+					: el("button", { textContent: "Clear completed", className: "clear-completed" }, onClearCompleted)
 			)
-			: el()
-		))
+		)
 	);
+	/** @param {Todo[]} todos */
+	function noOfLeft(todos){
+		const { length }= todos.filter(todo => !todo.completed);
+		return el("strong").append(
+			length + " ",
+			length === 1 ? "item left" : "items left"
+		)
+	}
 }
 
 /**
@@ -177,10 +163,11 @@ function TodoItem({ id, title, completed }) {
 		}
 		isEditing.set(false);
 	});
+	const formEdit = "edit";
 	/** @type {ddeElementAddon<HTMLFormElement>} */
 	const onSubmitEdit = on("submit", event => {
 		event.preventDefault();
-		const input = /** @type {HTMLFormElement} */(event.target).elements.namedItem("edit");
+		const input = /** @type {HTMLFormElement} */(event.target).elements.namedItem(formEdit);
 		const value = /** @type {HTMLInputElement} */(input).value.trim();
 		if (value) {
 			dispatchEdit({ id, title: value });
@@ -209,16 +196,15 @@ function TodoItem({ id, title, completed }) {
 			el("label", { textContent: title }, onStartEdit),
 			el("button", { className: "destroy" }, onDelete)
 		),
-		S.el(isEditing, editing => editing
-			? el("form", null, onSubmitEdit).append(
+		S.el(isEditing, editing => !editing
+			? el()
+			: el("form", null, onSubmitEdit).append(
 				el("input", {
 					className: "edit",
-					name: "edit",
+					name: formEdit,
 					value: title,
-					"data-id": id
 				}, onBlurEdit, onKeyDown, addFocus)
 			)
-			: el()
 		)
 	);
 }
@@ -354,7 +340,7 @@ function todosSignal(){
  */
 function routerSignal(signal){
 	const initial = location.hash.replace("#", "") || "all";
-	return signal(initial, {
+	const out = signal(initial, {
 		/**
 		 * Set the current route
 		 * @param {"all"|"active"|"completed"} hash - The route to set
@@ -364,6 +350,14 @@ function routerSignal(signal){
 			this.value = hash;
 		}
 	});
+
+	// Setup hash change listener
+	window.addEventListener("hashchange", () => {
+		const hash = location.hash.replace("#", "") || "all";
+		S.action(out, "set", /** @type {"all"|"active"|"completed"} */(hash));
+	});
+
+	return out;
 }
 
 /**
