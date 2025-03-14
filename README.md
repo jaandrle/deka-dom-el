@@ -95,7 +95,8 @@ into existing projects.
 
 #### CDN / Direct Script
 
-For CDN links and various build formats (ESM/IIFE, with/without signals, minified/unminified), see the [interactive format selector](https://jaandrle.github.io/deka-dom-el/) on the documentation site.
+For CDN links and various build formats (ESM/IIFE, with/without signals, minified/unminified), see the [interactive
+format selector](https://jaandrle.github.io/deka-dom-el/) on the documentation site.
 
 ```html
 <!-- Example with IIFE build (creates a global DDE object) -->

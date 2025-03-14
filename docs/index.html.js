@@ -1,4 +1,4 @@
-import "./components/getLibraryUrl.css.js";
+import "./components/getLibraryUrl.html.js";
 import { t, T } from "./utils/index.js";
 export const info= {
 	href: "./",
@@ -12,7 +12,7 @@ import { simplePage } from "./layout/simplePage.html.js";
 import { h3 } from "./components/pageUtils.html.js";
 import { example } from "./components/example.html.js";
 import { code } from "./components/code.html.js";
-import { ireland } from "./components/ireland.html.js";
+import { getLibraryUrl } from "./components/getLibraryUrl.html.js";
 /** @param {string} url */
 const fileURL= url=> new URL(url, import.meta.url);
 const references= {
@@ -110,11 +110,7 @@ export function page({ pkg, info }){
 		el("p").append(T`
 			Use the interactive selector below to choose your preferred format:
 		`),
-		el(ireland, {
-			src: fileURL("./components/getLibraryUrl.js.js"),
-			exportName: "getLibraryUrl",
-			page_id,
-		}),
+		el(getLibraryUrl, { page_id }),
 		el("div", { className: "note" }).append(
 			el("p").append(T`
 				Based on your selection, you can use dd<el> in your project like this:

@@ -165,9 +165,10 @@ export function page({ pkg, info }){
 
 				el("dt", t`on.disconnected(callback)`),
 				el("dd", t`Fires when the element is removed from the DOM`),
-				
+
 				el("dt", t`on.host(callback, host?)`),
-				el("dd", t`Fires when the host element is "ready" and allows applying properties based on the fully built template`),
+				el("dd", t`Fires when the host element is "ready" and allows applying properties based on the fully
+					built template`),
 			)
 		),
 		el(example, { src: fileURL("./components/examples/events/live-cycle.js"), page_id }),

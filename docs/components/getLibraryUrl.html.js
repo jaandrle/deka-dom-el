@@ -70,3 +70,14 @@ styles.css`
 	}
 }
 `;
+
+import { el } from "deka-dom-el";
+import { ireland } from "./ireland.html.js";
+
+export function getLibraryUrl({ page_id }){
+	return el(ireland, {
+		src: new URL("./getLibraryUrl.js.js", import.meta.url),
+		exportName: "getLibraryUrl",
+		page_id,
+	});
+}
