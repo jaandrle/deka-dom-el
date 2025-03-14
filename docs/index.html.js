@@ -101,13 +101,33 @@ export function page({ pkg, info }){
 
 		el(h3, t`Getting Started`),
 		el("p").append(T`
-			To get builded dd<el> to be used immediately in your browser, you can download the latest version from:
+			There are multiple ways to include dd<el> in your project. You can use npm for a full development setup,
+			or directly include it from a CDN for quick prototyping.
+		`),
+		el("h4", "npm installation"),
+		el(code, { content: "npm install deka-dom-el # Coming soon", language: "shell", page_id }),
+		el("h4", "CDN / Direct Script Usage"),
+		el("p").append(T`
+			Use the interactive selector below to choose your preferred format:
 		`),
 		el(ireland, {
 			src: fileURL("./components/getLibraryUrl.js.js"),
 			exportName: "getLibraryUrl",
 			page_id,
 		}),
+		el("div", { className: "note" }).append(
+			el("p").append(T`
+				Based on your selection, you can use dd<el> in your project like this:
+			`),
+			el(code, { content: `
+				// ESM format (modern JavaScript with import/export)
+				import { el, on } from "https://cdn.jsdelivr.net/gh/jaandrle/deka-dom-el/dist/esm-with-signals.min.js";
+
+				// Or with IIFE format (creates a global DDE object)
+				// <script src="https://cdn.jsdelivr.net/gh/jaandrle/deka-dom-el/dist/iife-with-signals.min.js"></script>
+				const { el, on } = DDE;
+			`, language: "js", page_id }),
+		),
 
 		el(h3, t`How to Use This Documentation`),
 		el("p").append(T`

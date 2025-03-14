@@ -8,6 +8,13 @@ const url_base= {
 export function getLibraryUrl(){
 	const lib= S([ "esm", "-with-signals", ".min" ]);
 	const url= S(()=> url_base.jsdeka+lib.get().join(""));
+	const urlLabel= S(() => {
+		const [format, signalsPart, minified] = lib.get();
+		const formatText = format === "esm" ? "ES Module" : "IIFE";
+		const signalsText = signalsPart ? " with signals" : "";
+		const minText = minified ? " (minified)" : "";
+		return `${formatText}${signalsText}${minText}`;
+	})
 	const onSubmit= on("submit", ev => {
 		ev.preventDefault();
 		const form= new FormData(/** @type {HTMLFormElement} */ (ev.target));
@@ -20,56 +27,66 @@ export function getLibraryUrl(){
 	const onChangeSubmit= on("change",
 		ev=> /** @type {HTMLSelectElement} */(ev.target).form.requestSubmit()
 	);
-	const onCopy= on("click", ev => {
-		const code= /** @type {HTMLDivElement} */ (ev.target).previousElementSibling;
-		navigator.clipboard.writeText(code.textContent);
-	});
 
 	return el("form", { id: "library-url-form" }, onSubmit).append(
-		el("select", { name: "module" }, onChangeSubmit).append(
-			el("option", { value: "esm", textContent: "ESM — modern JavaScript module" },
-				isSelected(lib.get()[0])),
-			el("option", { value: "iife", textContent: "IIFE — legacy JavaScript with DDE global variable" },
-				isSelected(lib.get()[0])),
-		),
-		el("select", { name: "what" }, onChangeSubmit).append(
-			el("option", { value: "", textContent: "only DOM part" },
-				isSelected(lib.get()[1])),
-			el("option", { value: "-with-signals", textContent: "DOM part and signals library" },
-				isSelected(lib.get()[1])),
-		),
-		el("select", { name: "minified" }, onChangeSubmit).append(
-			el("option", { value: "", textContent: "unminified" },
-				isSelected(lib.get()[2])),
-			el("option", { value: ".min", textContent: "minified" },
-				isSelected(lib.get()[2])),
+		el("h4", "Select your preferred library format:"),
+		el("div", { className: "selectors" }).append(
+			el("select", { name: "module" }, onChangeSubmit,
+				on.host(select => select.value = lib.get()[0]),
+			).append(
+				el("option", { value: "esm", textContent: "ESM — modern JavaScript module" }),
+				el("option", { value: "iife", textContent: "IIFE — legacy JavaScript with DDE global variable" }),
+			),
+			el("select", { name: "what" }, onChangeSubmit,
+				on.host(select => select.value = lib.get()[1]),
+			).append(
+				el("option", { value: "", textContent: "DOM part only" }),
+				el("option", { value: "-with-signals", textContent: "DOM + signals" }),
+			),
+			el("select", { name: "minified" }, onChangeSubmit,
+				on.host(select => select.value = lib.get()[2]),
+			).append(
+				el("option", { value: "", textContent: "Unminified" }),
+				el("option", { value: ".min", textContent: "Minified" }),
+			),
 		),
 		el("output").append(
-			el("p", "Library URL:"),
-			el("div", { className: "code", dataJs: "done", tabIndex: 0 }).append(
-				el("code").append(
-					el("pre", S(()=> url.get()+".js")),
-				),
-				el("button", {
-					className: "copy-button",
-					textContent: "Copy",
-					ariaLabel: "Copy code to clipboard",
-				}, onCopy),
+			el("div", { className: "url-title" }).append(
+				el("strong", "JavaScript:"),
+				el("span", urlLabel),
 			),
-			el("p", "Library type definition:"),
-			el("div", { className: "code", dataJs: "done", tabIndex: 0 }).append(
-				el("code").append(
-					el("pre", S(()=> url.get()+".d.ts")),
-				),
-				el("button", {
-					className: "copy-button",
-					textContent: "Copy",
-					ariaLabel: "Copy code to clipboard",
-				}, onCopy),
+			el(code, { value: S(()=> url.get()+".js") }),
+			el("div", { className: "url-title" }).append(
+				el("strong", "TypeScript definition:")
 			),
+			el(code, { value: S(()=> url.get()+".d.ts") }),
+			el("p", { className: "info-text",
+				textContent: "Use the CDN URL in your HTML or import it in your JavaScript files."
+			})
 		)
 	)
 }
-function isSelected(value){
-	return element=> element.selected= element.value===value;
+/** @param {{ value: ddeSignal<string> }} props */
+function code({ value }){
+	/** @type {ddeSignal<"Copy"|"Copied!">} */
+	const textContent= S("Copy");
+	const onCopy= on("click", () => {
+		navigator.clipboard.writeText(value.get());
+
+		textContent.set("Copied!");
+		setTimeout(() => {
+			textContent.set("Copy");
+		}, 1500);
+	});
+	return el("div", { className: "code", dataJs: "done", tabIndex: 0 }).append(
+		el("code").append(
+			el("pre", value),
+		),
+		el("button", {
+			className: "copy-button",
+			textContent,
+			ariaLabel: "Copy code to clipboard",
+		}, onCopy)
+	)
+	;
 }

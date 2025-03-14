@@ -86,7 +86,7 @@ html {
 }
 
 :focus-visible {
-	outline: 3px solid hsl(231, 48%, 70%);
+	outline: 3px solid var(--primary-light);
 	outline-offset: 2px;
 }
 
@@ -206,6 +206,20 @@ figure {
 		box-shadow: var(--shadow);
 		max-width: 100%;
 	}
+}
+select {
+	padding: 0.5rem 0.75rem;
+	border-radius: var(--border-radius);
+	border: 1px solid var(--border);
+	background-color: var(--bg);
+	color: var(--text);
+	cursor: pointer;
+	font-size: 0.95rem;
+	font-family: var(--font-main);
+}
+
+select:hover {
+	border-color: var(--primary);
 }
 
 /* Layout */

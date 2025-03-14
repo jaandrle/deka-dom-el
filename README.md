@@ -93,11 +93,22 @@ into existing projects.
 # npm install deka-dom-el
 ```
 
-#### Direct Script
+#### CDN / Direct Script
+
+For CDN links and various build formats (ESM/IIFE, with/without signals, minified/unminified), see the [interactive format selector](https://jaandrle.github.io/deka-dom-el/) on the documentation site.
+
 ```html
+<!-- Example with IIFE build (creates a global DDE object) -->
 <script src="https://cdn.jsdelivr.net/gh/jaandrle/deka-dom-el/dist/iife-with-signals.min.js"></script>
-<script type="module">
+<script>
 	const { el, S } = DDE;
+	// Your code here
+</script>
+
+<!-- Or with ES modules -->
+<script type="module">
+	import { el, S } from "https://cdn.jsdelivr.net/gh/jaandrle/deka-dom-el/dist/esm-with-signals.min.js";
+	// Your code here
 </script>
 ```
 
