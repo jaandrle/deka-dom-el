@@ -164,7 +164,8 @@ function registerClientPart(page_id){
 
 	document.head.append(
 		el("script", {
-			src: "https://unpkg.com/@beforesemicolon/html-parser/dist/client.js",
+			// src: "https://unpkg.com/@beforesemicolon/html-parser/dist/client.js",
+			src: "https://cdn.jsdelivr.net/npm/@beforesemicolon/html-parser/dist/client.js",
 			type: "text/javascript",
 			charset: "utf-8",
 			defer: true

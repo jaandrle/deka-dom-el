@@ -55,7 +55,10 @@ export function ireland({ src, exportName = "default", props = {} }) {
 		import(path)
 		.then(module => {
 			const component = module[exportName];
-			element.replaceWith(el(component, props, mark(id)));
+			const content= el(component, props, mark(id));
+			element.replaceWith(content);
+			content.querySelectorAll("input, textarea, button")
+				.forEach(el=> el.disabled= true);
 		})
 		.catch(console.error)
 	);

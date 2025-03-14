@@ -48,7 +48,8 @@ function convertHTMLtoDDE(html, options = {}) {
 
 	try {
 		const parsed = parse(html);
-		return nodeToDDE(parsed.children[0], options);
+		const content = parsed.children[0] || parsed.childNodes[0];
+		return !content ? "" : nodeToDDE(content, options);
 	} catch (error) {
 		console.error("Parsing error:", error);
 		return `// Error parsing HTML: ${error.message}`;
@@ -64,10 +65,14 @@ const NODE_TYPE = {
 
 // Convert a parsed node to dd<el> code
 function nodeToDDE(node, options = {}, level = 0) {
+	const tab= options.indent === "-1" ? "\t" : " ".repeat(options.indent);
+	const indent = tab.repeat(level);
+	const nextIndent = tab.repeat(level + 1);
+
 	const { nodeType } = node;
 	// Handle text nodes
 	if (nodeType === NODE_TYPE.TEXT) {
-		const text = node.nodeValue;
+		const text = el("i", { innerText: node.nodeValue }).textContent;
 		if (!text.trim()) return null;
 
 		// Return as plain text or template string for longer text
@@ -78,15 +83,15 @@ function nodeToDDE(node, options = {}, level = 0) {
 
 	// Handle comment nodes
 	if (nodeType === NODE_TYPE.COMMENT) {
-		return null; // TODO: Skip comments?
+		const text = node.nodeValue;
+		if (!text.trim()) return null;
+		return text.includes("\n")
+			? [ "/*", ...text.trim().split("\n").map(l=> tab+l), "*/" ]
+			: [ `// ${text}` ];
 	}
 
 	// For element nodes
 	if (nodeType === NODE_TYPE.ELEMENT) {
-		const tab= options.indent === "-1" ? "\t" : " ".repeat(options.indent);
-		const indent = tab.repeat(level);
-		const nextIndent = tab.repeat(level + 1);
-
 		// Special case for SVG elements
 		const isNS = node.tagName === "svg";
 		const elFunction = isNS ? "elNS" : "el";
@@ -171,12 +176,14 @@ function nodeToDDE(node, options = {}, level = 0) {
 		// Process children
 		const children = [];
 		for (const child of node.childNodes) {
-		const childCode = nodeToDDE(child, options, level + 1);
-		if (childCode) children.push(childCode);
+			const childCode = nodeToDDE(child, options, level + 1);
+			if (!childCode) continue;
+
+			children.push(childCode);
 		}
-		if(children.length===1 && node.childNodes[0].nodeType===NODE_TYPE.TEXT){
-		const textContent= children.pop().slice(1, -1);
-		attrs.unshift(`textContent: "${textContent}"`);
+		if(node.childNodes.length===1 && node.childNodes[0].nodeType===NODE_TYPE.TEXT){
+			const textContent= children.pop().slice(1, -1);
+			attrs.unshift(`textContent: "${textContent}"`);
 		}
 
 		// Build the element creation code
@@ -189,15 +196,16 @@ function nodeToDDE(node, options = {}, level = 0) {
 			result += `, {\n${nextIndent}${attrs.join(`,\n${nextIndent}`)},\n${indent}}`;
 		else
 			result += `, { ${attrs.join(", ")} }`;
-		} else if (children.length > 0) {
-		result += ", null";
 		}
 
 		// Add children if any
 		if (children.length > 0) {
-		result += `).append(\n${nextIndent}${children.join(`,\n${nextIndent}`)},\n${indent})`;
+			const chs= children.map(ch=>
+				Array.isArray(ch) ? ch.map(l=> nextIndent + l).join("\n") :
+				nextIndent + ch + ",");
+			result += `).append(\n${chs.join("\n")}\n${indent})`;
 		} else {
-		result += ")";
+			result += ")";
 		}
 
 		return result;
