@@ -31,7 +31,7 @@ function EmojiCounter({ initial }) {
 		el("p", {
 			className: "output",
 			textContent: S(() =>
-				`Hello World ${emoji.get().repeat(clicks.get())}`),
+				`Hello World ${emoji.get().repeat(count.get())}`),
 		}),
 
 		// 🎮 Controls - Update state on events
@@ -39,12 +39,12 @@ function EmojiCounter({ initial }) {
 			on("click", () => count.set(count.get() + 1))
 		),
 
-		el("select", null,
+		el("select", null, on.host(el=> el.value= initial),
 			on("change", e => emoji.set(e.target.value))
 		).append(
-			el(Option, "🎉", isSelected),
-			el(Option, "🚀", isSelected),
-			el(Option, "💖", isSelected),
+			el(Option, "🎉"),
+			el(Option, "🚀"),
+			el(Option, "💖"),
 		)
 	);
 }

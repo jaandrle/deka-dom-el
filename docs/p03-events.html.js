@@ -155,8 +155,8 @@ export function page({ pkg, info }){
 			You can think of an Addon as an “oncreate” event handler.
 		`),
 		el("p").append(T`
-			dd<el> provides two additional lifecycle events that correspond to ${el("a", { textContent:
-				"custom element", ...references.mdn_customElements })} lifecycle callbacks:
+			dd<el> provides three additional lifecycle events that correspond to ${el("a", { textContent:
+				"custom element", ...references.mdn_customElements })} lifecycle callbacks and component patterns:
 		`),
 		el("div", { className: "function-table" }).append(
 			el("dl").append(
@@ -165,6 +165,9 @@ export function page({ pkg, info }){
 
 				el("dt", t`on.disconnected(callback)`),
 				el("dd", t`Fires when the element is removed from the DOM`),
+				
+				el("dt", t`on.host(callback, host?)`),
+				el("dd", t`Fires when the host element is "ready" and allows applying properties based on the fully built template`),
 			)
 		),
 		el(example, { src: fileURL("./components/examples/events/live-cycle.js"), page_id }),
