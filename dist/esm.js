@@ -26,38 +26,7 @@ function onAbort(signal, listener) {
 	};
 }
 
-// src/signals-lib/common.js
-var signals_global = {
-	/**
-	* Checks if a value is a signal
-	* @param {any} attributes - Value to check
-	* @returns {boolean} Whether the value is a signal
-	*/
-	isSignal(attributes) {
-		return false;
-	},
-	/**
-	* Processes an attribute that might be reactive
-	* @param {Element} obj - Element that owns the attribute
-	* @param {string} key - Attribute name
-	* @param {any} attr - Attribute value
-	* @param {Function} set - Function to set the attribute
-	* @returns {any} Processed attribute value
-	*/
-	processReactiveAttribute(obj, key, attr, set) {
-		return attr;
-	}
-};
-function registerReactivity(def, global = true) {
-	if (global) return oAssign(signals_global, def);
-	Object.setPrototypeOf(def, signals_global);
-	return def;
-}
-function signals(_this) {
-	return isProtoFrom(_this, signals_global) && _this !== signals_global ? _this : signals_global;
-}
-
-// src/dom-common.js
+// src/dom-lib/common.js
 var enviroment = {
 	setDeleteAttr,
 	ssr: "",
@@ -83,7 +52,7 @@ var evc = "dde:connected";
 var evd = "dde:disconnected";
 var eva = "dde:attributeChanged";
 
-// src/events-observer.js
+// src/dom-lib/events-observer.js
 var c_ch_o = enviroment.M ? connectionsChangesObserverConstructor() : new Proxy({}, {
 	get() {
 		return () => {
@@ -247,7 +216,7 @@ function connectionsChangesObserverConstructor() {
 	}
 }
 
-// src/events.js
+// src/dom-lib/events.js
 function dispatchEvent(name, options, host) {
 	if (typeof options === "function") {
 		host = options;
@@ -292,10 +261,7 @@ on.disconnected = function(listener, options) {
 	};
 };
 
-// src/dom.js
-function queue(promise) {
-	return enviroment.q(promise);
-}
+// src/dom-lib/scopes.js
 var scopes = [{
 	get scope() {
 		return enviroment.D.body;
@@ -370,6 +336,61 @@ var scope = {
 		return scopes.pop();
 	}
 };
+on.host = (fn, host = scope.host) => (el) => host(() => fn(el));
+
+// src/signals-lib/common.js
+var signals_global = {
+	/**
+	* Checks if a value is a signal
+	* @param {any} attributes - Value to check
+	* @returns {boolean} Whether the value is a signal
+	*/
+	isSignal(attributes) {
+		return false;
+	},
+	/**
+	* Processes an attribute that might be reactive
+	* @param {Element} obj - Element that owns the attribute
+	* @param {string} key - Attribute name
+	* @param {any} attr - Attribute value
+	* @param {Function} set - Function to set the attribute
+	* @returns {any} Processed attribute value
+	*/
+	processReactiveAttribute(obj, key, attr, set) {
+		return attr;
+	}
+};
+function registerReactivity(def, global = true) {
+	if (global) return oAssign(signals_global, def);
+	Object.setPrototypeOf(def, signals_global);
+	return def;
+}
+function signals(_this) {
+	return isProtoFrom(_this, signals_global) && _this !== signals_global ? _this : signals_global;
+}
+
+// src/dom-lib/helpers.js
+function setRemove(obj, prop, key, val) {
+	return obj[(isUndef(val) ? "remove" : "set") + prop](key, val);
+}
+function setRemoveNS(obj, prop, key, val, ns = null) {
+	return obj[(isUndef(val) ? "remove" : "set") + prop + "NS"](ns, key, val);
+}
+function setDelete(obj, key, val) {
+	Reflect.set(obj, key, val);
+	if (!isUndef(val)) return;
+	return Reflect.deleteProperty(obj, key);
+}
+function elementAttribute(element, op, key, value) {
+	if (isInstance(element, enviroment.H))
+		return element[op + "Attribute"](key, value);
+	return element[op + "AttributeNS"](null, key, value);
+}
+
+// src/dom-lib/el.js
+function queue(promise) {
+	return enviroment.q(promise);
+}
 function append(...els) {
 	this.appendOriginal(...els);
 	return this;
@@ -439,38 +460,6 @@ function createElementNS(ns) {
 		return el;
 	};
 }
-function simulateSlots(element, root = element) {
-	const mark_e = "\xB9\u2070", mark_s = "\u2713";
-	const slots = Object.fromEntries(
-		Array.from(root.querySelectorAll("slot")).filter((s) => !s.name.endsWith(mark_e)).map((s) => [s.name += mark_e, s])
-	);
-	element.append = new Proxy(element.append, {
-		apply(orig, _, els) {
-			if (els[0] === root) return orig.apply(element, els);
-			for (const el of els) {
-				const name = (el.slot || "") + mark_e;
-				try {
-					elementAttribute(el, "remove", "slot");
-				} catch (_error) {
-				}
-				const slot = slots[name];
-				if (!slot) return;
-				if (!slot.name.startsWith(mark_s)) {
-					slot.childNodes.forEach((c) => c.remove());
-					slot.name = mark_s + name;
-				}
-				slot.append(el);
-			}
-			element.append = orig;
-			return element;
-		}
-	});
-	if (element !== root) {
-		const els = Array.from(element.childNodes);
-		element.append(...els);
-	}
-	return root;
-}
 var assign_context = /* @__PURE__ */ new WeakMap();
 var { setDeleteAttr: setDeleteAttr2 } = enviroment;
 function assign(element, ...attributes) {
@@ -533,11 +522,6 @@ function classListDeclarative(element, toggle) {
 	);
 	return element;
 }
-function elementAttribute(element, op, key, value) {
-	if (isInstance(element, enviroment.H))
-		return element[op + "Attribute"](key, value);
-	return element[op + "AttributeNS"](null, key, value);
-}
 function isPropSetter(el, key) {
 	if (!(key in el)) return false;
 	const des = getPropDescriptor(el, key);
@@ -561,19 +545,40 @@ function forEachEntries(s, target, element, obj, cb) {
 		cb(key, val);
 	});
 }
-function setRemove(obj, prop, key, val) {
-	return obj[(isUndef(val) ? "remove" : "set") + prop](key, val);
-}
-function setRemoveNS(obj, prop, key, val, ns = null) {
-	return obj[(isUndef(val) ? "remove" : "set") + prop + "NS"](ns, key, val);
-}
-function setDelete(obj, key, val) {
-	Reflect.set(obj, key, val);
-	if (!isUndef(val)) return;
-	return Reflect.deleteProperty(obj, key);
-}
 
-// src/customElement.js
+// src/dom-lib/customElement.js
+function simulateSlots(element, root = element) {
+	const mark_e = "\xB9\u2070", mark_s = "\u2713";
+	const slots = Object.fromEntries(
+		Array.from(root.querySelectorAll("slot")).filter((s) => !s.name.endsWith(mark_e)).map((s) => [s.name += mark_e, s])
+	);
+	element.append = new Proxy(element.append, {
+		apply(orig, _, els) {
+			if (els[0] === root) return orig.apply(element, els);
+			for (const el of els) {
+				const name = (el.slot || "") + mark_e;
+				try {
+					elementAttribute(el, "remove", "slot");
+				} catch (_error) {
+				}
+				const slot = slots[name];
+				if (!slot) return;
+				if (!slot.name.startsWith(mark_s)) {
+					slot.childNodes.forEach((c) => c.remove());
+					slot.name = mark_s + name;
+				}
+				slot.append(el);
+			}
+			element.append = orig;
+			return element;
+		}
+	});
+	if (element !== root) {
+		const els = Array.from(element.childNodes);
+		element.append(...els);
+	}
+	return root;
+}
 function customElementRender(target, render, props = {}) {
 	const custom_element = target.host || target;
 	scope.push({
@@ -662,7 +667,6 @@ export {
 	dispatchEvent,
 	createElement as el,
 	createElementNS as elNS,
-	elementAttribute,
 	lifecyclesToEvents,
 	memo,
 	on,

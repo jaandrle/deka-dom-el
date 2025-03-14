@@ -1,7 +1,6 @@
-import { signals } from "./signals-lib/common.js";
-import { enviroment as env } from './dom-common.js';
-import { isInstance, isUndef, oAssign } from "./helpers.js";
-import { on } from "./events.js";
+import { signals } from "../signals-lib/common.js";
+import { enviroment as env } from './common.js';
+import { isInstance, isUndef, oAssign } from "../helpers.js";
 
 /**
  * Queues a promise, this is helpful for crossplatform components (on server side we can wait for all registered
@@ -11,84 +10,6 @@ import { on } from "./events.js";
  */
 export function queue(promise){ return env.q(promise); }
 
-/**
- * Array of scope contexts for tracking component hierarchies
- * @type {{ scope: object, prevent: boolean, host: function }[]}
- */
-const scopes= [ {
-	get scope(){ return  env.D.body; },
-	host: c=> c ? c(env.D.body) : env.D.body,
-	prevent: true,
-} ];
-/** Store for disconnect abort controllers */
-const store_abort= new WeakMap();
-/**
- * Scope management utility for tracking component hierarchies
- */
-export const scope= {
-	/**
-	 * Gets the current scope
-	 * @returns {Object} Current scope context
-	 */
-	get current(){ return scopes[scopes.length-1]; },
-
-	/**
-	 * Gets the host element of the current scope
-	 * @returns {Function} Host accessor function
-	 */
-	get host(){ return this.current.host; },
-
-	/**
-	 * Creates/gets an AbortController that triggers when the element disconnects
-	 * */
-	get signal(){
-		const { host }= this;
-		if(store_abort.has(host)) return store_abort.get(host);
-
-		const a= new AbortController();
-		store_abort.set(host, a);
-		host(on.disconnected(()=> a.abort()));
-		return a.signal;
-	},
-
-	/**
-	 * Prevents default behavior in the current scope
-	 * @returns {Object} Current scope context
-	 */
-	preventDefault(){
-		const { current }= this;
-		current.prevent= true;
-		return current;
-	},
-
-	/**
-	 * Gets a copy of the current scope stack
-	 * @returns {Array} Copy of scope stack
-	 */
-	get state(){ return [ ...scopes ]; },
-
-	/**
-	 * Pushes a new scope to the stack
-	 * @param {Object} [s={}] - Scope object to push
-	 * @returns {number} New length of the scope stack
-	 */
-	push(s= {}){ return scopes.push(oAssign({}, this.current, { prevent: false }, s)); },
-
-	/**
-	 * Pushes the root scope to the stack
-	 * @returns {number} New length of the scope stack
-	 */
-	pushRoot(){ return scopes.push(scopes[0]); },
-
-	/**
-	 * Pops the current scope from the stack
-	 * @returns {Object|undefined} Popped scope or undefined if only one scope remains
-	 */
-	pop(){
-		if(scopes.length===1) return;
-		return scopes.pop();
-	},
-};
 /**
  * Chainable append function for elements
  * @private
@@ -107,6 +28,7 @@ export function chainableAppend(el){
 /** Current namespace for element creation */
 let namespace;
 
+import { scope } from "./scopes.js";
 /**
  * Creates a DOM element with specified tag, attributes and addons
  *
@@ -191,46 +113,6 @@ export function createElementNS(ns){
 /** Alias for createElementNS */
 export { createElementNS as elNS };
 
-/**
- * Simulates slot functionality for elements
- *
- * @param {HTMLElement} element - Parent element
- * @param {HTMLElement} [root=element] - Root element containing slots
- * @returns {HTMLElement} The root element
- */
-export function simulateSlots(element, root= element){
-	const mark_e= "¹⁰", mark_s= "✓"; //NOTE: Markers to identify slots processed by this function. Also “prevents” native behavior as it is unlikely to use these in names. // editorconfig-checker-disable-line
-	const slots= Object.fromEntries(
-		Array.from(root.querySelectorAll("slot"))
-			.filter(s => !s.name.endsWith(mark_e))
-			.map(s => [(s.name += mark_e), s]));
-	element.append= new Proxy(element.append, {
-		apply(orig, _, els){
-			if(els[0]===root) return orig.apply(element, els);
-			for(const el of els){
-				const name= (el.slot||"")+mark_e;
-				try{ elementAttribute(el, "remove", "slot"); } catch(_error){}
-				const slot= slots[name];
-				if(!slot) return;
-				if(!slot.name.startsWith(mark_s)){
-					slot.childNodes.forEach(c=> c.remove());
-					slot.name= mark_s+name;
-				}
-				slot.append(el);
-				//TODO?: el.dispatchEvent(new CustomEvent("dde:slotchange", { detail: slot }));
-			}
-			element.append= orig; //TODO?: better memory management, but non-native behavior!
-			return element;
-		}
-	});
-	if(element!==root){
-		const els= Array.from(element.childNodes);
-		//TODO?: els.forEach(el=> el.remove());
-		element.append(...els);
-	}
-	return root;
-}
-
 /** Store for element assignment contexts */
 const assign_context= new WeakMap();
 const { setDeleteAttr }= env;
@@ -251,6 +133,7 @@ export function assign(element, ...attributes){
 	assign_context.delete(element);
 	return element;
 }
+import { setDelete } from "./helpers.js";
 /**
  * Assigns a single attribute to an element
  *
@@ -290,6 +173,7 @@ export function assignAttribute(element, key, value){
 	}
 	return isPropSetter(element, key) ? setDeleteAttr(element, key, value) : setRemoveAttr(key, value);
 }
+import { setRemove, setRemoveNS } from "./helpers.js";
 /**
  * Gets or creates assignment context for an element
  *
@@ -318,21 +202,6 @@ export function classListDeclarative(element, toggle){
 		(class_name, val)=>
 			element.classList.toggle(class_name, val===-1 ? undefined : Boolean(val)) );
 	return element;
-}
-
-/**
- * Generic element attribute manipulation
- *
- * @param {Element} element - Element to manipulate
- * @param {string} op - Operation ("set" or "remove")
- * @param {string} key - Attribute name
- * @param {any} [value] - Attribute value
- * @returns {void}
- */
-export function elementAttribute(element, op, key, value){
-	if(isInstance(element, env.H))
-		return element[op+"Attribute"](key, value);
-	return element[op+"AttributeNS"](null, key, value);
 }
 
 //TODO: add cache? `(Map/Set)<el.tagName+key,isUndef>`
@@ -384,46 +253,4 @@ function forEachEntries(s, target, element, obj, cb){
 		val= s.processReactiveAttribute(element, key, val, cb);
 		cb(key, val);
 	});
-}
-
-/**
- * Sets or removes an attribute based on value
- *
- * @param {Element} obj - Element to modify
- * @param {string} prop - Property suffix ("Attribute")
- * @param {string} key - Attribute name
- * @param {any} val - Attribute value
- * @returns {void}
- * @private
- */
-function setRemove(obj, prop, key, val){
-	return obj[ (isUndef(val) ? "remove" : "set") + prop ](key, val);
-}
-
-/**
- * Sets or removes a namespaced attribute based on value
- *
- * @param {Element} obj - Element to modify
- * @param {string} prop - Property suffix ("Attribute")
- * @param {string} key - Attribute name
- * @param {any} val - Attribute value
- * @param {string|null} [ns=null] - Namespace URI
- * @returns {void}
- * @private
- */
-function setRemoveNS(obj, prop, key, val, ns= null){
-	return obj[ (isUndef(val) ? "remove" : "set") + prop + "NS" ](ns, key, val);
-}
-
-/**
- * Sets or deletes a property based on value
- *
- * @param {Object} obj - Object to modify
- * @param {string} key - Property name
- * @param {any} val - Property value
- * @returns {void}
- * @private
- */
-function setDelete(obj, key, val){
-	Reflect.set(obj, key, val); if(!isUndef(val)) return; return Reflect.deleteProperty(obj, key);
 }

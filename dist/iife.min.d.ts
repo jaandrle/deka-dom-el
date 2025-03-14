@@ -178,11 +178,22 @@ export interface On {
 	connected<EE extends ddeElementAddon<SupportedElement>, El extends (EE extends ddeElementAddon<infer El> ? El : never)>(listener: (this: El, event: CustomEvent<El>) => any, options?: AddEventListenerOptions): EE;
 	/** Listens to the element is disconnected from the live DOM. In case of custom elements uses [`disconnectedCallback`](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#custom_element_lifecycle_callbacks), or {@link MutationObserver} else where */ // editorconfig-checker-disable-line
 	disconnected<EE extends ddeElementAddon<SupportedElement>, El extends (EE extends ddeElementAddon<infer El> ? El : never)>(listener: (this: El, event: CustomEvent<void>) => any, options?: AddEventListenerOptions): EE;
-	/** Listens to the element attribute changes. In case of custom elements uses [`attributeChangedCallback`](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#custom_element_lifecycle_callbacks), or {@link MutationObserver} else where */ // editorconfig-checker-disable-line
-	attributeChanged<EE extends ddeElementAddon<SupportedElement>, El extends (EE extends ddeElementAddon<infer El> ? El : never)>(listener: (this: El, event: CustomEvent<[
-		string,
-		string
-	]>) => any, options?: AddEventListenerOptions): EE;
+	/**
+	 * Fires when the host element is "ready", for host element itsel, it is just an alias for `scope.host(listener)`.
+	 * This is handy to apply some property depending on full template such as:
+	 * ```js
+	 * const selected= "Z";
+	 * //...
+	 * return el("form").append(
+	 *		el("select", null, on.host(e=> e.value=selected)).append(
+	 *			el("option", { value: "A", textContent: "A" }),
+	 *			//...
+	 *			el("option", { value: "Z", textContent: "Z" }),
+	 *		),
+	 * );
+	 * ```
+	 * */
+	host<EE extends ddeElementAddon<SupportedElement>, El extends (EE extends ddeElementAddon<infer El> ? El : never)>(listener: (element: El) => any, host?: Host<SupportedElement>): EE;
 }
 export const on: On;
 export type Scope = {

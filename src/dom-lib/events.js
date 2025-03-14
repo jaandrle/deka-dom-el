@@ -1,5 +1,5 @@
-import { keyLTE, evc, evd } from './dom-common.js';
-import { oAssign, onAbort } from './helpers.js';
+import { keyLTE, evc, evd } from './common.js';
+import { oAssign, onAbort } from '../helpers.js';
 
 /**
  * Creates a function to dispatch events on elements

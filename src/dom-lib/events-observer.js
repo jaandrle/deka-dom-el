@@ -1,5 +1,5 @@
-import { enviroment as env, evc, evd } from './dom-common.js';
-import { isInstance } from "./helpers.js";
+import { enviroment as env, evc, evd } from './common.js';
+import { isInstance } from "../helpers.js";
 
 /**
  * Connection changes observer for tracking element connection/disconnection
