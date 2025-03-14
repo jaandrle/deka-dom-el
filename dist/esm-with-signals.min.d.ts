@@ -4,7 +4,7 @@ export interface Signal<V, A> {
 	/** The current value of the signal */
 	get(): V;
 	/** Set new value of the signal */
-	set(value: V): V;
+	set(value: V, force?: boolean): V;
 	toJSON(): V;
 	valueOf(): V;
 }
