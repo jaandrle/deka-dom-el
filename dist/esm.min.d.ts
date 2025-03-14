@@ -172,12 +172,12 @@ declare function dispatchEvent$1(name: keyof DocumentEventMap | string, options?
 declare function dispatchEvent$1(name: keyof DocumentEventMap | string, options: EventInit | null, host: Host<SupportedElement>): (data?: any) => void;
 export interface On {
 	/** Listens to the DOM event. See {@link Document.addEventListener} */
-	<Event extends keyof DocumentEventMap, EE extends ddeElementAddon<SupportedElement> = ddeElementAddon<HTMLElement>>(type: Event, listener: (this: EE extends ddeElementAddon<infer El> ? El : never, ev: DocumentEventMap[Event]) => any, options?: AddEventListenerOptions): EE;
+	<Event extends keyof DocumentEventMap, EL extends SupportedElement>(type: Event, listener: (this: EL, ev: DocumentEventMap[Event]) => any, options?: AddEventListenerOptions): ddeElementAddon<EL>;
 	<EE extends ddeElementAddon<SupportedElement> = ddeElementAddon<HTMLElement>>(type: string, listener: (this: EE extends ddeElementAddon<infer El> ? El : never, ev: Event | CustomEvent) => any, options?: AddEventListenerOptions): EE;
 	/** Listens to the element is connected to the live DOM. In case of custom elements uses [`connectedCallback`](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#custom_element_lifecycle_callbacks), or {@link MutationObserver} else where */ // editorconfig-checker-disable-line
-	connected<EE extends ddeElementAddon<SupportedElement>, El extends (EE extends ddeElementAddon<infer El> ? El : never)>(listener: (this: El, event: CustomEvent<El>) => any, options?: AddEventListenerOptions): EE;
+	connected<EL extends SupportedElement>(listener: (this: EL, event: CustomEvent<NoInfer<EL>>) => any, options?: AddEventListenerOptions): ddeElementAddon<EL>;
 	/** Listens to the element is disconnected from the live DOM. In case of custom elements uses [`disconnectedCallback`](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#custom_element_lifecycle_callbacks), or {@link MutationObserver} else where */ // editorconfig-checker-disable-line
-	disconnected<EE extends ddeElementAddon<SupportedElement>, El extends (EE extends ddeElementAddon<infer El> ? El : never)>(listener: (this: El, event: CustomEvent<void>) => any, options?: AddEventListenerOptions): EE;
+	disconnected<EL extends SupportedElement>(listener: (this: EL, event: CustomEvent<void>) => any, options?: AddEventListenerOptions): ddeElementAddon<EL>;
 	/**
 	 * Fires when the host element is "ready", for host element itsel, it is just an alias for `scope.host(listener)`.
 	 * This is handy to apply some property depending on full template such as:
@@ -193,7 +193,7 @@ export interface On {
 	 * );
 	 * ```
 	 * */
-	host<EE extends ddeElementAddon<SupportedElement>, El extends (EE extends ddeElementAddon<infer El> ? El : never)>(listener: (element: El) => any, host?: Host<SupportedElement>): EE;
+	host<EL extends SupportedElement>(listener: (element: EL) => any, host?: Host<SupportedElement>): ddeElementAddon<EL>;
 }
 export const on: On;
 export type Scope = {
