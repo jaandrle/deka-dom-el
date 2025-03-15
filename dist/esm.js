@@ -406,7 +406,8 @@ function createElement(tag, attributes, ...addons) {
 	const s = signals(this);
 	let scoped = 0;
 	let el, el_host;
-	if (Object(attributes) !== attributes || s.isSignal(attributes))
+	const att_type = typeof attributes;
+	if (att_type === "string" || att_type === "number" || s.isSignal(attributes))
 		attributes = { textContent: attributes };
 	switch (true) {
 		case typeof tag === "function": {
