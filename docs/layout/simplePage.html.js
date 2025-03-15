@@ -3,10 +3,7 @@ import { el, simulateSlots } from "deka-dom-el";
 
 import { header } from "./head.html.js";
 import { prevNext } from "../components/pageUtils.html.js";
-import { ireland } from "../components/ireland.html.js";
-import "../components/scrollTop.css.js";
-/** @param {string} url */
-const fileURL= url=> new URL(url, import.meta.url);
+import { scrollTop } from "../components/scrollTop.html.js";
 
 /** @param {Pick<import("../types.d.ts").PageAttrs, "pkg" | "info">} attrs */
 export function simplePage({ pkg, info }){
@@ -33,6 +30,6 @@ export function simplePage({ pkg, info }){
 		),
 
 		// Scroll to top button
-		el(ireland, { src: fileURL("../components/scrollTop.js.js"), exportName: "scrollTop" })
+		el(scrollTop),
 	));
 }

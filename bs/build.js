@@ -5,18 +5,18 @@ const files= [ "index", "index-with-signals" ];
 $.api("")
 .command("main", "Build main files", { default: true })
 .option("--no-types", "Also generate d.ts files", false)
-.action(async function main({ types }){
-	const regular = await build({
+.action(function main({ types }){
+	const regular = build({
 		files,
 		filesOut,
 		minify: "no",
 		types,
 	});
-	const min = await build({
+	const min = build({
 		files,
 		filesOut(file, mark= "esm"){
 			const out= filesOut(file, mark);
-			const idx= out.lastIndexOf(".");
+			const idx= out.indexOf(".");
 			return out.slice(0, idx)+".min"+out.slice(idx);
 		},
 		minify: "full",
@@ -25,8 +25,8 @@ $.api("")
 	return $.exit(regular + min);
 })
 .command("signals", "Build only signals (for example for analysis)")
-.action(async function signals(){
-	const regular = await build({
+.action(function signals(){
+	const regular = build({
 		files: [ "signals" ],
 		filesOut(file){ return "dist/."+file; },
 		minify: "no",

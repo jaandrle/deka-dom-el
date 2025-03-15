@@ -19,7 +19,7 @@ export function page({ pkg, info }){
 	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
 		el("div", { className: "warning" }).append(
-			el("p").append(...T`
+			el("p").append(T`
 				This part of the documentation is primarily intended for technical enthusiasts and authors of
 				3rd-party libraries. It describes an advanced feature, not a core part of the library. Most users will
 				not need to implement this functionality directly in their applications. This capability will hopefully
@@ -29,7 +29,7 @@ export function page({ pkg, info }){
 		),
 
 		el(h3, t`What Are Ireland Components?`),
-		el("p").append(...T`
+		el("p").append(T`
 			Ireland components are a special type of component that:
 		`),
 		el("ul").append(
@@ -38,24 +38,24 @@ export function page({ pkg, info }){
 		),
 
 		el(h3, t`How Ireland Components Work`),
-		el("p").append(...T`
+		el("p").append(T`
 			The Ireland component system consists of several parts working together:
 		`),
 
 		el("ol").append(
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Server-side rendering:")} Components are pre-rendered during the documentation build process
 			`),
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Component registration:")} Source files are copied to the documentation output directory
 			`),
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Client-side scripting:")} JavaScript code is generated to load and render components
 			`),
 		),
 
 		el(h3, t`Implementation Architecture`),
-		el("p").append(...T`
+		el("p").append(T`
 			The core of the Ireland system is implemented in ${el("code", "docs/components/ireland.html.js")}.
 			It integrates with the SSR build process using the ${el("code", "registerClientFile")} function
 			from ${el("code", "docs/ssr.js")}.
@@ -69,7 +69,7 @@ export function page({ pkg, info }){
 			})
 		`, page_id }),
 
-		el("p").append(...T`
+		el("p").append(T`
 			During the build process (${el("code", "bs/docs.js")}), the following happens:
 		`),
 
@@ -81,7 +81,7 @@ export function page({ pkg, info }){
 		),
 
 		el(h3, t`Core Implementation Details`),
-		el("p").append(...T`
+		el("p").append(T`
 			Let's look at the key parts of the ireland component implementation:
 		`),
 
@@ -253,7 +253,7 @@ export function page({ pkg, info }){
 		`, page_id }),
 
 		el(h3, t`Live Example`),
-			el("p").append(...T`
+			el("p").append(T`
 				Here’s a live example of an Ireland component showing a standard counter.
 				The component is defined in ${el("code", "docs/components/examples/ireland-test/counter.js")} and
 				rendered with the Ireland component system:
@@ -269,21 +269,21 @@ export function page({ pkg, info }){
 				page_id
 			}),
 
-			el("p").append(...T`
+			el("p").append(T`
 				When the page is loaded, the component is also loaded and rendered. The counter state is maintained
 				using signals, allowing for reactive updates as you click the buttons to increment and decrement the
 				value.
 			`),
 
 		el(h3, t`Practical Considerations and Limitations`),
-			el("p").append(...T`
+			el("p").append(T`
 				When implementing Ireland components in real documentation, there are several important
 				considerations to keep in mind:
 			`),
 
 			el("div", { className: "warning" }).append(
 				el("h4", t`Module Resolution and Bundling`),
-				el("p").append(...T`
+				el("p").append(T`
 					The examples shown here use bare module specifiers like ${el("code",
 						`import { el } from "deka-dom-el"`)} which aren’t supported in all browsers without importmaps.
 					In a production implementation, you would need to: `),
@@ -292,7 +292,7 @@ export function page({ pkg, info }){
 					el("li", t`Bundle component dependencies to avoid multiple requests`),
 					el("li", t`Ensure all module dependencies are properly resolved and copied to the output directory`)
 				),
-				el("p").append(...T`
+				el("p").append(T`
 					In this documentation, we replace the paths with ${el("code", "./esm-with-signals.js")} and provide
 					a bundled version of the library, but more complex components might require a dedicated bundling step.
 				`)
@@ -300,7 +300,7 @@ export function page({ pkg, info }){
 
 			el("div", { className: "note" }).append(
 				el("h4", t`Component Dependencies`),
-				el("p").append(...T`
+				el("p").append(T`
 					Real-world components typically depend on multiple modules and assets. The Ireland system would need
 					to be extended to:
 				`),
@@ -312,7 +312,7 @@ export function page({ pkg, info }){
 			),
 
 			el(h3, t`Advanced Usage`),
-			el("p").append(...T`
+			el("p").append(T`
 				The Ireland system can be extended in several ways to address these limitations:
 			`),
 
@@ -325,7 +325,7 @@ export function page({ pkg, info }){
 				el("li", t`Implement state persistence between runs`)
 			),
 
-			el("p").append(...T`
+			el("p").append(T`
 				This documentation site itself is built using the techniques described here,
 				showcasing how dd<el> can be used to create both the documentation and
 				the interactive examples within it. The implementation here is simplified for clarity,

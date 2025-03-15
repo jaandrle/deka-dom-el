@@ -159,10 +159,10 @@ signal.clear= function(...signals){
 };
 /** Property key for tracking reactive elements */
 const key_reactive= "__dde_reactive";
-import { enviroment as env, eva } from "../dom-common.js";
-import { el } from "../dom.js";
-import { scope } from "../dom.js";
-import { on } from "../events.js";
+import { enviroment as env, eva } from "../dom-lib/common.js";
+import { el } from "../dom-lib/index.js";
+import { scope } from "../dom-lib/scopes.js";
+import { on } from "../dom-lib/events.js";
 import { memo } from "../memo.js";
 
 /**

@@ -1,5 +1,3 @@
-export * from "./src/dom.js";
-export * from "./src/customElement.js";
-export * from "./src/events.js";
-export { registerReactivity } from "./src/signals-lib/common.js";
+export * from "./src/dom-lib/index.js";
 export { memo } from "./src/memo.js";
+export { registerReactivity } from "./src/signals-lib/common.js";

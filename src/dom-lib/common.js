@@ -21,7 +21,7 @@ export const enviroment= {
 	M: globalThis.MutationObserver,
 	q: p=> p || Promise.resolve(),
 };
-import { isInstance, isUndef } from './helpers.js';
+import { isInstance, isUndef } from '../helpers.js';
 
 /**
  * Handles attribute setting with special undefined handling

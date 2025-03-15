@@ -3,7 +3,6 @@ const host= "."+example.name;
 styles.css`
 ${host} {
 	grid-column: full-main;
-	width: calc(100% - .75em);
 	height: calc(4/6 * var(--body-max-width));
 	border-radius: var(--border-radius);
 	box-shadow: var(--shadow);
@@ -84,7 +83,6 @@ html[data-theme="light"] .cm-s-material .cm-error { color: #f44336 !important; }
 @media (max-width: 767px) {
 	${host} {
 		height: 50vh;
-		max-width: 100%;
 	}
 	${host} main {
 		flex-grow: 1;
@@ -97,7 +95,7 @@ html[data-theme="light"] .cm-s-material .cm-error { color: #f44336 !important; }
 	}
 }
 ${host}[data-variant=big]{
-	height: 100vh;
+	height: 150vh;
 
 	main {
 		flex-flow: column nowrap;

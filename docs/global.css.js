@@ -86,7 +86,7 @@ html {
 }
 
 :focus-visible {
-	outline: 3px solid hsl(231, 48%, 70%);
+	outline: 3px solid var(--primary-light);
 	outline-offset: 2px;
 }
 
@@ -193,6 +193,34 @@ pre code {
 	background-color: transparent;
 	padding: 0;
 }
+figure {
+	width: 100%;
+	text-align: center;
+	color: var(--text-light);
+	border: 1px dashed var(--border);
+	border-radius: var(--border-radius);
+
+	img {
+		object-fit: contain;
+		border-radius: var(--border-radius);
+		box-shadow: var(--shadow);
+		max-width: 100%;
+	}
+}
+select {
+	padding: 0.5rem 0.75rem;
+	border-radius: var(--border-radius);
+	border: 1px solid var(--border);
+	background-color: var(--bg);
+	color: var(--text);
+	cursor: pointer;
+	font-size: 0.95rem;
+	font-family: var(--font-main);
+}
+
+select:hover {
+	border-color: var(--primary);
+}
 
 /* Layout */
 body {
@@ -234,7 +262,7 @@ body > main {
 }
 body > main > *, body > main slot > * {
 	width: 100%;
-	max-width: 100%;
+	max-width: calc(var(--body-max-width) * 5/3);
 	margin-inline: auto;
 	grid-column: main;
 }
@@ -267,9 +295,8 @@ body > main h3, body > main h4 {
 /* Boxes */
 .illustration{
 	grid-column: full-main;
-	width: calc(100% - .75em);
 }
-.illustration:not(:has( .comparison)){
+.illustration:not(:has( .comparison)):not(:has( .tabs)) {
 	grid-column: main;
 
 	pre {

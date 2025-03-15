@@ -1,4 +1,4 @@
-import { enviroment as env } from './src/dom-common.js';
+import { enviroment as env } from './src/dom-lib/common.js';
 env.ssr= " ssr";
 
 const q_store= new Set();
