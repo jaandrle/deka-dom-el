@@ -8,25 +8,23 @@
  * - Responsive design for different devices
  */
 
-import { el, on } from "deka-dom-el";
+import { el, on, dispatchEvent, scope } from "deka-dom-el";
 import { S } from "deka-dom-el/signals";
 
+/** @typedef {{ id: number, title: string, description: string, priority: string, status: string }} Task */
 /**
  * Task Manager Component
  * @returns {HTMLElement} Task manager UI
  */
 export function TaskManager() {
-	// Local storage key
+	// <Tasks store>
 	const STORAGE_KEY = 'dde-task-manager';
-
-	// Task statuses
 	const STATUSES = {
 		TODO: 'todo',
 		IN_PROGRESS: 'in-progress',
 		DONE: 'done'
 	};
-
-	// Initial tasks from localStorage or defaults
+	/** @type {Task[]} */
 	let initialTasks = [];
 	try {
 		const saved = localStorage.getItem(STORAGE_KEY);
@@ -36,9 +34,7 @@ export function TaskManager() {
 	} catch (e) {
 		console.error('Failed to load tasks from localStorage', e);
 	}
-
 	if (!initialTasks.length) {
-		// Default tasks if nothing in localStorage
 		initialTasks = [
 			{ id: 1, title: 'Create project structure', description: 'Set up folders and initial files',
 				status: STATUSES.DONE, priority: 'high' },
@@ -50,8 +46,6 @@ export function TaskManager() {
 				status: STATUSES.TODO, priority: 'low' },
 		];
 	}
-
-	// Application state
 	const tasks = S(initialTasks, {
 		add(task) { this.value.push(task); },
 		remove(id) { this.value = this.value.filter(task => task.id !== id); },
@@ -60,15 +54,6 @@ export function TaskManager() {
 			if (current) Object.assign(current, task);
 		}
 	});
-	const newTaskTitle = S('');
-	const newTaskDescription = S('');
-	const newTaskPriority = S('medium');
-	const editingTaskId = S(null);
-	const draggedTaskId = S(null);
-	const filterPriority = S('all');
-	const searchQuery = S('');
-
-	// Save tasks to localStorage whenever they change
 	S.on(tasks, value => {
 		try {
 			localStorage.setItem(STORAGE_KEY, JSON.stringify(value));
@@ -76,7 +61,10 @@ export function TaskManager() {
 			console.error('Failed to save tasks to localStorage', e);
 		}
 	});
+	// </Tasks store>
 
+	const filterPriority = S('all');
+	const searchQuery = S('');
 	// Filtered tasks based on priority and search query
 	const filteredTasks = S(() => {
 		let filtered = tasks.get();
@@ -97,8 +85,7 @@ export function TaskManager() {
 
 		return filtered;
 	});
-
-	// Tasks grouped by status for display in columns
+	/** Tasks grouped by status for display in columns */
 	const tasksByStatus = S(() => {
 		const filtered = filteredTasks.get();
 		return {
@@ -108,179 +95,28 @@ export function TaskManager() {
 		};
 	});
 
-	// Event handlers
+	// <Add> signals and handlers for adding new tasks
+	const newTask = { title: '', description: '', priority: 'medium' };
 	const onAddTask = e => {
 		e.preventDefault();
+		if (!newTask.title) return;
 
-		const title = newTaskTitle.get().trim();
-		if (!title) return;
-
-		const newTask = {
+		S.action(tasks, "add", {
 			id: Date.now(),
-			title,
-			description: newTaskDescription.get().trim(),
 			status: STATUSES.TODO,
-			priority: newTaskPriority.get()
-		};
-
-		S.action(tasks, "add", newTask);
-		newTaskTitle.set('');
-		newTaskDescription.set('');
-		newTaskPriority.set('medium');
+			...newTask
+		});
+		e.target.reset();
 	};
-	const onDeleteTask = id => e => {
-		e.stopPropagation();
-		S.action(tasks, "remove", id);
-	};
-	const onEditStart = id => () => {
-		editingTaskId.set(id);
-	};
-	const onEditCancel = () => {
-		editingTaskId.set(null);
-	};
-	const onEditSave = id => e => {
-		e.preventDefault();
-		const form = e.target;
-		const title = form.elements.title.value.trim();
+	// </Add>
+	const onEdit= on("card:edit", /** @param {CardEditEvent} ev */({ detail: [ id, task ] })=>
+		S.action(tasks, "update", id, task));
+	const onDelete= on("card:delete", /** @param {CardDeleteEvent} ev */({ detail: id })=>
+		S.action(tasks, "remove", id));
 
-		if (!title) return;
-
-		tasks.set(tasks.get().map(task =>
-			task.id === id
-				? {
-						...task,
-						title,
-						description: form.elements.description.value.trim(),
-						priority: form.elements.priority.value
-					}
-				: task
-		));
-
-		editingTaskId.set(null);
-	};
-
-	function onDragable(id) {
-		return element => {
-			on("dragstart", e => {
-				draggedTaskId.set(id);
-				e.dataTransfer.effectAllowed = 'move';
-
-				// Add some styling to the element being dragged
-				setTimeout(() => {
-					const el = document.getElementById(`task-${id}`);
-					if (el) el.classList.add('dragging');
-				}, 0);
-			})(element);
-
-			on("dragend", () => {
-				draggedTaskId.set(null);
-
-				// Remove the styling
-				const el = document.getElementById(`task-${id}`);
-				if (el) el.classList.remove('dragging');
-			})(element);
-		};
-	}
-	function onDragArea(status) {
-		return element => {
-			on("dragover", e => {
-				e.preventDefault();
-				e.dataTransfer.dropEffect = 'move';
-
-				// Add a visual indicator for the drop target
-				const column = document.getElementById(`column-${status}`);
-				if (column) column.classList.add('drag-over');
-			})(element);
-
-			on("dragleave", () => {
-				// Remove the visual indicator
-				const column = document.getElementById(`column-${status}`);
-				if (column) column.classList.remove('drag-over');
-			})(element);
-
-			on("drop", e => {
-				e.preventDefault();
-				const id = draggedTaskId.get();
-				if (id) S.action(tasks, "update", id, { status });
-				// Remove the visual indicator
-				const column = document.getElementById(`column-${status}`);
-				if (column) column.classList.remove('drag-over');
-			})(element);
-		};
-	}
-
-	// Helper function to render a task card
-	function renderTaskCard(task) {
-		const isEditing = S(() => editingTaskId.get() === task.id);
-
-		return el("div", {
-			id: `task-${task.id}`,
-			className: `task-card priority-${task.priority}`,
-			draggable: true
-		}, onDragable(task.id)).append(
-			S.el(isEditing, editing => editing
-				// Edit mode
-				? el("form", { className: "task-edit-form" }, on("submit", onEditSave(task.id))).append(
-						el("input", {
-							name: "title",
-							className: "task-title-input",
-							defaultValue: task.title,
-							placeholder: "Task title",
-							required: true,
-							autoFocus: true
-						}),
-						el("textarea", {
-							name: "description",
-							className: "task-desc-input",
-							defaultValue: task.description,
-							placeholder: "Description (optional)"
-						}),
-						el("select", {
-							name: "priority",
-						}, on.host(el=> el.value = task.priority)).append(
-							el("option", { value: "low", textContent: "Low Priority" }),
-							el("option", { value: "medium", textContent: "Medium Priority" }),
-							el("option", { value: "high", textContent: "High Priority" })
-						),
-						el("div", { className: "task-edit-actions" }).append(
-							el("button", {
-								type: "button",
-								className: "cancel-btn"
-							}, on("click", onEditCancel)).append("Cancel"),
-							el("button", {
-								type: "submit",
-								className: "save-btn"
-							}).append("Save")
-						)
-					)
-				// View mode
-				: el().append(
-						el("div", { className: "task-header" }).append(
-							el("h3", { className: "task-title", textContent: task.title }),
-							el("div", { className: "task-actions" }).append(
-								el("button", {
-									className: "edit-btn",
-									"aria-label": "Edit task"
-								}, on("click", onEditStart(task.id))).append("✎"),
-								el("button", {
-									className: "delete-btn",
-									"aria-label": "Delete task"
-								}, on("click", onDeleteTask(task.id))).append("×")
-							)
-						),
-						task.description
-							? el("p", { className: "task-description", textContent: task.description })
-							: el(),
-						el("div", { className: "task-meta" }).append(
-							el("span", {
-								className: `priority-badge priority-${task.priority}`,
-								textContent: task.priority.charAt(0).toUpperCase() + task.priority.slice(1)
-							})
-						)
-					)
-			)
-		);
-	}
+	const { onDragable, onDragArea }= moveElementAddon(
+		(id, status) => S.action(tasks, "update", id, { status })
+	);
 
 	// Build the task manager UI
 	return el("div", { className: "task-manager" }).append(
@@ -310,12 +146,12 @@ export function TaskManager() {
 				el("input", {
 					type: "text",
 					placeholder: "New task title",
-					value: newTaskTitle.get(),
+					value: newTask.title,
 					required: true
-				}, on("input", e => newTaskTitle.set(e.target.value))),
+				}, on("input", e => newTask.title= e.target.value.trim())),
 				el("select", null,
-					on.host(el=> el.value= newTaskPriority.get()),
-					on("change", e => newTaskPriority.set(e.target.value))
+					on.host(el=> el.value= newTask.priority),
+					on("change", e => newTask.priority= e.target.value)
 				).append(
 					el("option", { value: "low", textContent: "Low" }),
 					el("option", { value: "medium", textContent: "Medium" }),
@@ -325,8 +161,8 @@ export function TaskManager() {
 			),
 			el("textarea", {
 				placeholder: "Task description (optional)",
-				value: newTaskDescription.get()
-			}, on("input", e => newTaskDescription.set(e.target.value)))
+				value: newTask.description
+			}, on("input", e => newTask.description= e.target.value.trim()))
 		),
 
 		// Task board with columns
@@ -338,13 +174,14 @@ export function TaskManager() {
 			}, onDragArea(STATUSES.TODO)).append(
 				el("h2", { className: "column-header" }).append(
 					"To Do ",
-					el("span", { className: "task-count" }).append(
-						S(() => tasksByStatus.get()[STATUSES.TODO].length)
-					)
+					el("span", {
+						textContent: S(() => tasksByStatus.get()[STATUSES.TODO].length),
+						className: "task-count"
+					}),
 				),
 				S.el(S(() => tasksByStatus.get()[STATUSES.TODO]), tasks =>
 					el("div", { className: "column-tasks" }).append(
-						...tasks.map(renderTaskCard)
+						...tasks.map(task=> el(TaskCard, { task, onDragable }, onEdit, onDelete))
 					)
 				)
 			),
@@ -356,13 +193,14 @@ export function TaskManager() {
 			}, onDragArea(STATUSES.IN_PROGRESS)).append(
 				el("h2", { className: "column-header" }).append(
 					"In Progress ",
-					el("span", { className: "task-count" }).append(
-						S(() => tasksByStatus.get()[STATUSES.IN_PROGRESS].length)
-					)
+					el("span", {
+						textContent: S(() => tasksByStatus.get()[STATUSES.IN_PROGRESS].length),
+						className: "task-count",
+					}),
 				),
 				S.el(S(() => tasksByStatus.get()[STATUSES.IN_PROGRESS]), tasks =>
 					el("div", { className: "column-tasks" }).append(
-						...tasks.map(renderTaskCard)
+						...tasks.map(task=> el(TaskCard, { task, onDragable }, onEdit, onDelete))
 					)
 				)
 			),
@@ -374,18 +212,177 @@ export function TaskManager() {
 			}, onDragArea(STATUSES.DONE)).append(
 				el("h2", { className: "column-header" }).append(
 					"Done ",
-					el("span", { className: "task-count" }).append(
-						S(() => tasksByStatus.get()[STATUSES.DONE].length)
-					)
+					el("span", {
+						textContent: S(() => tasksByStatus.get()[STATUSES.DONE].length),
+						className: "task-count",
+					}),
 				),
 				S.el(S(() => tasksByStatus.get()[STATUSES.DONE]), tasks =>
 					el("div", { className: "column-tasks" }).append(
-						...tasks.map(renderTaskCard)
+						...tasks.map(task=> el(TaskCard, { task, onDragable }, onEdit, onDelete))
 					)
 				)
 			)
 		),
 	);
+}
+/** @typedef {CustomEvent<[ string, Task ]>} CardEditEvent */
+/** @typedef {CustomEvent<string>} CardDeleteEvent */
+/**
+ * Task Card Component
+ * @type {(props: { task: Task, onDragable: (id: number) => ddeElementAddon<HTMLDivElement> }) => HTMLElement}
+ * @fires {CardEditEvent} card:edit
+ * @fires {CardDeleteEvent} card:delete
+ * */
+function TaskCard({ task, onDragable }){
+	const { host }= scope;
+	const isEditing = S(false);
+	const onEditStart = () => isEditing.set(true);
+
+	const dispatchEdit= dispatchEvent("card:edit", host);
+	const dispatchDelete= dispatchEvent("card:delete", host).bind(null, task.id);
+
+	return el("div", {
+		id: `task-${task.id}`,
+		className: `task-card priority-${task.priority}`,
+		draggable: true
+	}, onDragable(task.id)).append(
+		S.el(isEditing, editing => editing
+			? el(EditMode)
+			: el().append(
+				el("div", { className: "task-header" }).append(
+					el("h3", { className: "task-title", textContent: task.title }),
+					el("div", { className: "task-actions" }).append(
+						el("button", {
+							textContent: "✎",
+							className: "edit-btn",
+							ariaLabel: "Edit task"
+						}, on("click", onEditStart)),
+						el("button", {
+							textContent: "✕",
+							className: "delete-btn",
+							ariaLabel: "Delete task"
+						}, on("click", dispatchDelete))
+					)
+				),
+				!task.description
+				? el()
+				: el("p", { className: "task-description", textContent: task.description }),
+				el("div", { className: "task-meta" }).append(
+					el("span", {
+						className: `priority-badge priority-${task.priority}`,
+						textContent: task.priority.charAt(0).toUpperCase() + task.priority.slice(1)
+					})
+				)
+			)
+		)
+	);
+	function EditMode(){
+		const onEditSave = on("submit", e => {
+			e.preventDefault();
+			const formData = new FormData(/** @type {HTMLFormElement} */(e.target));
+			const title = formData.get("title");
+			const description = formData.get("description");
+			const priority = formData.get("priority");
+			isEditing.set(false);
+			dispatchEdit([ task.id, { title, description, priority } ]);
+		})
+		const onEditCancel = () => isEditing.set(false);
+
+		return el("form", { className: "task-edit-form" }, onEditSave).append(
+			el("input", {
+				name: "title",
+				className: "task-title-input",
+				defaultValue: task.title,
+				placeholder: "Task title",
+				required: true,
+				autoFocus: true
+			}),
+			el("textarea", {
+				name: "description",
+				className: "task-desc-input",
+				defaultValue: task.description,
+				placeholder: "Description (optional)"
+			}),
+			el("select", {
+				name: "priority",
+			}, on.host(el=> el.value = task.priority)).append(
+				el("option", { value: "low", textContent: "Low Priority" }),
+				el("option", { value: "medium", textContent: "Medium Priority" }),
+				el("option", { value: "high", textContent: "High Priority" })
+			),
+			el("div", { className: "task-edit-actions" }).append(
+				el("button", {
+					textContent: "Cancel",
+					type: "button",
+					className: "cancel-btn"
+				}, on("click", onEditCancel)),
+				el("button", {
+					textContent: "Save",
+					type: "submit",
+					className: "save-btn"
+				})
+			)
+		);
+	}
+}
+
+/**
+ * Helper function to handle move an element
+ * @param {(id: string, status: string) => void} onMoved
+ * */
+function moveElementAddon(onMoved){
+	let draggedTaskId = null;
+	function onDragable(id) {
+		return element => {
+			on("dragstart", e => {
+				draggedTaskId= id;
+				e.dataTransfer.effectAllowed = 'move';
+
+				// Add some styling to the element being dragged
+				setTimeout(() => {
+					const el = document.getElementById(`task-${id}`);
+					if (el) el.classList.add('dragging');
+				}, 0);
+			})(element);
+
+			on("dragend", () => {
+				draggedTaskId= null;
+
+				// Remove the styling
+				const el = document.getElementById(`task-${id}`);
+				if (el) el.classList.remove('dragging');
+			})(element);
+		};
+	}
+	function onDragArea(status) {
+		return element => {
+			on("dragover", e => {
+				e.preventDefault();
+				e.dataTransfer.dropEffect = 'move';
+
+				// Add a visual indicator for the drop target
+				const column = document.getElementById(`column-${status}`);
+				if (column) column.classList.add('drag-over');
+			})(element);
+
+			on("dragleave", () => {
+				// Remove the visual indicator
+				const column = document.getElementById(`column-${status}`);
+				if (column) column.classList.remove('drag-over');
+			})(element);
+
+			on("drop", e => {
+				e.preventDefault();
+				const id = draggedTaskId;
+				if (id) onMoved(id, status);
+				// Remove the visual indicator
+				const column = document.getElementById(`column-${status}`);
+				if (column) column.classList.remove('drag-over');
+			})(element);
+		};
+	}
+	return { onDragable, onDragArea };
 }
 
 // Render the component
