@@ -11,22 +11,22 @@
 import { el, memo, on } from "deka-dom-el";
 import { S } from "deka-dom-el/signals";
 
+// Sample image data
+const imagesSample = (url=> [
+	{ id: 1, src: url+'nature', alt: 'Nature', title: 'Beautiful Landscape' },
+	{ id: 2, src: url+'places', alt: 'City', title: 'Urban Architecture' },
+	{ id: 3, src: url+'people', alt: 'People', title: 'Street Photography' },
+	{ id: 4, src: url+'food', alt: 'Food', title: 'Culinary Delights' },
+	{ id: 5, src: url+'animals', alt: 'Animals', title: 'Wildlife' },
+	{ id: 6, src: url+'travel', alt: 'Travel', title: 'Adventure Awaits' },
+	{ id: 7, src: url+'computer', alt: 'Technology', title: 'Modern Tech' },
+	{ id: 8, src: url+'music', alt: 'Art', title: 'Creative Expression' },
+])('https://api.algobook.info/v1/randomimage?category=');
 /**
  * Interactive Image Gallery Component
  * @returns {HTMLElement} Gallery element
  */
-export function ImageGallery() {
-	// Sample image data
-	const images = [
-		{ id: 1, src: 'https://api.algobook.info/v1/randomimage?category=nature', alt: 'Nature', title: 'Beautiful Landscape' },
-		{ id: 2, src: 'https://api.algobook.info/v1/randomimage?category=places', alt: 'City', title: 'Urban Architecture' },
-		{ id: 3, src: 'https://api.algobook.info/v1/randomimage?category=people', alt: 'People', title: 'Street Photography' },
-		{ id: 4, src: 'https://api.algobook.info/v1/randomimage?category=food', alt: 'Food', title: 'Culinary Delights' },
-		{ id: 5, src: 'https://api.algobook.info/v1/randomimage?category=animals', alt: 'Animals', title: 'Wildlife' },
-		{ id: 6, src: 'https://api.algobook.info/v1/randomimage?category=travel', alt: 'Travel', title: 'Adventure Awaits' },
-		{ id: 7, src: 'https://api.algobook.info/v1/randomimage?category=computer', alt: 'Technology', title: 'Modern Tech' },
-		{ id: 8, src: 'https://api.algobook.info/v1/randomimage?category=music', alt: 'Art', title: 'Creative Expression' },
-	];
+export function ImageGallery(images= imagesSample) {
 
 	// Application state
 	const selectedImageId = S(null);

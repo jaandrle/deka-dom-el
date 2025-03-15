@@ -40,10 +40,14 @@ export function TaskManager() {
 	if (!initialTasks.length) {
 		// Default tasks if nothing in localStorage
 		initialTasks = [
-			{ id: 1, title: 'Create project structure', description: 'Set up folders and initial files', status: STATUSES.DONE, priority: 'high' },
-			{ id: 2, title: 'Design UI components', description: 'Create mockups for main views', status: STATUSES.IN_PROGRESS, priority: 'medium' },
-			{ id: 3, title: 'Implement authentication', description: 'Set up user login and registration', status: STATUSES.TODO, priority: 'high' },
-			{ id: 4, title: 'Write documentation', description: 'Document API endpoints and usage examples', status: STATUSES.TODO, priority: 'low' },
+			{ id: 1, title: 'Create project structure', description: 'Set up folders and initial files',
+				status: STATUSES.DONE, priority: 'high' },
+			{ id: 2, title: 'Design UI components', description: 'Create mockups for main views',
+				status: STATUSES.IN_PROGRESS, priority: 'medium' },
+			{ id: 3, title: 'Implement authentication', description: 'Set up user login and registration',
+				status: STATUSES.TODO, priority: 'high' },
+			{ id: 4, title: 'Write documentation', description: 'Document API endpoints and usage examples',
+				status: STATUSES.TODO, priority: 'low' },
 		];
 	}
 

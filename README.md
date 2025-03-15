@@ -115,13 +115,8 @@ format selector](https://jaandrle.github.io/deka-dom-el/) on the documentation s
 
 ### Documentation
 
-- [**Interactive Guide**](https://jaandrle.github.io/deka-dom-el): WIP
-- [**Examples Gallery**](https://jaandrle.github.io/deka-dom-el/p15-examples.html): A comprehensive collection of code examples and case studies
-  - Interactive Form with Validation
-  - Data Dashboard with Charts
-  - Image Gallery with Lightbox
-  - Kanban Task Manager
-  - TodoMVC Implementation
+- [**Interactive Guide**](https://jaandrle.github.io/deka-dom-el)
+- [**Examples**](https://jaandrle.github.io/deka-dom-el/p15-examples.html)
 
 ## Understanding Signals
 
@@ -134,10 +129,17 @@ Signals are the reactive backbone of Deka DOM Elements:
 
 ## Inspiration and Alternatives
 
-- [vanjs-org/van](https://github.com/vanjs-org/van) - World's smallest reactive UI framework
-- [adamhaile/S](https://github.com/adamhaile/S) - Simple, clean, fast reactive programming
-- [hyperhype/hyperscript](https://github.com/hyperhype/hyperscript) - Create HyperText with JavaScript
-- [potch/signals](https://github.com/potch/signals) - A small reactive signals library
-- [jaandrle/dollar_dom_component](https://github.com/jaandrle/dollar_dom_component) -
+- [vanjs-org/van](https://github.com/vanjs-org/van) — World's smallest reactive UI framework
+- [adamhaile/S](https://github.com/adamhaile/S) — Simple, clean, fast reactive programming
+- [hyperhype/hyperscript](https://github.com/hyperhype/hyperscript) — Create HyperText with JavaScript
+- [potch/signals](https://github.com/potch/signals) — A small reactive signals library
+- [AseasRoa/paintor](https://github.com/AseasRoa/paintor) - JavaScript library for building reactive client-side user
+	interfaces or HTML code.
+- [pota](https://pota.quack.uy/) — small and pluggable Reactive Web Renderer. It's compiler-less, includes an html
+	function, and a optimized babel preset in case you fancy JSX.
+- [jaandrle/dollar_dom_component](https://github.com/jaandrle/dollar_dom_component) —
 	Functional DOM components without JSX/virtual DOM
-- [mxjp/rvx: A signal based frontend framework](https://github.com/mxjp/rvx)
+- [TarekRaafat/eleva](https://github.com/TarekRaafat/eleva) — A minimalist, lightweight, pure vanilla JavaScript
+	frontend runtime framework.
+- [didi/mpx](https://github.com/didi/mpx) — Mpx，一款具有优秀开发体验和深度性能优化的增强型跨端小程序框架
+- [mxjp/rvx](https://github.com/mxjp/rvx) — A signal based frontend framework
