@@ -58,9 +58,6 @@ export function TaskManager() {
 		update(id, task) {
 			const current= this.value.find(t => t.id === id);
 			if (current) Object.assign(current, task);
-			// TODO: known bug for derived signals (the object is the same)
-			// so filteredTasks is not updated, hotfix ↙
-			this.value = structuredClone(this.value);
 		}
 	});
 	const newTaskTitle = S('');

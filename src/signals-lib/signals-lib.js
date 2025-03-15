@@ -57,12 +57,12 @@ export function signal(value, actions){
 	 * Updates the derived signal when dependencies change
 	 * @private
 	 */
-	function contextReWatch(){
+	function contextReWatch(_, force){
 		const [ origin, ...deps_old ]= deps.get(contextReWatch);
 		deps.set(contextReWatch, new Set([ origin ]));
 
 		stack_watch.push(contextReWatch);
-		write(out, value());
+		write(out, value(), force);
 		stack_watch.pop();
 
 		if(!deps_old.length) return;
@@ -95,7 +95,7 @@ signal.action= function(s, name, ...a){
 		throw new Error(`Action "${name}" not defined. See ${mark}.actions.`);
 	actions[name].apply(M, a);
 	if(M.skip) return (delete M.skip);
-	queueSignalWrite(s);
+	queueSignalWrite(s, true);
 };
 
 /**
@@ -434,7 +434,7 @@ function write(s, value, force){
 	if(!M || (!force && M.value===value)) return;
 
 	M.value= value;
-	queueSignalWrite(s);
+	queueSignalWrite(s, force);
 	return value;
 }
 

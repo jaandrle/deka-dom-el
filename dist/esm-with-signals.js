@@ -689,19 +689,19 @@ memo.scope = function memoScope(fun, { signal: signal2, onlyLast } = {}) {
 // src/signals-lib/helpers.js
 var mark = "__dde_signal";
 var queueSignalWrite = /* @__PURE__ */ (() => {
-	let pendingSignals = /* @__PURE__ */ new Set();
+	let pendingSignals = /* @__PURE__ */ new Map();
 	let scheduled = false;
 	function flushSignals() {
 		scheduled = false;
 		const todo = pendingSignals;
-		pendingSignals = /* @__PURE__ */ new Set();
-		for (const signal2 of todo) {
+		pendingSignals = /* @__PURE__ */ new Map();
+		for (const [signal2, force] of todo) {
 			const M = signal2[mark];
-			if (M) M.listeners.forEach((l) => l(M.value));
+			if (M) M.listeners.forEach((l) => l(M.value, force));
 		}
 	}
-	return function(s) {
-		pendingSignals.add(s);
+	return function(s, force = false) {
+		pendingSignals.set(s, pendingSignals.get(s) || force);
 		if (scheduled) return;
 		scheduled = true;
 		queueMicrotask(flushSignals);
@@ -738,11 +738,11 @@ function signal(value, actions) {
 		return create(false, value, actions);
 	if (isSignal(value)) return value;
 	const out = create(true);
-	function contextReWatch() {
+	function contextReWatch(_, force) {
 		const [origin, ...deps_old] = deps.get(contextReWatch);
 		deps.set(contextReWatch, /* @__PURE__ */ new Set([origin]));
 		stack_watch.push(contextReWatch);
-		write(out, value());
+		write(out, value(), force);
 		stack_watch.pop();
 		if (!deps_old.length) return;
 		const deps_curr = deps.get(contextReWatch);
@@ -764,7 +764,7 @@ signal.action = function(s, name, ...a) {
 		throw new Error(`Action "${name}" not defined. See ${mark}.actions.`);
 	actions[name].apply(M, a);
 	if (M.skip) return delete M.skip;
-	queueSignalWrite(s);
+	queueSignalWrite(s, true);
 };
 signal.on = function on2(s, listener, options = {}) {
 	const { signal: as } = options;
@@ -973,7 +973,7 @@ function write(s, value, force) {
 	const M = s[mark];
 	if (!M || !force && M.value === value) return;
 	M.value = value;
-	queueSignalWrite(s);
+	queueSignalWrite(s, force);
 	return value;
 }
 function addSignalListener(s, listener) {
