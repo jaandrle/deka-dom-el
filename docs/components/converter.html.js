@@ -70,6 +70,7 @@ styles.css`
 	background-color: var(--bg);
 	color: var(--text);
 	min-height: 200px;
+	height: 25em;
 	resize: vertical;
 }
 

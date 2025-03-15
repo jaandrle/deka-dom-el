@@ -356,11 +356,12 @@ export function converter() {
 						"dd<el> Output",
 						el("div", { className: "button-group" }).append(
 							el("button", {
+								textContent: "Copy",
 								type: "button",
 								className: "copy-button",
 								title: "Copy to clipboard",
 								disabled: S(() => !ddeOutput.get())
-							}, onCopy).append("Copy")
+							}, onCopy)
 						)
 					),
 					el("textarea", {
