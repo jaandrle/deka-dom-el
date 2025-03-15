@@ -116,7 +116,12 @@ format selector](https://jaandrle.github.io/deka-dom-el/) on the documentation s
 ### Documentation
 
 - [**Interactive Guide**](https://jaandrle.github.io/deka-dom-el): WIP
-- [Examples](./examples/): TBD/WIP
+- [**Examples Gallery**](https://jaandrle.github.io/deka-dom-el/p15-examples.html): A comprehensive collection of code examples and case studies
+  - Interactive Form with Validation
+  - Data Dashboard with Charts
+  - Image Gallery with Lightbox
+  - Kanban Task Manager
+  - TodoMVC Implementation
 
 ## Understanding Signals
 
