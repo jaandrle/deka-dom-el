@@ -101,21 +101,23 @@ export function page({ pkg, info }){
 		`),
 		el(code, { content: `
 			// Signal for current route (all/active/completed)
-			const pageS = routerSignal(S);
+			const { signal } = scope;
+			const pageS = routerSignal(S, signal);
 
 			// Signal for the todos collection with custom actions
 			const todosS = todosSignal();
 
 			// Derived signal that filters todos based on current route
-			const filteredTodosS = S(()=> {
+			const todosFilteredS = S(()=> {
 				const todos = todosS.get();
 				const filter = pageS.get();
+				if (filter === "all") return todos;
 				return todos.filter(todo => {
 					if (filter === "active") return !todo.completed;
 					if (filter === "completed") return todo.completed;
-					return true; // "all"
 				});
 			});
+			const todosRemainingS = S(()=> todosS.get().filter(todo => !todo.completed).length);
 		`, page_id }),
 
 		el("p").append(T`
@@ -200,6 +202,7 @@ export function page({ pkg, info }){
 						localStorage.setItem(store_key, JSON.stringify(value));
 					} catch (e) {
 						console.error("Failed to save todos to localStorage", e);
+						// Optionally, provide user feedback
 					}
 				});
 				return out;
@@ -222,19 +225,19 @@ export function page({ pkg, info }){
 		el("h4", t`1. Derived Signals for Filtering`),
 		el(code, { content: `
 			/** Derived signal that filters todos based on current route */
-			const filteredTodosS = S(()=> {
+			const todosFilteredS = S(()=> {
 				const todos = todosS.get();
 				const filter = pageS.get();
+				if (filter === "all") return todos;
 				return todos.filter(todo => {
 					if (filter === "active") return !todo.completed;
 					if (filter === "completed") return todo.completed;
-					return true; // "all"
 				});
 			});
 
 			// Using the derived signal in the UI
 			el("ul", { className: "todo-list" }).append(
-				S.el(filteredTodosS, filteredTodos => filteredTodos.map(todo =>
+				S.el(todosFilteredS, filteredTodos => filteredTodos.map(todo =>
 					memo(todo.id, ()=> el(TodoItem, todo, onDelete, onEdit)))
 				)
 			)
@@ -334,7 +337,7 @@ export function page({ pkg, info }){
 		el("h4", t`Memoizing Todo Items`),
 		el(code, { content: `
 			el("ul", { className: "todo-list" }).append(
-				S.el(filteredTodosS, filteredTodos => filteredTodos.map(todo =>
+				S.el(todosFilteredS, filteredTodos => filteredTodos.map(todo =>
 					memo(todo.id, ()=> el(TodoItem, todo, onDelete, onEdit)))
 				)
 			)
@@ -543,11 +546,13 @@ export function page({ pkg, info }){
 
 		el("h4", t`Conditional Clear Completed Button`),
 		el(code, { content: `
-			S.el(S(() => todosS.get().some(todo => todo.completed)),
-				hasTodosCompleted=> hasTodosCompleted
-				? el("button", { textContent: "Clear completed", className: "clear-completed" }, onClearCompleted)
-				: el()
-			)
+			todos.length - todosRemainingS.get() === 0
+				? el()
+				: memo("delete", () =>
+					el("button",
+						{ textContent: "Clear completed", className: "clear-completed" },
+						onClearCompleted)
+				)
 		`, page_id }),
 
 		el("div", { className: "note" }).append(
@@ -625,7 +630,7 @@ export function page({ pkg, info }){
 				${el("strong", "Declarative Class Management:")} Using the classList property for cleaner class handling
 			`),
 			el("li").append(T`
-				${el("strong", "Focus Management:")} Reliable input focus with requestAnimationFrame
+				${el("strong", "Focus Management:")} Reliable input focus with setTimeout
 			`),
 			el("li").append(T`
 				${el("strong", "Persistent Storage:")} Automatically saving application state with signal listeners

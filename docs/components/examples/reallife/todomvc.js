@@ -13,18 +13,20 @@ import { S } from "deka-dom-el/signals";
  * @returns {HTMLElement} The root TodoMVC application element
  */
 function Todos(){
-	const pageS = routerSignal(S);
+	const { signal } = scope;
+	const pageS = routerSignal(S, signal);
 	const todosS = todosSignal();
 	/** Derived signal that filters todos based on current route */
-	const filteredTodosS = S(()=> {
+	const todosFilteredS = S(()=> {
 		const todos = todosS.get();
 		const filter = pageS.get();
+		if (filter === "all") return todos;
 		return todos.filter(todo => {
 			if (filter === "active") return !todo.completed;
 			if (filter === "completed") return todo.completed;
-			return true; // "all"
 		});
 	});
+	const todosRemainingS = S(()=> todosS.get().filter(todo => !todo.completed).length);
 
 	/** @type {ddeElementAddon<HTMLInputElement>} */
 	const onToggleAll = on("change", event => {
@@ -73,7 +75,7 @@ function Todos(){
 				}, onToggleAll),
 				el("label", { htmlFor: "toggle-all", title: "Mark all as complete" }),
 				el("ul", { className: "todo-list" }).append(
-					S.el(filteredTodosS, filteredTodos => filteredTodos.map(todo =>
+					S.el(todosFilteredS, filteredTodos => filteredTodos.map(todo =>
 						memo(todo.id, ()=> el(TodoItem, todo, onDelete, onEdit)))
 					)
 				)
@@ -83,7 +85,7 @@ function Todos(){
 			? el()
 			: el("footer", { className: "footer" }).append(
 				el("span", { className: "todo-count" }).append(
-					noOfLeft(todos)
+					noOfLeft()
 				),
 				memo("filters", ()=>
 					el("ul", { className: "filters" }).append(
@@ -98,15 +100,18 @@ function Todos(){
 						)
 					),
 				),
-				!todos.some(todo => todo.completed)
+				todos.length - todosRemainingS.get() === 0
 					? el()
-					: el("button", { textContent: "Clear completed", className: "clear-completed" }, onClearCompleted)
+					: memo("delete", () =>
+						el("button",
+							{ textContent: "Clear completed", className: "clear-completed" },
+							onClearCompleted)
+					)
 			)
 		)
 	);
-	/** @param {Todo[]} todos */
-	function noOfLeft(todos){
-		const { length }= todos.filter(todo => !todo.completed);
+	function noOfLeft(){
+		const length = todosRemainingS.get();
 		return el("strong").append(
 			length + " ",
 			length === 1 ? "item left" : "items left"
@@ -194,7 +199,7 @@ function TodoItem({ id, title, completed }) {
 				checked: completed
 			}, onToggleCompleted),
 			el("label", { textContent: title }, onStartEdit),
-			el("button", { className: "destroy" }, onDelete)
+			el("button", { ariaLabel: "Delete todo", className: "destroy" }, onDelete)
 		),
 		S.el(isEditing, editing => !editing
 			? el()
@@ -328,6 +333,7 @@ function todosSignal(){
 			localStorage.setItem(store_key, JSON.stringify(value));
 		} catch (e) {
 			console.error("Failed to save todos to localStorage", e);
+			// Optionally, provide user feedback
 		}
 	});
 	return out;
@@ -336,9 +342,10 @@ function todosSignal(){
 /**
  * Creates a signal for managing route state
  *
- * @param {typeof S} signal - The signal constructor
+ * @param {typeof S} signal - The signal constructor from a library
+ * @param {AbortSignal} abortSignal
  */
-function routerSignal(signal){
+function routerSignal(signal, abortSignal){
 	const initial = location.hash.replace("#", "") || "all";
 	const out = signal(initial, {
 		/**
@@ -347,15 +354,16 @@ function routerSignal(signal){
 		 */
 		set(hash){
 			location.hash = hash;
-			this.value = hash;
-		}
+			//this.value = hash;
+		},
 	});
 
 	// Setup hash change listener
 	window.addEventListener("hashchange", () => {
 		const hash = location.hash.replace("#", "") || "all";
-		S.action(out, "set", /** @type {"all"|"active"|"completed"} */(hash));
-	});
+		//S.action(out, "set", /** @type {"all"|"active"|"completed"} */(hash));
+		out.set(hash);
+	}, { signal: abortSignal });
 
 	return out;
 }
