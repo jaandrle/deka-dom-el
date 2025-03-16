@@ -32,7 +32,6 @@ var DDE = (() => {
 		dispatchEvent: () => dispatchEvent,
 		el: () => createElement,
 		elNS: () => createElementNS,
-		elementAttribute: () => elementAttribute,
 		isSignal: () => isSignal,
 		lifecyclesToEvents: () => lifecyclesToEvents,
 		memo: () => memo,
@@ -101,38 +100,7 @@ var DDE = (() => {
 		}
 	};
 
-	// src/signals-lib/common.js
-	var signals_global = {
-		/**
-		* Checks if a value is a signal
-		* @param {any} attributes - Value to check
-		* @returns {boolean} Whether the value is a signal
-		*/
-		isSignal(attributes) {
-			return false;
-		},
-		/**
-		* Processes an attribute that might be reactive
-		* @param {Element} obj - Element that owns the attribute
-		* @param {string} key - Attribute name
-		* @param {any} attr - Attribute value
-		* @param {Function} set - Function to set the attribute
-		* @returns {any} Processed attribute value
-		*/
-		processReactiveAttribute(obj, key, attr, set) {
-			return attr;
-		}
-	};
-	function registerReactivity(def, global = true) {
-		if (global) return oAssign(signals_global, def);
-		Object.setPrototypeOf(def, signals_global);
-		return def;
-	}
-	function signals(_this) {
-		return isProtoFrom(_this, signals_global) && _this !== signals_global ? _this : signals_global;
-	}
-
-	// src/dom-common.js
+	// src/dom-lib/common.js
 	var enviroment = {
 		setDeleteAttr,
 		ssr: "",
@@ -158,7 +126,7 @@ var DDE = (() => {
 	var evd = "dde:disconnected";
 	var eva = "dde:attributeChanged";
 
-	// src/events-observer.js
+	// src/dom-lib/events-observer.js
 	var c_ch_o = enviroment.M ? connectionsChangesObserverConstructor() : new Proxy({}, {
 		get() {
 			return () => {
@@ -322,7 +290,7 @@ var DDE = (() => {
 		}
 	}
 
-	// src/events.js
+	// src/dom-lib/events.js
 	function dispatchEvent(name, options, host) {
 		if (typeof options === "function") {
 			host = options;
@@ -344,6 +312,7 @@ var DDE = (() => {
 			return element;
 		};
 	}
+	on.defer = (fn) => setTimeout.bind(null, fn, 0);
 	var lifeOptions = (obj) => oAssign({}, typeof obj === "object" ? obj : null, { once: true });
 	on.connected = function(listener, options) {
 		options = lifeOptions(options);
@@ -367,10 +336,7 @@ var DDE = (() => {
 		};
 	};
 
-	// src/dom.js
-	function queue(promise) {
-		return enviroment.q(promise);
-	}
+	// src/dom-lib/scopes.js
 	var scopes = [{
 		get scope() {
 			return enviroment.D.body;
@@ -445,6 +411,60 @@ var DDE = (() => {
 			return scopes.pop();
 		}
 	};
+
+	// src/signals-lib/common.js
+	var signals_global = {
+		/**
+		* Checks if a value is a signal
+		* @param {any} attributes - Value to check
+		* @returns {boolean} Whether the value is a signal
+		*/
+		isSignal(attributes) {
+			return false;
+		},
+		/**
+		* Processes an attribute that might be reactive
+		* @param {Element} obj - Element that owns the attribute
+		* @param {string} key - Attribute name
+		* @param {any} attr - Attribute value
+		* @param {Function} set - Function to set the attribute
+		* @returns {any} Processed attribute value
+		*/
+		processReactiveAttribute(obj, key, attr, set) {
+			return attr;
+		}
+	};
+	function registerReactivity(def, global = true) {
+		if (global) return oAssign(signals_global, def);
+		Object.setPrototypeOf(def, signals_global);
+		return def;
+	}
+	function signals(_this) {
+		return isProtoFrom(_this, signals_global) && _this !== signals_global ? _this : signals_global;
+	}
+
+	// src/dom-lib/helpers.js
+	function setRemove(obj, prop, key, val) {
+		return obj[(isUndef(val) ? "remove" : "set") + prop](key, val);
+	}
+	function setRemoveNS(obj, prop, key, val, ns = null) {
+		return obj[(isUndef(val) ? "remove" : "set") + prop + "NS"](ns, key, val);
+	}
+	function setDelete(obj, key, val) {
+		Reflect.set(obj, key, val);
+		if (!isUndef(val)) return;
+		return Reflect.deleteProperty(obj, key);
+	}
+	function elementAttribute(element, op, key, value) {
+		if (isInstance(element, enviroment.H))
+			return element[op + "Attribute"](key, value);
+		return element[op + "AttributeNS"](null, key, value);
+	}
+
+	// src/dom-lib/el.js
+	function queue(promise) {
+		return enviroment.q(promise);
+	}
 	function append(...els) {
 		this.appendOriginal(...els);
 		return this;
@@ -460,7 +480,8 @@ var DDE = (() => {
 		const s = signals(this);
 		let scoped = 0;
 		let el, el_host;
-		if (Object(attributes) !== attributes || s.isSignal(attributes))
+		const att_type = typeof attributes;
+		if (att_type === "string" || att_type === "number" || s.isSignal(attributes))
 			attributes = { textContent: attributes };
 		switch (true) {
 			case typeof tag === "function": {
@@ -513,38 +534,6 @@ var DDE = (() => {
 			namespace = void 0;
 			return el;
 		};
-	}
-	function simulateSlots(element, root = element) {
-		const mark_e = "\xB9\u2070", mark_s = "\u2713";
-		const slots = Object.fromEntries(
-			Array.from(root.querySelectorAll("slot")).filter((s) => !s.name.endsWith(mark_e)).map((s) => [s.name += mark_e, s])
-		);
-		element.append = new Proxy(element.append, {
-			apply(orig, _, els) {
-				if (els[0] === root) return orig.apply(element, els);
-				for (const el of els) {
-					const name = (el.slot || "") + mark_e;
-					try {
-						elementAttribute(el, "remove", "slot");
-					} catch (_error) {
-					}
-					const slot = slots[name];
-					if (!slot) return;
-					if (!slot.name.startsWith(mark_s)) {
-						slot.childNodes.forEach((c) => c.remove());
-						slot.name = mark_s + name;
-					}
-					slot.append(el);
-				}
-				element.append = orig;
-				return element;
-			}
-		});
-		if (element !== root) {
-			const els = Array.from(element.childNodes);
-			element.append(...els);
-		}
-		return root;
 	}
 	var assign_context = /* @__PURE__ */ new WeakMap();
 	var { setDeleteAttr: setDeleteAttr2 } = enviroment;
@@ -608,11 +597,6 @@ var DDE = (() => {
 		);
 		return element;
 	}
-	function elementAttribute(element, op, key, value) {
-		if (isInstance(element, enviroment.H))
-			return element[op + "Attribute"](key, value);
-		return element[op + "AttributeNS"](null, key, value);
-	}
 	function isPropSetter(el, key) {
 		if (!(key in el)) return false;
 		const des = getPropDescriptor(el, key);
@@ -636,19 +620,40 @@ var DDE = (() => {
 			cb(key, val);
 		});
 	}
-	function setRemove(obj, prop, key, val) {
-		return obj[(isUndef(val) ? "remove" : "set") + prop](key, val);
-	}
-	function setRemoveNS(obj, prop, key, val, ns = null) {
-		return obj[(isUndef(val) ? "remove" : "set") + prop + "NS"](ns, key, val);
-	}
-	function setDelete(obj, key, val) {
-		Reflect.set(obj, key, val);
-		if (!isUndef(val)) return;
-		return Reflect.deleteProperty(obj, key);
-	}
 
-	// src/customElement.js
+	// src/dom-lib/customElement.js
+	function simulateSlots(element, root = element) {
+		const mark_e = "\xB9\u2070", mark_s = "\u2713";
+		const slots = Object.fromEntries(
+			Array.from(root.querySelectorAll("slot")).filter((s) => !s.name.endsWith(mark_e)).map((s) => [s.name += mark_e, s])
+		);
+		element.append = new Proxy(element.append, {
+			apply(orig, _, els) {
+				if (els[0] === root) return orig.apply(element, els);
+				for (const el of els) {
+					const name = (el.slot || "") + mark_e;
+					try {
+						elementAttribute(el, "remove", "slot");
+					} catch (_error) {
+					}
+					const slot = slots[name];
+					if (!slot) return;
+					if (!slot.name.startsWith(mark_s)) {
+						slot.childNodes.forEach((c) => c.remove());
+						slot.name = mark_s + name;
+					}
+					slot.append(el);
+				}
+				element.append = orig;
+				return element;
+			}
+		});
+		if (element !== root) {
+			const els = Array.from(element.childNodes);
+			element.append(...els);
+		}
+		return root;
+	}
 	function customElementRender(target, render, props = {}) {
 		const custom_element = target.host || target;
 		scope.push({
@@ -729,19 +734,19 @@ var DDE = (() => {
 	// src/signals-lib/helpers.js
 	var mark = "__dde_signal";
 	var queueSignalWrite = /* @__PURE__ */ (() => {
-		let pendingSignals = /* @__PURE__ */ new Set();
+		let pendingSignals = /* @__PURE__ */ new Map();
 		let scheduled = false;
 		function flushSignals() {
 			scheduled = false;
 			const todo = pendingSignals;
-			pendingSignals = /* @__PURE__ */ new Set();
-			for (const signal2 of todo) {
+			pendingSignals = /* @__PURE__ */ new Map();
+			for (const [signal2, force] of todo) {
 				const M = signal2[mark];
-				if (M) M.listeners.forEach((l) => l(M.value));
+				if (M) M.listeners.forEach((l) => l(M.value, force));
 			}
 		}
-		return function(s) {
-			pendingSignals.add(s);
+		return function(s, force = false) {
+			pendingSignals.set(s, pendingSignals.get(s) || force);
 			if (scheduled) return;
 			scheduled = true;
 			queueMicrotask(flushSignals);
@@ -778,11 +783,11 @@ var DDE = (() => {
 			return create(false, value, actions);
 		if (isSignal(value)) return value;
 		const out = create(true);
-		function contextReWatch() {
+		function contextReWatch(_, force) {
 			const [origin, ...deps_old] = deps.get(contextReWatch);
 			deps.set(contextReWatch, /* @__PURE__ */ new Set([origin]));
 			stack_watch.push(contextReWatch);
-			write(out, value());
+			write(out, value(), force);
 			stack_watch.pop();
 			if (!deps_old.length) return;
 			const deps_curr = deps.get(contextReWatch);
@@ -804,7 +809,7 @@ var DDE = (() => {
 			throw new Error(`Action "${name}" not defined. See ${mark}.actions.`);
 		actions[name].apply(M, a);
 		if (M.skip) return delete M.skip;
-		queueSignalWrite(s);
+		queueSignalWrite(s, true);
 	};
 	signal.on = function on2(s, listener, options = {}) {
 		const { signal: as } = options;
@@ -1013,7 +1018,7 @@ var DDE = (() => {
 		const M = s[mark];
 		if (!M || !force && M.value === value) return;
 		M.value = value;
-		queueSignalWrite(s);
+		queueSignalWrite(s, force);
 		return value;
 	}
 	function addSignalListener(s, listener) {

@@ -45,7 +45,7 @@ const references= {
 export function page({ pkg, info }){
 	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
-		el("p").append(...T`
+		el("p").append(T`
 			${el("a", references.todomvc).append("TodoMVC")} is a project that helps developers compare different
 			frameworks by implementing the same todo application. This implementation showcases how dd<el>
 			can be used to build a complete, real-world application with all the expected features of a modern
@@ -63,7 +63,7 @@ export function page({ pkg, info }){
 				el("li", t`Component scopes for proper encapsulation`)
 			)
 		),
-		el("p").append(...T`
+		el("p").append(T`
 			Below is a fully working TodoMVC implementation. You can interact with it directly in this
 			documentation page. The example demonstrates how dd<el> handles common app development
 			challenges in a clean, maintainable way.
@@ -72,7 +72,7 @@ export function page({ pkg, info }){
 		el(example, { src: fileURL("./components/examples/reallife/todomvc.js"), variant: "big", page_id }),
 
 		el(h3, t`Application Architecture Overview`),
-		el("p").append(...T`
+		el("p").append(T`
 			The TodoMVC implementation is structured around several key components:
 		`),
 		el("div", { className: "function-table" }).append(
@@ -96,29 +96,31 @@ export function page({ pkg, info }){
 		),
 
 		el(h3, t`Reactive State Management with Signals`),
-		el("p").append(...T`
+		el("p").append(T`
 			The application uses three primary signals to manage state:
 		`),
 		el(code, { content: `
 			// Signal for current route (all/active/completed)
-			const pageS = routerSignal(S);
+			const { signal } = scope;
+			const pageS = routerSignal(S, signal);
 
 			// Signal for the todos collection with custom actions
 			const todosS = todosSignal();
 
 			// Derived signal that filters todos based on current route
-			const filteredTodosS = S(()=> {
+			const todosFilteredS = S(()=> {
 				const todos = todosS.get();
 				const filter = pageS.get();
+				if (filter === "all") return todos;
 				return todos.filter(todo => {
 					if (filter === "active") return !todo.completed;
 					if (filter === "completed") return todo.completed;
-					return true; // "all"
 				});
 			});
+			const todosRemainingS = S(()=> todosS.get().filter(todo => !todo.completed).length);
 		`, page_id }),
 
-		el("p").append(...T`
+		el("p").append(T`
 			The ${el("code", "todosSignal")} function creates a custom signal with actions for manipulating the todos:
 		`),
 		el(code, { content: `
@@ -178,6 +180,13 @@ export function page({ pkg, info }){
 						this.value = this.value.filter(todo => !todo.completed);
 					},
 					/**
+					 * Mark all todos as completed or active
+					 * @param {boolean} state - Whether to mark todos as completed or active
+					 */
+					completeAll(state = true) {
+						this.value.forEach(todo => todo.completed = state);
+					},
+					/**
 					 * Handle cleanup when signal is cleared
 					 */
 					[S.symbols.onclear](){
@@ -193,6 +202,7 @@ export function page({ pkg, info }){
 						localStorage.setItem(store_key, JSON.stringify(value));
 					} catch (e) {
 						console.error("Failed to save todos to localStorage", e);
+						// Optionally, provide user feedback
 					}
 				});
 				return out;
@@ -200,7 +210,7 @@ export function page({ pkg, info }){
 		`, page_id }),
 
 		el("div", { className: "note" }).append(
-			el("p").append(...T`
+			el("p").append(T`
 				Using ${el("a", references.mdn_storage).append("localStorage")} allows the application to persist todos
 				even when the page is refreshed. The ${el("code", "S.on")} listener ensures todos are saved
 				after every state change, providing automatic persistence without explicit calls.
@@ -208,37 +218,61 @@ export function page({ pkg, info }){
 		),
 
 		el(h3, t`Integration of Signals and Reactive UI`),
-		el("p").append(...T`
+		el("p").append(T`
 			The implementation demonstrates a clean integration between signal state and reactive UI:
 		`),
 
 		el("h4", t`1. Derived Signals for Filtering`),
 		el(code, { content: `
 			/** Derived signal that filters todos based on current route */
-			const filteredTodosS = S(()=> {
+			const todosFilteredS = S(()=> {
 				const todos = todosS.get();
 				const filter = pageS.get();
+				if (filter === "all") return todos;
 				return todos.filter(todo => {
 					if (filter === "active") return !todo.completed;
 					if (filter === "completed") return todo.completed;
-					return true; // "all"
 				});
 			});
 
 			// Using the derived signal in the UI
 			el("ul", { className: "todo-list" }).append(
-				S.el(filteredTodosS, filteredTodos => filteredTodos.map(todo =>
+				S.el(todosFilteredS, filteredTodos => filteredTodos.map(todo =>
 					memo(todo.id, ()=> el(TodoItem, todo, onDelete, onEdit)))
 				)
 			)
 		`, page_id }),
 
-		el("p").append(...T`
+		el("p").append(T`
 			The derived signal automatically recalculates whenever either the todos list or the current filter changes,
 			ensuring the UI always shows the correct filtered todos.
 		`),
 
-		el("h4", t`2. Local Component State`),
+		el("h4", t`2. Toggle All Functionality`),
+		el(code, { content: `
+			/** @type {ddeElementAddon<HTMLInputElement>} */
+			const onToggleAll = on("change", event => {
+				const checked = /** @type {HTMLInputElement} */ (event.target).checked;
+				S.action(todosS, "completeAll", checked);
+			});
+
+			// Using the toggle-all functionality in the UI
+			el("input", {
+				id: "toggle-all",
+				className: "toggle-all",
+				type: "checkbox"
+			}, onToggleAll),
+			el("label", { htmlFor: "toggle-all", title: "Mark all as complete" }),
+		`, page_id }),
+
+		el("p").append(T`
+			The "toggle all" checkbox allows users to mark all todos as completed or active. When the checkbox
+			is toggled, it calls the ${el("code", "completeAll")} action on the todos signal, passing the current
+			checked state. This is a good example of how signals and actions can be used to manage application
+			state in a clean, declarative way.
+		`),
+
+		el("h4", t`3. Local Component State`),
 		el(code, { content: `
 			function TodoItem({ id, title, completed }) {
 				const { host }= scope;
@@ -268,12 +302,12 @@ export function page({ pkg, info }){
 			}
 		`, page_id }),
 
-		el("p").append(...T`
+		el("p").append(T`
 			The TodoItem component maintains its own local UI state with signals, providing immediate
 			UI feedback while still communicating changes to the parent via events.
 		`),
 
-		el("h4", t`3. Reactive Properties`),
+		el("h4", t`4. Reactive Properties`),
 		el(code, { content: `
 			// Dynamic class attributes
 			el("a", {
@@ -289,27 +323,27 @@ export function page({ pkg, info }){
 		`, page_id }),
 
 		el("div", { className: "tip" }).append(
-			el("p").append(...T`
+			el("p").append(T`
 				Binding signals directly to element properties creates a reactive UI that automatically updates
 				when state changes, without the need for explicit DOM manipulation or virtual DOM diffing.
 			`)
 		),
 
 		el(h3, t`Performance Optimization with Memoization`),
-		el("p").append(...T`
+		el("p").append(T`
 			The implementation uses ${el("code", "memo")} to optimize performance in several key areas:
 		`),
 
 		el("h4", t`Memoizing Todo Items`),
 		el(code, { content: `
 			el("ul", { className: "todo-list" }).append(
-				S.el(filteredTodosS, filteredTodos => filteredTodos.map(todo =>
+				S.el(todosFilteredS, filteredTodos => filteredTodos.map(todo =>
 					memo(todo.id, ()=> el(TodoItem, todo, onDelete, onEdit)))
 				)
 			)
 		`, page_id }),
 
-		el("p").append(...T`
+		el("p").append(T`
 			This approach ensures that:
 		`),
 		el("ul").append(
@@ -329,14 +363,14 @@ export function page({ pkg, info }){
 			))
 		`, page_id }),
 
-		el("p").append(...T`
+		el("p").append(T`
 			By memoizing based on the todos length, the entire footer component is only re-rendered
 			when todos are added or removed, not when their properties change. This improves performance
 			by avoiding unnecessary DOM operations.
 		`),
 
 		el("div", { className: "tip" }).append(
-			el("p").append(...T`
+			el("p").append(T`
 				Memoization is especially important for UI elements that are expensive to render or that contain
 				many child elements. The ${el("code", "memo")} function allows precise control over when components
 				should re-render, avoiding the overhead of virtual DOM diffing algorithms.
@@ -344,13 +378,13 @@ export function page({ pkg, info }){
 		),
 
 		el(h3, t`Component-Based Architecture with Events`),
-		el("p").append(...T`
+		el("p").append(T`
 			The TodoMVC implementation demonstrates a clean component architecture with custom events
 			for communication between components:
 		`),
 
 		el("h4", t`1. Main Component Event Handling`),
-		el("p").append(...T`
+		el("p").append(T`
 			The main Todos component sets up event listeners to handle actions from child components:
 		`),
 		el(code, { content: `
@@ -360,7 +394,7 @@ export function page({ pkg, info }){
 		`, page_id }),
 
 		el("h4", t`2. The TodoItem Component with Scopes and Local State`),
-		el("p").append(...T`
+		el("p").append(T`
 			Each todo item is rendered by the TodoItem component that uses scopes, local signals, and custom events:
 		`),
 		el(code, { content: `
@@ -403,7 +437,7 @@ export function page({ pkg, info }){
 		`, page_id }),
 
 		el("div", { className: "tip" }).append(
-			el("p").append(...T`
+			el("p").append(T`
 				Using ${el("code", "scope")} and ${el("a", references.mdn_events).append("custom events")}
 				creates a clean separation of concerns. Each TodoItem component dispatches events up to the parent
 				without directly manipulating the application state, following a unidirectional data flow pattern.
@@ -411,7 +445,7 @@ export function page({ pkg, info }){
 		),
 
 		el(h3, t`Improved DOM Updates with classList`),
-		el("p").append(...T`
+		el("p").append(T`
 			The implementation uses the reactive ${el("code", "classList")} property for efficient class updates:
 		`),
 		el(code, { content: `
@@ -423,7 +457,7 @@ export function page({ pkg, info }){
 			);
 		`, page_id }),
 
-		el("p").append(...T`
+		el("p").append(T`
 			Benefits of using ${el("code", "classList")}:
 		`),
 		el("ul").append(
@@ -434,7 +468,7 @@ export function page({ pkg, info }){
 		),
 
 		el(h3, t`Improved Focus Management`),
-		el("p").append(...T`
+		el("p").append(T`
 			The implementation uses a dedicated function for managing focus in edit inputs:
 		`),
 		el(code, { content: `
@@ -462,7 +496,7 @@ export function page({ pkg, info }){
 			}, onBlurEdit, onKeyDown, addFocus)
 		`, page_id }),
 
-		el("p").append(...T`
+		el("p").append(T`
 			This approach offers several advantages:
 		`),
 		el("ul").append(
@@ -473,7 +507,7 @@ export function page({ pkg, info }){
 		),
 
 		el("div", { className: "note" }).append(
-			el("p").append(...T`
+			el("p").append(T`
 				Using ${el("a", references.mdn_raf).append("requestAnimationFrame")} ensures that the focus operation
 				happens after the browser has finished rendering the DOM changes, which is more reliable than
 				using setTimeout.
@@ -481,7 +515,7 @@ export function page({ pkg, info }){
 		),
 
 		el(h3, t`Efficient Conditional Rendering`),
-		el("p").append(...T`
+		el("p").append(T`
 			The implementation uses signals for efficient conditional rendering:
 		`),
 
@@ -512,15 +546,17 @@ export function page({ pkg, info }){
 
 		el("h4", t`Conditional Clear Completed Button`),
 		el(code, { content: `
-			S.el(S(() => todosS.get().some(todo => todo.completed)),
-				hasTodosCompleted=> hasTodosCompleted
-				? el("button", { textContent: "Clear completed", className: "clear-completed" }, onClearCompleted)
-				: el()
-			)
+			todos.length - todosRemainingS.get() === 0
+				? el()
+				: memo("delete", () =>
+					el("button",
+						{ textContent: "Clear completed", className: "clear-completed" },
+						onClearCompleted)
+				)
 		`, page_id }),
 
 		el("div", { className: "note" }).append(
-			el("p").append(...T`
+			el("p").append(T`
 				Unlike frameworks that use a virtual DOM, dd<el> directly updates only the specific DOM elements
 				that need to change. This approach is often more efficient for small to medium-sized applications,
 				especially when combined with strategic memoization.
@@ -528,7 +564,7 @@ export function page({ pkg, info }){
 		),
 
 		el(h3, t`Type Safety with JSDoc Comments`),
-		el("p").append(...T`
+		el("p").append(T`
 			The implementation uses comprehensive JSDoc comments to provide type safety without requiring TypeScript:
 		`),
 		el(code, { content: `
@@ -566,7 +602,7 @@ export function page({ pkg, info }){
 		`, page_id }),
 
 		el("div", { className: "tip" }).append(
-			el("p").append(...T`
+			el("p").append(T`
 				Using JSDoc comments provides many of the benefits of TypeScript (autocomplete, type checking,
 				documentation) while maintaining pure JavaScript code. This approach works well with modern
 				IDEs that support JSDoc type inference.
@@ -575,41 +611,41 @@ export function page({ pkg, info }){
 
 		el(h3, t`Best Practices Demonstrated`),
 		el("ol").append(
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Component Composition:")} Breaking the UI into focused, reusable components
 			`),
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Performance Optimization:")} Strategic memoization to minimize DOM operations
 			`),
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Reactive State Management:")} Using signals with derived computations
 			`),
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Event-Based Communication:")} Using custom events for component communication
 			`),
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Local Component State:")} Maintaining UI state within components for better encapsulation
 			`),
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Declarative Class Management:")} Using the classList property for cleaner class handling
 			`),
-			el("li").append(...T`
-				${el("strong", "Focus Management:")} Reliable input focus with requestAnimationFrame
+			el("li").append(T`
+				${el("strong", "Focus Management:")} Reliable input focus with setTimeout
 			`),
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Persistent Storage:")} Automatically saving application state with signal listeners
 			`),
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Type Safety:")} Using comprehensive JSDoc comments for type checking and documentation
 			`),
-			el("li").append(...T`
+			el("li").append(T`
 				${el("strong", "Composable Event Handlers:")} Attaching multiple event handlers to elements
 			`)
 		),
 
 		el("div", { className: "callout" }).append(
 			el("h4", t`Key Takeaways`),
-			el("p").append(...T`
+			el("p").append(T`
 				This TodoMVC implementation showcases the strengths of dd<el> for building real-world applications:
 			`),
 			el("ul").append(
@@ -622,7 +658,7 @@ export function page({ pkg, info }){
 			)
 		),
 
-		el("p").append(...T`
+		el("p").append(T`
 			You can find the ${el("a", references.github_example).append("complete source code")} for this example on GitHub.
 			Feel free to use it as a reference for your own projects or as a starting point for more complex applications.
 		`),

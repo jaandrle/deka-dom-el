@@ -9,7 +9,8 @@ export const mark= "__dde_signal";
  * @type {Function}
  */
 export const queueSignalWrite= (()=> {
-	let pendingSignals= new Set();
+	/** @type {Map<ddeSignal, boolean>} */
+	let pendingSignals= new Map();
 	let scheduled= false;
 
 	/**
@@ -19,19 +20,20 @@ export const queueSignalWrite= (()=> {
 	function flushSignals() {
 		scheduled = false;
 		const todo= pendingSignals;
-		pendingSignals= new Set();
-		for(const signal of todo){
+		pendingSignals= new Map();
+		for(const [ signal, force ] of todo){
 			const M = signal[mark];
-			if(M) M.listeners.forEach(l => l(M.value));
+			if(M) M.listeners.forEach(l => l(M.value, force));
 		}
 	}
 
 	/**
 	 * Queues a signal for update
-	 * @param {Object} s - Signal to queue
+	 * @param {ddeSignal} s - Signal to queue
+	 * @param {boolean} force - Forced update
 	 */
-	return function(s){
-		pendingSignals.add(s);
+	return function(s, force= false){
+		pendingSignals.set(s, pendingSignals.get(s) || force);
 		if(scheduled) return;
 		scheduled = true;
 		queueMicrotask(flushSignals);

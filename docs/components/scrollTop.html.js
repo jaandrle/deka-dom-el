@@ -37,3 +37,14 @@ styles.css`
 	}
 }
 `;
+
+import { el } from "deka-dom-el";
+import { ireland } from "./ireland.html.js";
+
+export function scrollTop(){
+	return el(ireland, {
+		src: new URL("./scrollTop.js.js", import.meta.url),
+		exportName: "scrollTop",
+		page_id: "*",
+	});
+}

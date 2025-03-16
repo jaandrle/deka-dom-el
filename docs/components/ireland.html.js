@@ -1,3 +1,33 @@
+import { styles } from "../ssr.js";
+styles.css`
+[data-dde-mark] {
+	opacity: .5;
+	filter: grayscale();
+
+	@media (prefers-reduced-motion: no-preference) {
+		animation: fadein 2s infinite ease forwards;;
+	}
+
+	position: relative;
+	&::after {
+		content: "Loading Ireland…";
+		background-color: rgba(0, 0, 0, .5);
+		color: white;
+		font-weight: bold;
+		border-radius: 5px;
+		padding: 5px 10px;
+		position: absolute;
+		top: 3%;
+		left: 50%;
+		transform: translateX(-50%);
+	}
+}
+@keyframes fadein {
+	from { opacity: .5; }
+	to { opacity: .85; }
+}
+`;
+
 import { el, queue } from "deka-dom-el";
 import { addEventListener, registerClientFile } from "../ssr.js";
 import { relative } from "node:path";
@@ -21,10 +51,17 @@ export function ireland({ src, exportName = "default", props = {} }) {
 	const path= "./"+relative(dir, src.pathname);
 	const id = "ireland-" + generateComponentId(src);
 	const element = el.mark({ type: "later", name: ireland.name });
-	queue(import(path).then(module => {
-		const component = module[exportName];
-		element.replaceWith(el(component, props, mark(id)));
-	}));
+	queue(
+		import(path)
+		.then(module => {
+			const component = module[exportName];
+			const content= el(component, props, mark(id));
+			element.replaceWith(content);
+			content.querySelectorAll("input, textarea, button")
+				.forEach(el=> el.disabled= true);
+		})
+		.catch(console.error)
+	);
 
 	if(!componentsRegistry.size)
 		addEventListener("oneachrender", registerClientPart);

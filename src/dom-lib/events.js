@@ -1,5 +1,5 @@
-import { keyLTE, evc, evd } from './dom-common.js';
-import { oAssign, onAbort } from './helpers.js';
+import { keyLTE, evc, evd } from './common.js';
+import { oAssign, onAbort } from '../helpers.js';
 
 /**
  * Creates a function to dispatch events on elements
@@ -37,6 +37,8 @@ export function on(event, listener, options){
 		return element;
 	};
 }
+
+on.defer= fn=> setTimeout.bind(null, fn, 0);
 
 import { c_ch_o } from "./events-observer.js";
 

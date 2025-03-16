@@ -184,7 +184,7 @@ import { el } from "deka-dom-el";
  * @param {string} [attrs.className]
  * @param {URL} [attrs.src] Example code file path
  * @param {string} [attrs.content] Example code
- * @param {"js"|"ts"|"html"|"css"} [attrs.language="js"] Language of the code
+ * @param {"js"|"ts"|"html"|"css"|"shell"} [attrs.language="js"] Language of the code
  * @param {string} [attrs.page_id] ID of the page, if setted it registers shiki
  * */
 export function code({ id, src, content, language= "js", className= host.slice(1), page_id }){

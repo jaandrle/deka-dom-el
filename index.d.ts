@@ -184,12 +184,12 @@ interface On{
 	/** Listens to the DOM event. See {@link Document.addEventListener} */
 	<
 		Event extends keyof DocumentEventMap,
-		EE extends ddeElementAddon<SupportedElement>= ddeElementAddon<HTMLElement>,
+		EL extends SupportedElement
 		>(
 			type: Event,
-			listener: (this: EE extends ddeElementAddon<infer El> ? El : never, ev: DocumentEventMap[Event]) => any,
+			listener: (this: EL, ev: DocumentEventMap[Event] & { target: EL }) => any,
 			options?: AddEventListenerOptions
-		) : EE;
+		) : ddeElementAddon<EL>;
 	<
 		EE extends ddeElementAddon<SupportedElement>= ddeElementAddon<HTMLElement>,
 		>(
@@ -199,28 +199,38 @@ interface On{
 		) : EE;
 	/** Listens to the element is connected to the live DOM. In case of custom elements uses [`connectedCallback`](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#custom_element_lifecycle_callbacks), or {@link MutationObserver} else where */// editorconfig-checker-disable-line
 	connected<
-		EE extends ddeElementAddon<SupportedElement>,
-		El extends ( EE extends ddeElementAddon<infer El> ? El : never )
+		EL extends SupportedElement
 		>(
-			listener: (this: El, event: CustomEvent<El>) => any,
+			listener: (this: EL, event: CustomEvent<NoInfer<EL>>) => any,
 			options?: AddEventListenerOptions
-		) : EE;
+		) : ddeElementAddon<EL>;
 	/** Listens to the element is disconnected from the live DOM. In case of custom elements uses [`disconnectedCallback`](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#custom_element_lifecycle_callbacks), or {@link MutationObserver} else where */// editorconfig-checker-disable-line
 	disconnected<
-		EE extends ddeElementAddon<SupportedElement>,
-		El extends ( EE extends ddeElementAddon<infer El> ? El : never )
+		EL extends SupportedElement
 		>(
-			listener: (this: El, event: CustomEvent<void>) => any,
+			listener: (this: EL, event: CustomEvent<void>) => any,
 			options?: AddEventListenerOptions
-		) : EE;
-	/** Listens to the element attribute changes. In case of custom elements uses [`attributeChangedCallback`](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#custom_element_lifecycle_callbacks), or {@link MutationObserver} else where */// editorconfig-checker-disable-line
-	attributeChanged<
-		EE extends ddeElementAddon<SupportedElement>,
-		El extends ( EE extends ddeElementAddon<infer El> ? El : never )
-		>(
-			listener: (this: El, event: CustomEvent<[ string, string ]>) => any,
-			options?: AddEventListenerOptions
-		) : EE;
+		) : ddeElementAddon<EL>;
+	/**
+	 * Fires after the next tick of the Javascript event loop.
+	 * This is handy for example to apply some property depending on the element content:
+	 * ```js
+	 * const selected= "Z";
+	 * //...
+	 * return el("form").append(
+	 *		el("select", null, on.defer(e=> e.value=selected)).append(
+	 *			el("option", { value: "A", textContent: "A" }),
+	 *			//...
+	 *			el("option", { value: "Z", textContent: "Z" }),
+	 *		),
+	 * );
+	 * ```
+	 * */
+	defer<
+		EL extends SupportedElement
+	>(
+		listener: (element: EL) => any,
+	) : ddeElementAddon<EL>;
 }
 export const on: On;
 

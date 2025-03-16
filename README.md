@@ -31,7 +31,7 @@ function EmojiCounter({ initial }) {
 		el("p", {
 			className: "output",
 			textContent: S(() =>
-				`Hello World ${emoji.get().repeat(clicks.get())}`),
+				`Hello World ${emoji.get().repeat(count.get())}`),
 		}),
 
 		// 🎮 Controls - Update state on events
@@ -39,12 +39,12 @@ function EmojiCounter({ initial }) {
 			on("click", () => count.set(count.get() + 1))
 		),
 
-		el("select", null,
+		el("select", null, on.host(el=> el.value= initial),
 			on("change", e => emoji.set(e.target.value))
 		).append(
-			el(Option, "🎉", isSelected),
-			el(Option, "🚀", isSelected),
-			el(Option, "💖", isSelected),
+			el(Option, "🎉"),
+			el(Option, "🚀"),
+			el(Option, "💖"),
 		)
 	);
 }
@@ -93,18 +93,30 @@ into existing projects.
 # npm install deka-dom-el
 ```
 
-#### Direct Script
+#### CDN / Direct Script
+
+For CDN links and various build formats (ESM/IIFE, with/without signals, minified/unminified), see the [interactive
+format selector](https://jaandrle.github.io/deka-dom-el/) on the documentation site.
+
 ```html
+<!-- Example with IIFE build (creates a global DDE object) -->
 <script src="https://cdn.jsdelivr.net/gh/jaandrle/deka-dom-el/dist/iife-with-signals.min.js"></script>
-<script type="module">
+<script>
 	const { el, S } = DDE;
+	// Your code here
+</script>
+
+<!-- Or with ES modules -->
+<script type="module">
+	import { el, S } from "https://cdn.jsdelivr.net/gh/jaandrle/deka-dom-el/dist/esm-with-signals.min.js";
+	// Your code here
 </script>
 ```
 
 ### Documentation
 
-- [**Interactive Guide**](https://jaandrle.github.io/deka-dom-el): WIP
-- [Examples](./examples/): TBD/WIP
+- [**Interactive Guide**](https://jaandrle.github.io/deka-dom-el)
+- [**Examples**](https://jaandrle.github.io/deka-dom-el/p15-examples.html)
 
 ## Understanding Signals
 
@@ -117,10 +129,17 @@ Signals are the reactive backbone of Deka DOM Elements:
 
 ## Inspiration and Alternatives
 
-- [vanjs-org/van](https://github.com/vanjs-org/van) - World's smallest reactive UI framework
-- [adamhaile/S](https://github.com/adamhaile/S) - Simple, clean, fast reactive programming
-- [hyperhype/hyperscript](https://github.com/hyperhype/hyperscript) - Create HyperText with JavaScript
-- [potch/signals](https://github.com/potch/signals) - A small reactive signals library
-- [jaandrle/dollar_dom_component](https://github.com/jaandrle/dollar_dom_component) -
+- [vanjs-org/van](https://github.com/vanjs-org/van) — World's smallest reactive UI framework
+- [adamhaile/S](https://github.com/adamhaile/S) — Simple, clean, fast reactive programming
+- [hyperhype/hyperscript](https://github.com/hyperhype/hyperscript) — Create HyperText with JavaScript
+- [potch/signals](https://github.com/potch/signals) — A small reactive signals library
+- [AseasRoa/paintor](https://github.com/AseasRoa/paintor) - JavaScript library for building reactive client-side user
+	interfaces or HTML code.
+- [pota](https://pota.quack.uy/) — small and pluggable Reactive Web Renderer. It's compiler-less, includes an html
+	function, and a optimized babel preset in case you fancy JSX.
+- [jaandrle/dollar_dom_component](https://github.com/jaandrle/dollar_dom_component) —
 	Functional DOM components without JSX/virtual DOM
-- [mxjp/rvx: A signal based frontend framework](https://github.com/mxjp/rvx)
+- [TarekRaafat/eleva](https://github.com/TarekRaafat/eleva) — A minimalist, lightweight, pure vanilla JavaScript
+	frontend runtime framework.
+- [didi/mpx](https://github.com/didi/mpx) — Mpx，一款具有优秀开发体验和深度性能优化的增强型跨端小程序框架
+- [mxjp/rvx](https://github.com/mxjp/rvx) — A signal based frontend framework

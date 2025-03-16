@@ -1,6 +1,47 @@
-import { keyLTE, evc, evd, eva } from "./dom-common.js";
-import { scope } from "./dom.js";
+import { keyLTE, evc, evd, eva } from "./common.js";
+import { scope } from "./scopes.js";
 import { c_ch_o } from "./events-observer.js";
+import { elementAttribute } from "./helpers.js";
+
+/**
+ * Simulates slot functionality for elements
+ *
+ * @param {HTMLElement} element - Parent element
+ * @param {HTMLElement} [root=element] - Root element containing slots
+ * @returns {HTMLElement} The root element
+ */
+export function simulateSlots(element, root= element){
+	const mark_e= "¹⁰", mark_s= "✓"; //NOTE: Markers to identify slots processed by this function. Also “prevents” native behavior as it is unlikely to use these in names. // editorconfig-checker-disable-line
+	const slots= Object.fromEntries(
+		Array.from(root.querySelectorAll("slot"))
+			.filter(s => !s.name.endsWith(mark_e))
+			.map(s => [(s.name += mark_e), s]));
+	element.append= new Proxy(element.append, {
+		apply(orig, _, els){
+			if(els[0]===root) return orig.apply(element, els);
+			for(const el of els){
+				const name= (el.slot||"")+mark_e;
+				try{ elementAttribute(el, "remove", "slot"); } catch(_error){}
+				const slot= slots[name];
+				if(!slot) return;
+				if(!slot.name.startsWith(mark_s)){
+					slot.childNodes.forEach(c=> c.remove());
+					slot.name= mark_s+name;
+				}
+				slot.append(el);
+				//TODO?: el.dispatchEvent(new CustomEvent("dde:slotchange", { detail: slot }));
+			}
+			element.append= orig; //TODO?: better memory management, but non-native behavior!
+			return element;
+		}
+	});
+	if(element!==root){
+		const els= Array.from(element.childNodes);
+		//TODO?: els.forEach(el=> el.remove());
+		element.append(...els);
+	}
+	return root;
+}
 
 /**
  * Renders content into a custom element or shadow root

@@ -15,10 +15,6 @@ export function mnemonic(){
 			" — listen to the signal value changes",
 		),
 		el("li").append(
-			el("code", "S.clear(...<signals>)"),
-			" — off and clear signals",
-		),
-		el("li").append(
 			el("code", "S(<value>, <actions>)"),
 			" — signal: pattern to create complex reactive objects/arrays",
 		),
@@ -29,6 +25,11 @@ export function mnemonic(){
 		el("li").append(
 			el("code", "S.el(<signal>, <function-returning-dom>)"),
 			" — render partial dom structure (template) based on the current signal value",
-		)
+		),
+		el("li").append(
+			el("code", "S.clear(...<signals>)"),
+			" — off and clear signals (most of the time it is not needed as reactive ",
+			"attributes and elements are cleared automatically)",
+		),
 	);
 }
