@@ -146,7 +146,7 @@ export function DataDashboard() {
 			el("div", { className: "year-filter" }).append(
 				el("label", { htmlFor: "yearSelect", textContent: "Select Year:" }),
 				el("select", { id: "yearSelect" },
-					on.host(el=> el.value = selectedYear.get().toString()),
+					on.defer(el=> el.value = selectedYear.get().toString()),
 					onYearChange
 				).append(
 					...years.map(year => el("option", { value: year, textContent: year }))

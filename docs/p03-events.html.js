@@ -155,7 +155,7 @@ export function page({ pkg, info }){
 			You can think of an Addon as an “oncreate” event handler.
 		`),
 		el("p").append(T`
-			dd<el> provides three additional lifecycle events that correspond to ${el("a", { textContent:
+			dd<el> provides two additional lifecycle events that correspond to ${el("a", { textContent:
 				"custom element", ...references.mdn_customElements })} lifecycle callbacks and component patterns:
 		`),
 		el("div", { className: "function-table" }).append(
@@ -165,10 +165,6 @@ export function page({ pkg, info }){
 
 				el("dt", t`on.disconnected(callback)`),
 				el("dd", t`Fires when the element is removed from the DOM`),
-
-				el("dt", t`on.host(callback, host?)`),
-				el("dd", t`Fires when the host element is "ready" and allows applying properties based on the fully
-					built template`),
 			)
 		),
 		el(example, { src: fileURL("./components/examples/events/live-cycle.js"), page_id }),
@@ -200,6 +196,19 @@ export function page({ pkg, info }){
 				el("li").append(T`
 					dd<el> ensures that connected/disconnected events fire only once for better predictability
 				`)
+			)
+		),
+
+		el(h3, t`Utility Helpers`),
+		el("p").append(T`
+			You can use the ${el("code", "on.defer")} helper to defer execution to the next event loop.
+			This is useful for example when you wan to set some element properties based on the current element
+			body (typically the ${el("code", "<select value=\"...\">")}).
+		`),
+		el("div", { className: "function-table" }).append(
+			el("dl").append(
+				el("dt", t`on.defer(callback)`),
+				el("dd", t`Helper that defers function execution to the next event loop (using setTimeout)`),
 			)
 		),
 

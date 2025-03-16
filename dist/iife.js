@@ -280,6 +280,7 @@ var DDE = (() => {
 			return element;
 		};
 	}
+	on.defer = (fn) => setTimeout.bind(null, fn, 0);
 	var lifeOptions = (obj) => oAssign({}, typeof obj === "object" ? obj : null, { once: true });
 	on.connected = function(listener, options) {
 		options = lifeOptions(options);
@@ -378,7 +379,6 @@ var DDE = (() => {
 			return scopes.pop();
 		}
 	};
-	on.host = (fn, host = scope.host) => (el) => host(() => fn(el));
 
 	// src/signals-lib/common.js
 	var signals_global = {

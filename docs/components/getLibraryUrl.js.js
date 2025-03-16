@@ -32,19 +32,19 @@ export function getLibraryUrl(){
 		el("h4", "Select your preferred library format:"),
 		el("div", { className: "selectors" }).append(
 			el("select", { name: "module" }, onChangeSubmit,
-				on.host(select => select.value = lib.get()[0]),
+				on.defer(select => select.value = lib.get()[0]),
 			).append(
 				el("option", { value: "esm", textContent: "ESM — modern JavaScript module" }),
 				el("option", { value: "iife", textContent: "IIFE — legacy JavaScript with DDE global variable" }),
 			),
 			el("select", { name: "what" }, onChangeSubmit,
-				on.host(select => select.value = lib.get()[1]),
+				on.defer(select => select.value = lib.get()[1]),
 			).append(
 				el("option", { value: "", textContent: "DOM part only" }),
 				el("option", { value: "-with-signals", textContent: "DOM + signals" }),
 			),
 			el("select", { name: "minified" }, onChangeSubmit,
-				on.host(select => select.value = lib.get()[2]),
+				on.defer(select => select.value = lib.get()[2]),
 			).append(
 				el("option", { value: "", textContent: "Unminified" }),
 				el("option", { value: ".min", textContent: "Minified" }),

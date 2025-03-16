@@ -38,6 +38,8 @@ export function on(event, listener, options){
 	};
 }
 
+on.defer= fn=> setTimeout.bind(null, fn, 0);
+
 import { c_ch_o } from "./events-observer.js";
 
 /**

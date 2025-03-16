@@ -1,5 +1,5 @@
 #!/usr/bin/env -S npx nodejsscript
-import { analyzeMetafileSync, buildSync as esbuildSync } from "esbuild";
+import { buildSync as esbuildSync } from "esbuild";
 const css= echo.css`
 	.info{ color: gray; }
 `;
@@ -93,7 +93,7 @@ function metaToLineStatus(meta, file){
 	const { bytes }= status;
 	const kbytes= bytes/1024;
 	const kbytesR= kbytes.toFixed(2);
-	return `${file}: ${kbytesR} KiB`;
+	return `${file}: ${kbytesR} kB`;
 }
 function echoVariant(name, todo= false){
 	if(todo) return echo.use("-R", "~ "+name);

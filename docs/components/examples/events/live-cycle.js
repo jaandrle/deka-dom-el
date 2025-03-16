@@ -5,10 +5,10 @@ function allLifecycleEvents(){
 		on.connected(log),
 		on.disconnected(log),
 	).append(
-		el("select", { id: "country" }, on.host(select => {
-			// This runs when the host (select) is ready with all its options
+		el("select", { id: "country" }, on.defer(select => {
+			// This runs when the select is ready with all its options
 			select.value = "cz"; // Pre-select Czechia
-			log({ type: "dde:on.host", detail: select });
+			log({ type: "dde:on.defer", detail: select });
 		})).append(
 			el("option", { value: "au", textContent: "Australia" }),
 			el("option", { value: "ca", textContent: "Canada" }),

@@ -109,9 +109,9 @@ export function TaskManager() {
 		e.target.reset();
 	};
 	// </Add>
-	const onEdit= on("card:edit", /** @param {CardEditEvent} ev */({ detail: [ id, task ] })=>
+	const onCardEdit= on("card:edit", /** @param {CardEditEvent} ev */({ detail: [ id, task ] })=>
 		S.action(tasks, "update", id, task));
-	const onDelete= on("card:delete", /** @param {CardDeleteEvent} ev */({ detail: id })=>
+	const onCardDelete= on("card:delete", /** @param {CardDeleteEvent} ev */({ detail: id })=>
 		S.action(tasks, "remove", id));
 
 	const { onDragable, onDragArea }= moveElementAddon(
@@ -129,7 +129,7 @@ export function TaskManager() {
 					value: searchQuery.get()
 				}, on("input", e => searchQuery.set(e.target.value))),
 				el("select", null,
-					on.host(el=> el.value= filterPriority.get()),
+					on.defer(el=> el.value= filterPriority.get()),
 					on("change", e => filterPriority.set(e.target.value))
 				).append(
 					el("option", { value: "all", textContent: "All Priorities" }),
@@ -150,7 +150,7 @@ export function TaskManager() {
 					required: true
 				}, on("input", e => newTask.title= e.target.value.trim())),
 				el("select", null,
-					on.host(el=> el.value= newTask.priority),
+					on.defer(el=> el.value= newTask.priority),
 					on("change", e => newTask.priority= e.target.value)
 				).append(
 					el("option", { value: "low", textContent: "Low" }),
@@ -181,7 +181,7 @@ export function TaskManager() {
 				),
 				S.el(S(() => tasksByStatus.get()[STATUSES.TODO]), tasks =>
 					el("div", { className: "column-tasks" }).append(
-						...tasks.map(task=> el(TaskCard, { task, onDragable }, onEdit, onDelete))
+						...tasks.map(task=> el(TaskCard, { task, onDragable }, onCardEdit, onCardDelete))
 					)
 				)
 			),
@@ -200,7 +200,7 @@ export function TaskManager() {
 				),
 				S.el(S(() => tasksByStatus.get()[STATUSES.IN_PROGRESS]), tasks =>
 					el("div", { className: "column-tasks" }).append(
-						...tasks.map(task=> el(TaskCard, { task, onDragable }, onEdit, onDelete))
+						...tasks.map(task=> el(TaskCard, { task, onDragable }, onCardEdit, onCardDelete))
 					)
 				)
 			),
@@ -219,7 +219,7 @@ export function TaskManager() {
 				),
 				S.el(S(() => tasksByStatus.get()[STATUSES.DONE]), tasks =>
 					el("div", { className: "column-tasks" }).append(
-						...tasks.map(task=> el(TaskCard, { task, onDragable }, onEdit, onDelete))
+						...tasks.map(task=> el(TaskCard, { task, onDragable }, onCardEdit, onCardDelete))
 					)
 				)
 			)
@@ -278,7 +278,7 @@ function TaskCard({ task, onDragable }){
 		)
 	);
 	function EditMode(){
-		const onEditSave = on("submit", e => {
+		const onSubmit = on("submit", e => {
 			e.preventDefault();
 			const formData = new FormData(/** @type {HTMLFormElement} */(e.target));
 			const title = formData.get("title");
@@ -289,7 +289,7 @@ function TaskCard({ task, onDragable }){
 		})
 		const onEditCancel = () => isEditing.set(false);
 
-		return el("form", { className: "task-edit-form" }, onEditSave).append(
+		return el("form", { className: "task-edit-form" }, onSubmit).append(
 			el("input", {
 				name: "title",
 				className: "task-title-input",
@@ -306,7 +306,7 @@ function TaskCard({ task, onDragable }){
 			}),
 			el("select", {
 				name: "priority",
-			}, on.host(el=> el.value = task.priority)).append(
+			}, on.defer(el=> el.value = task.priority)).append(
 				el("option", { value: "low", textContent: "Low Priority" }),
 				el("option", { value: "medium", textContent: "Medium Priority" }),
 				el("option", { value: "high", textContent: "High Priority" })

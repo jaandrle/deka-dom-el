@@ -187,7 +187,7 @@ interface On{
 		EL extends SupportedElement
 		>(
 			type: Event,
-			listener: (this: EL, ev: DocumentEventMap[Event]) => any,
+			listener: (this: EL, ev: DocumentEventMap[Event] & { target: EL }) => any,
 			options?: AddEventListenerOptions
 		) : ddeElementAddon<EL>;
 	<
@@ -212,13 +212,13 @@ interface On{
 			options?: AddEventListenerOptions
 		) : ddeElementAddon<EL>;
 	/**
-	 * Fires when the host element is "ready", for host element itsel, it is just an alias for `scope.host(listener)`.
-	 * This is handy to apply some property depending on full template such as:
+	 * Fires after the next tick of the Javascript event loop.
+	 * This is handy for example to apply some property depending on the element content:
 	 * ```js
 	 * const selected= "Z";
 	 * //...
 	 * return el("form").append(
-	 *		el("select", null, on.host(e=> e.value=selected)).append(
+	 *		el("select", null, on.defer(e=> e.value=selected)).append(
 	 *			el("option", { value: "A", textContent: "A" }),
 	 *			//...
 	 *			el("option", { value: "Z", textContent: "Z" }),
@@ -226,11 +226,10 @@ interface On{
 	 * );
 	 * ```
 	 * */
-	host<
+	defer<
 		EL extends SupportedElement
 	>(
 		listener: (element: EL) => any,
-		host?: Host<SupportedElement>
 	) : ddeElementAddon<EL>;
 }
 export const on: On;

@@ -80,5 +80,3 @@ export const scope= {
 		return scopes.pop();
 	},
 };
-// TODO: better place while no cross-import?
-on.host= (fn, host= scope.host)=> el=> host(()=> fn(el));

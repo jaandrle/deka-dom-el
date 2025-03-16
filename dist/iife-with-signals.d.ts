@@ -173,20 +173,22 @@ declare function dispatchEvent$1(name: keyof DocumentEventMap | string, options?
 declare function dispatchEvent$1(name: keyof DocumentEventMap | string, options: EventInit | null, host: Host<SupportedElement>): (data?: any) => void;
 export interface On {
 	/** Listens to the DOM event. See {@link Document.addEventListener} */
-	<Event extends keyof DocumentEventMap, EL extends SupportedElement>(type: Event, listener: (this: EL, ev: DocumentEventMap[Event]) => any, options?: AddEventListenerOptions): ddeElementAddon<EL>;
+	<Event extends keyof DocumentEventMap, EL extends SupportedElement>(type: Event, listener: (this: EL, ev: DocumentEventMap[Event] & {
+		target: EL;
+	}) => any, options?: AddEventListenerOptions): ddeElementAddon<EL>;
 	<EE extends ddeElementAddon<SupportedElement> = ddeElementAddon<HTMLElement>>(type: string, listener: (this: EE extends ddeElementAddon<infer El> ? El : never, ev: Event | CustomEvent) => any, options?: AddEventListenerOptions): EE;
 	/** Listens to the element is connected to the live DOM. In case of custom elements uses [`connectedCallback`](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#custom_element_lifecycle_callbacks), or {@link MutationObserver} else where */ // editorconfig-checker-disable-line
 	connected<EL extends SupportedElement>(listener: (this: EL, event: CustomEvent<NoInfer<EL>>) => any, options?: AddEventListenerOptions): ddeElementAddon<EL>;
 	/** Listens to the element is disconnected from the live DOM. In case of custom elements uses [`disconnectedCallback`](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements#custom_element_lifecycle_callbacks), or {@link MutationObserver} else where */ // editorconfig-checker-disable-line
 	disconnected<EL extends SupportedElement>(listener: (this: EL, event: CustomEvent<void>) => any, options?: AddEventListenerOptions): ddeElementAddon<EL>;
 	/**
-	 * Fires when the host element is "ready", for host element itsel, it is just an alias for `scope.host(listener)`.
-	 * This is handy to apply some property depending on full template such as:
+	 * Fires after the next tick of the Javascript event loop.
+	 * This is handy for example to apply some property depending on the element content:
 	 * ```js
 	 * const selected= "Z";
 	 * //...
 	 * return el("form").append(
-	 *		el("select", null, on.host(e=> e.value=selected)).append(
+	 *		el("select", null, on.defer(e=> e.value=selected)).append(
 	 *			el("option", { value: "A", textContent: "A" }),
 	 *			//...
 	 *			el("option", { value: "Z", textContent: "Z" }),
@@ -194,7 +196,7 @@ export interface On {
 	 * );
 	 * ```
 	 * */
-	host<EL extends SupportedElement>(listener: (element: EL) => any, host?: Host<SupportedElement>): ddeElementAddon<EL>;
+	defer<EL extends SupportedElement>(listener: (element: EL) => any): ddeElementAddon<EL>;
 }
 export const on: On;
 export type Scope = {
