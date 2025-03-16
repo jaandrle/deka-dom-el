@@ -9,7 +9,7 @@ document.body.append(
 	padding: 1em;
 	margin: 1em;
 }
-		`.trim())
+`.trim())
 );
 
 export function CounterStandard() {
