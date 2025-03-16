@@ -55,7 +55,7 @@ export function page({ pkg, info }){
 				el(MyComponent);
 
 				function MyComponent() {
-					// 2. access the host element
+					// 2. access the host element (or other scope related values)
 					const { host } = scope;
 
 					// 3. Add behavior to host

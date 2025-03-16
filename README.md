@@ -1,6 +1,7 @@
 **WIP** (the experimentation phase)
 | [source code on GitHub](https://github.com/jaandrle/deka-dom-el)
 | [*mirrored* on Gitea](https://gitea.jaandrle.cz/jaandrle/deka-dom-el)
+| [![git3moji](https://img.shields.io/badge/git3moji%E2%80%93v1-%E2%9A%A1%EF%B8%8F%F0%9F%90%9B%F0%9F%93%BA%F0%9F%91%AE%F0%9F%94%A4-fffad8.svg?style=flat-square)](https://robinpokorny.github.io/git3moji/) <!-- editorconfig-checker-disable-line -->
 
 <p align="center">
 	<img src="docs/assets/logo.svg" alt="Deka DOM Elements Logo" width="180" height="180">
@@ -126,6 +127,11 @@ Signals are the reactive backbone of Deka DOM Elements:
 - [The Evolution of Signals in JavaScript](https://dev.to/this-is-learning/the-evolution-of-signals-in-javascript-8ob)
 - [TC39 Signals Proposal](https://github.com/tc39/proposal-signals) (future standard)
 - [Observer pattern](https://en.wikipedia.org/wiki/Observer_pattern) (underlying concept)
+
+## Contributing
+
+We welcome contributions from the community! Please see our [Contributing Guide](CONTRIBUTING.md) for details on how to
+get started, coding standards, commit guidelines, and the pull request process.
 
 ## Inspiration and Alternatives
 

@@ -208,6 +208,6 @@ export function page({ pkg, info }){
 			`),
 		),
 
-		el(mnemonic)
+		el(mnemonic),
 	);
 }

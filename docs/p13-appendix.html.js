@@ -129,75 +129,6 @@ export function page({ pkg, info }){
 			`)
 		),
 
-		el("h4", t`Using Signals Appropriately`),
-		el("p").append(T`
-			While signals provide powerful reactivity for complex UI interactions, they’re not always necessary.
-		`),
-
-		el("div", { className: "tabs" }).append(
-			el("div", { className: "tab", dataTab: "events" }).append(
-				el("h4", t`We can process form events without signals`),
-				el("p", t`This can be used when the form data doesn’t need to be reactive and we just waiting for
-					results.`),
-				el(code, { page_id, content: `
-					const onFormSubmit = on("submit", e => {
-						e.preventDefault();
-						const formData = new FormData(e.currentTarget);
-						// this can be sent to a server
-						// or processed locally
-						// e.g.: console.log(Object.fromEntries(formData))
-					});
-					// …
-					return el("form", null, onFormSubmit).append(
-						// …
-					);
-				` })
-			),
-
-			el("div", { className: "tab", dataTab: "variables" }).append(
-				el("h4", t`We can use variables without signals`),
-				el("p", t`We use this when we dont’t need to reflect changes in the elsewhere (UI).`),
-				el(code, { page_id, content: `
-					let canSubmit = false;
-
-					const onFormSubmit = on("submit", e => {
-						e.preventDefault();
-						if(!canSubmit) return; // some message
-						// …
-					});
-					const onAllowSubmit = on("click", e => {
-						canSubmit = true;
-					});
-				`}),
-			),
-
-			el("div", { className: "tab", dataTab: "state" }).append(
-				el("h4", t`Using signals`),
-				el("p", t`We use this when we need to reflect changes for example in the UI (e.g. enable/disable
-					buttons).`),
-				el(code, { page_id, content: `
-					const canSubmit = S(false);
-
-					const onFormSubmit = on("submit", e => {
-						e.preventDefault();
-						// …
-					});
-					const onAllowSubmit = on("click", e => {
-						canSubmit.set(true);
-					});
-
-					return el("form", null, onFormSubmit).append(
-						// ...
-						el("button", { textContent: "Allow Submit", type: "button" }, onAllowSubmit),
-						el("button", { disabled: S(()=> !canSubmit), textContent: "Submit" })
-					);
-				`}),
-			),
-			el("p").append(T`
-				A good approach is to started with variables/constants and when necessary, convert them to signals.
-			`),
-		),
-
 		el("h4", t`Migrating from Traditional Approaches`),
 		el("p").append(T`
 			When migrating from traditional DOM manipulation or other frameworks to dd<el>:
@@ -394,46 +325,46 @@ export function page({ pkg, info }){
 				el("tr").append(
 					el("th", "Feature"),
 					el("th", "dd<el>"),
-					el("th", "React"),
-					el("th", "Vue"),
-					el("th", "Svelte")
+					el("th", "VanJS"),
+					el("th", "Solid"),
+					el("th", "Alpine")
 				)
 			),
 			el("tbody").append(
 				el("tr").append(
 					el("td", "No Build Step Required"),
 					el("td", "✅"),
+					el("td", "✅"),
 					el("td", "⚠️ JSX needs transpilation"),
-					el("td", "⚠️ SFC needs compilation"),
-					el("td", "❌ Requires compilation")
+					el("td", "✅")
 				),
 				el("tr").append(
-					el("td", "Bundle Size (minimal)"),
-					el("td", "~10-15kb"),
-					el("td", "~40kb+"),
-					el("td", "~33kb+"),
-					el("td", "Minimal runtime")
+					el("td", "Bundle Size (minified)"),
+					el("td", "~14kb"),
+					el("td", "~3kb"),
+					el("td", "~20kb"),
+					el("td", "~43kb")
 				),
 				el("tr").append(
 					el("td", "Reactivity Model"),
 					el("td", "Signal-based"),
-					el("td", "Virtual DOM diffing"),
-					el("td", "Proxy-based"),
-					el("td", "Compile-time reactivity")
+					el("td", "Signal-based (basics only)"),
+					el("td", "Signal-based"),
+					el("td", "MVVM + Proxy")
 				),
 				el("tr").append(
 					el("td", "DOM Interface"),
 					el("td", "Direct DOM API"),
-					el("td", "Virtual DOM"),
-					el("td", "Virtual DOM"),
-					el("td", "Compiled DOM updates")
+					el("td", "Direct DOM API"),
+					el("td", "Compiled DOM updates"),
+					el("td", "Directive-based")
 				),
 				el("tr").append(
 					el("td", "Server-Side Rendering"),
 					el("td", "✅ Basic Support"),
+					el("td", "✅ Basic Support"),
 					el("td", "✅ Advanced"),
-					el("td", "✅ Advanced"),
-					el("td", "✅ Advanced")
+					el("td", "❌")
 				)
 			)
 		),
