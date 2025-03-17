@@ -1,4 +1,4 @@
-**WIP** (the experimentation phase)
+**Alpha**
 | [source code on GitHub](https://github.com/jaandrle/deka-dom-el)
 | [*mirrored* on Gitea](https://gitea.jaandrle.cz/jaandrle/deka-dom-el)
 | [![git3moji](https://img.shields.io/badge/git3moji%E2%80%93v1-%E2%9A%A1%EF%B8%8F%F0%9F%90%9B%F0%9F%93%BA%F0%9F%91%AE%F0%9F%94%A4-fffad8.svg?style=flat-square)](https://robinpokorny.github.io/git3moji/) <!-- editorconfig-checker-disable-line -->
@@ -40,7 +40,7 @@ function EmojiCounter({ initial }) {
 			on("click", () => count.set(count.get() + 1))
 		),
 
-		el("select", null, on.host(el=> el.value= initial),
+		el("select", null, on.defer(el=> el.value= initial),
 			on("change", e => emoji.set(e.target.value))
 		).append(
 			el(Option, "🎉"),
@@ -61,39 +61,30 @@ Creating reactive elements, components, and Web Components using the native
 ## Features at a Glance
 
 - ✅ **No build step required** — use directly in browsers or Node.js
-- ☑️ **Lightweight** — ~10-15kB minified (original goal 10kB) with zero/minimal dependencies
+- ☑️ **Lightweight** — ~10-15kB minified (original goal 10kB) with **zero**/minimal dependencies
 - ✅ **Declarative & functional approach** for clean, maintainable code
 - ✅ **Signals and events** for reactive UI
 - ✅ **Memoization for performance** — optimize rendering with intelligent caching
-- ✅ **Optional build-in signals** with support for custom reactive implementations
+- ✅ **Optional build-in signals** with support for custom reactive implementations (#39)
 - ✅ **Server-side rendering** support via [jsdom](https://github.com/jsdom/jsdom)
-- ✅ **TypeScript support** (work in progress)
+- ✅ **TypeScript support**
 - ☑️ **Support for debugging with browser DevTools** without extensions
-- ☑️ **Enhanced Web Components** support (work in progress)
-
-## Why Another Library?
-
-This library bridges the gap between minimal solutions like van/hyperscript and more comprehensive frameworks like
-[solid-js](https://github.com/solidjs/solid), offering a balanced trade-off between size, complexity, and usability.
-
-Following functional programming principles, dd\<el\> starts with pure JavaScript (DOM API) and gradually adds
-auxiliary functions. These range from minor improvements to advanced features for building complete declarative
-reactive UI templates.
-
-A key advantage: any internal function (`assign`, `classListDeclarative`, `on`, `dispatchEvent`, `S`, etc.) can be used
-independently while also working seamlessly together. This modular approach makes it easier to integrate the library
-into existing projects.
+- ☑️ **Enhanced Web Components** support
 
 ## Getting Started
 
+### Documentation
+
+- [**Documentation and Guide**](https://jaandrle.github.io/deka-dom-el)
+- [**Examples**](https://jaandrle.github.io/deka-dom-el/p15-examples.html)
+
 ### Installation
 
-#### npm
 ```bash
 npm install deka-dom-el --save
 ```
 
-#### CDN / Direct Script
+…or via CDN / Direct Script:
 
 For CDN links and various build formats (ESM/IIFE, with/without signals, minified/unminified), see the [interactive
 format selector](https://jaandrle.github.io/deka-dom-el/) on the documentation site.
@@ -113,10 +104,18 @@ format selector](https://jaandrle.github.io/deka-dom-el/) on the documentation s
 </script>
 ```
 
-### Documentation
+## Why Another Library?
 
-- [**Interactive Guide**](https://jaandrle.github.io/deka-dom-el)
-- [**Examples**](https://jaandrle.github.io/deka-dom-el/p15-examples.html)
+This library bridges the gap between minimal solutions like van/hyperscript and more comprehensive frameworks like
+[solid-js](https://github.com/solidjs/solid), offering a balanced trade-off between size, complexity, and usability.
+
+Following functional programming principles, dd\<el\> starts with pure JavaScript (DOM API) and gradually adds
+auxiliary functions. These range from minor improvements to advanced features for building complete declarative
+reactive UI templates.
+
+A key advantage: any internal function (`assign`, `classListDeclarative`, `on`, `dispatchEvent`, `S`, etc.) can be used
+independently while also working seamlessly together. This modular approach makes it easier to integrate the library
+into existing projects.
 
 ## Understanding Signals
 
