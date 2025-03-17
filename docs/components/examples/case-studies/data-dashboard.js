@@ -23,14 +23,6 @@ export function DataDashboard() {
 		conversion: [2.9, 3.5, 3.7, 2.6, 3.4, 3.5, 2.8, 2.8, 2.8, 3.1, 3.0, 2.7],
 		months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 	};
-
-	// Application state
-	const selectedYear = S(2024);
-	const selectedDataType = S(/** @type {'sales' | 'visitors' | 'conversion'} */ ('sales'));
-	const isLoading = S(false);
-	const error = S(null);
-
-	// Filter options
 	const years = [2022, 2023, 2024];
 	const dataTypes = [
 		{ id: 'sales', label: 'Sales', unit: 'K' },
@@ -38,42 +30,32 @@ export function DataDashboard() {
 		{ id: 'conversion', label: 'Conversion Rate', unit: '%' }
 	];
 
-	// Computed values
-	const selectedData = S(() => {
-		return DATA[selectedDataType.get()];
-	});
-
-	const currentDataType = S(() => {
-		return dataTypes.find(type => type.id === selectedDataType.get());
-	});
-
-	const totalValue = S(() => {
-		const data = selectedData.get();
-		return data.reduce((sum, value) => sum + value, 0);
-	});
-
-	const averageValue = S(() => {
-		const data = selectedData.get();
-		return data.reduce((sum, value) => sum + value, 0) / data.length;
-	});
-
-	const highestValue = S(() => {
-		return Math.max(...selectedData.get());
-	});
-
-	// Event handlers
+	// Filter options
+	const selectedYear = S(2024);
 	const onYearChange = on("change", e => {
 		selectedYear.set(parseInt(/** @type {HTMLSelectElement} */(e.target).value));
 		loadData();
 	});
-
+	const selectedDataType = S(/** @type {'sales' | 'visitors' | 'conversion'} */ ('sales'));
 	const onDataTypeChange = on("click", e => {
 		const type = /** @type {'sales' | 'visitors' | 'conversion'} */(
 			/** @type {HTMLButtonElement} */(e.currentTarget).dataset.type);
 		selectedDataType.set(type);
 	});
+	const currentDataType = S(() => dataTypes.find(type => type.id === selectedDataType.get()));
+	const selectedData = S(() => DATA[selectedDataType.get()]);
+
+	// Values based on filters
+	const totalValue = S(() => selectedData.get().reduce((sum, value) => sum + value, 0));
+	const averageValue = S(() => {
+		const data = selectedData.get();
+		return data.reduce((sum, value) => sum + value, 0) / data.length;
+	});
+	const highestValue = S(() => Math.max(...selectedData.get()));
 
 	// Simulate data loading
+	const isLoading = S(false);
+	const error = S(null);
 	function loadData() {
 		isLoading.set(true);
 		error.set(null);
@@ -114,7 +96,7 @@ export function DataDashboard() {
 			// Draw grid labels
 			ctx.fillStyle = '#999';
 			ctx.font = '12px Arial';
-			ctx.fillText(Math.round(maxValue * (i / 5)), 20, y + 5);
+			ctx.fillText(Math.round(maxValue * (i / 5)).toString(), 20, y + 5);
 		}
 		ctx.stroke();
 
@@ -154,7 +136,6 @@ export function DataDashboard() {
 			)
 		),
 
-		// Error message (only shown when there's an error)
 		S.el(error, errorMsg => !errorMsg
 			? el()
 			: el("div", { className: "error-message" }).append(
@@ -163,7 +144,6 @@ export function DataDashboard() {
 				),
 		),
 
-		// Loading indicator
 		S.el(isLoading, loading => !loading
 			? el()
 			: el("div", { className: "loading-spinner" })
