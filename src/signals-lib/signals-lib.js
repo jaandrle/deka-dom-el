@@ -1,6 +1,6 @@
 import { queueSignalWrite, mark } from "./helpers.js";
 export { mark };
-import { hasOwn, oCreate, oAssign } from "../helpers.js";
+import { hasOwn, oCreate, oAssign, requestIdle } from "../helpers.js";
 
 const Signal = oCreate(null, {
 	get: { value(){ return read(this); } },
@@ -214,7 +214,7 @@ signal.el= function(s, map){
  */
 function requestCleanUpReactives(host){
 	if(!host || !host[key_reactive]) return;
-	(requestIdleCallback || setTimeout)(function(){
+	requestIdle().then(function(){
 		host[key_reactive]= host[key_reactive]
 			.filter(([ s, el ])=> el.isConnected ? true : (removeSignalListener(...s), false));
 	});

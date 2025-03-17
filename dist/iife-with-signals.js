@@ -86,6 +86,11 @@ var DDE = (() => {
 	function kebabToCamel(name) {
 		return name.replace(/-./g, (x) => x[1].toUpperCase());
 	}
+	function requestIdle() {
+		return new Promise(function(resolve) {
+			(globalThis.requestIdleCallback || requestAnimationFrame)(resolve);
+		});
+	}
 
 	// src/dom-lib/common.js
 	var enviroment = {
@@ -223,11 +228,6 @@ var DDE = (() => {
 			if (!is_observing || store.size) return;
 			is_observing = false;
 			observer.disconnect();
-		}
-		function requestIdle() {
-			return new Promise(function(resolve) {
-				(requestIdleCallback || requestAnimationFrame)(resolve);
-			});
 		}
 		async function collectChildren(element) {
 			if (store.size > 30)
@@ -869,7 +869,7 @@ var DDE = (() => {
 	};
 	function requestCleanUpReactives(host) {
 		if (!host || !host[key_reactive]) return;
-		(requestIdleCallback || setTimeout)(function() {
+		requestIdle().then(function() {
 			host[key_reactive] = host[key_reactive].filter(([s, el]) => el.isConnected ? true : (removeSignalListener(...s), false));
 		});
 	}

@@ -67,6 +67,11 @@ var DDE = (() => {
 			signal.removeEventListener("abort", listener);
 		};
 	}
+	function requestIdle() {
+		return new Promise(function(resolve) {
+			(globalThis.requestIdleCallback || requestAnimationFrame)(resolve);
+		});
+	}
 
 	// src/dom-lib/common.js
 	var enviroment = {
@@ -204,11 +209,6 @@ var DDE = (() => {
 			if (!is_observing || store.size) return;
 			is_observing = false;
 			observer.disconnect();
-		}
-		function requestIdle() {
-			return new Promise(function(resolve) {
-				(requestIdleCallback || requestAnimationFrame)(resolve);
-			});
 		}
 		async function collectChildren(element) {
 			if (store.size > 30)

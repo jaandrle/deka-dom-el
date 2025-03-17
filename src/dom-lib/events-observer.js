@@ -1,5 +1,5 @@
 import { enviroment as env, evc, evd } from './common.js';
-import { isInstance } from "../helpers.js";
+import { isInstance, requestIdle } from "../helpers.js";
 
 /**
  * Connection changes observer for tracking element connection/disconnection
@@ -148,15 +148,6 @@ function connectionsChangesObserverConstructor(){
 		is_observing= false;
 		observer.disconnect();
 	}
-
-	//TODO: remount support?
-	/**
-	 * Schedule a task during browser idle time
-	 * @returns {Promise<void>} Promise that resolves when browser is idle
-	 */
-	function requestIdle(){ return new Promise(function(resolve){
-		(requestIdleCallback || requestAnimationFrame)(resolve);
-	}); }
 
 	/**
 	 * Collects child elements from the store that are contained by the given element

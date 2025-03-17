@@ -68,3 +68,12 @@ export function observedAttributes(instance, observedAttribute){
  * @returns {string} The camelCase string
  */
 function kebabToCamel(name){ return name.replace(/-./g, x=> x[1].toUpperCase()); }
+
+/**
+ * Schedule a task during browser idle time
+ * @returns {Promise<void>} Promise that resolves when browser is idle
+ */
+export function requestIdle(){ return new Promise(function(resolve){
+		(globalThis.requestIdleCallback || requestAnimationFrame)(resolve);
+	});
+}
