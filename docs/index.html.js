@@ -105,7 +105,7 @@ export function page({ pkg, info }){
 			or directly include it from a CDN for quick prototyping.
 		`),
 		el("h4", "npm installation"),
-		el(code, { content: "npm install deka-dom-el # Coming soon", language: "shell", page_id }),
+		el(code, { content: "npm install deka-dom-el --save", language: "shell", page_id }),
 		el("h4", "CDN / Direct Script Usage"),
 		el("p").append(T`
 			Use the interactive selector below to choose your preferred format:

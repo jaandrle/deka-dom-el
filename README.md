@@ -90,8 +90,7 @@ into existing projects.
 
 #### npm
 ```bash
-# TBD
-# npm install deka-dom-el
+npm install deka-dom-el --save
 ```
 
 #### CDN / Direct Script
