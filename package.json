@@ -7,7 +7,7 @@
 	"homepage": "https://github.com/jaandrle/deka-dom-el",
 	"repository": {
 		"type": "git",
-		"url": "git@github.com:jaandrle/deka-dom-el.git"
+		"url": "git+ssh://git@github.com/jaandrle/deka-dom-el.git"
 	},
 	"bugs": {
 		"url": "https://github.com/jaandrle/deka-dom-el/issues"
