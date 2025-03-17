@@ -1,5 +1,5 @@
 import { hasOwn, oCreate } from "./helpers.js";
-const memoMark= "__dde_memo_of";
+const memoMark= "__dde_memo";
 const memo_scope= [];
 /**
  * ```js
@@ -20,7 +20,7 @@ export function memo(key, generator){
 	const [ { cache, after } ]= memo_scope;
 	return after(k, hasOwn(cache, k) ? cache[k] : generator(key));
 }
-memo.isScope= function(obj){ return Boolean(obj[memoMark]); };
+memo.isScope= function(obj){ return obj[memoMark]; };
 /**
  * @param {Function} fun
  * @param {Object} [options={}]
@@ -43,7 +43,7 @@ memo.scope= function memoScopeCreate(fun, { signal, onlyLast }= {}){
 		cache= cache_local;
 		return out;
 	}
-	memoScope[memoMark]= fun;
+	memoScope[memoMark]= true;
 	memoScope.clear= ()=> cache= oCreate();
 	if(signal) signal.addEventListener("abort", memoScope.clear);
 	return memoScope;

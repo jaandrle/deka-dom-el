@@ -665,7 +665,7 @@ var DDE = (() => {
 	}
 
 	// src/memo.js
-	var memoMark = "__dde_memo_of";
+	var memoMark = "__dde_memo";
 	var memo_scope = [];
 	function memo(key, generator) {
 		if (!memo_scope.length) return generator(key);
@@ -674,7 +674,7 @@ var DDE = (() => {
 		return after(k, hasOwn(cache, k) ? cache[k] : generator(key));
 	}
 	memo.isScope = function(obj) {
-		return Boolean(obj[memoMark]);
+		return obj[memoMark];
 	};
 	memo.scope = function memoScopeCreate(fun, { signal, onlyLast } = {}) {
 		let cache = oCreate();
@@ -693,7 +693,7 @@ var DDE = (() => {
 			cache = cache_local;
 			return out;
 		}
-		memoScope[memoMark] = fun;
+		memoScope[memoMark] = true;
 		memoScope.clear = () => cache = oCreate();
 		if (signal) signal.addEventListener("abort", memoScope.clear);
 		return memoScope;

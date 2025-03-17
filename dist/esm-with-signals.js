@@ -639,7 +639,7 @@ function wrapMethod(obj, method, apply) {
 }
 
 // src/memo.js
-var memoMark = "__dde_memo_of";
+var memoMark = "__dde_memo";
 var memo_scope = [];
 function memo(key, generator) {
 	if (!memo_scope.length) return generator(key);
@@ -648,7 +648,7 @@ function memo(key, generator) {
 	return after(k, hasOwn(cache, k) ? cache[k] : generator(key));
 }
 memo.isScope = function(obj) {
-	return Boolean(obj[memoMark]);
+	return obj[memoMark];
 };
 memo.scope = function memoScopeCreate(fun, { signal: signal2, onlyLast } = {}) {
 	let cache = oCreate();
@@ -667,7 +667,7 @@ memo.scope = function memoScopeCreate(fun, { signal: signal2, onlyLast } = {}) {
 		cache = cache_local;
 		return out;
 	}
-	memoScope[memoMark] = fun;
+	memoScope[memoMark] = true;
 	memoScope.clear = () => cache = oCreate();
 	if (signal2) signal2.addEventListener("abort", memoScope.clear);
 	return memoScope;
@@ -787,7 +787,7 @@ signal.clear = function(...signals2) {
 };
 var key_reactive = "__dde_reactive";
 signal.el = function(s, map) {
-	map = memo.isScope(map) ? map : memo.scope(map, { onlyLast: true });
+	const mapScoped = memo.isScope(map) ? map : memo.scope(map, { onlyLast: true });
 	const { current } = scope, { scope: sc } = current;
 	const mark_start = createElement.mark({ type: "reactive", component: sc && sc.name || "" }, true);
 	const mark_end = mark_start.end;
@@ -797,7 +797,7 @@ signal.el = function(s, map) {
 		if (!mark_start.parentNode || !mark_end.parentNode)
 			return removeSignalListener(s, reRenderReactiveElement);
 		scope.push(current);
-		let els = map(v);
+		let els = mapScoped(v);
 		scope.pop();
 		if (!Array.isArray(els))
 			els = [els];
@@ -817,7 +817,7 @@ signal.el = function(s, map) {
 	current.host(on.disconnected(
 		() => (
 			/*! Clears cached elements for reactive element `S.el` */
-			map.clear()
+			mapScoped.clear()
 		)
 	));
 	return out;
@@ -889,9 +889,8 @@ var signals_config = {
 function removeSignalsFromElements(s, listener, ...notes) {
 	const { current } = scope;
 	current.host(function(element) {
-		if (element[key_reactive])
-			return element[key_reactive].push([[s, listener], ...notes]);
-		element[key_reactive] = [];
+		if (!element[key_reactive]) element[key_reactive] = [];
+		element[key_reactive].push([[s, listener], ...notes]);
 		if (current.prevent) return;
 		on.disconnected(
 			() => (
