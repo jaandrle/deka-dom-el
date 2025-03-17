@@ -82,7 +82,7 @@ export function page({ pkg, info }){
 
 		el("p").append(T`
 			By separating these concerns, your code becomes more modular, testable, and easier to maintain. This
-			approach ${el("strong", "is not")} something new and/or special to dd<el>. It’s based on ${el("a", {
+			approach ${el("strong", "is not something new and/or special to dd<el>")}. It’s based on ${el("a", {
 				textContent: "MVC", ...references.w_mvc })} (${el("a", { textContent: "MVVM", ...references.w_mvv })}),
 			but is there presented in simpler form.
 		`),
@@ -105,7 +105,7 @@ export function page({ pkg, info }){
 			or directly include it from a CDN for quick prototyping.
 		`),
 		el("h4", "npm installation"),
-		el(code, { content: "npm install deka-dom-el # Coming soon", language: "shell", page_id }),
+		el(code, { content: "npm install deka-dom-el --save", language: "shell", page_id }),
 		el("h4", "CDN / Direct Script Usage"),
 		el("p").append(T`
 			Use the interactive selector below to choose your preferred format:
@@ -154,6 +154,10 @@ export function page({ pkg, info }){
 				Interactive demos with server-side pre-rendering`),
 			el("li").append(T`${el("a", { href: "p13-appendix.html" }).append(el("strong", "Appendix & Summary"))} —
 				Comprehensive reference and best practices`),
+			el("li").append(T`${el("a", { href: "p14-converter.html" }).append(el("strong", "HTML Converter"))} —
+				Convert HTML to dd<el> JavaScript code`),
+			el("li").append(T`${el("a", { href: "p15-examples.html" }).append(el("strong", "Examples Gallery"))} —
+				Real-world application examples and case studies`),
 		),
 		el("p").append(T`
 			Each section builds on the previous ones, so we recommend following them in order.

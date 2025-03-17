@@ -1,6 +1,6 @@
 import { queueSignalWrite, mark } from "./helpers.js";
 export { mark };
-import { hasOwn, Defined, oCreate, oAssign } from "../helpers.js";
+import { hasOwn, oCreate, oAssign } from "../helpers.js";
 
 const Signal = oCreate(null, {
 	get: { value(){ return read(this); } },
@@ -169,21 +169,21 @@ import { memo } from "../memo.js";
  * Creates a reactive DOM element that re-renders when signal changes
  *
  * @param {Object} s - Signal object to watch
- * @param {Function} map - Function mapping signal value to DOM elements
+ * @param {Function} mapScoped - Function mapping signal value to DOM elements
  * @returns {DocumentFragment} Fragment containing reactive elements
  */
 signal.el= function(s, map){
-	map= memo.isScope(map) ? map : memo.scope(map, { onlyLast: true });
-	const mark_start= el.mark({ type: "reactive", source: new Defined().compact }, true);
+	const mapScoped= memo.isScope(map) ? map : memo.scope(map, { onlyLast: true });
+	const { current }= scope, { scope: sc }= current;
+	const mark_start= el.mark({ type: "reactive", component: sc && sc.name || "" }, true);
 	const mark_end= mark_start.end;
 	const out= env.D.createDocumentFragment();
 	out.append(mark_start, mark_end);
-	const { current }= scope;
 	const reRenderReactiveElement= v=> {
 		if(!mark_start.parentNode || !mark_end.parentNode) // === `isConnected` or wasn’t yet rendered
 			return removeSignalListener(s, reRenderReactiveElement);
 		scope.push(current);
-		let els= map(v);
+		let els= mapScoped(v);
 		scope.pop();
 		if(!Array.isArray(els))
 			els= [ els ];
@@ -202,7 +202,7 @@ signal.el= function(s, map){
 	reRenderReactiveElement(s.get());
 	current.host(on.disconnected(()=>
 		/*! Clears cached elements for reactive element `S.el` */
-		map.clear()
+		mapScoped.clear()
 	));
 	return out;
 };
@@ -314,9 +314,8 @@ export const signals_config= {
 function removeSignalsFromElements(s, listener, ...notes){
 	const { current }= scope;
 	current.host(function(element){
-		if(element[key_reactive])
-			return element[key_reactive].push([ [ s, listener ], ...notes ]);
-		element[key_reactive]= [];
+		if(!element[key_reactive]) element[key_reactive]= [];
+		element[key_reactive].push([ [ s, listener ], ...notes ]);
 		if(current.prevent) return; // typically document.body, doenst need auto-remove as it should happen on page leave
 		on.disconnected(()=>
 			/*! Clears all Signals listeners added in the current scope/host (`S.el`, `assign`, …?).
@@ -386,7 +385,6 @@ function toSignal(s, value, actions, readonly= false){
 		value: oAssign(oCreate(protoSigal), {
 			value, actions, onclear, host,
 			listeners: new Set(),
-			defined: new Defined().stack,
 			readonly
 		}),
 		enumerable: false,

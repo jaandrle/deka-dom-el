@@ -68,21 +68,3 @@ export function observedAttributes(instance, observedAttribute){
  * @returns {string} The camelCase string
  */
 function kebabToCamel(name){ return name.replace(/-./g, x=> x[1].toUpperCase()); }
-
-/**
- * Error class for definition tracking
- * Shows the correct stack trace for debugging (signal) creation
- */
-export class Defined extends Error{
-	constructor(){
-		super();
-		const [ curr, ...rest ]= this.stack.split("\n");
-		const curr_file= curr.slice(curr.indexOf("@"), curr.indexOf(".js:")+4);
-		const curr_lib= curr_file.includes("src/helpers.js") ? "src/" : curr_file;
-		this.stack= rest.find(l=> !l.includes(curr_lib)) || curr;
-	}
-	get compact(){
-		const { stack }= this;
-		return stack.slice(0, stack.indexOf("@")+1)+"…"+stack.slice(stack.lastIndexOf("/"));
-	}
-}

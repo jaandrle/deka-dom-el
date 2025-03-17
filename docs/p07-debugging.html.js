@@ -80,8 +80,7 @@ export function page({ pkg, info }){
 			el("li", t`listeners: A Set of functions called when the signal value changes`),
 			el("li", t`actions: Custom actions that can be performed on the signal`),
 			el("li", t`onclear: Functions to run when the signal is cleared`),
-			el("li", t`host: Reference to the host element/scope`),
-			el("li", t`defined: Stack trace information for debugging`),
+			el("li", t`host: Reference to the host element/scope in which the signal was created`),
 			el("li", t`readonly: Boolean flag indicating if the signal is read-only`)
 		),
 		el("p").append(T`
@@ -114,7 +113,13 @@ export function page({ pkg, info }){
 		el("ul").append(
 			el("li", t`That you’re using signal.set() to update the value, not modifying objects/arrays directly`),
 			el("li", t`For mutable objects, ensure you’re using actions or making proper copies before updating`),
-			el("li", t`That the signal is actually connected to the DOM element (check your S.el or attribute binding code)`)
+			el("li", t`That the signal is actually connected to the DOM element (check your S.el or attribute binding
+				code)`),
+			el("li").append(T`
+				That you’re passing signal corecctly (without using ${el("code", "*.get()")}) and for ${el("code",
+				"S.el")} that you passing (derived) signals not a function (use ${el("code",
+				"S.el(S(()=> count.get() % 2), odd=> …)")}).
+			`),
 		),
 		el(code, { src: fileURL("./components/examples/debugging/mutations.js"), page_id }),
 

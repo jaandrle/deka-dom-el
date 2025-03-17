@@ -27,7 +27,7 @@ memo.isScope= function(obj){ return obj[memoMark]; };
  * @param {AbortSignal} options.signal
  * @param {boolean} [options.onlyLast=false]
  * */
-memo.scope= function memoScope(fun, { signal, onlyLast }= {}){
+memo.scope= function memoScopeCreate(fun, { signal, onlyLast }= {}){
 	let cache= oCreate();
 	function memoScope(...args){
 		if(signal && signal.aborted)

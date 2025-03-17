@@ -41,19 +41,6 @@ function observedAttributes(instance, observedAttribute2) {
 function kebabToCamel(name) {
 	return name.replace(/-./g, (x) => x[1].toUpperCase());
 }
-var Defined = class extends Error {
-	constructor() {
-		super();
-		const [curr, ...rest] = this.stack.split("\n");
-		const curr_file = curr.slice(curr.indexOf("@"), curr.indexOf(".js:") + 4);
-		const curr_lib = curr_file.includes("src/helpers.js") ? "src/" : curr_file;
-		this.stack = rest.find((l) => !l.includes(curr_lib)) || curr;
-	}
-	get compact() {
-		const { stack } = this;
-		return stack.slice(0, stack.indexOf("@") + 1) + "\u2026" + stack.slice(stack.lastIndexOf("/"));
-	}
-};
 
 // src/dom-lib/common.js
 var enviroment = {
@@ -303,7 +290,7 @@ var store_abort = /* @__PURE__ */ new WeakMap();
 var scope = {
 	/**
 	* Gets the current scope
-	* @returns {Object} Current scope context
+	* @returns {typeof scopes[number]} Current scope context
 	*/
 	get current() {
 		return scopes[scopes.length - 1];
@@ -663,9 +650,9 @@ function memo(key, generator) {
 memo.isScope = function(obj) {
 	return obj[memoMark];
 };
-memo.scope = function memoScope(fun, { signal: signal2, onlyLast } = {}) {
+memo.scope = function memoScopeCreate(fun, { signal: signal2, onlyLast } = {}) {
 	let cache = oCreate();
-	function memoScope2(...args) {
+	function memoScope(...args) {
 		if (signal2 && signal2.aborted)
 			return fun.apply(this, args);
 		let cache_local = onlyLast ? cache : oCreate();
@@ -680,10 +667,10 @@ memo.scope = function memoScope(fun, { signal: signal2, onlyLast } = {}) {
 		cache = cache_local;
 		return out;
 	}
-	memoScope2[memoMark] = true;
-	memoScope2.clear = () => cache = oCreate();
-	if (signal2) signal2.addEventListener("abort", memoScope2.clear);
-	return memoScope2;
+	memoScope[memoMark] = true;
+	memoScope.clear = () => cache = oCreate();
+	if (signal2) signal2.addEventListener("abort", memoScope.clear);
+	return memoScope;
 };
 
 // src/signals-lib/helpers.js
@@ -800,17 +787,17 @@ signal.clear = function(...signals2) {
 };
 var key_reactive = "__dde_reactive";
 signal.el = function(s, map) {
-	map = memo.isScope(map) ? map : memo.scope(map, { onlyLast: true });
-	const mark_start = createElement.mark({ type: "reactive", source: new Defined().compact }, true);
+	const mapScoped = memo.isScope(map) ? map : memo.scope(map, { onlyLast: true });
+	const { current } = scope, { scope: sc } = current;
+	const mark_start = createElement.mark({ type: "reactive", component: sc && sc.name || "" }, true);
 	const mark_end = mark_start.end;
 	const out = enviroment.D.createDocumentFragment();
 	out.append(mark_start, mark_end);
-	const { current } = scope;
 	const reRenderReactiveElement = (v) => {
 		if (!mark_start.parentNode || !mark_end.parentNode)
 			return removeSignalListener(s, reRenderReactiveElement);
 		scope.push(current);
-		let els = map(v);
+		let els = mapScoped(v);
 		scope.pop();
 		if (!Array.isArray(els))
 			els = [els];
@@ -830,7 +817,7 @@ signal.el = function(s, map) {
 	current.host(on.disconnected(
 		() => (
 			/*! Clears cached elements for reactive element `S.el` */
-			map.clear()
+			mapScoped.clear()
 		)
 	));
 	return out;
@@ -902,9 +889,8 @@ var signals_config = {
 function removeSignalsFromElements(s, listener, ...notes) {
 	const { current } = scope;
 	current.host(function(element) {
-		if (element[key_reactive])
-			return element[key_reactive].push([[s, listener], ...notes]);
-		element[key_reactive] = [];
+		if (!element[key_reactive]) element[key_reactive] = [];
+		element[key_reactive].push([[s, listener], ...notes]);
 		if (current.prevent) return;
 		on.disconnected(
 			() => (
@@ -949,7 +935,6 @@ function toSignal(s, value, actions, readonly = false) {
 			onclear,
 			host,
 			listeners: /* @__PURE__ */ new Set(),
-			defined: new Defined().stack,
 			readonly
 		}),
 		enumerable: false,

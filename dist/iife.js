@@ -316,7 +316,7 @@ var DDE = (() => {
 	var scope = {
 		/**
 		* Gets the current scope
-		* @returns {Object} Current scope context
+		* @returns {typeof scopes[number]} Current scope context
 		*/
 		get current() {
 			return scopes[scopes.length - 1];
@@ -676,9 +676,9 @@ var DDE = (() => {
 	memo.isScope = function(obj) {
 		return obj[memoMark];
 	};
-	memo.scope = function memoScope(fun, { signal, onlyLast } = {}) {
+	memo.scope = function memoScopeCreate(fun, { signal, onlyLast } = {}) {
 		let cache = oCreate();
-		function memoScope2(...args) {
+		function memoScope(...args) {
 			if (signal && signal.aborted)
 				return fun.apply(this, args);
 			let cache_local = onlyLast ? cache : oCreate();
@@ -693,10 +693,10 @@ var DDE = (() => {
 			cache = cache_local;
 			return out;
 		}
-		memoScope2[memoMark] = true;
-		memoScope2.clear = () => cache = oCreate();
-		if (signal) signal.addEventListener("abort", memoScope2.clear);
-		return memoScope2;
+		memoScope[memoMark] = true;
+		memoScope.clear = () => cache = oCreate();
+		if (signal) signal.addEventListener("abort", memoScope.clear);
+		return memoScope;
 	};
 	return __toCommonJS(index_exports);
 })();

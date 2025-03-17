@@ -27,25 +27,23 @@ const imagesSample = (url=> [
  * @returns {HTMLElement} Gallery element
  */
 export function ImageGallery(images= imagesSample) {
-
-	// Application state
-	const selectedImageId = S(null);
 	const filterTag = S('all');
 	const imagesToDisplay = S(() => {
 		const tag = filterTag.get();
 		if (tag === 'all') return images;
 		else return images.filter(img => img.alt.toLowerCase() === tag);
 	})
+	const onFilterChange = tag => on("click", () => {
+		filterTag.set(tag);
+	});
 
-	// Derived state
+	// Lightbox
+	const selectedImageId = S(null);
 	const selectedImage = S(() => {
 		const id = selectedImageId.get();
 		return id ? images.find(img => img.id === id) : null;
 	});
-
 	const isLightboxOpen = S(() => selectedImage.get() !== null);
-
-	// Event handlers
 	const onImageClick = id => on("click", () => {
 		selectedImageId.set(id);
 		document.body.style.overflow = 'hidden'; // Prevent scrolling when lightbox is open
@@ -76,9 +74,6 @@ export function ImageGallery(images= imagesSample) {
 		const nextIndex = (currentIndex + 1) % images.length;
 		selectedImageId.set(images[nextIndex].id);
 	};
-	const onFilterChange = tag => on("click", () => {
-		filterTag.set(tag);
-	});
 
 	// Keyboard navigation handler
 	function handleKeyDown(e) {

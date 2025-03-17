@@ -277,7 +277,72 @@ export function page({ pkg, info }){
 			`),
 			el("li").append(T`
 				${el("strong", "Avoid infinite loops")}: Be careful when one signal updates another in a subscription
-			`)
+			`),
+		),
+		el("p").append(T`
+			While signals provide powerful reactivity for complex UI interactions, they’re not always necessary.
+			A good approach is to started with variables/constants and when necessary, convert them to signals.
+		`),
+
+		el("div", { className: "tabs" }).append(
+			el("div", { className: "tab", dataTab: "events" }).append(
+				el("h4", t`We can process form events without signals`),
+				el("p", t`This can be used when the form data doesn’t need to be reactive and we just waiting for
+					results.`),
+				el(code, { page_id, content: `
+					const onFormSubmit = on("submit", e => {
+						e.preventDefault();
+						const formData = new FormData(e.currentTarget);
+						// this can be sent to a server
+						// or processed locally
+						// e.g.: console.log(Object.fromEntries(formData))
+					});
+					// …
+					return el("form", null, onFormSubmit).append(
+						// …
+					);
+				` })
+			),
+
+			el("div", { className: "tab", dataTab: "variables" }).append(
+				el("h4", t`We can use variables without signals`),
+				el("p", t`We use this when we dont’t need to reflect changes in the elsewhere (UI).`),
+				el(code, { page_id, content: `
+					let canSubmit = false;
+
+					const onFormSubmit = on("submit", e => {
+						e.preventDefault();
+						if(!canSubmit) return; // some message
+						// …
+					});
+					const onAllowSubmit = on("click", e => {
+						canSubmit = true;
+					});
+				`}),
+			),
+
+			el("div", { className: "tab", dataTab: "state" }).append(
+				el("h4", t`Using signals`),
+				el("p", t`We use this when we need to reflect changes for example in the UI (e.g. enable/disable
+					buttons).`),
+				el(code, { page_id, content: `
+					const canSubmit = S(false);
+
+					const onFormSubmit = on("submit", e => {
+						e.preventDefault();
+						// …
+					});
+					const onAllowSubmit = on("click", e => {
+						canSubmit.set(true);
+					});
+
+					return el("form", null, onFormSubmit).append(
+						// ...
+						el("button", { textContent: "Allow Submit", type: "button" }, onAllowSubmit),
+						el("button", { disabled: S(()=> !canSubmit), textContent: "Submit" })
+					);
+				`}),
+			),
 		),
 
 		el("div", { className: "troubleshooting" }).append(
@@ -298,6 +363,6 @@ export function page({ pkg, info }){
 			)
 		),
 
-		el(mnemonic)
+		el(mnemonic),
 	);
 }

@@ -73,8 +73,17 @@ export function Form({ initial }) {
 			this.value[key] = value;
 		}
 	});
+	/**
+	 * Event handler for input events
+	 * @param {"value"|"checked"} prop
+	 * @returns {(ev: Event) => void}
+	 * */
+	const onChange= prop => ev => {
+		const input = /** @type {HTMLInputElement} */(ev.target);
+		S.action(formState, "update", /** @type {keyof FormState} */(input.id), input[prop]);
+	};
 
-	// Derived signals for validation
+	// Form validate state
 	const nameValid = S(() => formState.get().name.length >= 3);
 	const emailValid = S(() => {
 		const email = formState.get().email;
@@ -89,8 +98,6 @@ export function Form({ initial }) {
 		return password === confirmPassword && confirmPassword !== '';
 	});
 	const termsAgreed = S(() => formState.get().agreedToTerms);
-
-	// Overall form validity
 	const formValid = S(() =>
 		nameValid.get() &&
 		emailValid.get() &&
@@ -99,16 +106,6 @@ export function Form({ initial }) {
 		termsAgreed.get()
 	);
 
-	// Event handlers
-	/**
-	 * Event handler for input events
-	 * @param {"value"|"checked"} prop
-	 * @returns {(ev: Event) => void}
-	 * */
-	const onChange= prop => ev => {
-		const input = /** @type {HTMLInputElement} */(ev.target);
-		S.action(formState, "update", /** @type {keyof FormState} */(input.id), input[prop]);
-	};
 	const dispatcSubmit = dispatchEvent("form:submit", host);
 	const onSubmit = on("submit", e => {
 		e.preventDefault();

@@ -29,7 +29,7 @@ export function mnemonic(){
 		el("li").append(
 			el("code", "S.clear(...<signals>)"),
 			" — off and clear signals (most of the time it is not needed as reactive ",
-			"attributes and elements are cleared automatically)",
+			"attributes and elements are handled automatically)",
 		),
 	);
 }

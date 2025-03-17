@@ -9,7 +9,7 @@ export function mnemonic(){
 		),
 		el("li").append(
 			el("code", "el(<tag-name>, <primitive>)[.append(...)]: <element-from-tag-name>"),
-			" — simple element containing only text",
+			" — simple element containing only text (accepts string, number or signal)",
 		),
 		el("li").append(
 			el("code", "el(<tag-name>, <object>)[.append(...)]: <element-from-tag-name>"),
@@ -26,6 +26,6 @@ export function mnemonic(){
 		el("li").append(
 			el("code", "elNS(<namespace>)(<as-el-see-above>)[.append(...)]: <element-based-on-arguments>"),
 			" — typically SVG elements",
-		)
+		),
 	);
 }

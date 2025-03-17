@@ -136,7 +136,7 @@ export function page({ pkg, info }){
 				el("li", t`Set up lifecycle behaviors`),
 				el("li", t`Integrate third-party libraries`),
 				el("li", t`Create reusable element behaviors`),
-				el("li", t`Capture element references`)
+				el("li", t`Capture element references`), // TODO: add example?
 			)
 		),
 		el("p").append(T`
