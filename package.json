@@ -89,7 +89,7 @@
 		"test": "echo \"Error: no tests yet\"",
 		"build": "bs/build.js",
 		"lint": "bs/lint.sh",
-		"docs": "bs/docs.sh"
+		"docs": "bs/docs.js"
 	},
 	"keywords": [
 		"dom",
