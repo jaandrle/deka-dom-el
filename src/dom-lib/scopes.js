@@ -19,7 +19,7 @@ const store_abort= new WeakMap();
 export const scope= {
 	/**
 	 * Gets the current scope
-	 * @returns {Object} Current scope context
+	 * @returns {typeof scopes[number]} Current scope context
 	 */
 	get current(){ return scopes[scopes.length-1]; },
 

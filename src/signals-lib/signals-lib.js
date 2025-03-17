@@ -1,6 +1,6 @@
 import { queueSignalWrite, mark } from "./helpers.js";
 export { mark };
-import { hasOwn, Defined, oCreate, oAssign } from "../helpers.js";
+import { hasOwn, oCreate, oAssign } from "../helpers.js";
 
 const Signal = oCreate(null, {
 	get: { value(){ return read(this); } },
@@ -174,11 +174,11 @@ import { memo } from "../memo.js";
  */
 signal.el= function(s, map){
 	map= memo.isScope(map) ? map : memo.scope(map, { onlyLast: true });
-	const mark_start= el.mark({ type: "reactive", source: new Defined().compact }, true);
+	const { current }= scope, { scope: sc }= current;
+	const mark_start= el.mark({ type: "reactive", component: sc && sc.name || "" }, true);
 	const mark_end= mark_start.end;
 	const out= env.D.createDocumentFragment();
 	out.append(mark_start, mark_end);
-	const { current }= scope;
 	const reRenderReactiveElement= v=> {
 		if(!mark_start.parentNode || !mark_end.parentNode) // === `isConnected` or wasn’t yet rendered
 			return removeSignalListener(s, reRenderReactiveElement);
@@ -386,7 +386,6 @@ function toSignal(s, value, actions, readonly= false){
 		value: oAssign(oCreate(protoSigal), {
 			value, actions, onclear, host,
 			listeners: new Set(),
-			defined: new Defined().stack,
 			readonly
 		}),
 		enumerable: false,

@@ -274,7 +274,7 @@ var store_abort = /* @__PURE__ */ new WeakMap();
 var scope = {
 	/**
 	* Gets the current scope
-	* @returns {Object} Current scope context
+	* @returns {typeof scopes[number]} Current scope context
 	*/
 	get current() {
 		return scopes[scopes.length - 1];
@@ -623,7 +623,7 @@ function wrapMethod(obj, method, apply) {
 }
 
 // src/memo.js
-var memoMark = "__dde_memo";
+var memoMark = "__dde_memo_of";
 var memo_scope = [];
 function memo(key, generator) {
 	if (!memo_scope.length) return generator(key);
@@ -632,11 +632,11 @@ function memo(key, generator) {
 	return after(k, hasOwn(cache, k) ? cache[k] : generator(key));
 }
 memo.isScope = function(obj) {
-	return obj[memoMark];
+	return Boolean(obj[memoMark]);
 };
-memo.scope = function memoScope(fun, { signal, onlyLast } = {}) {
+memo.scope = function memoScopeCreate(fun, { signal, onlyLast } = {}) {
 	let cache = oCreate();
-	function memoScope2(...args) {
+	function memoScope(...args) {
 		if (signal && signal.aborted)
 			return fun.apply(this, args);
 		let cache_local = onlyLast ? cache : oCreate();
@@ -651,10 +651,10 @@ memo.scope = function memoScope(fun, { signal, onlyLast } = {}) {
 		cache = cache_local;
 		return out;
 	}
-	memoScope2[memoMark] = true;
-	memoScope2.clear = () => cache = oCreate();
-	if (signal) signal.addEventListener("abort", memoScope2.clear);
-	return memoScope2;
+	memoScope[memoMark] = fun;
+	memoScope.clear = () => cache = oCreate();
+	if (signal) signal.addEventListener("abort", memoScope.clear);
+	return memoScope;
 };
 export {
 	assign,

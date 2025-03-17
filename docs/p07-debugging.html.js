@@ -81,7 +81,6 @@ export function page({ pkg, info }){
 			el("li", t`actions: Custom actions that can be performed on the signal`),
 			el("li", t`onclear: Functions to run when the signal is cleared`),
 			el("li", t`host: Reference to the host element/scope in which the signal was created`),
-			el("li", t`defined: Stack trace information for debugging`),
 			el("li", t`readonly: Boolean flag indicating if the signal is read-only`)
 		),
 		el("p").append(T`
