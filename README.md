@@ -1,7 +1,7 @@
 **Alpha**
 | [source code on GitHub](https://github.com/jaandrle/deka-dom-el)
 | [*mirrored* on Gitea](https://gitea.jaandrle.cz/jaandrle/deka-dom-el)
-| [![git3moji](https://img.shields.io/badge/git3moji%E2%80%93v1-%E2%9A%A1%EF%B8%8F%F0%9F%90%9B%F0%9F%93%BA%F0%9F%91%AE%F0%9F%94%A4-fffad8.svg?style=flat-square)](https://robinpokorny.github.io/git3moji/) <!-- editorconfig-checker-disable-line -->
+| [npm package](https://www.npmjs.com/package/deka-dom-el)
 
 <p align="center">
 	<img src="docs/assets/logo.svg" alt="Deka DOM Elements Logo" width="180" height="180">
@@ -23,9 +23,6 @@ function EmojiCounter({ initial }) {
 	// ✨ State - Define reactive data
 	const count = S(0);
 	const emoji = S(initial);
-
-	/** @param {HTMLOptionElement} el */
-	const isSelected= el=> (el.selected= el.value===initial);
 
 	// 🔄 View - UI updates automatically when signals change
 	return el().append(
@@ -87,7 +84,7 @@ npm install deka-dom-el --save
 …or via CDN / Direct Script:
 
 For CDN links and various build formats (ESM/IIFE, with/without signals, minified/unminified), see the [interactive
-format selector](https://jaandrle.github.io/deka-dom-el/) on the documentation site.
+format selector](https://jaandrle.github.io/deka-dom-el/#h-getting-started) on the documentation site.
 
 ```html
 <!-- Example with IIFE build (creates a global DDE object) -->

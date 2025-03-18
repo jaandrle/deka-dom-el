@@ -16,7 +16,11 @@ import { getLibraryUrl } from "./components/getLibraryUrl.html.js";
 /** @param {string} url */
 const fileURL= url=> new URL(url, import.meta.url);
 const references= {
-	w_mvv:{
+	npm: {
+		title: t`NPM package page for dd<el>`,
+		href: "https://www.npmjs.com/package/deka-dom-el",
+	},
+	w_mvv: {
 		title: t`Wikipedia: Model–view–viewmodel`,
 		href: "https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93viewmodel",
 	},
@@ -106,6 +110,10 @@ export function page({ pkg, info }){
 		`),
 		el("h4", "npm installation"),
 		el(code, { content: "npm install deka-dom-el --save", language: "shell", page_id }),
+		el("p").append(T`
+			…see ${el("a", { textContent: "package page", ...references.npm, target: "_blank" })}.
+		`),
+
 		el("h4", "CDN / Direct Script Usage"),
 		el("p").append(T`
 			Use the interactive selector below to choose your preferred format:

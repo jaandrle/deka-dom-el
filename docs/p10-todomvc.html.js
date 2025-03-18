@@ -311,9 +311,9 @@ export function page({ pkg, info }){
 		el(code, { content: `
 			// Dynamic class attributes
 			el("a", {
-				textContent: "All",
-				className: S(()=> pageS.get() === "all" ? "selected" : ""),
-				href: "#"
+				textContent,
+				classList: { selected: S(()=> pageS.get() === textContent.toLowerCase()) },
+				href: \`#\${textContent.toLowerCase()}\`
 			})
 
 			// Reactive classList
@@ -355,18 +355,25 @@ export function page({ pkg, info }){
 
 		el("h4", t`Memoizing UI Sections`),
 		el(code, { content: `
-			S.el(todosS, todos => memo(todos.length, length=> length
-				? el("footer", { className: "footer" }).append(
-					// Footer content...
+			S.el(todosS, ({ length }) => !length
+				? el()
+				: el("footer", { className: "footer" }).append(
+					// …
+					memo("filters", ()=>
+						// …
+								el("a", {
+									textContent,
+									classList: { selected: S(()=> pageS.get() === textContent.toLowerCase()) },
+									href: \`#\${textContent.toLowerCase()}\`
+								})
+					// …
 				)
-				: el()
 			))
 		`, page_id }),
 
 		el("p").append(T`
-			By memoizing based on the todos length, the entire footer component is only re-rendered
-			when todos are added or removed, not when their properties change. This improves performance
-			by avoiding unnecessary DOM operations.
+			We memoize the UI section and uses derived signal for the classList. Re-rendering this part is therefore
+			unnecessary when the number of todos changes.
 		`),
 
 		el("div", { className: "tip" }).append(
@@ -389,8 +396,10 @@ export function page({ pkg, info }){
 		`),
 		el(code, { content: `
 			// Event handlers in the main component
-			const onDelete = on("todo:delete", ev => S.action(todosS, "delete", ev.detail));
-			const onEdit = on("todo:edit", ev => S.action(todosS, "edit", ev.detail));
+			const onDelete = on("todo:delete", ev =>
+				S.action(todosS, "delete", /** @type {{ detail: Todo["id"] }} */(ev).detail));
+			const onEdit = on("todo:edit", ev =>
+				S.action(todosS, "edit", /** @type {{ detail: Partial<Todo> & { id: Todo["id"] } }} */(ev).detail));
 		`, page_id }),
 
 		el("h4", t`2. The TodoItem Component with Scopes and Local State`),
@@ -522,25 +531,24 @@ export function page({ pkg, info }){
 		el("h4", t`Conditional Todo List`),
 		el(code, { content: `
 			S.el(todosS, todos => todos.length
-				? el("main", { className: "main" }).append(
+				? el()
+				: el("main", { className: "main" }).append(
 					// Main content with toggle all and todo list
 				)
-				: el()
 			)
 		`, page_id }),
 
 		el("h4", t`Conditional Edit Form`),
 		el(code, { content: `
-			S.el(isEditing, editing => editing
-				? el("form", null, onSubmitEdit).append(
+			S.el(isEditing, editing => !editing
+				? el()
+				: el("form", null, onSubmitEdit).append(
 					el("input", {
 						className: "edit",
-						name: "edit",
+						name: formEdit,
 						value: title,
-						"data-id": id
 					}, onBlurEdit, onKeyDown, addFocus)
 				)
-				: el()
 			)
 		`, page_id }),
 
@@ -630,7 +638,7 @@ export function page({ pkg, info }){
 				${el("strong", "Declarative Class Management:")} Using the classList property for cleaner class handling
 			`),
 			el("li").append(T`
-				${el("strong", "Focus Management:")} Reliable input focus with setTimeout
+				${el("strong", "Focus Management:")} Reliable input focus with requestAnimationFrame
 			`),
 			el("li").append(T`
 				${el("strong", "Persistent Storage:")} Automatically saving application state with signal listeners

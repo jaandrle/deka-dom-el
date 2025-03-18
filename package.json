@@ -4,7 +4,7 @@
 	"description": "A low-code library that simplifies the creation of native DOM elements/components using small wrappers and tweaks.",
 	"author": "Jan Andrle <andrle.jan@centrum.cz>",
 	"license": "MIT",
-	"homepage": "https://github.com/jaandrle/deka-dom-el",
+	"homepage": "https://jaandrle.github.io/deka-dom-el/",
 	"repository": {
 		"type": "git",
 		"url": "git+ssh://git@github.com/jaandrle/deka-dom-el.git"
