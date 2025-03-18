@@ -1,9 +1,8 @@
 import { T, t } from "./utils/index.js";
 export const info= {
 	title: t`Ireland Components`,
-	fullTitle: t`Interactive Demo Components with Server-Side Pre-Rendering`,
-	description: t`Creating live, interactive component examples in documentation with server-side
-		rendering and client-side hydration.`,
+	fullTitle: t`Server-Side Pre-Rendering and Client-Side Rehydration`,
+	description: t`Using Ireland components for server-side pre-rendering and client-side rehydration`,
 };
 
 import { el } from "deka-dom-el";
