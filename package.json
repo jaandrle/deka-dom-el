@@ -52,7 +52,6 @@
 		"maxdepth": 3,
 		"maxcomplexity": 14,
 		"globals": {
-			"requestIdleCallback": false,
 			"AbortController": false,
 			"AbortSignal": false,
 			"FinalizationRegistry": false
