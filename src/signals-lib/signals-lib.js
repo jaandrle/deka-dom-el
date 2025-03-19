@@ -1,15 +1,14 @@
 import { queueSignalWrite, mark } from "./helpers.js";
 export { mark };
-import { hasOwn, oCreate, oAssign } from "../helpers.js";
+import { hasOwn, oCreate, oAssign, requestIdle } from "../helpers.js";
 
-const Signal = oCreate(null, {
+const SignalReadOnly= oCreate(null, {
 	get: { value(){ return read(this); } },
-	set: { value(...v){ return write(this, ...v); } },
 	toJSON: { value(){ return read(this); } },
 	valueOf: { value(){ return this[mark] && this[mark].value; } }
 });
-const SignalReadOnly= oCreate(Signal, {
-	set: { value(){ return; } },
+const Signal = oCreate(SignalReadOnly, {
+	set: { value(...v){ return write(this, ...v); } },
 });
 /**
  * Checks if a value is a signal
@@ -214,7 +213,7 @@ signal.el= function(s, map){
  */
 function requestCleanUpReactives(host){
 	if(!host || !host[key_reactive]) return;
-	(requestIdleCallback || setTimeout)(function(){
+	requestIdle().then(function(){
 		host[key_reactive]= host[key_reactive]
 			.filter(([ s, el ])=> el.isConnected ? true : (removeSignalListener(...s), false));
 	});
@@ -314,9 +313,14 @@ export const signals_config= {
 function removeSignalsFromElements(s, listener, ...notes){
 	const { current }= scope;
 	current.host(function(element){
-		if(!element[key_reactive]) element[key_reactive]= [];
+		const is_first= !element[key_reactive];
+		if(is_first) element[key_reactive]= [];
 		element[key_reactive].push([ [ s, listener ], ...notes ]);
-		if(current.prevent) return; // typically document.body, doenst need auto-remove as it should happen on page leave
+		if(
+			!is_first
+			// typically document.body, doenst need auto-remove as it should happen on page leave
+			|| current.prevent
+		) return;
 		on.disconnected(()=>
 			/*! Clears all Signals listeners added in the current scope/host (`S.el`, `assign`, …?).
 				You can investigate the `__dde_reactive` key of the element. */
@@ -344,7 +348,7 @@ const cleanUpRegistry = new FinalizationRegistry(function(s){
  */
 function create(is_readonly, value, actions){
 	const varS = oCreate(is_readonly ? SignalReadOnly : Signal);
-	const SI= toSignal(varS, value, actions, is_readonly);
+	const SI= toSignal(varS, value, actions);
 	cleanUpRegistry.register(SI, SI[mark]);
 	return SI;
 }
@@ -367,11 +371,10 @@ const protoSigal= oAssign(oCreate(), {
  * @param {Object} s - Object to transform
  * @param {any} value - Initial value
  * @param {Object} actions - Custom actions
- * @param {boolean} [readonly=false] - Whether the signal is readonly
  * @returns {Object} Signal object with get() and set() methods
  * @private
  */
-function toSignal(s, value, actions, readonly= false){
+function toSignal(s, value, actions){
 	const onclear= [];
 	if(typeOf(actions)!=="[object Object]")
 		actions= {};
@@ -385,7 +388,6 @@ function toSignal(s, value, actions, readonly= false){
 		value: oAssign(oCreate(protoSigal), {
 			value, actions, onclear, host,
 			listeners: new Set(),
-			readonly
 		}),
 		enumerable: false,
 		writable: false,

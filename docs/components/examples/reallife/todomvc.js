@@ -81,11 +81,11 @@ function Todos(){
 				)
 			)
 		),
-		S.el(todosS, todos => !todos.length
+		S.el(todosS, ({ length }) => !length
 			? el()
 			: el("footer", { className: "footer" }).append(
 				el("span", { className: "todo-count" }).append(
-					noOfLeft()
+					el("strong", length + " " + (length === 1 ? "item" : "items")),
 				),
 				memo("filters", ()=>
 					el("ul", { className: "filters" }).append(
@@ -100,7 +100,7 @@ function Todos(){
 						)
 					),
 				),
-				todos.length - todosRemainingS.get() === 0
+				length - todosRemainingS.get() === 0
 					? el()
 					: memo("delete", () =>
 						el("button",
@@ -110,13 +110,6 @@ function Todos(){
 			)
 		)
 	);
-	function noOfLeft(){
-		const length = todosRemainingS.get();
-		return el("strong").append(
-			length + " ",
-			length === 1 ? "item left" : "items left"
-		)
-	}
 }
 
 /**

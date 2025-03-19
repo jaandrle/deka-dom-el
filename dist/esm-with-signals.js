@@ -41,6 +41,11 @@ function observedAttributes(instance, observedAttribute2) {
 function kebabToCamel(name) {
 	return name.replace(/-./g, (x) => x[1].toUpperCase());
 }
+function requestIdle() {
+	return new Promise(function(resolve) {
+		(globalThis.requestIdleCallback || requestAnimationFrame)(resolve);
+	});
+}
 
 // src/dom-lib/common.js
 var enviroment = {
@@ -178,11 +183,6 @@ function connectionsChangesObserverConstructor() {
 		if (!is_observing || store.size) return;
 		is_observing = false;
 		observer.disconnect();
-	}
-	function requestIdle() {
-		return new Promise(function(resolve) {
-			(requestIdleCallback || requestAnimationFrame)(resolve);
-		});
 	}
 	async function collectChildren(element) {
 		if (store.size > 30)
@@ -696,12 +696,9 @@ var queueSignalWrite = /* @__PURE__ */ (() => {
 })();
 
 // src/signals-lib/signals-lib.js
-var Signal = oCreate(null, {
+var SignalReadOnly = oCreate(null, {
 	get: { value() {
 		return read(this);
-	} },
-	set: { value(...v) {
-		return write(this, ...v);
 	} },
 	toJSON: { value() {
 		return read(this);
@@ -710,9 +707,9 @@ var Signal = oCreate(null, {
 		return this[mark] && this[mark].value;
 	} }
 });
-var SignalReadOnly = oCreate(Signal, {
-	set: { value() {
-		return;
+var Signal = oCreate(SignalReadOnly, {
+	set: { value(...v) {
+		return write(this, ...v);
 	} }
 });
 function isSignal(candidate) {
@@ -824,7 +821,7 @@ signal.el = function(s, map) {
 };
 function requestCleanUpReactives(host) {
 	if (!host || !host[key_reactive]) return;
-	(requestIdleCallback || setTimeout)(function() {
+	requestIdle().then(function() {
 		host[key_reactive] = host[key_reactive].filter(([s, el]) => el.isConnected ? true : (removeSignalListener(...s), false));
 	});
 }
@@ -889,9 +886,10 @@ var signals_config = {
 function removeSignalsFromElements(s, listener, ...notes) {
 	const { current } = scope;
 	current.host(function(element) {
-		if (!element[key_reactive]) element[key_reactive] = [];
+		const is_first = !element[key_reactive];
+		if (is_first) element[key_reactive] = [];
 		element[key_reactive].push([[s, listener], ...notes]);
-		if (current.prevent) return;
+		if (!is_first || current.prevent) return;
 		on.disconnected(
 			() => (
 				/*! Clears all Signals listeners added in the current scope/host (`S.el`, `assign`, …?).
@@ -906,7 +904,7 @@ var cleanUpRegistry = new FinalizationRegistry(function(s) {
 });
 function create(is_readonly, value, actions) {
 	const varS = oCreate(is_readonly ? SignalReadOnly : Signal);
-	const SI = toSignal(varS, value, actions, is_readonly);
+	const SI = toSignal(varS, value, actions);
 	cleanUpRegistry.register(SI, SI[mark]);
 	return SI;
 }
@@ -918,7 +916,7 @@ var protoSigal = oAssign(oCreate(), {
 		this.skip = true;
 	}
 });
-function toSignal(s, value, actions, readonly = false) {
+function toSignal(s, value, actions) {
 	const onclear = [];
 	if (typeOf(actions) !== "[object Object]")
 		actions = {};
@@ -934,8 +932,7 @@ function toSignal(s, value, actions, readonly = false) {
 			actions,
 			onclear,
 			host,
-			listeners: /* @__PURE__ */ new Set(),
-			readonly
+			listeners: /* @__PURE__ */ new Set()
 		}),
 		enumerable: false,
 		writable: false,

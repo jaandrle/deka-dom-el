@@ -1,4 +1,8 @@
 export { t } from "./utils/index.js";
+/** @type {string} */
+export let page_id;
+/** @param {string} id */
+export function currentPageId(id){ page_id= id; }
 export const path_target= {
 	root: "dist/docs/",
 	css: "dist/docs/",

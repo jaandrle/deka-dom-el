@@ -39,7 +39,6 @@ const references= {
 };
 /** @param {import("./types.d.ts").PageAttrs} attrs */
 export function page({ pkg, info }){
-	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
 		el("p").append(T`
 			Events are at the core of interactive web applications. dd<el> provides a clean, declarative approach to
@@ -57,7 +56,7 @@ export function page({ pkg, info }){
 			)
 		),
 
-		el(code, { src: fileURL("./components/examples/events/intro.js"), page_id }),
+		el(code, { src: fileURL("./components/examples/events/intro.js") }),
 
 		el(h3, t`Events and Listeners: Two Approaches`),
 		el("p").append(T`
@@ -70,11 +69,11 @@ export function page({ pkg, info }){
 			el("div", { className: "tabs" }).append(
 				el("div", { className: "tab" }).append(
 					el("h5", t`Native DOM API`),
-					el(code, { content: `element.addEventListener("click", callback, options);`, page_id })
+					el(code, { content: `element.addEventListener("click", callback, options);`, language: "js" })
 				),
 				el("div", { className: "tab" }).append(
 					el("h5", t`dd<el> Approach`),
-					el(code, { content: `on("click", callback, options)(element);`, page_id })
+					el(code, { content: `on("click", callback, options)(element);`, language: "js" })
 				)
 			)
 		),
@@ -82,7 +81,7 @@ export function page({ pkg, info }){
 			The main benefit of dd<el>’s approach is that it works as an Addon (see below), making it easy to integrate
 			directly into element declarations.
 		`),
-		el(example, { src: fileURL("./components/examples/events/compare.js"), page_id }),
+		el(example, { src: fileURL("./components/examples/events/compare.js") }),
 
 		el(h3, t`Removing Event Listeners`),
 		el("div", { className: "note" }).append(
@@ -91,7 +90,7 @@ export function page({ pkg, info }){
 				${el("a", { textContent: "AbortSignal", ...references.mdn_abortListener })} for declarative removal:
 			`)
 		),
-		el(example, { src: fileURL("./components/examples/events/abortSignal.js"), page_id }),
+		el(example, { src: fileURL("./components/examples/events/abortSignal.js") }),
 		el("p").append(T`
 			This is the same for signals (see next section) and works well with scopes and library extendability (
 			see scopes and extensions section — mainly ${el("code", "scope.signal")}).
@@ -101,26 +100,26 @@ export function page({ pkg, info }){
 		el("div", { className: "tabs" }).append(
 			el("div", { className: "tab", dataTab: "html-attr" }).append(
 				el("h4", t`HTML Attribute Style`),
-				el(code, { src: fileURL("./components/examples/events/attribute-event.js"), page_id }),
+				el(code, { src: fileURL("./components/examples/events/attribute-event.js") }),
 				el("p").append(T`
-					Forces usage as an HTML attribute. Corresponds to
+					Forces usage as an HTML attribute. Corresponds to
 					${el("code", `<button onclick="console.log(event)">click me</button>`)}. This can be particularly
 					useful for SSR scenarios.
 				`)
 			),
 			el("div", { className: "tab", dataTab: "property" }).append(
 				el("h4", t`Property Assignment`),
-				el(code, { src: fileURL("./components/examples/events/property-event.js"), page_id }),
+				el(code, { src: fileURL("./components/examples/events/property-event.js") }),
 				el("p", t`Assigns the event handler directly to the element’s property.`)
 			),
 			el("div", { className: "tab", dataTab: "addon" }).append(
 				el("h4", t`Addon Approach`),
-				el(code, { src: fileURL("./components/examples/events/chain-event.js"), page_id }),
+				el(code, { src: fileURL("./components/examples/events/chain-event.js") }),
 				el("p", t`Uses the addon pattern (so adds the event listener to the element), see above.`)
 			)
 		),
 		el("p").append(T`
-			For a deeper comparison of these approaches, see
+			For a deeper comparison of these approaches, see
 			${el("a", { textContent: "WebReflection’s detailed analysis", ...references.web_events })}.
 		`),
 
@@ -143,7 +142,7 @@ export function page({ pkg, info }){
 			You can use Addons as ≥3rd argument of the ${el("code", "el")} function, making it possible to
 			extend your templates with additional functionality:
 		`),
-		el(example, { src: fileURL("./components/examples/events/templateWithListeners.js"), page_id }),
+		el(example, { src: fileURL("./components/examples/events/templateWithListeners.js") }),
 		el("p").append(T`
 			As the example shows, you can provide types in JSDoc+TypeScript using the global type
 			${el("code", "ddeElementAddon")}. Notice how Addons can also be used to get element references.
@@ -167,7 +166,7 @@ export function page({ pkg, info }){
 				el("dd", t`Fires when the element is removed from the DOM`),
 			)
 		),
-		el(example, { src: fileURL("./components/examples/events/live-cycle.js"), page_id }),
+		el(example, { src: fileURL("./components/examples/events/live-cycle.js") }),
 
 		el("div", { className: "note" }).append(
 			el("p").append(T`
@@ -217,8 +216,8 @@ export function page({ pkg, info }){
 			This makes it easy to implement component communication through events, following standard web platform
 			patterns. The curried approach allows for easy reuse of event dispatchers throughout your application.
 		`),
-		el(example, { src: fileURL("./components/examples/events/compareDispatch.js"), page_id }),
-		el(code, { src: fileURL("./components/examples/events/dispatch.js"), page_id }),
+		el(example, { src: fileURL("./components/examples/events/compareDispatch.js") }),
+		el(code, { src: fileURL("./components/examples/events/dispatch.js") }),
 
 		el(h3, t`Best Practices`),
 		el("ol").append(
@@ -251,6 +250,6 @@ export function page({ pkg, info }){
 			)
 		),
 
-		el(mnemonic)
+		el(mnemonic),
 	);
 }

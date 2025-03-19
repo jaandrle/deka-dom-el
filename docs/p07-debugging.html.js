@@ -15,7 +15,6 @@ const fileURL= url=> new URL(url, import.meta.url);
 
 /** @param {import("./types.d.ts").PageAttrs} attrs */
 export function page({ pkg, info }){
-	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
 		el("p").append(T`
 			Debugging is an essential part of application development. This guide provides techniques
@@ -36,7 +35,7 @@ export function page({ pkg, info }){
 		el(code, { content: `
 			const signal = S(0);
 			console.log('Current value:', signal.valueOf());
-		`, page_id }),
+		`, language: "js" }),
 		el("div", { className: "warning" }).append(
 			el("p").append(T`
 				${el("code", "signal.get")} is OK, but in some situations may lead to unexpected results:
@@ -49,7 +48,7 @@ export function page({ pkg, info }){
 					// but typically this is fine ↓
 					return signal.get() + 1;
 				});
-			` })
+			`, language: "js" })
 		),
 		el("p").append(T`
 			You can also monitor signal changes by adding a listener:
@@ -57,7 +56,7 @@ export function page({ pkg, info }){
 		el(code, { content: `
 			// Log every time the signal changes
 			S.on(signal, value => console.log('Signal changed:', value));
-		`, page_id }),
+		`, language: "js" }),
 
 		el("h4", t`Debugging derived signals`),
 		el("p").append(T`
@@ -69,7 +68,7 @@ export function page({ pkg, info }){
 			el("li", t`Add logging/debugger inside the computation function to see when it runs`),
 			el("li", t`Verify that the computation function actually accesses the signal values with .get()`)
 		),
-		el(example, { src: fileURL("./components/examples/debugging/consoleLog.js"), page_id }),
+		el(example, { src: fileURL("./components/examples/debugging/consoleLog.js") }),
 
 		el("h4", t`Examining signal via DevTools`),
 		el("p").append(T`
@@ -77,11 +76,11 @@ export function page({ pkg, info }){
 			signal objects. It contains the following information:
 		`),
 		el("ul").append(
+			// TODO: value?
 			el("li", t`listeners: A Set of functions called when the signal value changes`),
 			el("li", t`actions: Custom actions that can be performed on the signal`),
 			el("li", t`onclear: Functions to run when the signal is cleared`),
 			el("li", t`host: Reference to the host element/scope in which the signal was created`),
-			el("li", t`readonly: Boolean flag indicating if the signal is read-only`)
 		),
 		el("p").append(T`
 			…to determine the current value of the signal, call ${el("code", "signal.valueOf()")}. Don’t hesitate to
@@ -121,7 +120,7 @@ export function page({ pkg, info }){
 				"S.el(S(()=> count.get() % 2), odd=> …)")}).
 			`),
 		),
-		el(code, { src: fileURL("./components/examples/debugging/mutations.js"), page_id }),
+		el(code, { src: fileURL("./components/examples/debugging/mutations.js") }),
 
 		el("h4", t`Memory leaks with signal listeners`),
 		el("p").append(T`
@@ -137,7 +136,7 @@ export function page({ pkg, info }){
 			el("li", t`Make sure derived signals don’t perform expensive calculations unnecessarily`),
 			el("li", t`Keep signal computations focused and minimal`)
 		),
-		el(code, { src: fileURL("./components/examples/debugging/debouncing.js"), page_id }),
+		el(code, { src: fileURL("./components/examples/debugging/debouncing.js") }),
 
 		el(h3, t`Browser DevTools tips for components and reactivity`),
 		el("p").append(T`
@@ -150,7 +149,7 @@ export function page({ pkg, info }){
 			that are automatically updated when signal values change. These elements are wrapped in special
 			comment nodes for debugging (to be true they are also used internally, so please do not edit them by hand):
 		`),
-		el(code, { src: fileURL("./components/examples/debugging/dom-reactive-mark.html"), page_id }),
+		el(code, { src: fileURL("./components/examples/debugging/dom-reactive-mark.html") }),
 		el("p").append(T`
 			This is particularly useful when debugging why a reactive section isn’t updating as expected.
 			You can inspect the elements between the comment nodes to see their current state and the
@@ -187,7 +186,7 @@ export function page({ pkg, info }){
 			so you can see the element and property that changes in the console right away. These properties make it
 			easier to understand the reactive structure of your application when inspecting elements.
 		`),
-		el(example, { src: fileURL("./components/examples/signals/debugging-dom.js"), page_id }),
+		el(example, { src: fileURL("./components/examples/signals/debugging-dom.js") }),
 
 		el("p", { className: "note" }).append(T`
 			${el("code", "<element>.__dde_reactive")} - An array property on DOM elements that tracks signal-to-element

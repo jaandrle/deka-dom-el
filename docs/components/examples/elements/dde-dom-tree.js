@@ -6,6 +6,6 @@ import { el } from "deka-dom-el";
 document.body.append(
 	el("div").append(
 		el("h1", "Title"),
-		el("p", "Paragraph")
-	)
+		el("p", "Paragraph"),
+	),
 );

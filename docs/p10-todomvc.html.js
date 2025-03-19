@@ -43,7 +43,6 @@ const references= {
 
 /** @param {import("./types.d.ts").PageAttrs} attrs */
 export function page({ pkg, info }){
-	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
 		el("p").append(T`
 			${el("a", references.todomvc).append("TodoMVC")} is a project that helps developers compare different
@@ -69,7 +68,7 @@ export function page({ pkg, info }){
 			challenges in a clean, maintainable way.
 		`),
 
-		el(example, { src: fileURL("./components/examples/reallife/todomvc.js"), variant: "big", page_id }),
+		el(example, { src: fileURL("./components/examples/reallife/todomvc.js"), variant: "big" }),
 
 		el(h3, t`Application Architecture Overview`),
 		el("p").append(T`
@@ -118,7 +117,7 @@ export function page({ pkg, info }){
 				});
 			});
 			const todosRemainingS = S(()=> todosS.get().filter(todo => !todo.completed).length);
-		`, page_id }),
+		`, language: "js" }),
 
 		el("p").append(T`
 			The ${el("code", "todosSignal")} function creates a custom signal with actions for manipulating the todos:
@@ -207,7 +206,7 @@ export function page({ pkg, info }){
 				});
 				return out;
 			}
-		`, page_id }),
+		`, language: "js" }),
 
 		el("div", { className: "note" }).append(
 			el("p").append(T`
@@ -241,7 +240,7 @@ export function page({ pkg, info }){
 					memo(todo.id, ()=> el(TodoItem, todo, onDelete, onEdit)))
 				)
 			)
-		`, page_id }),
+		`, language: "js" }),
 
 		el("p").append(T`
 			The derived signal automatically recalculates whenever either the todos list or the current filter changes,
@@ -263,7 +262,7 @@ export function page({ pkg, info }){
 				type: "checkbox"
 			}, onToggleAll),
 			el("label", { htmlFor: "toggle-all", title: "Mark all as complete" }),
-		`, page_id }),
+		`, language: "js" }),
 
 		el("p").append(T`
 			The "toggle all" checkbox allows users to mark all todos as completed or active. When the checkbox
@@ -300,7 +299,7 @@ export function page({ pkg, info }){
 					// Component content...
 				);
 			}
-		`, page_id }),
+		`, language: "js" }),
 
 		el("p").append(T`
 			The TodoItem component maintains its own local UI state with signals, providing immediate
@@ -311,16 +310,16 @@ export function page({ pkg, info }){
 		el(code, { content: `
 			// Dynamic class attributes
 			el("a", {
-				textContent: "All",
-				className: S(()=> pageS.get() === "all" ? "selected" : ""),
-				href: "#"
+				textContent,
+				classList: { selected: S(()=> pageS.get() === textContent.toLowerCase()) },
+				href: \`#\${textContent.toLowerCase()}\`
 			})
 
 			// Reactive classList
 			el("li", {
 				classList: { completed: isCompleted, editing: isEditing }
 			})
-		`, page_id }),
+		`, language: "js" }),
 
 		el("div", { className: "tip" }).append(
 			el("p").append(T`
@@ -341,7 +340,7 @@ export function page({ pkg, info }){
 					memo(todo.id, ()=> el(TodoItem, todo, onDelete, onEdit)))
 				)
 			)
-		`, page_id }),
+		`, language: "js" }),
 
 		el("p").append(T`
 			This approach ensures that:
@@ -355,18 +354,25 @@ export function page({ pkg, info }){
 
 		el("h4", t`Memoizing UI Sections`),
 		el(code, { content: `
-			S.el(todosS, todos => memo(todos.length, length=> length
-				? el("footer", { className: "footer" }).append(
-					// Footer content...
+			S.el(todosS, ({ length }) => !length
+				? el()
+				: el("footer", { className: "footer" }).append(
+					// …
+					memo("filters", ()=>
+						// …
+								el("a", {
+									textContent,
+									classList: { selected: S(()=> pageS.get() === textContent.toLowerCase()) },
+									href: \`#\${textContent.toLowerCase()}\`
+								})
+					// …
 				)
-				: el()
 			))
-		`, page_id }),
+		`, language: "js" }),
 
 		el("p").append(T`
-			By memoizing based on the todos length, the entire footer component is only re-rendered
-			when todos are added or removed, not when their properties change. This improves performance
-			by avoiding unnecessary DOM operations.
+			We memoize the UI section and uses derived signal for the classList. Re-rendering this part is therefore
+			unnecessary when the number of todos changes.
 		`),
 
 		el("div", { className: "tip" }).append(
@@ -389,9 +395,11 @@ export function page({ pkg, info }){
 		`),
 		el(code, { content: `
 			// Event handlers in the main component
-			const onDelete = on("todo:delete", ev => S.action(todosS, "delete", ev.detail));
-			const onEdit = on("todo:edit", ev => S.action(todosS, "edit", ev.detail));
-		`, page_id }),
+			const onDelete = on("todo:delete", ev =>
+				S.action(todosS, "delete", /** @type {{ detail: Todo["id"] }} */(ev).detail));
+			const onEdit = on("todo:edit", ev =>
+				S.action(todosS, "edit", /** @type {{ detail: Partial<Todo> & { id: Todo["id"] } }} */(ev).detail));
+		`, language: "js" }),
 
 		el("h4", t`2. The TodoItem Component with Scopes and Local State`),
 		el("p").append(T`
@@ -434,7 +442,7 @@ export function page({ pkg, info }){
 
 				// Component implementation...
 			}
-		`, page_id }),
+		`, language: "js" }),
 
 		el("div", { className: "tip" }).append(
 			el("p").append(T`
@@ -455,7 +463,7 @@ export function page({ pkg, info }){
 			}).append(
 				// Component content...
 			);
-		`, page_id }),
+		`, language: "js" }),
 
 		el("p").append(T`
 			Benefits of using ${el("code", "classList")}:
@@ -494,7 +502,7 @@ export function page({ pkg, info }){
 				value: title,
 				"data-id": id
 			}, onBlurEdit, onKeyDown, addFocus)
-		`, page_id }),
+		`, language: "js" }),
 
 		el("p").append(T`
 			This approach offers several advantages:
@@ -522,27 +530,26 @@ export function page({ pkg, info }){
 		el("h4", t`Conditional Todo List`),
 		el(code, { content: `
 			S.el(todosS, todos => todos.length
-				? el("main", { className: "main" }).append(
+				? el()
+				: el("main", { className: "main" }).append(
 					// Main content with toggle all and todo list
 				)
-				: el()
 			)
-		`, page_id }),
+		`, language: "js" }),
 
 		el("h4", t`Conditional Edit Form`),
 		el(code, { content: `
-			S.el(isEditing, editing => editing
-				? el("form", null, onSubmitEdit).append(
+			S.el(isEditing, editing => !editing
+				? el()
+				: el("form", null, onSubmitEdit).append(
 					el("input", {
 						className: "edit",
-						name: "edit",
+						name: formEdit,
 						value: title,
-						"data-id": id
 					}, onBlurEdit, onKeyDown, addFocus)
 				)
-				: el()
 			)
-		`, page_id }),
+		`, language: "js" }),
 
 		el("h4", t`Conditional Clear Completed Button`),
 		el(code, { content: `
@@ -553,7 +560,7 @@ export function page({ pkg, info }){
 						{ textContent: "Clear completed", className: "clear-completed" },
 						onClearCompleted)
 				)
-		`, page_id }),
+		`, language: "js" }),
 
 		el("div", { className: "note" }).append(
 			el("p").append(T`
@@ -599,7 +606,7 @@ export function page({ pkg, info }){
 				if (event.key !== "Escape") return;
 				isEditing.set(false);
 			});
-		`, page_id }),
+		`, language: "js" }),
 
 		el("div", { className: "tip" }).append(
 			el("p").append(T`
@@ -630,7 +637,7 @@ export function page({ pkg, info }){
 				${el("strong", "Declarative Class Management:")} Using the classList property for cleaner class handling
 			`),
 			el("li").append(T`
-				${el("strong", "Focus Management:")} Reliable input focus with setTimeout
+				${el("strong", "Focus Management:")} Reliable input focus with requestAnimationFrame
 			`),
 			el("li").append(T`
 				${el("strong", "Persistent Storage:")} Automatically saving application state with signal listeners

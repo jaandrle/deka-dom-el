@@ -42,7 +42,6 @@ const references= {
 };
 /** @param {import("./types.d.ts").PageAttrs} attrs */
 export function page({ pkg, info }){
-	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
 		el("p").append(T`
 			Signals provide a simple yet powerful way to create reactive applications with dd<el>. They handle the
@@ -58,7 +57,7 @@ export function page({ pkg, info }){
 				el("li").append(T`${el("strong", "In future")} no dependencies or framework lock-in`)
 			)
 		),
-		el(code, { src: fileURL("./components/examples/signals/intro.js"), page_id }),
+		el(code, { src: fileURL("./components/examples/signals/intro.js") }),
 
 		el(h3, t`The 3-Part Structure of Signals`),
 		el("p").append(T`
@@ -68,21 +67,21 @@ export function page({ pkg, info }){
 		el("div", { className: "signal-diagram" }).append(
 			el("div", { className: "signal-part" }).append(
 				el("h4", t`PART 1: Create Signal`),
-				el(code, { content: "const count = S(0);", page_id }),
+				el(code, { content: "const count = S(0);", language: "js" }),
 				el("p", t`Define a reactive value that can be observed and changed`)
 			),
 			el("div", { className: "signal-part" }).append(
 				el("h4", t`PART 2: React to Changes`),
-				el(code, { content: "S.on(count, value => updateUI(value));", page_id }),
+				el(code, { content: "S.on(count, value => updateUI(value));", language: "js" }),
 				el("p", t`Subscribe to signal changes with callbacks or effects`)
 			),
 			el("div", { className: "signal-part" }).append(
 				el("h4", t`PART 3: Update Signal`),
-				el(code, { content: "count.set(count.get() + 1);", page_id }),
+				el(code, { content: "count.set(count.get() + 1);", language: "js" }),
 				el("p", t`Modify the signal value, which automatically triggers updates`)
 			)
 		),
-		el(example, { src: fileURL("./components/examples/signals/signals.js"), page_id }),
+		el(example, { src: fileURL("./components/examples/signals/signals.js") }),
 
 		el("div", { className: "note" }).append(
 			el("p").append(T`
@@ -125,12 +124,12 @@ export function page({ pkg, info }){
 			Computed values (also called derived signals) automatically update when their dependencies change.
 			Create them by passing ${el("strong", "a function")} to ${el("code", "S()")}:
 		`),
-		el(example, { src: fileURL("./components/examples/signals/derived.js"), page_id }),
+		el(example, { src: fileURL("./components/examples/signals/derived.js") }),
 		el("p").append(T`
 			Derived signals are read-only - you can’t call ${el("code", ".set()")} on them. Their value is always
 			computed from their dependencies. They’re perfect for transforming or combining data from other signals.
 		`),
-		el(example, { src: fileURL("./components/examples/signals/computations-abort.js"), page_id }),
+		el(example, { src: fileURL("./components/examples/signals/computations-abort.js") }),
 
 		el(h3, t`Signal Actions: For Complex State`),
 		el("p").append(T`
@@ -151,7 +150,7 @@ export function page({ pkg, info }){
 						});
 						// Use the action
 						S.action(todos, "add", "New todo");
-					`, page_id })
+					`, language: "js" })
 				),
 				el("div", { className: "bad-practice" }).append(
 					el("h5", t`❌ Without Actions`),
@@ -161,7 +160,7 @@ export function page({ pkg, info }){
 						const items = todos.get();
 						items.push("New todo");
 						// This WON’T trigger updates!
-					`, page_id }))
+					`, language: "js" }))
 				),
 		),
 		el("p").append(T`
@@ -172,7 +171,7 @@ export function page({ pkg, info }){
 			${el("code", "this.stopPropagation()")} in the method representing the given action. As it can be seen in
 			examples, the “store” value is available also in the function for given action (${el("code", "this.value")}).
 		`),
-		el(example, { src: fileURL("./components/examples/signals/actions-demo.js"), page_id }),
+		el(example, { src: fileURL("./components/examples/signals/actions-demo.js") }),
 
 		el("p").append(T`
 			Actions provide these benefits:
@@ -186,7 +185,7 @@ export function page({ pkg, info }){
 		el("p").append(T`
 			Here’s a more complete example of a todo list using signal actions:
 		`),
-		el(example, { src: fileURL("./components/examples/signals/actions-todos.js"), page_id }),
+		el(example, { src: fileURL("./components/examples/signals/actions-todos.js") }),
 
 		el("div", { className: "tip" }).append(
 			el("p").append(T`
@@ -223,7 +222,7 @@ export function page({ pkg, info }){
 
 					// Later:
 					color.set("red"); // UI updates automatically
-				`, page_id }),
+				`, language: "js" }),
 			),
 			el("div", { className: "tab", dataTab: "elements" }).append(
 				el("h4", t`Reactive Elements`),
@@ -241,7 +240,7 @@ export function page({ pkg, info }){
 
 					// Later:
 					S.action(items, "push", "Dragonfruit"); // List updates automatically
-				`, page_id }),
+				`, language: "js" }),
 			)
 		),
 
@@ -250,12 +249,12 @@ export function page({ pkg, info }){
 			You can use special properties like ${el("code", "dataset")}, ${el("code", "ariaset")}, and
 			${el("code", "classList")} for fine-grained control over specific attribute types.
 		`),
-		el(example, { src: fileURL("./components/examples/signals/dom-attrs.js"), page_id }),
+		el(example, { src: fileURL("./components/examples/signals/dom-attrs.js") }),
 
 		el("p").append(T`
 			${el("code", "S.el()")} is especially powerful for conditional rendering and lists:
 		`),
-		el(example, { src: fileURL("./components/examples/signals/dom-el.js"), page_id }),
+		el(example, { src: fileURL("./components/examples/signals/dom-el.js") }),
 
 		el(h3, t`Best Practices for Signals`),
 		el("p").append(T`
@@ -289,7 +288,7 @@ export function page({ pkg, info }){
 				el("h4", t`We can process form events without signals`),
 				el("p", t`This can be used when the form data doesn’t need to be reactive and we just waiting for
 					results.`),
-				el(code, { page_id, content: `
+				el(code, { content: `
 					const onFormSubmit = on("submit", e => {
 						e.preventDefault();
 						const formData = new FormData(e.currentTarget);
@@ -301,13 +300,13 @@ export function page({ pkg, info }){
 					return el("form", null, onFormSubmit).append(
 						// …
 					);
-				` })
+				`, language: "js" })
 			),
 
 			el("div", { className: "tab", dataTab: "variables" }).append(
 				el("h4", t`We can use variables without signals`),
 				el("p", t`We use this when we dont’t need to reflect changes in the elsewhere (UI).`),
-				el(code, { page_id, content: `
+				el(code, { content: `
 					let canSubmit = false;
 
 					const onFormSubmit = on("submit", e => {
@@ -318,14 +317,14 @@ export function page({ pkg, info }){
 					const onAllowSubmit = on("click", e => {
 						canSubmit = true;
 					});
-				`}),
+				`, language: "js" }),
 			),
 
 			el("div", { className: "tab", dataTab: "state" }).append(
 				el("h4", t`Using signals`),
 				el("p", t`We use this when we need to reflect changes for example in the UI (e.g. enable/disable
 					buttons).`),
-				el(code, { page_id, content: `
+				el(code, { content: `
 					const canSubmit = S(false);
 
 					const onFormSubmit = on("submit", e => {
@@ -341,7 +340,7 @@ export function page({ pkg, info }){
 						el("button", { textContent: "Allow Submit", type: "button" }, onAllowSubmit),
 						el("button", { disabled: S(()=> !canSubmit), textContent: "Submit" })
 					);
-				`}),
+				`, language: "js" }),
 			),
 		),
 

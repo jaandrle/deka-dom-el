@@ -57,7 +57,6 @@ const references= {
 };
 /** @param {import("./types.d.ts").PageAttrs} attrs */
 export function page({ pkg, info }){
-	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
 		el("p").append(T`
 			dd<el> pairs powerfully with ${el("a", references.mdn_web_components).append(el("strong", t`Web
@@ -73,7 +72,7 @@ export function page({ pkg, info }){
 				el("li", t`Clean component lifecycle management`),
 			),
 		),
-		el(code, { src: fileURL("./components/examples/customElement/intro.js"), page_id }),
+		el(code, { src: fileURL("./components/examples/customElement/intro.js") }),
 
 		el(h3, t`Getting Started: Web Components Basics`),
 		el("p").append(T`
@@ -95,7 +94,7 @@ export function page({ pkg, info }){
 		el("p").append(T`
 			Let’s start with a basic Custom Element example without dd<el> to establish the foundation:
 		`),
-		el(code, { src: fileURL("./components/examples/customElement/native-basic.js"), page_id }),
+		el(code, { src: fileURL("./components/examples/customElement/native-basic.js") }),
 
 		el("div", { className: "note" }).append(
 			el("p").append(T`
@@ -124,7 +123,7 @@ export function page({ pkg, info }){
 				el("dd", t`Allows using on.connected(), on.disconnected() or S.observedAttributes().`)
 			)
 		),
-		el(example, { src: fileURL("./components/examples/customElement/customElementWithDDE.js"), page_id }),
+		el(example, { src: fileURL("./components/examples/customElement/customElementWithDDE.js") }),
 
 		el("div", { className: "tip" }).append(
 			el("p").append(T`
@@ -156,7 +155,7 @@ export function page({ pkg, info }){
 				el("dd", t`The rendered DOM tree`)
 			)
 		),
-		el(example, { src: fileURL("./components/examples/customElement/dde.js"), page_id }),
+		el(example, { src: fileURL("./components/examples/customElement/dde.js") }),
 
 		el("div", { className: "note" }).append(
 			el("p").append(T`
@@ -188,7 +187,7 @@ export function page({ pkg, info }){
 			Using the ${el("code", "S.observedAttributes")} creates a reactive connection between your element’s
 			attributes and its internal rendering. When attributes change, your component automatically updates!
 		`),
-		el(example, { src: fileURL("./components/examples/customElement/observedAttributes.js"), page_id }),
+		el(example, { src: fileURL("./components/examples/customElement/observedAttributes.js") }),
 
 		el("div", { className: "callout" }).append(
 			el("h4", t`How S.observedAttributes Works`),
@@ -221,7 +220,7 @@ export function page({ pkg, info }){
 								<p>Content</p>
 			` })
 		),
-		el(example, { src: fileURL("./components/examples/customElement/shadowRoot.js"), page_id }),
+		el(example, { src: fileURL("./components/examples/customElement/shadowRoot.js") }),
 
 		el("p").append(T`
 			For more information on Shadow DOM, see
@@ -234,7 +233,7 @@ export function page({ pkg, info }){
 			Besides the encapsulation, the Shadow DOM allows for using the ${el("a", references.mdn_shadow_dom_slot).append(
 			el("strong", t`<slot>`), t` element(s)`)}. You can simulate this feature using ${el("code", "simulateSlots")}:
 		`),
-		el(example, { src: fileURL("./components/examples/customElement/simulateSlots.js"), page_id }),
+		el(example, { src: fileURL("./components/examples/customElement/simulateSlots.js") }),
 		el("div", { className: "function-table" }).append(
 			el("h4", t`simulateSlots`),
 			el("dl").append(

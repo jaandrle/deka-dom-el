@@ -1,10 +1,10 @@
 {
 	"name": "deka-dom-el",
-	"version": "0.9.3-alpha",
+	"version": "0.9.4-alpha",
 	"description": "A low-code library that simplifies the creation of native DOM elements/components using small wrappers and tweaks.",
 	"author": "Jan Andrle <andrle.jan@centrum.cz>",
 	"license": "MIT",
-	"homepage": "https://github.com/jaandrle/deka-dom-el",
+	"homepage": "https://jaandrle.github.io/deka-dom-el/",
 	"repository": {
 		"type": "git",
 		"url": "git+ssh://git@github.com/jaandrle/deka-dom-el.git"
@@ -52,7 +52,6 @@
 		"maxdepth": 3,
 		"maxcomplexity": 14,
 		"globals": {
-			"requestIdleCallback": false,
 			"AbortController": false,
 			"AbortSignal": false,
 			"FinalizationRegistry": false
@@ -61,25 +60,25 @@
 	"size-limit": [
 		{
 			"path": "./index.js",
-			"limit": "10.5 kB",
+			"limit": "10 kB",
 			"gzip": false,
 			"brotli": false
 		},
 		{
 			"path": "./signals.js",
-			"limit": "12.5 kB",
+			"limit": "12.2 kB",
 			"gzip": false,
 			"brotli": false
 		},
 		{
 			"path": "./index-with-signals.js",
-			"limit": "15 kB",
+			"limit": "14.75 kB",
 			"gzip": false,
 			"brotli": false
 		},
 		{
 			"path": "./index-with-signals.js",
-			"limit": "5.5 kB"
+			"limit": "5.25 kB"
 		}
 	],
 	"modifyEsbuildConfig": {

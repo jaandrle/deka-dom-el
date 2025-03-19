@@ -1,4 +1,4 @@
-import { styles } from "../ssr.js";
+import { page_id, styles } from "../ssr.js";
 const host= "."+example.name;
 styles.css`
 ${host} {
@@ -119,9 +119,8 @@ import { relative } from "node:path";
  * @param {URL} attrs.src Example code file path
  * @param {"js"|"ts"|"html"|"css"} [attrs.language="js"] Language of the code
  * @param {"normal"|"big"} [attrs.variant="normal"] Size of the example
- * @param {string} attrs.page_id ID of the page
  * */
-export function example({ src, language= "js", variant= "normal", page_id }){
+export function example({ src, language= "js", variant= "normal" }){
 	registerClientPart(page_id);
 	const content= s.cat(src).toString()
 		.replaceAll(/ from "deka-dom-el(\/signals)?";/g, ' from "./esm-with-signals.js";');

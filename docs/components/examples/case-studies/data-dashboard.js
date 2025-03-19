@@ -303,6 +303,7 @@ document.body.append(
 				padding: 1rem;
 				margin-bottom: 1.5rem;
 				box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+				overflow: auto;
 			}
 
 			.loading-spinner {

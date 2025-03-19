@@ -1,4 +1,4 @@
-import { styles } from "../ssr.js";
+import { page_id, styles } from "../ssr.js";
 
 styles.css`
 #html-to-dde-converter {
@@ -149,12 +149,11 @@ import { ireland } from "./ireland.html.js";
 import { el } from "deka-dom-el";
 const fileURL= url=> new URL(url, import.meta.url);
 
-export function converter({ page_id }){
+export function converter(){
 	registerClientPart(page_id);
 	return el(ireland, {
 		src: fileURL("./converter.js.js"),
 		exportName: "converter",
-		page_id,
 	});
 }
 

@@ -3,8 +3,8 @@ import { t, T } from "./utils/index.js";
 export const info= {
 	href: "./",
 	title: t`Introduction`,
-	fullTitle: t`Vanilla for flavouring — a full-fledged feast for large projects`,
-	description: t`A lightweight, reactive DOM library for creating dynamic UIs with a declarative syntax`,
+	fullTitle: t`Vanilla for flavouring — a full-fledged feast for large projects`,
+	description: t`Reactive DOM library for creating dynamic UIs with a declarative syntax`,
 };
 
 import { el } from "deka-dom-el";
@@ -16,7 +16,11 @@ import { getLibraryUrl } from "./components/getLibraryUrl.html.js";
 /** @param {string} url */
 const fileURL= url=> new URL(url, import.meta.url);
 const references= {
-	w_mvv:{
+	npm: {
+		title: t`NPM package page for dd<el>`,
+		href: "https://www.npmjs.com/package/deka-dom-el",
+	},
+	w_mvv: {
 		title: t`Wikipedia: Model–view–viewmodel`,
 		href: "https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93viewmodel",
 	},
@@ -27,10 +31,9 @@ const references= {
 };
 /** @param {import("./types.d.ts").PageAttrs} attrs */
 export function page({ pkg, info }){
-	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
 		el("p").append(T`
-			Welcome to Deka DOM Elements (dd<el> or DDE) — a lightweight library for building dynamic UIs with
+			Welcome to Deka DOM Elements (dd<el> or DDE) — a library for building dynamic UIs with
 			a declarative syntax that stays close to the native DOM API. dd<el> gives you powerful reactive tools
 			without the complexity and overhead of larger frameworks.
 		`),
@@ -40,11 +43,11 @@ export function page({ pkg, info }){
 				el("li", t`No build step required — use directly in the browser`),
 				el("li", t`Lightweight core (~10–15kB minified) without unnecessary dependencies (0 at now 😇)`),
 				el("li", t`Natural DOM API — work with real DOM nodes, not abstractions`),
-				el("li", t`Built-in reactivity with simplified but powerful signals system`),
+				el("li", t`Built-in (but optional) reactivity with simplified but powerful signals system`),
 				el("li", t`Clean code organization with the 3PS pattern`)
 			)
 		),
-		el(example, { src: fileURL("./components/examples/introducing/helloWorld.js"), page_id }),
+		el(example, { src: fileURL("./components/examples/introducing/helloWorld.js") }),
 
 		el(h3, { textContent: t`The 3PS Pattern: Simplified architecture pattern`, id: "h-3ps" }),
 		el("p").append(T`
@@ -56,11 +59,11 @@ export function page({ pkg, info }){
 			el("div", { className: "tabs" }).append(
 				el("div", { className: "tab" }).append(
 					el("h5", t`Traditional DOM Manipulation`),
-					el(code, { src: fileURL("./components/examples/introducing/3ps-before.js"), page_id }),
+					el(code, { src: fileURL("./components/examples/introducing/3ps-before.js") }),
 				),
 				el("div", { className: "tab" }).append(
 					el("h5", t`dd<el>'s 3PS Pattern`),
-					el(code, { src: fileURL("./components/examples/introducing/3ps.js"), page_id }),
+					el(code, { src: fileURL("./components/examples/introducing/3ps.js") }),
 				)
 			)
 		),
@@ -101,16 +104,20 @@ export function page({ pkg, info }){
 
 		el(h3, t`Getting Started`),
 		el("p").append(T`
-			There are multiple ways to include dd<el> in your project. You can use npm for a full development setup,
-			or directly include it from a CDN for quick prototyping.
+			There are multiple ways to include dd<el> in your project. You can use npm for a full development setup,
+			or directly include it from a CDN for quick prototyping.
 		`),
 		el("h4", "npm installation"),
-		el(code, { content: "npm install deka-dom-el --save", language: "shell", page_id }),
+		el(code, { content: "npm install deka-dom-el --save", language: "shell" }),
+		el("p").append(T`
+			…see ${el("a", { textContent: "package page", ...references.npm, target: "_blank" })}.
+		`),
+
 		el("h4", "CDN / Direct Script Usage"),
 		el("p").append(T`
 			Use the interactive selector below to choose your preferred format:
 		`),
-		el(getLibraryUrl, { page_id }),
+		el(getLibraryUrl),
 		el("div", { className: "note" }).append(
 			el("p").append(T`
 				Based on your selection, you can use dd<el> in your project like this:
@@ -119,10 +126,10 @@ export function page({ pkg, info }){
 				// ESM format (modern JavaScript with import/export)
 				import { el, on } from "https://cdn.jsdelivr.net/gh/jaandrle/deka-dom-el/dist/esm-with-signals.min.js";
 
-				// Or with IIFE format (creates a global DDE object)
+				// Or with IIFE format (creates a global DDE object)
 				// <script src="https://cdn.jsdelivr.net/gh/jaandrle/deka-dom-el/dist/iife-with-signals.min.js"></script>
 				const { el, on } = DDE;
-			`, language: "js", page_id }),
+			`, language: "js" }),
 		),
 
 		el(h3, t`How to Use This Documentation`),
@@ -146,7 +153,7 @@ export function page({ pkg, info }){
 				Integrating third-party functionalities`),
 			el("li").append(T`${el("a", { href: "p09-optimization.html" })
 					.append(el("strong", "Performance Optimization"))} — Techniques for optimizing your applications`),
-			el("li").append(T`${el("a", { href: "p10-todomvc.html" }).append(el("strong", "TodoMVC"))} — A real-world
+			el("li").append(T`${el("a", { href: "p10-todomvc.html" }).append(el("strong", "TodoMVC"))} — A real-world
 				application implementation`),
 			el("li").append(T`${el("a", { href: "p11-ssr.html" }).append(el("strong", "SSR"))} — Server-side
 				rendering with dd<el>`),

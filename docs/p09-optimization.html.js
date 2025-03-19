@@ -43,7 +43,6 @@ const references= {
 
 /** @param {import("./types.d.ts").PageAttrs} attrs */
 export function page({ pkg, info }){
-	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
 		el("p").append(T`
 			As your applications grow, performance becomes increasingly important. dd<el> provides several
@@ -60,7 +59,7 @@ export function page({ pkg, info }){
 				el("li", t`Simple debugging for performance bottlenecks`)
 			)
 		),
-		el(code, { src: fileURL("./components/examples/optimization/intro.js"), page_id }),
+		el(code, { src: fileURL("./components/examples/optimization/intro.js") }),
 
 		el(h3, t`Memoization with memo: Native vs dd<el>`),
 		el("p").append(T`
@@ -84,7 +83,7 @@ export function page({ pkg, info }){
 								))
 							);
 						}
-					`, page_id })
+					`, language: "js" })
 				),
 				el("div").append(
 					el("h5", t`With dd<el>'s memo`),
@@ -102,7 +101,7 @@ export function page({ pkg, info }){
 								)))
 							);
 						}
-					`, page_id })
+					`, language: "js" })
 				)
 			)
 		),
@@ -134,7 +133,7 @@ export function page({ pkg, info }){
 						memo(todo.id, () =>
 							el(TodoItem, todo)
 			))))
-		`, page_id }),
+		`, language: "js" }),
 
 		el("p").append(T`
 			The ${el("code", "memo")} function in this context:
@@ -146,7 +145,7 @@ export function page({ pkg, info }){
 			el("li", t`Only calls the generator function when rendering an item with a new key`)
 		),
 
-		el(example, { src: fileURL("./components/examples/optimization/memo.js"), page_id }),
+		el(example, { src: fileURL("./components/examples/optimization/memo.js") }),
 
 		el(h3, t`Creating Memoization Scopes`),
 		el("p").append(T`
@@ -171,7 +170,7 @@ export function page({ pkg, info }){
 			const container = el("div").append(
 				...items.map(item => renderItem(item))
 			);
-		`, page_id }),
+		`, language: "js" }),
 
 		el("p").append(T`
 			The scope function accepts options to customize its behavior:
@@ -188,7 +187,7 @@ export function page({ pkg, info }){
 				// Clear cache when signal is aborted
 				signal: controller.signal
 			});
-		`, page_id }),
+		`, language: "js" }),
 		el("p").append(T`
 			You can use custom memo scope as function in (e. g. ${el("code", "S.el(signal, renderList)")}) and as
 			(Abort) signal use ${el("code", "scope.signal")}.
@@ -317,7 +316,7 @@ export function page({ pkg, info }){
 
 			// On subsequent renders, the cached fragment is empty!
 			container.append(memoizedFragment); // Nothing gets appended
-		`, page_id }),
+		`, language: "js" }),
 
 		el("p").append(T`
 			This happens because a DocumentFragment is emptied when it's appended to the DOM. When the fragment
@@ -338,7 +337,7 @@ export function page({ pkg, info }){
 						S.el(itemsSignal, items => items.map(item => el("div", item)))
 					)
 				);
-			`, page_id })
+			`, language: "js" })
 		),
 
 		el("p").append(T`

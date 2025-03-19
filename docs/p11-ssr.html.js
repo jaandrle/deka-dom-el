@@ -14,7 +14,6 @@ const fileURL= url=> new URL(url, import.meta.url);
 
 /** @param {import("./types.js").PageAttrs} attrs */
 export function page({ pkg, info }){
-	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
 		el("div", { className: "warning" }).append(
 			el("p").append(T`
@@ -45,7 +44,7 @@ export function page({ pkg, info }){
 				than jsdom
 			`),
 		),
-		el(code, { src: fileURL("./components/examples/ssr/intro.js"), page_id }),
+		el(code, { src: fileURL("./components/examples/ssr/intro.js") }),
 
 		el(h3, t`Why Server-Side Rendering?`),
 		el("p").append(T`
@@ -71,27 +70,27 @@ export function page({ pkg, info }){
 			el("li", t`Provides a promise queue system for managing async operations during rendering`),
 			el("li", t`Handles DOM property/attribute mapping differences between browsers and jsdom`)
 		),
-		el(code, { src: fileURL("./components/examples/ssr/start.js"), page_id }),
+		el(code, { src: fileURL("./components/examples/ssr/start.js") }),
 
 		el(h3, t`Basic SSR Example`),
 		el("p").append(T`
 			Here’s a simple example of how to use dd<el> for server-side rendering in a Node.js script:
 		`),
-		el(code, { src: fileURL("./components/examples/ssr/basic-example.js"), page_id }),
+		el(code, { src: fileURL("./components/examples/ssr/basic-example.js") }),
 
 		el(h3, t`Building a Static Site Generator`),
 		el("p").append(T`
 			You can build a complete static site generator with dd<el>. In fact, this documentation site
 			is built using dd<el> for server-side rendering! Here’s how the documentation build process works:
 		`),
-		el(code, { src: fileURL("./components/examples/ssr/static-site-generator.js"), page_id }),
+		el(code, { src: fileURL("./components/examples/ssr/static-site-generator.js") }),
 
 		el(h3, t`Working with Async Content in SSR`),
 		el("p").append(T`
 			The jsdom export includes a queue system to handle asynchronous operations during rendering.
 			This is crucial for components that fetch data or perform other async tasks.
 		`),
-		el(code, { src: fileURL("./components/examples/ssr/async-data.js"), page_id }),
+		el(code, { src: fileURL("./components/examples/ssr/async-data.js") }),
 
 		el(h3, t`Working with Dynamic Imports for SSR`),
 		el("p").append(T`
@@ -119,7 +118,7 @@ export function page({ pkg, info }){
 		el("p").append(T`
 			Follow this pattern when creating server-side rendered pages:
 		`),
-		el(code, { src: fileURL("./components/examples/ssr/pages.js"), page_id }),
+		el(code, { src: fileURL("./components/examples/ssr/pages.js") }),
 
 		el(h3, t`SSR Considerations and Limitations`),
 		el("p").append(T`
@@ -141,7 +140,7 @@ export function page({ pkg, info }){
 			This documentation site itself is built using dd<el>’s SSR capabilities.
 			The build process collects all page components, renders them with jsdom, and outputs static HTML files.
 		`),
-		el(code, { src: fileURL("./components/examples/ssr/static-site-generator.js"), page_id }),
+		el(code, { src: fileURL("./components/examples/ssr/static-site-generator.js") }),
 
 		el("p").append(T`
 			The resulting static files can be deployed to any static hosting service,

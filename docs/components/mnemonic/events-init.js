@@ -13,6 +13,10 @@ export function mnemonic(){
 			". To connect to custom element see following page, else it is simulated by MutationObserver."
 		),
 		el("li").append(
+			el("code", "on.defer(<identity>=> <identity>)(<identity>)"),
+			" — calls callback later",
+		),
+		el("li").append(
 			el("code", "dispatchEvent(<event>[, <options>])(element)"),
 			" — just ", el("code", "<element>.dispatchEvent(new Event(<event>[, <options>]))")
 		),

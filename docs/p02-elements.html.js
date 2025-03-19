@@ -47,12 +47,11 @@ const references= {
 };
 /** @param {import("./types.d.ts").PageAttrs} attrs */
 export function page({ pkg, info }){
-	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
 		el("p").append(T`
 			Building user interfaces in JavaScript often involves creating and manipulating DOM elements.
-			dd<el> provides a simple yet powerful approach to element creation that is declarative, chainable,
-			and maintains a clean syntax close to HTML structure.
+			dd<el> provides a simple yet powerful approach to element creation that is declarative, chainable,
+			and maintains a clean syntax close to HTML structure.
 		`),
 		el("div", { className: "callout" }).append(
 			el("h4", t`dd<el> Elements: Key Benefits`),
@@ -65,7 +64,7 @@ export function page({ pkg, info }){
 			)
 		),
 
-		el(code, { src: fileURL("./components/examples/elements/intro.js"), page_id }),
+		el(code, { src: fileURL("./components/examples/elements/intro.js") }),
 
 		el(h3, t`Creating Elements: Native vs dd<el>`),
 		el("p").append(T`
@@ -77,11 +76,11 @@ export function page({ pkg, info }){
 			el("div", { className: "comparison" }).append(
 				el("div").append(
 					el("h5", t`Native DOM API`),
-					el(code, { src: fileURL("./components/examples/elements/native-dom-create.js"), page_id })
+					el(code, { src: fileURL("./components/examples/elements/native-dom-create.js") })
 				),
 				el("div").append(
 					el("h5", t`dd<el> Approach`),
-					el(code, { src: fileURL("./components/examples/elements/dde-dom-create.js"), page_id })
+					el(code, { src: fileURL("./components/examples/elements/dde-dom-create.js") })
 				)
 			)
 		),
@@ -89,7 +88,7 @@ export function page({ pkg, info }){
 			The ${el("code", "el")} function provides a simple wrapper around ${el("code", "document.createElement")}
 			with enhanced property assignment.
 		`),
-		el(example, { src: fileURL("./components/examples/elements/dekaCreateElement.js"), page_id }),
+		el(example, { src: fileURL("./components/examples/elements/dekaCreateElement.js") }),
 
 		el(h3, t`Advanced Property Assignment`),
 		el("p").append(T`
@@ -122,7 +121,7 @@ export function page({ pkg, info }){
 				el("dd").append(T`Pass ${el("code", "undefined")} to remove a property or attribute`)
 			)
 		),
-		el(example, { src: fileURL("./components/examples/elements/dekaAssign.js"), page_id }),
+		el(example, { src: fileURL("./components/examples/elements/dekaAssign.js") }),
 
 		el("div", { className: "note" }).append(
 			el("p").append(T`
@@ -142,11 +141,11 @@ export function page({ pkg, info }){
 			el("div", { className: "comparison" }).append(
 				el("div", { className: "bad-practice" }).append(
 					el("h5", t`❌ Native DOM API`),
-					el(code, { src: fileURL("./components/examples/elements/native-dom-tree.js"), page_id })
+					el(code, { src: fileURL("./components/examples/elements/native-dom-tree.js") })
 				),
 				el("div", { className: "good-practice" }).append(
 					el("h5", t`✅ dd<el> Approach`),
-					el(code, { src: fileURL("./components/examples/elements/dde-dom-tree.js"), page_id })
+					el(code, { src: fileURL("./components/examples/elements/dde-dom-tree.js") })
 				)
 			)
 		),
@@ -154,14 +153,14 @@ export function page({ pkg, info }){
 			This chainable pattern is much cleaner and easier to follow, especially for deeply nested elements.
 			It also makes it simple to add multiple children to a parent element in a single fluent expression.
 		`),
-		el(example, { src: fileURL("./components/examples/elements/dekaAppend.js"), page_id }),
+		el(example, { src: fileURL("./components/examples/elements/dekaAppend.js") }),
 
 		el(h3, t`Using Components to Build UI Fragments`),
 		el("p").append(T`
 			The ${el("code", "el")} function is overloaded to support both tag names and function components.
 			This lets you refactor complex UI trees into reusable pieces:
 		`),
-		el(example, { src: fileURL("./components/examples/elements/dekaBasicComponent.js"), page_id }),
+		el(example, { src: fileURL("./components/examples/elements/dekaBasicComponent.js") }),
 		el("p").append(T`
 			Component functions receive the properties object as their first argument, just like regular elements.
 			This makes it easy to pass data down to components and create reusable UI fragments.
@@ -185,9 +184,9 @@ export function page({ pkg, info }){
 			function which corresponds to the native ${el("a", references.mdn_ns).append(el("code",
 				"document.createElementNS"))}:
 		`),
-		el(example, { src: fileURL("./components/examples/elements/dekaElNS.js"), page_id }),
+		el(example, { src: fileURL("./components/examples/elements/dekaElNS.js") }),
 		el("p").append(T`
-			This function returns a namespace-specific element creator, allowing you to work with any element type
+			This function returns a namespace-specific element creator, allowing you to work with any element type
 			using the same consistent interface.
 		`),
 

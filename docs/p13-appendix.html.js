@@ -40,7 +40,6 @@ const references= {
 
 /** @param {import("./types.d.ts").PageAttrs} attrs */
 export function page({ pkg, info }){
-	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
 		el("p").append(T`
 			This reference guide provides a comprehensive summary of dd<el>’s key concepts, best practices,
@@ -166,7 +165,7 @@ export function page({ pkg, info }){
 					className: S(() => countS.get() > 10 ? 'warning' : '')
 				})
 			);
-		`, page_id }),
+		`, language: "js" }),
 
 		el(h3, t`Key Concepts Reference`),
 
