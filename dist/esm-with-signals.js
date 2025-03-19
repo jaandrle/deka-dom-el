@@ -886,9 +886,10 @@ var signals_config = {
 function removeSignalsFromElements(s, listener, ...notes) {
 	const { current } = scope;
 	current.host(function(element) {
-		if (!element[key_reactive]) element[key_reactive] = [];
+		const is_first = !element[key_reactive];
+		if (is_first) element[key_reactive] = [];
 		element[key_reactive].push([[s, listener], ...notes]);
-		if (current.prevent) return;
+		if (!is_first || current.prevent) return;
 		on.disconnected(
 			() => (
 				/*! Clears all Signals listeners added in the current scope/host (`S.el`, `assign`, …?).
