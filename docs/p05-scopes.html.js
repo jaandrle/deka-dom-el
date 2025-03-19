@@ -27,14 +27,13 @@ const references= {
 };
 /** @param {import("./types.d.ts").PageAttrs} attrs */
 export function page({ pkg, info }){
-	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
 		el("p").append(T`
 			For state-less components we can use functions as UI components (see “Elements” page). But in real life,
 			we may need to handle the component’s life-cycle and provide JavaScript the way to properly use
 			the ${el("a", { textContent: t`Garbage collection`, ...references.garbage_collection })}.
 		`),
-		el(code, { src: fileURL("./components/examples/scopes/intro.js"), page_id }),
+		el(code, { src: fileURL("./components/examples/scopes/intro.js") }),
 		el("p").append(T`The library therefore uses ${el("em", t`scopes`)} to provide these functionalities.`),
 
 		el(h3, t`Understanding Host Elements and Scopes`),
@@ -83,7 +82,7 @@ export function page({ pkg, info }){
 				el("dd", t`Applies the addons to the host element (and returns the host element)`)
 			)
 		),
-		el(example, { src: fileURL("./components/examples/scopes/scopes-and-hosts.js"), page_id }),
+		el(example, { src: fileURL("./components/examples/scopes/scopes-and-hosts.js") }),
 
 		el("div", { className: "tip" }).append(
 			el("p").append(T`
@@ -95,7 +94,7 @@ export function page({ pkg, info }){
 				If you are interested in the implementation details, see Class-Based Components section.
 			`)
 		),
-		el(code, { src: fileURL("./components/examples/scopes/good-practise.js"), page_id }),
+		el(code, { src: fileURL("./components/examples/scopes/good-practise.js") }),
 
 		el(h3, t`Class-Based Components`),
 		el("p").append(T`
@@ -103,7 +102,7 @@ export function page({ pkg, info }){
 			For this, we implement function ${el("code", "elClass")} and use it to demonstrate implementation details
 			for better understanding of the scope logic.
 		`),
-		el(example, { src: fileURL("./components/examples/scopes/class-component.js"), page_id }),
+		el(example, { src: fileURL("./components/examples/scopes/class-component.js") }),
 
 		el(h3, t`Automatic Cleanup with Scopes`),
 		el("p").append(T`
@@ -123,7 +122,7 @@ export function page({ pkg, info }){
 					- Custom cleanup code (dd<el> and user)
 			` })
 		),
-		el(example, { src: fileURL("./components/examples/scopes/cleaning.js"), page_id }),
+		el(example, { src: fileURL("./components/examples/scopes/cleaning.js") }),
 
 		el("div", { className: "note" }).append(
 			el("p").append(T`
@@ -149,17 +148,17 @@ export function page({ pkg, info }){
 			el("div", { className: "tab", dataTab: "declarative" }).append(
 				el("h4", t`✅ Declarative Approach`),
 				el("p", t`Define what your UI should look like based on state:`),
-				el(code, { src: fileURL("./components/examples/scopes/declarative.js"), page_id })
+				el(code, { src: fileURL("./components/examples/scopes/declarative.js") })
 			),
 			el("div", { className: "tab", dataTab: "imperative" }).append(
 				el("h4", t`⚠️ Imperative Approach`),
 				el("p", t`Manually update the DOM in response to events:`),
-				el(code, { src: fileURL("./components/examples/scopes/imperative.js"), page_id })
+				el(code, { src: fileURL("./components/examples/scopes/imperative.js") })
 			),
 			el("div", { className: "tab", dataTab: "mixed" }).append(
 				el("h4", t`❌ Mixed Approach`),
 				el("p", t`This approach should be avoided:`),
-				el(code, { src: fileURL("./components/examples/scopes/mixed.js"), page_id })
+				el(code, { src: fileURL("./components/examples/scopes/mixed.js") })
 			)
 		),
 

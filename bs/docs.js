@@ -2,7 +2,7 @@
 /* jshint esversion: 11,-W097, -W040, module: true, node: true, expr: true, undef: true *//* global echo, $, pipe, s, fetch, cyclicLoop */// editorconfig-checker-disable-line
 echo("Building static documentation files…");
 echo("Preparing…");
-import { path_target, pages as pages_registered, styles, dispatchEvent, t } from "../docs/ssr.js";
+import { path_target, pages as pages_registered, styles, currentPageId, dispatchEvent, t } from "../docs/ssr.js";
 import { createHTMl } from "./docs/jsdom.js";
 import { register, queue } from "../jsdom.js";
 const pkg= s.cat("package.json").xargs(JSON.parse);
@@ -28,6 +28,7 @@ for(const { id, info } of pages){
 	);
 	const { el }= await register(serverDOM.dom);
 	const { page }= await import(`../docs/${id}.html.js`);
+	currentPageId(id)
 	serverDOM.document.body.append(
 		el(page, { pkg, info }),
 	);

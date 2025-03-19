@@ -1,4 +1,4 @@
-import { styles } from "../ssr.js";
+import { styles, page_id } from "../ssr.js";
 
 styles.css`
 #library-url-form {
@@ -74,7 +74,7 @@ styles.css`
 import { el } from "deka-dom-el";
 import { ireland } from "./ireland.html.js";
 
-export function getLibraryUrl({ page_id }){
+export function getLibraryUrl(){
 	return el(ireland, {
 		src: new URL("./getLibraryUrl.js.js", import.meta.url),
 		exportName: "getLibraryUrl",

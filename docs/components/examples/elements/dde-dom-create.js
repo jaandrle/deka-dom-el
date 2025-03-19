@@ -4,7 +4,7 @@ import { el } from "deka-dom-el";
 const button = el("button", {
 	textContent: "Click me",
 	className: "primary",
-	disabled: true
+	disabled: true,
 });
 
 // Shorter and more expressive

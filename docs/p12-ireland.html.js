@@ -15,7 +15,6 @@ const fileURL= url=> new URL(url, import.meta.url);
 
 /** @param {import("./types.js").PageAttrs} attrs */
 export function page({ pkg, info }){
-	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
 		el("div", { className: "warning" }).append(
 			el("p").append(T`
@@ -66,7 +65,7 @@ export function page({ pkg, info }){
 				src: fileURL("./components/examples/path/to/component.js"),
 				exportName: "NamedExport", // optional, defaults to "default",
 			})
-		`, page_id }),
+		`, language: "js" }),
 
 		el("p").append(T`
 			During the build process (${el("code", "bs/docs.js")}), the following happens:
@@ -118,7 +117,7 @@ export function page({ pkg, info }){
 
 			// Final build step - trigger SSR end event
 			dispatchEvent("onssrend");
-		`, page_id }),
+		`, language: "js" }),
 		el("h4", t`File Registration`),
 		el(code, { content: `
 			// From docs/ssr.js - File registration system
@@ -144,7 +143,7 @@ export function page({ pkg, info }){
 				head[head instanceof HTMLScriptElement ? "src" : "href"] = file_name;
 				document.head.append(head);
 			}
-		`, page_id }),
+		`, language: "js" }),
 		el("h4", t`Server-Side Rendering`),
 		el(code, { content: `
 			// From docs/components/ireland.html.js - Server-side component implementation
@@ -225,7 +224,7 @@ export function page({ pkg, info }){
 					\`.trim())
 				);
 			}
-		`, page_id }),
+		`, language: "js" }),
 		el("h4", t`Client-Side Hydration`),
 		el(code, { content: `
 			// From docs/components/ireland.js.js - Client-side hydration
@@ -249,7 +248,7 @@ export function page({ pkg, info }){
 				});
 				});
 			}
-		`, page_id }),
+		`, language: "js" }),
 
 		el(h3, t`Live Example`),
 			el("p").append(T`
@@ -258,14 +257,10 @@ export function page({ pkg, info }){
 				rendered with the Ireland component system:
 			`),
 
-			el(code, {
-				src: fileURL("./components/examples/ireland-test/counter.js"),
-				page_id
-			}),
+			el(code, { src: fileURL("./components/examples/ireland-test/counter.js") }),
 			el(ireland, {
 				src: fileURL("./components/examples/ireland-test/counter.js"),
 				exportName: "CounterStandard",
-				page_id
 			}),
 
 			el("p").append(T`

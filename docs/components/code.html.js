@@ -1,4 +1,4 @@
-import { registerClientFile, styles } from "../ssr.js";
+import { page_id, registerClientFile, styles } from "../ssr.js";
 const host= "."+code.name;
 styles.css`
 /* Code block styling */
@@ -178,21 +178,26 @@ ${host}:hover .copy-button {
 `;
 import { el } from "deka-dom-el";
 /**
+ * @typedef {"js"|"ts"|"html"|"css"|"shell"|"-"} Language
+ * */
+/**
  * Prints code to the page and registers flems to make it interactive.
  * @param {object} attrs
  * @param {string} [attrs.id]
  * @param {string} [attrs.className]
  * @param {URL} [attrs.src] Example code file path
  * @param {string} [attrs.content] Example code
- * @param {"js"|"ts"|"html"|"css"|"shell"} [attrs.language="js"] Language of the code
- * @param {string} [attrs.page_id] ID of the page, if setted it registers shiki
+ * @param {Language} [attrs.language="-s"] Language of the code
  * */
-export function code({ id, src, content, language= "js", className= host.slice(1), page_id }){
-	if(src) content= s.cat(src);
+export function code({ id, src, content, language= "-", className= host.slice(1) }){
+	if(src){
+		content= s.cat(src);
+		if(language=== "-") language= /** @type {Language} */(src.pathname.split(".").pop());
+	}
 	content= normalizeIndentation(content);
 	let dataJS;
-	if(page_id){
-		registerClientPart(page_id);
+	if(language!== "-"){
+		registerClientPart();
 		dataJS= "todo";
 	}
 	return el("div", { id, className, dataJS, tabIndex: 0 }).append(
@@ -204,8 +209,7 @@ export function pre({ content }){
 	return el("pre").append(el("code", content.trim()));
 }
 let is_registered= {};
-/** @param {string} page_id */
-function registerClientPart(page_id){
+function registerClientPart(){
 	if(is_registered[page_id]) return;
 
 	// Add Shiki with a more reliable loading method

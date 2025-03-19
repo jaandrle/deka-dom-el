@@ -13,7 +13,6 @@ import { converter } from "./components/converter.html.js";
 
 /** @param {import("./types.d.ts").PageAttrs} attrs */
 export function page({ pkg, info }){
-	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
 		el("p").append(T`
 			Transitioning from HTML to dd<el> is simple with our interactive converter. This tool helps you quickly
@@ -28,7 +27,7 @@ export function page({ pkg, info }){
 		),
 
 		// The actual converter component
-		el(converter, { page_id }),
+		el(converter),
 
 		el(h3, t`Next Steps`),
 		el("p").append(T`

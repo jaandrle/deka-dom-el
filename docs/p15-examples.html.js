@@ -14,7 +14,6 @@ const fileURL= url=> new URL(url, import.meta.url);
 
 /** @param {import("./types.d.ts").PageAttrs} attrs */
 export function page({ pkg, info }){
-	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
 		el("p").append(T`
 			Real-world application examples showcasing how to build complete, production-ready interfaces with dd<el>:
@@ -25,14 +24,14 @@ export function page({ pkg, info }){
 			third-party charting library, data fetching and state management, responsive layout design, and multiple
 			interactive components working together.
 		`),
-		el(example, { src: fileURL("./components/examples/case-studies/data-dashboard.js"), variant: "big", page_id }),
+		el(example, { src: fileURL("./components/examples/case-studies/data-dashboard.js"), variant: "big" }),
 
 		el(h3, t`Interactive Form`),
 		el("p").append(T`
 			Complete form with real-time validation, conditional rendering, and responsive design. Form handling with
 			real-time validation, reactive UI updates, complex form state management, and clean separation of concerns.
 		`),
-		el(example, { src: fileURL("./components/examples/case-studies/interactive-form.js"), variant: "big", page_id }),
+		el(example, { src: fileURL("./components/examples/case-studies/interactive-form.js"), variant: "big" }),
 
 
 		el(h3, t`Interactive Image Gallery`),
@@ -40,7 +39,7 @@ export function page({ pkg, info }){
 			Responsive image gallery with lightbox, keyboard navigation, and filtering. Dynamic loading of content,
 			lightbox functionality, animation handling, and keyboard and gesture navigation support.
 		`),
-		el(example, { src: fileURL("./components/examples/case-studies/image-gallery.js"), variant: "big", page_id }),
+		el(example, { src: fileURL("./components/examples/case-studies/image-gallery.js"), variant: "big" }),
 
 
 		el(h3, t`Task Manager`),
@@ -49,7 +48,7 @@ export function page({ pkg, info }){
 			with signals, drag and drop functionality, local storage persistence, and responsive design for different
 			devices.
 		`),
-		el(example, { src: fileURL("./components/examples/case-studies/task-manager.js"), variant: "big", page_id }),
+		el(example, { src: fileURL("./components/examples/case-studies/task-manager.js"), variant: "big" }),
 
 
 		el(h3, t`TodoMVC`),

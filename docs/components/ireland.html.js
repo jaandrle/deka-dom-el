@@ -43,7 +43,6 @@ const componentsRegistry = new Map();
  * @param {object} attrs
  * @param {URL} attrs.src - Path to the file containing the component
  * @param {string} [attrs.exportName="default"] - Name of the export to use
- * @param {string} attrs.page_id - ID of the current page
  * @param {object} [attrs.props={}] - Props to pass to the component
  */
 export function ireland({ src, exportName = "default", props = {} }) {

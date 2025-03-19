@@ -14,7 +14,6 @@ const fileURL= url=> new URL(url, import.meta.url);
 
 /** @param {import("./types.js").PageAttrs} attrs */
 export function page({ pkg, info }){
-	const page_id= info.id;
 	return el(simplePage, { info, pkg }).append(
 		el("p").append(T`
 			dd<el> is designed with extensibility in mind. This page covers how to separate
@@ -49,7 +48,7 @@ export function page({ pkg, info }){
 
 			// Using an addon
 			el("div", { id: "example" }, myAddon({ option: "value" }));
-		`, page_id }),
+		`, language: "js" }),
 
 		el(h3, t`Resource Cleanup with Abort Signals`),
 		el("p").append(T`
@@ -83,7 +82,7 @@ export function page({ pkg, info }){
 				const { signal }= scope;
 				return el("div", null, externalLibraryAddon({ option: "value" }, signal));
 			}
-		`, page_id }),
+		`, language: "js" }),
 
 		el(h3, t`Building Library-Independent Extensions`),
 		el("p").append(T`
@@ -104,7 +103,7 @@ export function page({ pkg, info }){
 								});
 							};
 						}
-					`, page_id })
+					`, language: "js" })
 				),
 				el("div", { className: "tab" }).append(
 					el("h5", t`⚠️ Library-Dependent`),
@@ -118,7 +117,7 @@ export function page({ pkg, info }){
 								})(element);
 							};
 						}
-					`, page_id })
+					`, language: "js" })
 				)
 			)
 		),
@@ -177,7 +176,7 @@ export function page({ pkg, info }){
 					textContent: "All"
 				})
 			);
-		`, page_id }),
+		`, language: "js" }),
 
 		el("div", { className: "callout" }).append(
 			el("h4", t`Benefits of Signal Factories`),
@@ -217,7 +216,7 @@ export function page({ pkg, info }){
 			const counter = createEnhancedSignal(0);
 			el("button", { textContent: "Increment", onclick: () => counter.increment() });
 			el("div", S.text\`Count: \${counter}\`);
-		`, page_id }),
+		`, language: "js" }),
 
 		el("div", { className: "tip" }).append(
 			el("p").append(T`
@@ -259,7 +258,7 @@ export function page({ pkg, info }){
 			// Update signal value
 			count.set(5); // Logs: 5
 			console.log(doubled.get()); // 10
-		`, page_id }),
+		`, language: "js" }),
 		el("p").append(T`
 			The independent signals API includes all core functionality (${el("code", "S()")}, ${el("code", "S.on()")},
 			${el("code", "S.action()")}).

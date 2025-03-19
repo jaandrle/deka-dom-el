@@ -1,17 +1,18 @@
+<img src="docs/assets/logo.svg" alt="Deka DOM Elements Logo"
+style="
+	float: inline-start;
+	margin-inline-end: 20px;
+	aspect-ratio: 1;
+	height: 75px;
+	height: 2.5lh;
+">
 **Alpha**
-| [source code on GitHub](https://github.com/jaandrle/deka-dom-el)
-| [*mirrored* on Gitea](https://gitea.jaandrle.cz/jaandrle/deka-dom-el)
-| [npm package](https://www.npmjs.com/package/deka-dom-el)
-
-<p align="center">
-	<img src="docs/assets/logo.svg" alt="Deka DOM Elements Logo" width="180" height="180">
-</p>
-
-# Deka DOM Elements (dd\<el\> or DDE)
+| [Docs](https://jaandrle.github.io/deka-dom-el "Official documentation and guide site")
+| [NPM](https://www.npmjs.com/package/deka-dom-el "Official NPM package page")
+| [GitHub](https://github.com/jaandrle/deka-dom-el "Official GitHub repository")
+([*Gitea*](https://gitea.jaandrle.cz/jaandrle/deka-dom-el "GitHub repository mirror on my own Gitea instance"))
 
 ***Vanilla for flavouring — a full-fledged feast for large projects***
-
-*…use simple DOM API by default and library tools and logic when you need them*
 
 ```javascript
 // 🌟 Reactive component with clear separation of concerns
@@ -20,25 +21,23 @@ document.body.append(
 );
 
 function EmojiCounter({ initial }) {
-	// ✨ State - Define reactive data
+	// ✨ - Define reactive data
 	const count = S(0);
 	const emoji = S(initial);
+	const textContent = S(() => `Hello World ${emoji.get().repeat(count.get())}`);
 
-	// 🔄 View - UI updates automatically when signals change
+	// 🔄 - UI updates automatically when signals change
 	return el().append(
-		el("p", {
-			className: "output",
-			textContent: S(() =>
-				`Hello World ${emoji.get().repeat(count.get())}`),
-		}),
+		el("p", { textContent, className: "output" }),
 
-		// 🎮 Controls - Update state on events
+		// 🎮 - Update state on events
 		el("button", { textContent: "Add Emoji" },
-			on("click", () => count.set(count.get() + 1))
+			on("click", () => count.set(count.get() + 1)),
 		),
 
-		el("select", null, on.defer(el=> el.value= initial),
-			on("change", e => emoji.set(e.target.value))
+		el("select", null,
+			on.defer(el=> el.value= initial),
+			on("change", e => emoji.set(e.target.value)),
 		).append(
 			el(Option, "🎉"),
 			el(Option, "🚀"),
@@ -50,6 +49,9 @@ function Option({ textContent }){
 	return el("option", { value: textContent, textContent });
 }
 ```
+*…use simple DOM API by default and library tools and logic when you need them*
+
+# Deka DOM Elements (dd\<el\> or DDE)
 
 Creating reactive elements, components, and Web Components using the native
 [IDL](https://developer.mozilla.org/en-US/docs/Glossary/IDL)/JavaScript DOM API enhanced with
@@ -61,11 +63,12 @@ Creating reactive elements, components, and Web Components using the native
 - ☑️ **Lightweight** — ~10-15kB minified (original goal 10kB) with **zero**/minimal dependencies
 - ✅ **Declarative & functional approach** for clean, maintainable code
 - ✅ **Signals and events** for reactive UI
+- ✅ **Auto-releasing resources** for memory management but nice development experience
 - ✅ **Memoization for performance** — optimize rendering with intelligent caching
-- ✅ **Optional build-in signals** with support for custom reactive implementations (#39)
-- ✅ **Server-side rendering** support via [jsdom](https://github.com/jsdom/jsdom)
+- ☑️ **Optional build-in signals** with support for custom reactive implementations (#39)
+- ☑️ **Server-side rendering** support via [jsdom](https://github.com/jsdom/jsdom)
 - ✅ **TypeScript support**
-- ☑️ **Support for debugging with browser DevTools** without extensions
+- ✅ **Support for debugging with browser DevTools** without extensions
 - ☑️ **Enhanced Web Components** support
 
 ## Getting Started
@@ -138,9 +141,9 @@ get started, coding standards, commit guidelines, and the pull request process.
 	interfaces or HTML code.
 - [pota](https://pota.quack.uy/) — small and pluggable Reactive Web Renderer. It's compiler-less, includes an html
 	function, and a optimized babel preset in case you fancy JSX.
-- [jaandrle/dollar_dom_component](https://github.com/jaandrle/dollar_dom_component) —
-	Functional DOM components without JSX/virtual DOM
 - [TarekRaafat/eleva](https://github.com/TarekRaafat/eleva) — A minimalist, lightweight, pure vanilla JavaScript
 	frontend runtime framework.
 - [didi/mpx](https://github.com/didi/mpx) — Mpx，一款具有优秀开发体验和深度性能优化的增强型跨端小程序框架
 - [mxjp/rvx](https://github.com/mxjp/rvx) — A signal based frontend framework
+- [jaandrle/dollar_dom_component](https://github.com/jaandrle/dollar_dom_component) —
+	Functional DOM components without JSX/virtual DOM (my old library)
