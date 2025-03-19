@@ -75,11 +75,14 @@ where everyone feels comfortable participating.
 
 …see [BS folder](./bs/README.md) for more info.
 
+## Categorizing [![git3moji](https://img.shields.io/badge/git3moji%E2%80%93v1-%E2%9A%A1%EF%B8%8F%F0%9F%90%9B%F0%9F%93%BA%F0%9F%91%AE%F0%9F%94%A4-fffad8.svg?style=flat-square)](https://robinpokorny.github.io/git3moji/) <!-- editorconfig-checker-disable-line -->
+We use [git3moji](https://git3moji.netlify.app/) for commit messages, issue titles, pull request titles and in other
+areas. To make categorizing quick and consistent.
+
 ## Commit Guidelines
 
-We use
-[![git3moji](https://img.shields.io/badge/git3moji%E2%80%93v1-%E2%9A%A1%EF%B8%8F%F0%9F%90%9B%F0%9F%93%BA%F0%9F%91%AE%F0%9F%94%A4-fffad8.svg?style=flat-square)](https://robinpokorny.github.io/git3moji/) <!-- editorconfig-checker-disable-line -->
-for commit messages. This helps keep the commit history clear and consistent.
+We use [git3moji](https://git3moji.netlify.app/) for commit messages. This helps keep the commit history clear and
+consistent.
 
 ```
 :emoji: Short summary of the change

@@ -69,10 +69,11 @@ Creating reactive elements, components, and Web Components using the native
 
 ## Getting Started
 
-### Documentation
+### Quick Links
 
 - [**Documentation and Guide**](https://jaandrle.github.io/deka-dom-el)
 - [**Examples**](https://jaandrle.github.io/deka-dom-el/p15-examples.html)
+- [**Changelog**](https://github.com/jaandrle/deka-dom-el/releases)
 
 ### Installation
 
