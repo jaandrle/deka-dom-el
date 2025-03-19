@@ -1,11 +1,3 @@
-<img src="docs/assets/logo.svg" alt="Deka DOM Elements Logo"
-style="
-	float: inline-start;
-	margin-inline-end: 20px;
-	aspect-ratio: 1;
-	height: 75px;
-	height: 2.5lh;
-">
 **Alpha**
 | [Docs](https://jaandrle.github.io/deka-dom-el "Official documentation and guide site")
 | [NPM](https://www.npmjs.com/package/deka-dom-el "Official NPM package page")
@@ -50,6 +42,10 @@ function Option({ textContent }){
 }
 ```
 *…use simple DOM API by default and library tools and logic when you need them*
+
+<p align="center">
+	<img src="docs/assets/logo.svg" alt="Deka DOM Elements Logo" width="180" height="180">
+</p>
 
 # Deka DOM Elements (dd\<el\> or DDE)
 
