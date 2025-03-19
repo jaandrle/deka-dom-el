@@ -77,11 +77,11 @@ export function page({ pkg, info }){
 			signal objects. It contains the following information:
 		`),
 		el("ul").append(
+			// TODO: value?
 			el("li", t`listeners: A Set of functions called when the signal value changes`),
 			el("li", t`actions: Custom actions that can be performed on the signal`),
 			el("li", t`onclear: Functions to run when the signal is cleared`),
 			el("li", t`host: Reference to the host element/scope in which the signal was created`),
-			el("li", t`readonly: Boolean flag indicating if the signal is read-only`)
 		),
 		el("p").append(T`
 			…to determine the current value of the signal, call ${el("code", "signal.valueOf()")}. Don’t hesitate to

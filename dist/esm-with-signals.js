@@ -696,12 +696,9 @@ var queueSignalWrite = /* @__PURE__ */ (() => {
 })();
 
 // src/signals-lib/signals-lib.js
-var Signal = oCreate(null, {
+var SignalReadOnly = oCreate(null, {
 	get: { value() {
 		return read(this);
-	} },
-	set: { value(...v) {
-		return write(this, ...v);
 	} },
 	toJSON: { value() {
 		return read(this);
@@ -710,9 +707,9 @@ var Signal = oCreate(null, {
 		return this[mark] && this[mark].value;
 	} }
 });
-var SignalReadOnly = oCreate(Signal, {
-	set: { value() {
-		return;
+var Signal = oCreate(SignalReadOnly, {
+	set: { value(...v) {
+		return write(this, ...v);
 	} }
 });
 function isSignal(candidate) {
@@ -906,7 +903,7 @@ var cleanUpRegistry = new FinalizationRegistry(function(s) {
 });
 function create(is_readonly, value, actions) {
 	const varS = oCreate(is_readonly ? SignalReadOnly : Signal);
-	const SI = toSignal(varS, value, actions, is_readonly);
+	const SI = toSignal(varS, value, actions);
 	cleanUpRegistry.register(SI, SI[mark]);
 	return SI;
 }
@@ -918,7 +915,7 @@ var protoSigal = oAssign(oCreate(), {
 		this.skip = true;
 	}
 });
-function toSignal(s, value, actions, readonly = false) {
+function toSignal(s, value, actions) {
 	const onclear = [];
 	if (typeOf(actions) !== "[object Object]")
 		actions = {};
@@ -934,8 +931,7 @@ function toSignal(s, value, actions, readonly = false) {
 			actions,
 			onclear,
 			host,
-			listeners: /* @__PURE__ */ new Set(),
-			readonly
+			listeners: /* @__PURE__ */ new Set()
 		}),
 		enumerable: false,
 		writable: false,

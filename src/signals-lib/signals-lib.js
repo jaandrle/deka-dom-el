@@ -2,14 +2,13 @@ import { queueSignalWrite, mark } from "./helpers.js";
 export { mark };
 import { hasOwn, oCreate, oAssign, requestIdle } from "../helpers.js";
 
-const Signal = oCreate(null, {
+const SignalReadOnly= oCreate(null, {
 	get: { value(){ return read(this); } },
-	set: { value(...v){ return write(this, ...v); } },
 	toJSON: { value(){ return read(this); } },
 	valueOf: { value(){ return this[mark] && this[mark].value; } }
 });
-const SignalReadOnly= oCreate(Signal, {
-	set: { value(){ return; } },
+const Signal = oCreate(SignalReadOnly, {
+	set: { value(...v){ return write(this, ...v); } },
 });
 /**
  * Checks if a value is a signal
@@ -344,7 +343,7 @@ const cleanUpRegistry = new FinalizationRegistry(function(s){
  */
 function create(is_readonly, value, actions){
 	const varS = oCreate(is_readonly ? SignalReadOnly : Signal);
-	const SI= toSignal(varS, value, actions, is_readonly);
+	const SI= toSignal(varS, value, actions);
 	cleanUpRegistry.register(SI, SI[mark]);
 	return SI;
 }
@@ -367,11 +366,10 @@ const protoSigal= oAssign(oCreate(), {
  * @param {Object} s - Object to transform
  * @param {any} value - Initial value
  * @param {Object} actions - Custom actions
- * @param {boolean} [readonly=false] - Whether the signal is readonly
  * @returns {Object} Signal object with get() and set() methods
  * @private
  */
-function toSignal(s, value, actions, readonly= false){
+function toSignal(s, value, actions){
 	const onclear= [];
 	if(typeOf(actions)!=="[object Object]")
 		actions= {};
@@ -385,7 +383,6 @@ function toSignal(s, value, actions, readonly= false){
 		value: oAssign(oCreate(protoSigal), {
 			value, actions, onclear, host,
 			listeners: new Set(),
-			readonly
 		}),
 		enumerable: false,
 		writable: false,
