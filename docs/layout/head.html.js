@@ -151,7 +151,7 @@ export function header({ info: { href, title, description }, pkg }){
 				),
 				el("span", {
 					className: "version-badge",
-					"aria-label": "Version",
+					ariaLabel: "Version",
 					textContent: pkg.version || ""
 				})
 			),
@@ -165,13 +165,13 @@ export function header({ info: { href, title, description }, pkg }){
 function nav({ href, pkg }){
 	return el("nav", {
 		role: "navigation",
-		"aria-label": "Main navigation",
+		ariaLabel: "Main navigation",
 		className: nav.name
 	}).append(
 		el("a", {
 			href: pkg.homepage,
 			className: "github-link",
-			"aria-label": "View on GitHub",
+			ariaLabel: "View on GitHub",
 			target: "_blank",
 			rel: "noopener noreferrer",
 		}).append(
@@ -185,11 +185,11 @@ function nav({ href, pkg }){
 			return el("a", {
 				href: isIndex ? "./" : p.href,
 				title: p.description || `Go to ${p.title}`,
-				"aria-current": isCurrent ? "page" : null,
+				ariaCurrent: isCurrent ? "page" : null,
 			}).append(
 				el("span", {
 					className: "nav-number",
-					"aria-hidden": "true",
+					ariaHidden: "true",
 					textContent: `${i+1}. `
 				}),
 				p.title

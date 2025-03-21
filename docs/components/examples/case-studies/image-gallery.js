@@ -152,17 +152,17 @@ export function ImageGallery(images= imagesSample) {
 					}).append(
 						el("button", {
 							className: "lightbox-close-btn",
-							"aria-label": "Close lightbox"
+							ariaLabel: "Close lightbox"
 						}, on("click", closeLightbox)).append("×"),
 
 						el("button", {
 							className: "lightbox-prev-btn",
-							"aria-label": "Previous image"
+							ariaLabel: "Previous image"
 						}, on("click", onPrevImage)).append("❮"),
 
 						el("button", {
 							className: "lightbox-next-btn",
-							"aria-label": "Next image"
+							ariaLabel: "Next image"
 						}, on("click", onNextImage)).append("❯"),
 
 						S.el(selectedImage, img => !img
