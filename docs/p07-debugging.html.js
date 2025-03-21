@@ -168,6 +168,22 @@ export function page({ pkg, info }){
 			el("li", t`name - The name of the component function`),
 			el("li", t`host - Indicates whether the host is "this" (for DocumentFragments) or "parentElement"`),
 		),
+		el("div", { className: "warning" }).append(
+			el("p").append(T`
+				There are edge case when the mark can be missing. For example, the (utility) components with reactive
+				keys such as ${el("code", ".textContent")}, ${el("code", ".innerText")} or ${el("code", ".innerHTML")}.
+				As they change the content of the host element.
+			`),
+			el(code, { content: `
+				function Counter() {
+					const count = S(0);
+					return el("button",
+						{ textContent: count, type: "button" },
+						on("click", () => count.set(count.get() + 1)),
+					);
+				}
+			`, language: "js" }),
+		),
 
 		el("h4", t`Identifying reactive elements in the DOM`),
 		el("p").append(T`
