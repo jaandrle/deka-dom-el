@@ -82,10 +82,10 @@ export function ImageGallery(images= imagesSample) {
 				closeLightbox();
 				break;
 			case 'ArrowLeft':
-				document.querySelector('.lightbox-prev-btn').click();
+				onPrevImage(e);
 				break;
 			case 'ArrowRight':
-				document.querySelector('.lightbox-next-btn').click();
+				onNextImage(e);
 				break;
 		}
 	}
@@ -126,12 +126,12 @@ export function ImageGallery(images= imagesSample) {
 						el("div", {
 							className: "gallery-item",
 							dataTag: image.alt.toLowerCase()
-						}).append(
+						}, onImageClick(image.id)).append(
 							el("img", {
 								src: image.src,
 								alt: image.alt,
 								loading: "lazy"
-							}, onImageClick(image.id)),
+							}),
 							el("div", { className: "gallery-item-caption" }).append(
 								el("h3", image.title),
 								el("p", image.alt)
@@ -146,41 +146,41 @@ export function ImageGallery(images= imagesSample) {
 		S.el(isLightboxOpen, open => !open
 			? el()
 			: el("div", { className: "lightbox-overlay" }, on("click", closeLightbox)).append(
-					el("div", {
-						className: "lightbox-content",
-						onClick: e => e.stopPropagation() // Prevent closing when clicking inside
-					}).append(
-						el("button", {
-							className: "lightbox-close-btn",
-							ariaLabel: "Close lightbox"
-						}, on("click", closeLightbox)).append("×"),
+				el("div", {
+					className: "lightbox-content",
+					onClick: e => e.stopPropagation() // Prevent closing when clicking inside
+				}).append(
+					el("button", {
+						className: "lightbox-close-btn",
+						ariaLabel: "Close lightbox",
+					}, on("click", closeLightbox)).append("×"),
 
-						el("button", {
-							className: "lightbox-prev-btn",
-							ariaLabel: "Previous image"
-						}, on("click", onPrevImage)).append("❮"),
+					el("button", {
+						className: "lightbox-prev-btn",
+						ariaLabel: "Previous image",
+					}, on("click", onPrevImage)).append("❮"),
 
-						el("button", {
-							className: "lightbox-next-btn",
-							ariaLabel: "Next image"
-						}, on("click", onNextImage)).append("❯"),
+					el("button", {
+						className: "lightbox-next-btn",
+						ariaLabel: "Next image",
+					}, on("click", onNextImage)).append("❯"),
 
-						S.el(selectedImage, img => !img
-							? el()
-							: el("div", { className: "lightbox-image-container" }).append(
-								el("img", {
-									src: img.src,
-									alt: img.alt,
-									className: "lightbox-image"
-								}),
-								el("div", { className: "lightbox-caption" }).append(
-									el("h2", img.title),
-									el("p", img.alt)
-								)
-							)
+					S.el(selectedImage, img => !img
+						? el()
+						: el("div", { className: "lightbox-image-container" }).append(
+							el("img", {
+								src: img.src,
+								alt: img.alt,
+								className: "lightbox-image",
+							}),
+							el("div", { className: "lightbox-caption" }).append(
+								el("h2", img.title),
+								el("p", img.alt),
+							),
 						)
-					)
-				)
+					),
+				),
+			),
 		),
 	);
 }
