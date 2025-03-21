@@ -1,9 +1,13 @@
-import { el, on } from "deka-dom-el";
+import { el, on, scope } from "deka-dom-el";
 import { S } from "deka-dom-el/signals";
 
 export function ProductCatalog() {
+	const { signal }= scope;
+
 	const itemsPerPage = 5;
-	const products = asyncSignal(S, fetchProducts, { initial: [], keepLast: true });
+	const products = asyncSignal(S,
+		fetchProducts,
+		{ initial: [], keepLast: true, signal });
 	const searchTerm = S("");
 	const handleSearch = (e) => searchTerm.set(e.target.value);
 	const sortOrder = S("default");
@@ -220,10 +224,14 @@ function simulateNetworkDelay(min = 300, max = 1200) {
  * @template T
  * @param {typeof S} S - Signal constructor
  * @param {(params: { signal: AbortSignal }) => Promise<T>} invoker - Async function to execute
- * @param {{ initial?: T, keepLast?: boolean }} options - Configuration options
+ * @param {{ initial?: T, keepLast?: boolean, signal?: AbortSignal }} options - Configuration options
  * @returns {Object} Status signals and control methods
  */
-export function asyncSignal(S, invoker, { initial, keepLast } = {}) {
+export function asyncSignal(S, invoker, { initial, keepLast, signal } = {}) {
+	/** @type {(s: AbortSignal) => AbortSignal} */
+	const anySignal = !signal || !AbortSignal.any // TODO: make better
+		? s=> s
+		: s=> AbortSignal.any([s, signal]);
 	// Status tracking signals
 	const status = S("pending");
 	const result = S(initial);
@@ -242,7 +250,7 @@ export function asyncSignal(S, invoker, { initial, keepLast } = {}) {
 
 		try {
 			const data = await invoker({
-				signal: controller.signal,
+				signal: anySignal(controller.signal),
 			});
 			if (!controller.signal.aborted) {
 				status.set("resolved");
