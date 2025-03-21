@@ -41,7 +41,12 @@ export function page({ pkg, info }){
 			el("h4", t`Key Benefits of dd<el>`),
 			el("ul").append(
 				el("li", t`No build step required — use directly in the browser`),
-				el("li", t`Lightweight core (~10–15kB minified) without unnecessary dependencies (0 at now 😇)`),
+				el("li", t`Minimalized footprint:`),
+				el("ul").append(
+					el("li", t`lightweight core (~10–15kB minified)`),
+					el("li", t`…without unnecessary dependencies (0 at now 😇)`),
+					el("li", t`auto-releasing resources with focus on performance and development experience`),
+				),
 				el("li", t`Natural DOM API — work with real DOM nodes, not abstractions`),
 				el("li", t`Built-in (but optional) reactivity with simplified but powerful signals system`),
 				el("li", t`Clean code organization with the 3PS pattern`)
