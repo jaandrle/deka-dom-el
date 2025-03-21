@@ -1,10 +1,10 @@
 {
 	"name": "deka-dom-el",
-	"version": "0.9.4-alpha",
+	"version": "0.9.5-alpha",
 	"description": "A low-code library that simplifies the creation of native DOM elements/components using small wrappers and tweaks.",
 	"author": "Jan Andrle <andrle.jan@centrum.cz>",
 	"license": "MIT",
-	"homepage": "https://jaandrle.github.io/deka-dom-el/",
+	"homepage": "https://github.com/jaandrle/deka-dom-el",
 	"repository": {
 		"type": "git",
 		"url": "git+ssh://git@github.com/jaandrle/deka-dom-el.git"
@@ -17,20 +17,20 @@
 	"type": "module",
 	"exports": {
 		".": {
-			"import": "./index.js",
-			"types": "./index.d.ts"
+			"types": "./index.d.ts",
+			"import": "./index.js"
 		},
 		"./signals": {
-			"import": "./signals.js",
-			"types": "./signals.d.ts"
+			"types": "./signals.d.ts",
+			"import": "./signals.js"
 		},
 		"./jsdom": {
-			"import": "./jsdom.js",
-			"types": "./jsdom.d.ts"
+			"types": "./jsdom.d.ts",
+			"import": "./jsdom.js"
 		},
 		"./src/signals-lib": {
-			"import": "./src/signals-lib/signals-lib.js",
-			"types": "./src/signals-lib/signals-lib.d.ts"
+			"types": "./src/signals-lib/signals-lib.d.ts",
+			"import": "./src/signals-lib/signals-lib.js"
 		}
 	},
 	"files": [
@@ -103,7 +103,8 @@
 		"esbuild": "~0.25",
 		"jsdom": "~26.0",
 		"jshint": "~2.13",
-		"nodejsscript": "^1.0.2",
+		"nodejsscript": "^1.0",
+		"publint": "^0.3",
 		"size-limit-node-esbuild": "~0.3"
 	}
 }

@@ -51,9 +51,9 @@ export function createElement(tag, attributes, ...addons){
 			const host= (...c)=> !c.length ? el_host :
 				(scoped===1 ? addons.unshift(...c) : c.forEach(c=> c(el_host)), undefined);
 			scope.push({ scope: tag, host });
-			el= tag(attributes || undefined);
-			const is_fragment= isInstance(el, env.F);
+			el= /** @type {Element} */(tag(attributes || undefined));
 			if(el.nodeName==="#comment") break;
+			const is_fragment= isInstance(el, env.F);
 			const el_mark= createElement.mark({
 				type: "component",
 				name: tag.name,

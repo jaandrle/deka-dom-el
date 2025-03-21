@@ -74,13 +74,11 @@ export function h3({ textContent, id }){
 		if(!id) id= "h-"+textContent.toLowerCase().replaceAll(/\s/g, "-").replaceAll(/[^a-z-]/g, "");
 		return el("h3", { id }).append(
 				el("a", {
-						className: "heading-anchor",
-						href: "#"+id,
-						textContent: "#",
-						title: `Link to this section: ${textContent}`,
-						"aria-label": `Link to section ${textContent}`
+					className: "heading-anchor",
+					href: "#"+id,
+					title: `Link to this section: ${textContent}`,
 				}),
-				" ",
+				"# ",
 				textContent,
 		);
 }

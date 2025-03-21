@@ -1,5 +1,5 @@
 **Alpha**
-| [Docs](https://jaandrle.github.io/deka-dom-el "Official documentation and guide site")
+| [Docs&Examples](https://jaandrle.github.io/deka-dom-el "Official documentation and guide site")
 | [NPM](https://www.npmjs.com/package/deka-dom-el "Official NPM package page")
 | [GitHub](https://github.com/jaandrle/deka-dom-el "Official GitHub repository")
 ([*Gitea*](https://gitea.jaandrle.cz/jaandrle/deka-dom-el "GitHub repository mirror on my own Gitea instance"))
@@ -9,7 +9,7 @@
 ```javascript
 // 🌟 Reactive component with clear separation of concerns
 document.body.append(
-	el(EmojiCounter, { initial: "🚀" })
+	el(EmojiCounter, { initial: "🚀" }),
 );
 
 function EmojiCounter({ initial }) {
@@ -34,7 +34,7 @@ function EmojiCounter({ initial }) {
 			el(Option, "🎉"),
 			el(Option, "🚀"),
 			el(Option, "💖"),
-		)
+		),
 	);
 }
 function Option({ textContent }){
@@ -56,10 +56,10 @@ Creating reactive elements, components, and Web Components using the native
 ## Features at a Glance
 
 - ✅ **No build step required** — use directly in browsers or Node.js
-- ☑️ **Lightweight** — ~10-15kB minified (original goal 10kB) with **zero**/minimal dependencies
-- ✅ **Declarative & functional approach** for clean, maintainable code
+- ✅ **Minimalized footprint** — ~10-15kB minified bundle (original goal 10kB), **zero**/minimal dependencies and
+	small in-memory size (auto-releasing resources as much as possible)
+- ✅ **Declarative & functional approach support** for clean, maintainable code
 - ✅ **Signals and events** for reactive UI
-- ✅ **Auto-releasing resources** for memory management but nice development experience
 - ✅ **Memoization for performance** — optimize rendering with intelligent caching
 - ☑️ **Optional build-in signals** with support for custom reactive implementations (#39)
 - ☑️ **Server-side rendering** support via [jsdom](https://github.com/jsdom/jsdom)
