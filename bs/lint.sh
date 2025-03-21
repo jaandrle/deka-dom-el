@@ -9,3 +9,4 @@ npx editorconfig-checker -format gcc ${additional}
 npx jshint index.js src ${additional}
 [ "$one" = 'vim' ] && exit 0
 npx size-limit
+npx publint

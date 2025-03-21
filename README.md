@@ -1,5 +1,5 @@
 **Alpha**
-| [Docs](https://jaandrle.github.io/deka-dom-el "Official documentation and guide site")
+| [Docs&Examples](https://jaandrle.github.io/deka-dom-el "Official documentation and guide site")
 | [NPM](https://www.npmjs.com/package/deka-dom-el "Official NPM package page")
 | [GitHub](https://github.com/jaandrle/deka-dom-el "Official GitHub repository")
 ([*Gitea*](https://gitea.jaandrle.cz/jaandrle/deka-dom-el "GitHub repository mirror on my own Gitea instance"))
