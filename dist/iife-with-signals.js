@@ -805,7 +805,7 @@ var DDE = (() => {
 	};
 	signal.symbols = {
 		//signal: mark,
-		onclear: Symbol.for("Signal.onclear")
+		onclear: /* @__PURE__ */ Symbol.for("Signal.onclear")
 	};
 	signal.clear = function(...signals2) {
 		for (const s of signals2) {
