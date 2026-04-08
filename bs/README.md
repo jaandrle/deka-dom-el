@@ -17,3 +17,12 @@ Lints size of the project, jshint. See configs:
 - `package.json`: key `size-limit`
 - `package.json`: key `jshintConfig`
 - `.editorconfig`
+
+### bs/npm/lint
+Linted projects’ npm dependencies.
+
+### bs/npm/update
+Updates projects’ npm dependencies.
+
+### bs/npm/install-audit
+Audits projects’ npm dependencies to be installed.
